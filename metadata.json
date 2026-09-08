@@ -1,0 +1,6 @@
+{
+  "name": "e-TAT - Sistem Tim Asesmen Terpadu",
+  "description": "Sistem terpadu koordinasi asesmen medis dan hukum, penugasan, sidang pleno, pengesahan rekomendasi, serta pemantauan tindak lanjut rehabilitasi dan perkara narkotika.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
