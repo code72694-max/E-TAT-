@@ -23,7 +23,11 @@ import {
   Info,
   Building2,
   AlertTriangle,
-  FileText
+  FileText,
+  Activity,
+  BadgeAlert,
+  UserCheck,
+  AlertOctagon
 } from 'lucide-react';
 
 interface AboutViewProps {
@@ -31,7 +35,7 @@ interface AboutViewProps {
   onNavigateToTab?: (tab: ActiveTab) => void;
 }
 
-type SectionTab = 'roadmap' | 'roles' | 'outputs' | 'regulasi';
+type SectionTab = 'roadmap' | 'roles' | 'outputs' | 'pengawasan' | 'regulasi';
 
 export const AboutView: React.FC<AboutViewProps> = ({
   currentUser,
@@ -168,6 +172,27 @@ export const AboutView: React.FC<AboutViewProps> = ({
       ],
       output: 'Tanda Terima Admisi Klien, Surat Rujukan Terpenuhi, & Berkas Perkara Lengkap P-21',
       statusResult: 'rekomendasi_terbit → selesai_tindak_lanjut'
+    },
+    {
+      step: 8,
+      title: 'Pengawasan Klien Pasca TAT (Aftercare & Kepatuhan RJ)',
+      timeframe: 'Masa Layanan Aktif (1 s/d 12 Bulan Sesuai Rekomendasi Pleno)',
+      actor: 'Konselor Rehab, Penyidik Pengawas Satresnarkoba, Bapas',
+      actorRole: 'rehabilitasi' as UserRole,
+      summary: 'Pemantauan terpadu kepatuhan wajib lapor, konseling psikososial, skrining periodik toksikologi urin (terjadwal & acak), serta penegakan sanksi peringatan SP-1/SP-2/SP-3.',
+      inputs: [
+        'Surat Rekomendasi Resmi TAT',
+        'Lembar Komitmen Rehabilitasi Terperiksa & Keluarga',
+        'Buku Jurnal Pengawasan Klien e-TAT'
+      ],
+      actions: [
+        'Pencatatan sesi konseling individu mingguan, terapi kelompok, dan absensi wajib lapor',
+        'Pemeriksaan skrining urin toksikologi berkala (5 parameter narkotika) terjadwal maupun uji acak mendadak',
+        'Penerbitan Surat Peringatan Klien (SP-1 awal, SP-2 keras, SP-3 pencabutan rekomendasi RJ) apabila klien mangkir',
+        'Penerbitan Surat Keterangan Selesai Program (SKSP) sebagai bukti tuntas untuk penghentian penuntutan permanen'
+      ],
+      output: 'Buku Catatan Pengawasan Digital, Log Hasil Tes Urin, SP Pelanggaran, & Surat Keterangan Selesai Program (SKSP)',
+      statusResult: 'selesai_tindak_lanjut → pengawasan (patuh / dalam_peringatan / selesai_program)'
     }
   ];
 
@@ -580,9 +605,9 @@ export const AboutView: React.FC<AboutViewProps> = ({
         {/* Quick Highlights Strip */}
         <div className="mt-6 pt-5 border-t border-slate-100 grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
           <div className="bg-slate-50/80 rounded-xl p-3 border border-slate-100">
-            <span className="text-2xl font-bold text-blue-700 block">7</span>
+            <span className="text-2xl font-bold text-blue-700 block">8</span>
             <span className="text-xs font-semibold text-slate-700">Tahap Alur Layanan</span>
-            <span className="text-[10px] text-slate-400 block mt-0.5">End-to-End Workflow</span>
+            <span className="text-[10px] text-slate-400 block mt-0.5">Termasuk Pasca TAT</span>
           </div>
           <div className="bg-slate-50/80 rounded-xl p-3 border border-slate-100">
             <span className="text-2xl font-bold text-emerald-700 block">8</span>
@@ -590,9 +615,9 @@ export const AboutView: React.FC<AboutViewProps> = ({
             <span className="text-[10px] text-slate-400 block mt-0.5">Hak Akses Tersegregasi</span>
           </div>
           <div className="bg-slate-50/80 rounded-xl p-3 border border-slate-100">
-            <span className="text-2xl font-bold text-purple-700 block">6</span>
+            <span className="text-2xl font-bold text-purple-700 block">8</span>
             <span className="text-xs font-semibold text-slate-700">Output Resmi</span>
-            <span className="text-[10px] text-slate-400 block mt-0.5">Dokumen & QR Valid</span>
+            <span className="text-[10px] text-slate-400 block mt-0.5">Dokumen, SP & SKSP</span>
           </div>
           <div className="bg-slate-50/80 rounded-xl p-3 border border-slate-100">
             <span className="text-2xl font-bold text-amber-700 block">6 Hari</span>
@@ -641,6 +666,19 @@ export const AboutView: React.FC<AboutViewProps> = ({
         >
           <Award className="w-4 h-4" />
           <span>Daftar Output & Dokumen Resmi</span>
+        </button>
+
+        <button
+          id="tab-about-pengawasan"
+          onClick={() => setActiveSection('pengawasan')}
+          className={`flex items-center space-x-2 px-4 py-2.5 text-xs font-semibold rounded-lg transition-all shrink-0 cursor-pointer ${
+            activeSection === 'pengawasan'
+              ? 'bg-blue-600 text-white shadow-xs'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+          }`}
+        >
+          <Activity className="w-4 h-4" />
+          <span>Mekanisme Pengawasan Klien Pasca TAT</span>
         </button>
 
         <button
@@ -1072,7 +1110,268 @@ export const AboutView: React.FC<AboutViewProps> = ({
         </div>
       )}
 
-      {/* SECTION 4: DASAR HUKUM & BATASAN SISTEM */}
+      {/* SECTION 4: MEKANISME PENGAWASAN KLIEN PASCA TAT (AFTERCARE & KEPATUHAN) */}
+      {activeSection === 'pengawasan' && (
+        <div className="space-y-6">
+          {/* Header Banner */}
+          <div className="bg-white border border-slate-200 rounded-xl p-6 space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200">
+              <div>
+                <h2 className="text-base sm:text-lg font-bold text-slate-900 flex items-center space-x-2">
+                  <Activity className="w-5 h-5 text-teal-600" />
+                  <span>Mekanisme Pengawasan Klien Pasca TAT (Aftercare & Kepatuhan Hukum)</span>
+                </h2>
+                <p className="text-xs text-slate-500 mt-1">
+                  Pedoman operasional pemantauan berkala tersangka yang direhabilitasi dalam kerangka Keadilan Restoratif (Restorative Justice) dan Diversi Anak.
+                </p>
+              </div>
+              <span className="self-start text-[11px] font-bold bg-teal-100 text-teal-800 border border-teal-300 px-3 py-1 rounded-full flex items-center space-x-1.5">
+                <ShieldCheck className="w-3.5 h-3.5 text-teal-700" />
+                <span>Zero Relapse & Kepatuhan Hukum</span>
+              </span>
+            </div>
+
+            {/* Konsep Filosofis */}
+            <div className="bg-teal-50/70 border border-teal-200 rounded-xl p-4 text-xs space-y-2 text-teal-900">
+              <span className="font-bold flex items-center space-x-1.5">
+                <Info className="w-4 h-4 text-teal-700" />
+                <span>Prinsip Kunci: Rekomendasi TAT Adalah Titik Awal Komitmen Pemulihan, Bukan Pembebasan Murni</span>
+              </span>
+              <p className="leading-relaxed text-teal-800">
+                Penyelesaian perkara melalui pendekatan Keadilan Restoratif (Perpol No. 08/2021 dan Perja No. 15/2020) menuntut kepatuhan nyata dari tersangka untuk menjalani pemulihan. Tanpa pengawasan terpadu antara <strong>Konselor Rehabilitasi</strong>, <strong>Penyidik Satresnarkoba</strong>, dan <strong>Bapas/Kejaksaan</strong>, hak keadilan restoratif rawan dimanipulasi atau ditinggalkan (drop out). Sistem e-TAT menyediakan <strong>Buku Catatan Pengawasan Digital</strong> guna mendokumentasikan setiap sesi dan hasil tes secara transparan dan berlandaskan hukum.
+              </p>
+            </div>
+          </div>
+
+          {/* 4 PILAR MEKANISME CARA MENGAWASI */}
+          <div className="bg-white border border-slate-200 rounded-xl p-6 space-y-4">
+            <h3 className="text-sm font-bold text-slate-900 flex items-center space-x-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+              <span>4 Pilar Mekanisme Pengawasan Klien (Bagaimana Cara Mengawasi)</span>
+            </h3>
+            <p className="text-xs text-slate-500">
+              Pengawasan tidak bersifat administratif pasif, melainkan intervensi aktif melalui 4 instrumen pembinaan:
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+              {/* Pilar 1 */}
+              <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-xs text-slate-900 flex items-center space-x-1.5">
+                    <CalendarCheck className="w-4 h-4 text-blue-600" />
+                    <span>1. Wajib Lapor Mingguan & Konseling</span>
+                  </span>
+                  <span className="text-[10px] bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-bold">Mingguan</span>
+                </div>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Klien yang menjalani rawat jalan diwajibkan hadir fisik ke klinik/fasilitas rehabilitasi minimal 1 kali setiap minggu untuk konseling individu, evaluasi pemicu stres (trigger management), dan pencatatan absensi di sistem.
+                </p>
+                <div className="text-[11px] text-slate-500 bg-white p-2 rounded border border-slate-200">
+                  <strong>Output:</strong> Catatan Jurnal Pengawasan (Status Kehadiran: Hadir / Izin Sah / Mangkir).
+                </div>
+              </div>
+
+              {/* Pilar 2 */}
+              <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-xs text-slate-900 flex items-center space-x-1.5">
+                    <Stethoscope className="w-4 h-4 text-purple-600" />
+                    <span>2. Skrining Toksikologi Urin (Terjadwal & Acak)</span>
+                  </span>
+                  <span className="text-[10px] bg-purple-100 text-purple-800 px-2 py-0.5 rounded font-bold">Berkala</span>
+                </div>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Pemeriksaan laboratorium menggunakan rapid test multi-panel 5 parameter zat (AMP, MET, THC, BZO, MOP). Pengujian dilakukan terjadwal setiap akhir bulan <strong>serta uji acak (unannounced / random screen)</strong> tanpa pemberitahuan sebelumnya demi mencegah manipulasi hidrasi sampel urin.
+                </p>
+                <div className="text-[11px] text-slate-500 bg-white p-2 rounded border border-slate-200">
+                  <strong>Standar:</strong> Wajib 100% Negatif. Hasil positif langsung memicu eskalasi pelanggaran.
+                </div>
+              </div>
+
+              {/* Pilar 3 */}
+              <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-xs text-slate-900 flex items-center space-x-1.5">
+                    <Users className="w-4 h-4 text-amber-600" />
+                    <span>3. Home Visit & Kolaborasi Keluarga</span>
+                  </span>
+                  <span className="text-[10px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded font-bold">Insidentil</span>
+                </div>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Konselor bersama petugas pendamping mengunjungi domisili tempat tinggal klien. Keluarga bertindak sebagai penjamin sosial (guarantor) yang menandatangani pakta integritas dan melaporkan jika timbul perilaku mencurigakan atau indikasi bergaul kembali dengan jaringan narkotika.
+                </p>
+                <div className="text-[11px] text-slate-500 bg-white p-2 rounded border border-slate-200">
+                  <strong>Fokus:</strong> Verifikasi kestabilan lingkungan tempat tinggal dan dukungan pemulihan.
+                </div>
+              </div>
+
+              {/* Pilar 4 */}
+              <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-xs text-slate-900 flex items-center space-x-1.5">
+                    <Award className="w-4 h-4 text-emerald-600" />
+                    <span>4. Evaluasi Vokasional & Kesiapan Sosial</span>
+                  </span>
+                  <span className="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-bold">Tahap Akhir</span>
+                </div>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Klien diarahkan mengikuti kegiatan produktif vokasional (pelatihan kerja, wirausaha mikro, atau kembali bersekolah/kuliah bagi usia anak/remaja) agar tidak terisolasi sosial yang memicu kekambuhan (relapse).
+                </p>
+                <div className="text-[11px] text-slate-500 bg-white p-2 rounded border border-slate-200">
+                  <strong>Indikator:</strong> Klien pulih, berfungsi sosial, dan memiliki rutinitas harian positif.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* MEKANISME PENEGAKAN DISIPLIN & SURAT PERINGATAN (SP) */}
+          <div className="bg-white border border-slate-200 rounded-xl p-6 space-y-4">
+            <h3 className="text-sm font-bold text-slate-900 flex items-center space-x-2">
+              <AlertTriangle className="w-4 h-4 text-rose-600" />
+              <span>Mekanisme Penegakan Disiplin & Eskalasi Sanksi (Bagan Alur Pelanggaran)</span>
+            </h3>
+            <p className="text-xs text-slate-500">
+              Tindakan berjenjang apabila klien tidak memenuhi kewajiban wajib lapor atau terbukti mengonsumsi narkotika:
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
+              {/* SP-1 */}
+              <div className="bg-amber-50/60 border border-amber-300 rounded-xl p-4 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-xs text-amber-900 flex items-center space-x-1.5">
+                    <BadgeAlert className="w-4 h-4 text-amber-700" />
+                    <span>SP-1 (Peringatan Awal)</span>
+                  </span>
+                  <span className="text-[10px] bg-amber-200 text-amber-900 px-2 py-0.5 rounded font-bold">Mangkir 1x</span>
+                </div>
+                <p className="text-xs text-slate-700 leading-relaxed">
+                  Diterbitkan ketika klien tidak hadir pada sesi wajib lapor terjadwal tanpa surat izin atau surat keterangan sakit sah.
+                </p>
+                <div className="pt-2 border-t border-amber-200 text-[11px] text-amber-900 space-y-1">
+                  <div>• Konselor memanggil penjamin keluarga dalam 1x24 jam</div>
+                  <div>• Klien diwajibkan mengganti sesi (kompensasi ganda)</div>
+                  <div>• Tembusan SP-1 otomatis terkirim ke Penyidik e-TAT</div>
+                </div>
+              </div>
+
+              {/* SP-2 */}
+              <div className="bg-orange-50/60 border border-orange-300 rounded-xl p-4 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-xs text-orange-900 flex items-center space-x-1.5">
+                    <AlertTriangle className="w-4 h-4 text-orange-700" />
+                    <span>SP-2 (Peringatan Keras)</span>
+                  </span>
+                  <span className="text-[10px] bg-orange-200 text-orange-900 px-2 py-0.5 rounded font-bold">Mangkir 2x</span>
+                </div>
+                <p className="text-xs text-slate-700 leading-relaxed">
+                  Diterbitkan ketika klien mengabaikan SP-1 dan kembali mangkir pada minggu berikutnya tanpa konfirmasi.
+                </p>
+                <div className="pt-2 border-t border-orange-200 text-[11px] text-orange-900 space-y-1">
+                  <div>• Pemanggilan resmi bersama Penyidik Satresnarkoba</div>
+                  <div>• Pelaksanaan tes urin wajib mendadak di kantor penyidik</div>
+                  <div>• Peringatan terakhir sebelum pembatalan restorative justice</div>
+                </div>
+              </div>
+
+              {/* SP-3 */}
+              <div className="bg-rose-50/60 border border-rose-300 rounded-xl p-4 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-xs text-rose-900 flex items-center space-x-1.5">
+                    <AlertOctagon className="w-4 h-4 text-rose-700" />
+                    <span>SP-3 (Pencabutan Hak RJ)</span>
+                  </span>
+                  <span className="text-[10px] bg-rose-200 text-rose-900 px-2 py-0.5 rounded font-bold">Drop Out / Positif</span>
+                </div>
+                <p className="text-xs text-slate-700 leading-relaxed">
+                  Diterbitkan apabila klien mangkir 3 kali ATAU <strong>terbukti positif narkoba (relapse)</strong> dalam uji laboratorium urin.
+                </p>
+                <div className="pt-2 border-t border-rose-200 text-[11px] text-rose-900 space-y-1">
+                  <div>• Rekomendasi Restorative Justice / diversi resmi dicabut</div>
+                  <div>• Status kepatuhan beralih menjadi <em>tidak_patuh_mangkir</em></div>
+                  <div>• Berkas perkara dilimpahkan ke Penuntut Umum untuk sidang pengadilan pidana umum</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* MEKANISME KELULUSAN & PENGHENTIAN PERKARA TETAP */}
+          <div className="bg-emerald-50/70 border border-emerald-300 rounded-xl p-6 space-y-4">
+            <h3 className="text-sm font-bold text-emerald-950 flex items-center space-x-2">
+              <Award className="w-5 h-5 text-emerald-700" />
+              <span>Mekanisme Kelulusan Program & Penghentian Penuntutan Tetap (SKSP)</span>
+            </h3>
+            <p className="text-xs text-emerald-900 leading-relaxed">
+              Apabila klien memenuhi seluruh persyaratan pengawasan hingga akhir masa rehabilitasi:
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1 text-xs">
+              <div className="bg-white p-3.5 rounded-xl border border-emerald-200 space-y-1.5">
+                <span className="font-bold text-slate-900 block">1. Evaluasi Akhir Pleno Terpadu</span>
+                <p className="text-slate-600">
+                  Konselor dan Tim Asesor Medis melakukan evaluasi akhir tingkat kepulihan (skor ASSIST pasca terapi) dan uji toksikologi konfirmasi akhir.
+                </p>
+              </div>
+
+              <div className="bg-white p-3.5 rounded-xl border border-emerald-200 space-y-1.5">
+                <span className="font-bold text-slate-900 block">2. Penerbitan SKSP Resmi</span>
+                <p className="text-slate-600">
+                  Diterbitkan <strong>Surat Keterangan Selesai Program (SKSP)</strong> bernomor seri resmi yang ditandatangani oleh pimpinan fasilitas rehabilitasi dan Koordinator TAT.
+                </p>
+              </div>
+
+              <div className="bg-white p-3.5 rounded-xl border border-emerald-200 space-y-1.5">
+                <span className="font-bold text-slate-900 block">3. Penetapan SP3 / SKP2 Tetap</span>
+                <p className="text-slate-600">
+                  SKSP diserahkan kepada Penyidik Polri sebagai dasar penerbitan SP3 (Surat Perintah Penghentian Penyidikan) atau kepada Jaksa Penuntut Umum untuk SKP2 Restorative Justice permanen.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* MATRIKS KOORDINASI LINTAS PERAN DALAM PENGAWASAN */}
+          <div className="bg-white border border-slate-200 rounded-xl p-6 space-y-4">
+            <h3 className="text-sm font-bold text-slate-900 flex items-center space-x-2">
+              <Scale className="w-4 h-4 text-blue-600" />
+              <span>Matriks Pembagian Peran Pengawasan di Aplikasi e-TAT</span>
+            </h3>
+            <div className="overflow-x-auto text-xs">
+              <table className="w-full text-left border border-slate-200 rounded-lg overflow-hidden">
+                <thead className="bg-slate-100 text-slate-700 font-semibold border-b border-slate-200">
+                  <tr>
+                    <th className="p-3">Peran Pengguna</th>
+                    <th className="p-3">Tindakan Utama pada Tab Pengawasan</th>
+                    <th className="p-3">Keluaran / Tanggung Jawab</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-200 bg-white">
+                  <tr>
+                    <td className="p-3 font-semibold text-slate-900">Petugas / Konselor Rehabilitasi</td>
+                    <td className="p-3 text-slate-600">Mencatat jurnal mingguan, menginput hasil tes urin, dan menerbitkan draf SP jika mangkir</td>
+                    <td className="p-3 text-teal-700 font-medium">Buku log kehadiran, rekap toksikologi & penerbitan SKSP</td>
+                  </tr>
+                  <tr>
+                    <td className="p-3 font-semibold text-slate-900">Penyidik Pengaju (Satresnarkoba)</td>
+                    <td className="p-3 text-slate-600">Memantau kepatuhan terperiksa secara real-time dan melakukan penjemputan jika terbit SP-2</td>
+                    <td className="p-3 text-blue-700 font-medium">Pengawasan legalitas proses pidana & pemenuhan syarat Restorative Justice</td>
+                  </tr>
+                  <tr>
+                    <td className="p-3 font-semibold text-slate-900">Sekretariat TAT</td>
+                    <td className="p-3 text-slate-600">Mendistribusikan tembusan SP ke Kejaksaan dan mendokumentasikan arsip pengawasan perkara</td>
+                    <td className="p-3 text-slate-700 font-medium">Tertib administrasi & sinkronisasi berkas perkara</td>
+                  </tr>
+                  <tr>
+                    <td className="p-3 font-semibold text-slate-900">Koordinator TAT & Pimpinan</td>
+                    <td className="p-3 text-slate-600">Memonitor dasbor kepatuhan agregat, mengevaluasi angka keberhasilan pemulihan (zero relapse)</td>
+                    <td className="p-3 text-purple-700 font-medium">Audit pengawasan, laporan berkala pimpinan & kepatuhan SLA</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* SECTION 5: DASAR HUKUM & BATASAN SISTEM */}
       {activeSection === 'regulasi' && (
         <div className="space-y-6">
           <div className="bg-white border border-slate-200 rounded-xl p-5 space-y-4">
@@ -1194,6 +1493,18 @@ export const AboutView: React.FC<AboutViewProps> = ({
                       <td className="p-2.5 text-slate-600">Koordinator, Medis, Hukum</td>
                       <td className="p-2.5 text-blue-700 font-semibold">Hari ke-5 s/d Hari ke-6</td>
                       <td className="p-2.5 text-emerald-700 font-bold">Surat Rekomendasi Resmi</td>
+                    </tr>
+                    <tr>
+                      <td className="p-2.5 font-medium text-slate-900">7. Koordinasi Rujukan & Admisi</td>
+                      <td className="p-2.5 text-slate-600">Fasilitas Rehab & Penyidik</td>
+                      <td className="p-2.5 text-blue-700 font-semibold">Maks. Hari ke-14</td>
+                      <td className="p-2.5 text-slate-600">Tiket rujukan & tanggal masuk rawat</td>
+                    </tr>
+                    <tr>
+                      <td className="p-2.5 font-medium text-slate-900">8. Pengawasan Pasca TAT (Aftercare)</td>
+                      <td className="p-2.5 text-slate-600">Konselor, Penyidik & Bapas</td>
+                      <td className="p-2.5 text-blue-700 font-semibold">1 s/d 12 Bulan</td>
+                      <td className="p-2.5 text-teal-700 font-bold">Jurnal lapor, tes urin & SKSP tuntas</td>
                     </tr>
                   </tbody>
                 </table>

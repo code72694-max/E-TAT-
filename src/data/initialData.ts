@@ -1164,6 +1164,102 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
       statusProsesHukumTerkait: 'Kesepakatan Diversi disahkan oleh Pengadilan Negeri Bandung. Proses pidana dihentikan demi kepentingan terbaik anak.',
       terakhirDiperbarui: '2026-08-20 10:00'
     },
+    pengawasanKlien: {
+      id: 'pgw-068',
+      statusKepatuhan: 'sangat_patuh',
+      modalitasLayanan: 'Rawat Jalan',
+      durasiBulan: 2,
+      tanggalMulai: '2026-08-18',
+      tanggalTargetSelesai: '2026-10-18',
+      instansiPelaksanaRehab: 'Klinik Pratama BNN Kota Bandung (IPWL)',
+      konselorPendamping: 'Konselor Adiksi Pratama Test-1, S.Psi',
+      penyidikPengawas: 'Penyidik Pembantu Test-4 (Polresta Bandung)',
+      petugasBapas: 'Pembimbing Kemasyarakatan Bapas Bandung Test-1',
+      totalSesiWajib: 12,
+      sesiTerselesaikan: 8,
+      jumlahMangkir: 0,
+      suratPeringatanList: [],
+      riwayatTesUrinBerkala: [
+        {
+          id: 'urin-068-1',
+          tanggalTes: '2026-08-18',
+          tahapKe: 1,
+          jenisPemeriksaan: 'Terjadwal',
+          parameter: ['AMP', 'MET', 'THC', 'BZO', 'MOP'],
+          hasil: 'Negatif',
+          keterangan: 'Skrining intake awal rehabilitasi rawat jalan. Tidak terdeteksi zat.',
+          petugasPemeriksa: 'Analis Lab Klinik BNN Test-1'
+        },
+        {
+          id: 'urin-068-2',
+          tanggalTes: '2026-09-02',
+          tahapKe: 2,
+          jenisPemeriksaan: 'Terjadwal',
+          parameter: ['AMP', 'MET', 'THC', 'BZO', 'MOP'],
+          hasil: 'Negatif',
+          keterangan: 'Evaluasi berkala minggu ke-2. Klien kooperatif dan aktif di sekolah.',
+          petugasPemeriksa: 'Analis Lab Klinik BNN Test-1'
+        },
+        {
+          id: 'urin-068-3',
+          tanggalTes: '2026-09-16',
+          tahapKe: 3,
+          jenisPemeriksaan: 'Acak (Random)',
+          parameter: ['AMP', 'MET', 'THC', 'BZO', 'MOP'],
+          hasil: 'Negatif',
+          keterangan: 'Uji acak mendadak saat sesi konseling. Hasil konfirmasi bersih.',
+          petugasPemeriksa: 'Analis Lab Klinik BNN Test-1'
+        }
+      ],
+      jurnalPengawasan: [
+        {
+          id: 'jrn-068-1',
+          tanggal: '2026-08-18',
+          jenisKegiatan: 'Konseling Individu',
+          statusKehadiran: 'Hadir',
+          catatanPerkembangan: 'Intake perdana. Klien berkomitmen mengikuti program diversi bersama wali.',
+          petugasPengawas: 'Konselor Adiksi Pratama Test-1, S.Psi',
+          instansiPengawas: 'Klinik Pratama BNN Kota Bandung'
+        },
+        {
+          id: 'jrn-068-2',
+          tanggal: '2026-08-25',
+          jenisKegiatan: 'Wajib Lapor Mingguan',
+          statusKehadiran: 'Hadir',
+          catatanPerkembangan: 'Sesi wajib lapor didampingi ibu terperiksa. Menunjukkan kepatuhan jadwal sekolah.',
+          petugasPengawas: 'Pembimbing Kemasyarakatan Bapas Bandung Test-1',
+          instansiPengawas: 'Bapas Kelas I Bandung'
+        },
+        {
+          id: 'jrn-068-3',
+          tanggal: '2026-09-02',
+          jenisKegiatan: 'Sesi Terapi Kelompok',
+          statusKehadiran: 'Hadir',
+          catatanPerkembangan: 'Terapi kelompok remaja sebaya: latihan asertif menolak tawaran obat terlarang.',
+          petugasPengawas: 'Konselor Adiksi Pratama Test-1, S.Psi',
+          instansiPengawas: 'Klinik Pratama BNN Kota Bandung'
+        },
+        {
+          id: 'jrn-068-4',
+          tanggal: '2026-09-09',
+          jenisKegiatan: 'Wajib Lapor Mingguan',
+          statusKehadiran: 'Hadir',
+          catatanPerkembangan: 'Laporan mingguan teratur. Hubungan dengan keluarga membaik signifikan.',
+          petugasPengawas: 'Penyidik Pembantu Test-4',
+          instansiPengawas: 'Sat Resnarkoba Polresta Bandung'
+        },
+        {
+          id: 'jrn-068-5',
+          tanggal: '2026-09-16',
+          jenisKegiatan: 'Home Visit (Kunjungan Rumah)',
+          statusKehadiran: 'Hadir',
+          catatanPerkembangan: 'Kunjungan rumah oleh PK Bapas dan konselor. Lingkungan keluarga kondusif dan mendukung.',
+          petugasPengawas: 'Pembimbing Kemasyarakatan Bapas Bandung Test-1',
+          instansiPengawas: 'Bapas Kelas I Bandung'
+        }
+      ],
+      rekomendasiTindakLanjutHukum: 'Diusulkan Surat Keterangan Selesai'
+    },
     catatanPengecualian: {
       tipe: 'anak_berhadapan_hukum',
       keterangan: 'Perkara anak berhadapan dengan hukum (ABH). Wajib didampingi orang tua/wali dan PK BAPAS. Publikasi identitas dilarang keras.'
@@ -1177,6 +1273,223 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
         actorPeran: 'sekretariat',
         aksi: 'Konfirmasi Masuk Layanan Rehab',
         rincian: 'Klien anak Terperiksa Test-6 mulai menjalani sesi perdana konseling rawat jalan di Klinik BNN Bandung.'
+      }
+    ]
+  },
+
+  // KASUS 7: PENGAWASAN PASCA TAT DENGAN PERINGATAN (SP-1 KARENA MANGKIR 1X)
+  {
+    id: 'tat-055',
+    nomorPermohonan: 'TAT/2026/08/055',
+    tanggalPengajuan: '2026-08-01',
+    tenggatSlaTanggal: '2026-08-06',
+    isMendekatiTenggat: false,
+    isMelewatiTenggat: false,
+    statusProsesUtama: 'selesai_tindak_lanjut',
+    statusMedis: 'siap_dibahas',
+    statusHukum: 'siap_dibahas',
+    statusDokumen: 'resmi_terbit',
+    statusTindakLanjut: 'terlaksana',
+    pengajuId: 'user-pengaju',
+    pengajuNama: 'Penyidik Pengaju Test-1',
+    instansiPengaju: 'Sat Resnarkoba Polresta Bandung',
+    penanggungJawabBerikutnya: 'Konselor Klinik BNN & Penyidik Pengawas',
+    tindakanBerikutnyaLabel: 'Pengawasan Klien: Dalam status Peringatan SP-1 akibat mangkir 1x sesi wajib lapor',
+    terperiksa: {
+      id: 'trp-055',
+      namaLengkap: 'Terperiksa Test-7 (Dalam Pengawasan SP-1)',
+      alias: 'Subjek Uji 7',
+      nik: '3273011508930005',
+      isNikVerified: true,
+      tempatLahir: 'Bandung',
+      tanggalLahir: '1993-08-15',
+      usia: 33,
+      jenisKelamin: 'Laki-laki',
+      pekerjaan: 'Wiraswasta Kuliner',
+      alamatKtp: 'Kec. Lengkong, Kota Bandung',
+      alamatDomisili: 'Kec. Lengkong, Kota Bandung',
+      namaWaliPendamping: 'Keluarga Terperiksa Test-7',
+      kontakWali: '0812-7788-9900'
+    },
+    perkara: {
+      id: 'perk-055',
+      nomorLaporanPolisi: 'LP/A/92/VIII/2026/SPKT.SATRESNARKOBA/POLRESTA BANDUNG',
+      tanggalLp: '2026-07-31',
+      instansiPenyidik: 'Sat Resnarkoba Polresta Bandung',
+      namaPenyidik: 'Penyidik Pengaju Test-1',
+      nomorHpPenyidik: '0813-8899-1122',
+      pasalDipersangkakan: 'Pasal 127 ayat (1) huruf a UU No. 35/2009',
+      tempatKejadianPerkara: 'Kec. Lengkong, Kota Bandung',
+      tanggalWaktuPenangkapan: '2026-07-31 21:00 WIB',
+      kronologiSingkat: 'Diamankan saat mengonsumsi ganja di tempat tinggal. BB di bawah ambang SEMA No. 04/2010 (0.8 gr).',
+      barangBuktiList: [
+        {
+          id: 'bb-055-1',
+          jenisZat: 'Ganja / Kanabis Kering',
+          beratBersihGram: 0.8,
+          statusUjiLab: 'positif',
+          keterangan: '1 bungkus kertas kecil'
+        }
+      ]
+    },
+    timAsesmen: {
+      sekretariatNama: 'Petugas Sekretariat Test-1',
+      asesorMedisNama: 'Dokter Asesor Medis Test-1',
+      asesorHukumNama: 'Asesor Hukum Test-1',
+      jadwalPleno: '2026-08-05 10:00 WIB',
+      lokasiPemeriksaan: 'Ruang TAT BNN Kota Bandung'
+    },
+    dokumenList: [],
+    rekomendasiResmi: {
+      nomorSurat: 'REK-TAT/055/VIII/2026/BNNP-JABAR',
+      tanggalTerbit: '2026-08-05',
+      dibuatOleh: 'Sekretariat TAT BNNP Jawa Barat',
+      ringkasanMedis: 'Penyalahgunaan zat kanabis derajat sedang. Direkomendasikan rawat jalan 3 bulan.',
+      ringkasanHukum: 'Penyalahguna murni, memenuhi syarat Restorative Justice Polri sesuai Perpol No. 08/2021.',
+      rekomendasiFinalText: 'Rekomendasi Restorative Justice dengan kewajiban menjalani Rehabilitasi Rawat Jalan 3 bulan di Klinik Pratama BNN Kota Bandung.',
+      isLengkapPengesahan: true,
+      qrVerificationCode: 'ETAT-VERIF-2026-055-RJ88',
+      filePdfSimulasiUrl: '#',
+      daftarPengesah: [
+        { id: 's-55-1', nama: 'Dokter Asesor Medis Test-1', jabatan: 'Asesor Medis', instansi: 'RSUD Bandung', status: 'disahkan', tanggalPengesahan: '2026-08-05 11:00' },
+        { id: 's-55-2', nama: 'Asesor Hukum Test-1', jabatan: 'Asesor Hukum', instansi: 'Kejari Bandung', status: 'disahkan', tanggalPengesahan: '2026-08-05 11:30' },
+        { id: 's-55-3', nama: 'Koordinator TAT Test-1', jabatan: 'Ketua TAT', instansi: 'BNNP Jabar', status: 'disahkan', tanggalPengesahan: '2026-08-05 14:00' }
+      ]
+    },
+    tindakLanjut: {
+      id: 'tl-055',
+      jenisTindakLanjut: 'Diversi / Restorative Justice',
+      namaFasilitasTujuan: 'Klinik Pratama BNN Kota Bandung (IPWL)',
+      kontakFasilitas: '(022) 2503201',
+      statusRujukan: 'klien_mulai_layanan',
+      tanggalRujukanDikirim: '2026-08-06',
+      tanggalKonfirmasiFasilitas: '2026-08-07',
+      tanggalMulaiLayanan: '2026-08-10',
+      penanggungJawabTindakLanjut: 'Konselor Adiksi Klinik BNN & Penyidik Polresta',
+      statusProsesHukumTerkait: 'Penyidikan dihentikan bersyarat melalui Surat Perintah Penghentian Penyidikan (SP3) RJ dengan syarat kepatuhan penuh program rehab.',
+      terakhirDiperbarui: '2026-09-18 11:30'
+    },
+    pengawasanKlien: {
+      id: 'pgw-055',
+      statusKepatuhan: 'dalam_peringatan',
+      modalitasLayanan: 'Rawat Jalan',
+      durasiBulan: 3,
+      tanggalMulai: '2026-08-10',
+      tanggalTargetSelesai: '2026-11-10',
+      instansiPelaksanaRehab: 'Klinik Pratama BNN Kota Bandung (IPWL)',
+      konselorPendamping: 'Konselor Adiksi Pratama Test-1, S.Psi',
+      penyidikPengawas: 'Penyidik Pengaju Test-1 (Sat Resnarkoba Polresta)',
+      totalSesiWajib: 16,
+      sesiTerselesaikan: 6,
+      jumlahMangkir: 1,
+      suratPeringatanList: [
+        {
+          nomorSp: 'SP-1/TAT-AWAS/055/IX/2026',
+          tingkatSp: 'SP-1 (Peringatan Awal)',
+          tanggalSp: '2026-09-14',
+          alasan: 'Klien tidak hadir pada sesi wajib lapor mingguan ke-5 tanggal 12 September tanpa keterangan sah. Peringatan keras diberikan: jika mangkir kembali akan diterbitkan SP-2 dan eskalasi ke penyidik.',
+          diterbitkanOleh: 'Konselor Klinik BNN & Disetujui Penyidik Pengawas'
+        }
+      ],
+      riwayatTesUrinBerkala: [
+        {
+          id: 'urin-055-1',
+          tanggalTes: '2026-08-10',
+          tahapKe: 1,
+          jenisPemeriksaan: 'Terjadwal',
+          parameter: ['THC', 'MET', 'AMP'],
+          hasil: 'Negatif',
+          keterangan: 'Skrining awal admisi rawat jalan.',
+          petugasPemeriksa: 'Analis Lab Klinik BNN Test-1'
+        },
+        {
+          id: 'urin-055-2',
+          tanggalTes: '2026-09-01',
+          tahapKe: 2,
+          jenisPemeriksaan: 'Terjadwal',
+          parameter: ['THC', 'MET', 'AMP'],
+          hasil: 'Negatif',
+          keterangan: 'Evaluasi bulan ke-1. Hasil tes urin bersih dari metabolit kanabis.',
+          petugasPemeriksa: 'Analis Lab Klinik BNN Test-1'
+        },
+        {
+          id: 'urin-055-3',
+          tanggalTes: '2026-09-15',
+          tahapKe: 3,
+          jenisPemeriksaan: 'Acak (Random)',
+          parameter: ['THC', 'MET', 'AMP'],
+          hasil: 'Negatif',
+          keterangan: 'Uji urin wajib paska pemanggilan SP-1. Hasil tetap negatif.',
+          petugasPemeriksa: 'Analis Lab Klinik BNN Test-1'
+        }
+      ],
+      jurnalPengawasan: [
+        {
+          id: 'jrn-055-1',
+          tanggal: '2026-08-10',
+          jenisKegiatan: 'Konseling Individu',
+          statusKehadiran: 'Hadir',
+          catatanPerkembangan: 'Sesi intake & penetapan jadwal wajib lapor tiap hari Jumat.',
+          petugasPengawas: 'Konselor Adiksi Pratama Test-1, S.Psi',
+          instansiPengawas: 'Klinik Pratama BNN Kota Bandung'
+        },
+        {
+          id: 'jrn-055-2',
+          tanggal: '2026-08-17',
+          jenisKegiatan: 'Wajib Lapor Mingguan',
+          statusKehadiran: 'Hadir',
+          catatanPerkembangan: 'Sesi evaluasi pemicu stres kerja dan manajemen waktu.',
+          petugasPengawas: 'Konselor Adiksi Pratama Test-1, S.Psi',
+          instansiPengawas: 'Klinik Pratama BNN Kota Bandung'
+        },
+        {
+          id: 'jrn-055-3',
+          tanggal: '2026-08-24',
+          jenisKegiatan: 'Sesi Terapi Kelompok',
+          statusKehadiran: 'Hadir',
+          catatanPerkembangan: 'Mengikuti diskusi kelompok pemulihan adiksi.',
+          petugasPengawas: 'Konselor Adiksi Pratama Test-1, S.Psi',
+          instansiPengawas: 'Klinik Pratama BNN Kota Bandung'
+        },
+        {
+          id: 'jrn-055-4',
+          tanggal: '2026-09-01',
+          jenisKegiatan: 'Pemeriksaan Urin',
+          statusKehadiran: 'Hadir',
+          catatanPerkembangan: 'Tes urin bulan ke-1 hasil negatif.',
+          petugasPengawas: 'Analis Lab Klinik BNN Test-1',
+          instansiPengawas: 'Klinik Pratama BNN Kota Bandung'
+        },
+        {
+          id: 'jrn-055-5',
+          tanggal: '2026-09-12',
+          jenisKegiatan: 'Wajib Lapor Mingguan',
+          statusKehadiran: 'Mangkir / Tanpa Kabar',
+          catatanPerkembangan: 'Klien tidak hadir dan nomor ponsel tidak merespons saat dihubungi petugas. Petugas menerbitkan SP-1.',
+          petugasPengawas: 'Konselor Adiksi Pratama Test-1, S.Psi',
+          instansiPengawas: 'Klinik Pratama BNN Kota Bandung'
+        },
+        {
+          id: 'jrn-055-6',
+          tanggal: '2026-09-15',
+          jenisKegiatan: 'Konseling Individu',
+          statusKehadiran: 'Hadir',
+          catatanPerkembangan: 'Klien hadir memenuhi panggilan SP-1 didampingi wali. Mengakui lalai karena urusan pekerjaan. Berjanji patuh pada jadwal sisa.',
+          petugasPengawas: 'Konselor Adiksi Pratama Test-1, S.Psi',
+          instansiPengawas: 'Klinik Pratama BNN Kota Bandung'
+        }
+      ],
+      rekomendasiTindakLanjutHukum: 'Lanjut Rehabilitasi'
+    },
+    klarifikasiList: [],
+    auditLogs: [
+      {
+        id: 'aud-55-1',
+        timestamp: '2026-09-14 14:00',
+        actorNama: 'Petugas Fasilitas Rehab Test-1',
+        actorPeran: 'rehabilitasi',
+        aksi: 'Penerbitan SP-1 Klien Mangkir',
+        rincian: 'Diterbitkan SP-1/TAT-AWAS/055/IX/2026 karena mangkir sesi wajib lapor tanggal 12 September 2026.'
       }
     ]
   }

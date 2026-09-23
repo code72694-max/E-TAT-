@@ -23,8 +23,13 @@ import { AdministrasiView } from './components/AdministrasiView';
 import { ModalPengajuanBaru } from './components/ModalPengajuanBaru';
 import { ModalVerifikasiQR } from './components/ModalVerifikasiQR';
 import { AboutView } from './components/AboutView';
+import { LandingPageView } from './components/LandingPageView';
+import { LoginPage } from './components/LoginPage';
 
 export default function App() {
+  // Navigation / Auth mode: 'landing' (public), 'login' (role selection), or 'dashboard' (authenticated)
+  const [appViewMode, setAppViewMode] = useState<'landing' | 'login' | 'dashboard'>('landing');
+
   // Current logged in user (defaults to Sekretariat for comprehensive overview)
   const [currentUser, setCurrentUser] = useState<UserProfile>(MOCK_USERS[1]); // Rina Marlina, S.H. (Sekretariat)
   const [currentTab, setCurrentTab] = useState<ActiveTab>('beranda');
@@ -230,6 +235,34 @@ export default function App() {
     }
   };
 
+  // 1. PUBLIC LANDING PAGE
+  if (appViewMode === 'landing') {
+    return (
+      <LandingPageView
+        onGoToLogin={() => setAppViewMode('login')}
+        permohonanList={permohonanList}
+        onOpenPermohonanDetail={(id) => {
+          setSelectedPermohonanId(id);
+          setAppViewMode('dashboard');
+        }}
+      />
+    );
+  }
+
+  // 2. ROLE SELECTION / BYPASS LOGIN PAGE
+  if (appViewMode === 'login') {
+    return (
+      <LoginPage
+        onLogin={(user) => {
+          handleSelectUser(user);
+          setAppViewMode('dashboard');
+        }}
+        onBackToLanding={() => setAppViewMode('landing')}
+      />
+    );
+  }
+
+  // 3. AUTHENTICATED ROLE WORKSPACE DASHBOARD
   return (
     <div className="min-h-screen bg-slate-50/70 flex flex-col text-slate-800 antialiased font-sans">
       {/* Top Application Header */}
@@ -242,6 +275,9 @@ export default function App() {
         pendingAlertsCount={badgeCounts.perluPerbaikan + (badgeCounts.tindakLanjutTerhambat > 0 ? 1 : 0) + (badgeCounts.menungguPengesahan > 0 ? 1 : 0)}
         onToggleMobileNav={() => setIsMobileNavOpen(!isMobileNavOpen)}
         isMobileNavOpen={isMobileNavOpen}
+        onLogout={() => setAppViewMode('login')}
+        onGoToLanding={() => setAppViewMode('landing')}
+        onGoToLogin={() => setAppViewMode('login')}
       />
 
       {/* Main Workspace Layout - Desktop: Clean sidebar docked at the far left */}
@@ -255,6 +291,8 @@ export default function App() {
           badgeCounts={badgeCounts}
           isMobileOpen={isMobileNavOpen}
           onCloseMobile={() => setIsMobileNavOpen(false)}
+          onLogout={() => setAppViewMode('login')}
+          onGoToLanding={() => setAppViewMode('landing')}
         />
 
         {/* Content Viewport */}

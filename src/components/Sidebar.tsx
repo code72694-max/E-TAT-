@@ -15,7 +15,9 @@ import {
   Plus,
   AlertCircle,
   X,
-  Info
+  Info,
+  LogOut,
+  Globe
 } from 'lucide-react';
 
 export type ActiveTab =
@@ -46,6 +48,8 @@ interface SidebarProps {
   };
   isMobileOpen?: boolean;
   onCloseMobile?: () => void;
+  onLogout?: () => void;
+  onGoToLanding?: () => void;
 }
 
 interface MenuItem {
@@ -64,7 +68,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onOpenNewModal,
   badgeCounts,
   isMobileOpen = false,
-  onCloseMobile
+  onCloseMobile,
+  onLogout,
+  onGoToLanding
 }) => {
   const getRoleNav = (): {
     categories: { key: string; title: string }[];
@@ -90,7 +96,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               label: 'Daftar Berkas',
               icon: <FileSpreadsheet className="w-4 h-4" />,
               badge: badgeCounts.perluPerbaikan > 0 ? badgeCounts.perluPerbaikan : undefined,
-              badgeColor: 'bg-amber-50 text-amber-700 border-amber-200/80',
+              badgeColor: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
               category: 'utama'
             },
             {
@@ -98,7 +104,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               label: 'Perbaikan Berkas',
               icon: <FileCheck2 className="w-4 h-4" />,
               badge: badgeCounts.perluPerbaikan > 0 ? badgeCounts.perluPerbaikan : undefined,
-              badgeColor: 'bg-amber-50 text-amber-700 border-amber-200/80',
+              badgeColor: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
               category: 'utama'
             },
             {
@@ -144,7 +150,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               label: 'Daftar Berkas',
               icon: <FileSpreadsheet className="w-4 h-4" />,
               badge: badgeCounts.siapVerifikasi > 0 ? badgeCounts.siapVerifikasi : undefined,
-              badgeColor: 'bg-blue-50 text-blue-700 border-blue-200/80',
+              badgeColor: 'bg-[#1E2D4A] text-slate-200 border-[#2A3F6D]',
               category: 'utama'
             },
             {
@@ -152,7 +158,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               label: 'Verifikasi Berkas',
               icon: <FileCheck2 className="w-4 h-4" />,
               badge: badgeCounts.siapVerifikasi > 0 ? badgeCounts.siapVerifikasi : undefined,
-              badgeColor: 'bg-blue-50 text-blue-700 border-blue-200/80',
+              badgeColor: 'bg-[#1E2D4A] text-slate-200 border-[#2A3F6D]',
               category: 'utama'
             },
             {
@@ -166,7 +172,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               label: 'Sidang Pleno',
               icon: <Users className="w-4 h-4" />,
               badge: badgeCounts.siapPleno > 0 ? badgeCounts.siapPleno : undefined,
-              badgeColor: 'bg-indigo-50 text-indigo-700 border-indigo-200/80',
+              badgeColor: 'bg-[#1E2D4A] text-slate-200 border-[#2A3F6D]',
               category: 'utama'
             },
             {
@@ -174,7 +180,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               label: 'Pengesahan Dokumen',
               icon: <FileSignature className="w-4 h-4" />,
               badge: badgeCounts.menungguPengesahan > 0 ? badgeCounts.menungguPengesahan : undefined,
-              badgeColor: 'bg-purple-50 text-purple-700 border-purple-200/80',
+              badgeColor: 'bg-[#1E2D4A] text-slate-200 border-[#2A3F6D]',
               category: 'output'
             },
             {
@@ -182,7 +188,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               label: 'Rujukan & Fasilitas',
               icon: <Share2 className="w-4 h-4" />,
               badge: badgeCounts.tindakLanjutTerhambat > 0 ? badgeCounts.tindakLanjutTerhambat : undefined,
-              badgeColor: 'bg-rose-50 text-rose-700 border-rose-200/80',
+              badgeColor: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
               category: 'output'
             },
             {
@@ -225,13 +231,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               label: 'Sidang Pleno',
               icon: <Users className="w-4 h-4" />,
               badge: badgeCounts.siapPleno > 0 ? badgeCounts.siapPleno : undefined,
-              badgeColor: 'bg-indigo-50 text-indigo-700 border-indigo-200/80',
-              category: 'asesor'
-            },
-            {
-              id: 'about',
-              label: 'Tentang & Panduan Alur',
-              icon: <Info className="w-4 h-4" />,
+              badgeColor: 'bg-[#1E2D4A] text-slate-200 border-[#2A3F6D]',
               category: 'asesor'
             },
             {
@@ -274,7 +274,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               label: 'Sidang Pleno',
               icon: <Users className="w-4 h-4" />,
               badge: badgeCounts.siapPleno > 0 ? badgeCounts.siapPleno : undefined,
-              badgeColor: 'bg-indigo-50 text-indigo-700 border-indigo-200/80',
+              badgeColor: 'bg-[#1E2D4A] text-slate-200 border-[#2A3F6D]',
               category: 'asesor'
             }
           ],
@@ -307,7 +307,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               label: 'Sidang Pleno',
               icon: <Users className="w-4 h-4" />,
               badge: badgeCounts.siapPleno > 0 ? badgeCounts.siapPleno : undefined,
-              badgeColor: 'bg-indigo-50 text-indigo-700 border-indigo-200/80',
+              badgeColor: 'bg-[#1E2D4A] text-slate-200 border-[#2A3F6D]',
               category: 'utama'
             },
             {
@@ -315,7 +315,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               label: 'Pengesahan Rekomendasi',
               icon: <FileSignature className="w-4 h-4" />,
               badge: badgeCounts.menungguPengesahan > 0 ? badgeCounts.menungguPengesahan : undefined,
-              badgeColor: 'bg-purple-50 text-purple-700 border-purple-200/80',
+              badgeColor: 'bg-[#1E2D4A] text-slate-200 border-[#2A3F6D]',
               category: 'utama'
             },
             {
@@ -323,7 +323,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               label: 'Rujukan & Fasilitas',
               icon: <Share2 className="w-4 h-4" />,
               badge: badgeCounts.tindakLanjutTerhambat > 0 ? badgeCounts.tindakLanjutTerhambat : undefined,
-              badgeColor: 'bg-rose-50 text-rose-700 border-rose-200/80',
+              badgeColor: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
               category: 'utama'
             },
             {
@@ -366,7 +366,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               label: 'Rujukan & Fasilitas',
               icon: <Share2 className="w-4 h-4" />,
               badge: badgeCounts.tindakLanjutTerhambat > 0 ? badgeCounts.tindakLanjutTerhambat : undefined,
-              badgeColor: 'bg-rose-50 text-rose-700 border-rose-200/80',
+              badgeColor: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
               category: 'kelola'
             },
             {
@@ -397,7 +397,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               label: 'Rujukan Klien',
               icon: <Share2 className="w-4 h-4" />,
               badge: badgeCounts.tindakLanjutTerhambat > 0 ? badgeCounts.tindakLanjutTerhambat : undefined,
-              badgeColor: 'bg-rose-50 text-rose-700 border-rose-200/80',
+              badgeColor: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
               category: 'output'
             },
             {
@@ -489,43 +489,43 @@ export const Sidebar: React.FC<SidebarProps> = ({
   };
 
   const sidebarContent = (
-    <aside className="w-64 lg:w-72 bg-white text-slate-700 flex flex-col shrink-0 border-r border-slate-200/90 select-none h-full">
+    <aside className="w-64 lg:w-72 bg-[#0B132B] text-slate-200 flex flex-col shrink-0 border-r border-[#1E2D4A] select-none h-full shadow-lg">
       {/* Mobile Header Bar inside Drawer */}
-      <div className="md:hidden flex items-center justify-between p-4 border-b border-slate-200">
+      <div className="md:hidden flex items-center justify-between p-4 border-b border-[#1E2D4A] bg-[#0E172B]">
         <div>
-          <span className="font-bold text-sm text-slate-900 block">{navConfig.roleLabel}</span>
-          <span className="text-[10px] text-slate-500">{navConfig.roleDesc}</span>
+          <span className="font-bold text-sm text-white block">{navConfig.roleLabel}</span>
+          <span className="text-[10px] text-slate-400">{navConfig.roleDesc}</span>
         </div>
         <button
           onClick={onCloseMobile}
-          className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
+          className="p-1.5 text-slate-400 hover:text-white hover:bg-[#14213D] rounded-lg transition-colors cursor-pointer"
         >
           <X className="w-5 h-5" />
         </button>
       </div>
 
       {/* Role Context Bar on Desktop */}
-      <div className="hidden md:block px-4 py-3 border-b border-slate-100 bg-slate-50/60">
+      <div className="hidden md:block px-4 py-3.5 border-b border-[#1E2D4A] bg-[#0E172B]">
         <div className="flex items-center justify-between">
-          <span className="text-[10px] uppercase font-bold tracking-wider text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200/60">
+          <span className="text-[10px] uppercase font-extrabold tracking-wider text-[#F3E5AB] bg-[#D4AF37]/15 px-2.5 py-0.5 rounded border border-[#D4AF37]/30">
             {navConfig.roleLabel}
           </span>
         </div>
-        <p className="text-[11px] text-slate-500 mt-1 line-clamp-1 leading-snug">
+        <p className="text-[11px] text-slate-400 mt-1 line-clamp-2 leading-relaxed">
           {navConfig.roleDesc}
         </p>
       </div>
 
       {/* Primary Action Button (If authorized for this role) */}
       {navConfig.showCreateButton && (
-        <div className="p-3.5 border-b border-slate-100">
+        <div className="p-3.5 border-b border-[#1E2D4A] bg-[#0B132B]">
           <button
             id="btn-buat-permohonan-sidebar"
             onClick={() => {
               onOpenNewModal();
               if (onCloseMobile) onCloseMobile();
             }}
-            className="w-full flex items-center justify-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-3.5 rounded-xl border border-blue-700 transition-all duration-150 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer"
+            className="w-full flex items-center justify-center space-x-2 bg-gradient-to-r from-[#D4AF37] to-[#AA7C11] hover:brightness-110 text-slate-950 font-extrabold py-2.5 px-3.5 rounded-xl border border-[#FFF2B2]/40 shadow-md shadow-[#D4AF37]/15 transition-all text-xs cursor-pointer"
           >
             <Plus className="w-4 h-4 stroke-[2.5]" />
             <span>{navConfig.buttonLabel}</span>
@@ -534,30 +534,30 @@ export const Sidebar: React.FC<SidebarProps> = ({
       )}
 
       {/* Navigation List grouped neatly per role */}
-      <nav className="flex-1 px-3 py-3 space-y-2 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-200">
+      <nav className="flex-1 px-3 py-3 space-y-1 overflow-y-auto scrollbar-thin scrollbar-thumb-[#1E2D4A]">
         <div className="space-y-1">
           {navConfig.items.map((item) => {
             const isActive = currentTab === item.id;
             const isAbout = item.id === 'about';
             return (
               <React.Fragment key={item.id}>
-                {isAbout && <div className="my-2 border-t border-slate-100" />}
+                {isAbout && <div className="my-2 border-t border-[#1E2D4A]" />}
                 <button
                 key={item.id}
                 id={`nav-item-${item.id}`}
                 onClick={() => handleItemClick(item.id)}
-                className={`w-full group flex items-center justify-between px-3 py-2 text-xs font-medium rounded-lg transition-all duration-150 text-left ${
+                className={`w-full group flex items-center justify-between px-3 py-2 text-xs font-semibold rounded-xl transition-all duration-150 text-left cursor-pointer ${
                   isActive
-                    ? 'bg-blue-50 text-blue-700 font-semibold border-r-2 border-blue-600'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                    ? 'bg-[#14213D] text-[#F3E5AB] font-bold border-l-3 border-[#D4AF37] shadow-sm'
+                    : 'text-slate-300 hover:text-white hover:bg-[#14213D]/60'
                 }`}
               >
                 <div className="flex items-center space-x-2.5 truncate">
                   <span
                     className={`shrink-0 transition-colors ${
                       isActive
-                        ? 'text-blue-600'
-                        : 'text-slate-400 group-hover:text-slate-600'
+                        ? 'text-[#D4AF37]'
+                        : 'text-slate-400 group-hover:text-slate-200'
                     }`}
                   >
                     {item.icon}
@@ -567,7 +567,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 {item.badge !== undefined && (
                   <span
                     className={`ml-2 shrink-0 px-2 py-0.5 text-[10px] font-bold rounded-full border ${
-                      item.badgeColor || 'bg-slate-100 text-slate-700 border-slate-200'
+                      item.badgeColor || 'bg-[#1E2D4A] text-slate-200 border-[#2A3F6D]'
                     }`}
                   >
                     {item.badge}
@@ -579,6 +579,32 @@ export const Sidebar: React.FC<SidebarProps> = ({
           })}
         </div>
       </nav>
+
+      {/* Footer Navigation: Portal Publik & Logout */}
+      {(onGoToLanding || onLogout) && (
+        <div className="p-3 border-t border-[#1E2D4A] space-y-1 bg-[#080D1A] shrink-0">
+          {onGoToLanding && (
+            <button
+              type="button"
+              onClick={onGoToLanding}
+              className="w-full flex items-center space-x-2.5 px-3 py-2 text-xs font-semibold text-slate-300 hover:text-[#D4AF37] hover:bg-[#14213D] rounded-xl transition-colors cursor-pointer border border-transparent hover:border-[#2A3F6D]"
+            >
+              <Globe className="w-4 h-4 text-[#D4AF37]" />
+              <span>Portal Publik Utama</span>
+            </button>
+          )}
+          {onLogout && (
+            <button
+              type="button"
+              onClick={onLogout}
+              className="w-full flex items-center space-x-2.5 px-3 py-2 text-xs font-semibold text-rose-300 hover:text-rose-200 hover:bg-rose-950/40 rounded-xl transition-colors cursor-pointer border border-transparent hover:border-rose-900/40"
+            >
+              <LogOut className="w-4 h-4 text-rose-400" />
+              <span>Ganti Akun / Logout</span>
+            </button>
+          )}
+        </div>
+      )}
     </aside>
   );
 

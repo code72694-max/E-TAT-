@@ -274,6 +274,62 @@ export interface TindakLanjutLayanan {
   terakhirDiperbarui: string;
 }
 
+// Pengawasan Klien Pasca TAT (Aftercare & Monitoring)
+export interface TesUrinBerkala {
+  id: string;
+  tanggalTes: string;
+  tahapKe: number; // Tes ke-1, ke-2, dst
+  jenisPemeriksaan: 'Terjadwal' | 'Acak (Random)';
+  parameter: string[]; // AMP, MET, THC, BZO, MOP
+  hasil: 'Negatif' | 'Positif';
+  keterangan?: string;
+  petugasPemeriksa: string;
+}
+
+export interface JurnalPengawasan {
+  id: string;
+  tanggal: string;
+  jenisKegiatan: 'Konseling Individu' | 'Sesi Terapi Kelompok' | 'Wajib Lapor Mingguan' | 'Home Visit (Kunjungan Rumah)' | 'Pemeriksaan Urin' | 'Evaluasi Vokasional';
+  statusKehadiran: 'Hadir' | 'Izin Sah' | 'Mangkir / Tanpa Kabar';
+  catatanPerkembangan: string;
+  petugasPengawas: string;
+  instansiPengawas: string;
+}
+
+export interface SuratPeringatanKlien {
+  nomorSp: string;
+  tingkatSp: 'SP-1 (Peringatan Awal)' | 'SP-2 (Peringatan Keras)' | 'SP-3 (Rekomendasi Pencabutan RJ)';
+  tanggalSp: string;
+  alasan: string;
+  diterbitkanOleh: string;
+}
+
+export interface PengawasanKlien {
+  id: string;
+  statusKepatuhan: 'sangat_patuh' | 'patuh' | 'dalam_peringatan' | 'tidak_patuh_mangkir' | 'selesai_program';
+  modalitasLayanan: 'Rawat Jalan' | 'Rawat Inap' | 'Bina Lanjut Pascarehab';
+  durasiBulan: number;
+  tanggalMulai: string;
+  tanggalTargetSelesai: string;
+  instansiPelaksanaRehab: string;
+  konselorPendamping: string;
+  penyidikPengawas: string;
+  petugasBapas?: string;
+  totalSesiWajib: number;
+  sesiTerselesaikan: number;
+  jumlahMangkir: number;
+  suratPeringatanList: SuratPeringatanKlien[];
+  riwayatTesUrinBerkala: TesUrinBerkala[];
+  jurnalPengawasan: JurnalPengawasan[];
+  rekomendasiTindakLanjutHukum: 'Lanjut Rehabilitasi' | 'Pencabutan Hak RJ / Lanjut Sidang' | 'Diusulkan Surat Keterangan Selesai';
+  suratKeteranganSelesai?: {
+    nomorSurat: string;
+    tanggalTerbit: string;
+    predikat: 'Selesai Baik (Pulih Produktif)' | 'Selesai Cukup' | 'Gagal / Dikeluarkan';
+    ditandatanganiOleh: string;
+  };
+}
+
 // Klarifikasi Terarah (Q&A antar pemangku kepentingan)
 export interface Klarifikasi {
   id: string;
@@ -344,6 +400,7 @@ export interface PermohonanAsesmen {
   sidangPleno?: SidangPleno;
   rekomendasiResmi?: RekomendasiResmi;
   tindakLanjut?: TindakLanjutLayanan;
+  pengawasanKlien?: PengawasanKlien;
   
   // Fitur Pendukung
   klarifikasiList: Klarifikasi[];

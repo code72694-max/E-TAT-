@@ -29,8 +29,10 @@ import {
   AlertCircle,
   ExternalLink,
   Edit3,
-  Send
+  Send,
+  Activity
 } from 'lucide-react';
+import { PengawasanPascaTatSection } from './PengawasanPascaTatSection';
 
 interface PermohonanDetailProps {
   permohonan: PermohonanAsesmen;
@@ -49,6 +51,7 @@ export type DetailTab =
   | 'pleno'
   | 'dokumen'
   | 'tindak_lanjut'
+  | 'pengawasan'
   | 'klarifikasi'
   | 'riwayat';
 
@@ -74,20 +77,30 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
         if (permohonan.rekomendasiResmi && (permohonan.statusProsesUtama === 'rekomendasi_terbit' || permohonan.statusProsesUtama === 'selesai_tindak_lanjut')) {
           tabs.push({ id: 'dokumen', label: 'Rekomendasi Resmi Diterima', icon: <FileSignature className="w-3.5 h-3.5" /> });
         }
+        if (permohonan.pengawasanKlien || permohonan.statusProsesUtama === 'selesai_tindak_lanjut') {
+          tabs.push({ id: 'pengawasan', label: 'Pengawasan Pasca TAT', icon: <Activity className="w-3.5 h-3.5" /> });
+        }
         tabs.push({ id: 'klarifikasi', label: `Klarifikasi (${permohonan.klarifikasiList.length})`, icon: <MessageSquare className="w-3.5 h-3.5" /> });
         return tabs;
       }
-      case 'sekretariat':
-        return [
+      case 'sekretariat': {
+        const tabs: { id: DetailTab; label: string; icon: React.ReactNode }[] = [
           { id: 'ringkasan', label: 'Ringkasan & Identitas', icon: <User className="w-3.5 h-3.5" /> },
           { id: 'administrasi', label: 'Verifikasi Berkas', icon: <FileText className="w-3.5 h-3.5" /> },
           { id: 'jadwal', label: 'Penugasan & Jadwal', icon: <Calendar className="w-3.5 h-3.5" /> },
           { id: 'pleno', label: 'Persiapan Pleno', icon: <Users className="w-3.5 h-3.5" /> },
           { id: 'dokumen', label: 'Distribusi Dokumen', icon: <FileSignature className="w-3.5 h-3.5" /> },
           { id: 'tindak_lanjut', label: 'Koordinasi Rujukan', icon: <Share2 className="w-3.5 h-3.5" /> },
+        ];
+        if (permohonan.pengawasanKlien || permohonan.statusProsesUtama === 'selesai_tindak_lanjut') {
+          tabs.push({ id: 'pengawasan', label: 'Pengawasan Pasca TAT', icon: <Activity className="w-3.5 h-3.5" /> });
+        }
+        tabs.push(
           { id: 'klarifikasi', label: `Klarifikasi (${permohonan.klarifikasiList.length})`, icon: <MessageSquare className="w-3.5 h-3.5" /> },
           { id: 'riwayat', label: 'Audit Trail', icon: <History className="w-3.5 h-3.5" /> }
-        ];
+        );
+        return tabs;
+      }
       case 'medis':
         return [
           { id: 'ringkasan', label: 'Identitas Terperiksa', icon: <User className="w-3.5 h-3.5" /> },
@@ -105,31 +118,48 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
           { id: 'pleno', label: 'Klarifikasi Pleno', icon: <Users className="w-3.5 h-3.5" /> },
           { id: 'klarifikasi', label: `Klarifikasi (${permohonan.klarifikasiList.length})`, icon: <MessageSquare className="w-3.5 h-3.5" /> }
         ];
-      case 'koordinator':
-        return [
+      case 'koordinator': {
+        const tabs: { id: DetailTab; label: string; icon: React.ReactNode }[] = [
           { id: 'ringkasan', label: 'Ringkasan & Kendali Kasus', icon: <User className="w-3.5 h-3.5" /> },
           { id: 'jadwal', label: 'Kesiapan Jadwal Tim', icon: <Calendar className="w-3.5 h-3.5" /> },
           { id: 'pleno', label: 'Sidang Pleno TAT', icon: <Users className="w-3.5 h-3.5" /> },
           { id: 'dokumen', label: 'Pengesahan Rekomendasi Mandat', icon: <FileSignature className="w-3.5 h-3.5" /> },
           { id: 'tindak_lanjut', label: 'Monitoring Rujukan', icon: <Share2 className="w-3.5 h-3.5" /> },
+        ];
+        if (permohonan.pengawasanKlien || permohonan.statusProsesUtama === 'selesai_tindak_lanjut') {
+          tabs.push({ id: 'pengawasan', label: 'Pengawasan Pasca TAT', icon: <Activity className="w-3.5 h-3.5" /> });
+        }
+        tabs.push(
           { id: 'klarifikasi', label: `Klarifikasi (${permohonan.klarifikasiList.length})`, icon: <MessageSquare className="w-3.5 h-3.5" /> },
           { id: 'riwayat', label: 'Audit Trail Lengkap', icon: <History className="w-3.5 h-3.5" /> }
-        ];
-      case 'pimpinan':
-        return [
+        );
+        return tabs;
+      }
+      case 'pimpinan': {
+        const tabs: { id: DetailTab; label: string; icon: React.ReactNode }[] = [
           { id: 'ringkasan', label: 'Ringkasan Perkara & SLA', icon: <User className="w-3.5 h-3.5" /> },
           { id: 'jadwal', label: 'Jadwal & Progres', icon: <Calendar className="w-3.5 h-3.5" /> },
           { id: 'pleno', label: 'Berita Acara Pleno', icon: <Users className="w-3.5 h-3.5" /> },
           { id: 'dokumen', label: 'Rekomendasi Terbit', icon: <FileSignature className="w-3.5 h-3.5" /> },
           { id: 'tindak_lanjut', label: 'Realisasi Rujukan', icon: <Share2 className="w-3.5 h-3.5" /> },
-          { id: 'riwayat', label: 'Audit Trail Pengawasan', icon: <History className="w-3.5 h-3.5" /> }
         ];
-      case 'rehabilitasi':
-        return [
+        if (permohonan.pengawasanKlien || permohonan.statusProsesUtama === 'selesai_tindak_lanjut') {
+          tabs.push({ id: 'pengawasan', label: 'Pengawasan Pasca TAT', icon: <Activity className="w-3.5 h-3.5" /> });
+        }
+        tabs.push(
+          { id: 'riwayat', label: 'Audit Trail Pengawasan', icon: <History className="w-3.5 h-3.5" /> }
+        );
+        return tabs;
+      }
+      case 'rehabilitasi': {
+        const tabs: { id: DetailTab; label: string; icon: React.ReactNode }[] = [
           { id: 'ringkasan', label: 'Informasi Klien Rujukan', icon: <User className="w-3.5 h-3.5" /> },
           { id: 'dokumen', label: 'Dokumen Rekomendasi Legal', icon: <FileSignature className="w-3.5 h-3.5" /> },
-          { id: 'tindak_lanjut', label: 'Konfirmasi Admisi & Tindak Lanjut', icon: <Share2 className="w-3.5 h-3.5" /> }
+          { id: 'tindak_lanjut', label: 'Konfirmasi Admisi & Tindak Lanjut', icon: <Share2 className="w-3.5 h-3.5" /> },
+          { id: 'pengawasan', label: 'Pengawasan Klien Pasca TAT', icon: <Activity className="w-3.5 h-3.5" /> }
         ];
+        return tabs;
+      }
       case 'admin':
         return [
           { id: 'ringkasan', label: 'Metadata Registrasi Berkas', icon: <User className="w-3.5 h-3.5" /> },
@@ -221,6 +251,45 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
       ...permohonan,
       statusProsesUtama: action === 'admisi' ? 'selesai_tindak_lanjut' : permohonan.statusProsesUtama,
       tindakLanjut: updatedTindakLanjut,
+      pengawasanKlien: action === 'admisi' && !permohonan.pengawasanKlien ? {
+        id: 'pgw-' + Date.now(),
+        statusKepatuhan: 'patuh',
+        modalitasLayanan: permohonan.asesmenMedis?.kebutuhanRawat === 'Rawat Inap' ? 'Rawat Inap' : 'Rawat Jalan',
+        durasiBulan: permohonan.asesmenMedis?.durasiUsulanBulan || 3,
+        tanggalMulai: nowStr,
+        tanggalTargetSelesai: '3 Bulan Sejak Admisi',
+        instansiPelaksanaRehab: permohonan.tindakLanjut.namaFasilitasTujuan || currentUser.agency,
+        konselorPendamping: currentUser.name,
+        penyidikPengawas: permohonan.perkara.namaPenyidik,
+        totalSesiWajib: 12,
+        sesiTerselesaikan: 1,
+        jumlahMangkir: 0,
+        suratPeringatanList: [],
+        riwayatTesUrinBerkala: [
+          {
+            id: 'urin-' + Date.now(),
+            tanggalTes: nowStr,
+            tahapKe: 1,
+            jenisPemeriksaan: 'Terjadwal',
+            parameter: ['AMP', 'MET', 'THC', 'BZO', 'MOP'],
+            hasil: 'Negatif',
+            keterangan: 'Skrining intake awal admisi rehabilitasi pasca rekomendasi TAT.',
+            petugasPemeriksa: currentUser.name
+          }
+        ],
+        jurnalPengawasan: [
+          {
+            id: 'jrn-' + Date.now(),
+            tanggal: nowStr,
+            jenisKegiatan: 'Konseling Individu',
+            statusKehadiran: 'Hadir',
+            catatanPerkembangan: 'Sesi intake admisi dan penandatanganan lembar komitmen program rehabilitasi pasca TAT.',
+            petugasPengawas: currentUser.name,
+            instansiPengawas: currentUser.agency
+          }
+        ],
+        rekomendasiTindakLanjutHukum: 'Lanjut Rehabilitasi'
+      } : permohonan.pengawasanKlien,
       auditLogs: [
         {
           id: 'aud-' + Date.now(),
@@ -1438,6 +1507,15 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
               </div>
             )}
           </div>
+        )}
+
+        {/* TAB PENGAWASAN KLIEN PASCA TAT */}
+        {activeTab === 'pengawasan' && (
+          <PengawasanPascaTatSection
+            permohonan={permohonan}
+            currentUser={currentUser}
+            onUpdatePermohonan={onUpdatePermohonan}
+          />
         )}
 
         {/* TAB 9: KLARIFIKASI TERARAH (Targeted Q&A per Role) */}
