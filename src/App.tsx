@@ -264,7 +264,7 @@ export default function App() {
 
   // 3. AUTHENTICATED ROLE WORKSPACE DASHBOARD
   return (
-    <div className="min-h-screen bg-slate-50/70 flex flex-col text-slate-800 antialiased font-sans">
+    <div className="min-h-screen bg-[#071326] flex flex-col text-slate-100 antialiased font-sans selection:bg-[#38bdf8]/30 selection:text-white">
       {/* Top Application Header */}
       <Header
         currentUser={currentUser}
@@ -281,7 +281,7 @@ export default function App() {
       />
 
       {/* Main Workspace Layout - Desktop: Clean sidebar docked at the far left */}
-      <div className="flex-1 flex w-full">
+      <div className="flex-1 flex w-full bg-[#071326]">
         {/* Sidebar at desktop corner */}
         <Sidebar
           currentTab={currentTab}
@@ -296,7 +296,7 @@ export default function App() {
         />
 
         {/* Content Viewport */}
-        <main className="flex-1 min-w-0 p-4 sm:p-6 lg:p-8 overflow-x-hidden">
+        <main className="flex-1 min-w-0 p-4 sm:p-6 lg:p-8 overflow-x-hidden bg-[#071326]">
           <div className="max-w-7xl mx-auto w-full">
             {renderCurrentView()}
           </div>

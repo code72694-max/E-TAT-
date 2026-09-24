@@ -64,13 +64,13 @@ export const PengawasanPascaTatSection: React.FC<PengawasanPascaTatSectionProps>
   // If permohonan doesn't have pengawasanKlien yet, provide an initialize button
   if (!permohonan.pengawasanKlien) {
     return (
-      <div className="bg-white border border-slate-200 rounded-xl p-8 text-center space-y-4">
-        <div className="w-12 h-12 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center mx-auto">
+      <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl p-8 text-center space-y-4">
+        <div className="w-12 h-12 bg-amber-950/40 text-[#F1C40F] border border-amber-500/30 rounded-full flex items-center justify-center mx-auto">
           <Activity className="w-6 h-6" />
         </div>
         <div className="max-w-md mx-auto">
-          <h3 className="text-base font-bold text-slate-900">Program Pengawasan Klien Belum Diaktifkan</h3>
-          <p className="text-xs text-slate-600 mt-1 leading-relaxed">
+          <h3 className="text-base font-bold text-white">Program Pengawasan Klien Belum Diaktifkan</h3>
+          <p className="text-xs text-slate-400 mt-1 leading-relaxed">
             Pengawasan klien pasca TAT aktif setelah surat rekomendasi terbit dan klien mulai menjalani layanan di fasilitas rehabilitasi atau kesepakatan diversi/RJ disahkan.
           </p>
         </div>
@@ -136,9 +136,9 @@ export const PengawasanPascaTatSection: React.FC<PengawasanPascaTatSectionProps>
               };
               onUpdatePermohonan(updated);
             }}
-            className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-4 py-2 rounded-lg inline-flex items-center space-x-2"
+            className="bg-gradient-to-r from-[#144782] via-[#17549c] to-[#1c64b8] hover:from-[#175194] hover:via-[#1c60b0] hover:to-[#2274d4] text-white text-xs font-semibold px-4 py-2 rounded-lg inline-flex items-center space-x-2 border border-[#2d7ad6]/70 shadow-lg cursor-pointer"
           >
-            <Activity className="w-4 h-4" />
+            <Activity className="w-4 h-4 text-[#38bdf8]" />
             <span>Aktifkan Buku Pengawasan Klien Pasca TAT Sekarang</span>
           </button>
         )}
@@ -324,13 +324,13 @@ export const PengawasanPascaTatSection: React.FC<PengawasanPascaTatSectionProps>
   return (
     <div className="space-y-6">
       {/* Header & Quick Action Buttons */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-3 border-b border-slate-200">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-3 border-b border-[#1b3459]">
         <div>
-          <h3 className="text-base font-bold text-slate-900 flex items-center space-x-2">
-            <Activity className="w-5 h-5 text-teal-600" />
+          <h3 className="text-base font-bold text-white flex items-center space-x-2">
+            <Activity className="w-5 h-5 text-teal-400" />
             <span>Pengawasan Klien Pasca TAT (Aftercare & Monitoring)</span>
           </h3>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-slate-400 mt-0.5">
             Mekanisme terpadu pemantauan kehadiran wajib lapor, skrining toksikologi urin berkala, dan penegakan kepatuhan hukum berkeadilan restoratif.
           </p>
         </div>
@@ -339,29 +339,29 @@ export const PengawasanPascaTatSection: React.FC<PengawasanPascaTatSectionProps>
           <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={() => setShowAddJurnalModal(true)}
-              className="bg-teal-600 hover:bg-teal-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center space-x-1.5 transition-colors"
+              className="bg-teal-600 hover:bg-teal-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center space-x-1.5 transition-colors cursor-pointer"
             >
               <PlusCircle className="w-3.5 h-3.5" />
               <span>Catat Wajib Lapor / Sesi</span>
             </button>
             <button
               onClick={() => setShowAddUrinModal(true)}
-              className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center space-x-1.5 transition-colors"
+              className="bg-[#144782] hover:bg-[#1a5599] text-white text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center space-x-1.5 border border-[#2d7ad6]/60 transition-colors cursor-pointer"
             >
-              <Stethoscope className="w-3.5 h-3.5" />
+              <Stethoscope className="w-3.5 h-3.5 text-[#38bdf8]" />
               <span>Input Tes Urin Berkala</span>
             </button>
             <button
               onClick={() => setShowIssueSpModal(true)}
-              className="bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center space-x-1.5 transition-colors"
+              className="bg-amber-950/60 hover:bg-amber-900/60 text-amber-300 border border-amber-500/40 text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center space-x-1.5 transition-colors cursor-pointer"
             >
-              <AlertTriangle className="w-3.5 h-3.5 text-amber-700" />
+              <AlertTriangle className="w-3.5 h-3.5 text-[#F1C40F]" />
               <span>Terbitkan Peringatan (SP)</span>
             </button>
             {!pgw.suratKeteranganSelesai && (
               <button
                 onClick={() => setShowFinishModal(true)}
-                className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center space-x-1.5 transition-colors"
+                className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center space-x-1.5 transition-colors cursor-pointer"
               >
                 <Award className="w-3.5 h-3.5" />
                 <span>Terbitkan SK Selesai</span>
@@ -374,118 +374,118 @@ export const PengawasanPascaTatSection: React.FC<PengawasanPascaTatSectionProps>
       {/* COMPLIANCE STATUS SCORECARD */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
         {/* Card 1: Status Kepatuhan */}
-        <div className="bg-white border border-slate-200 rounded-xl p-4 flex flex-col justify-between">
-          <span className="text-[11px] font-bold uppercase text-slate-500">Status Kepatuhan Klien</span>
+        <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl p-4 flex flex-col justify-between">
+          <span className="text-[11px] font-bold uppercase text-slate-400">Status Kepatuhan Klien</span>
           <div className="mt-2">
             <span
               className={`inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-bold border ${
                 pgw.statusKepatuhan === 'sangat_patuh'
-                  ? 'bg-emerald-100 text-emerald-800 border-emerald-300'
+                  ? 'bg-emerald-950/60 text-emerald-300 border-emerald-500/40'
                   : pgw.statusKepatuhan === 'patuh'
-                  ? 'bg-blue-100 text-blue-800 border-blue-300'
+                  ? 'bg-blue-950/60 text-blue-300 border-blue-500/40'
                   : pgw.statusKepatuhan === 'dalam_peringatan'
-                  ? 'bg-amber-100 text-amber-800 border-amber-300'
+                  ? 'bg-amber-950/60 text-amber-300 border-amber-500/40'
                   : pgw.statusKepatuhan === 'selesai_program'
-                  ? 'bg-purple-100 text-purple-800 border-purple-300'
-                  : 'bg-rose-100 text-rose-800 border-rose-300'
+                  ? 'bg-purple-950/60 text-purple-300 border-purple-500/40'
+                  : 'bg-rose-950/60 text-rose-300 border-rose-500/40'
               }`}
             >
-              {pgw.statusKepatuhan === 'sangat_patuh' && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />}
-              {pgw.statusKepatuhan === 'patuh' && <UserCheck className="w-3.5 h-3.5 text-blue-600" />}
-              {pgw.statusKepatuhan === 'dalam_peringatan' && <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />}
-              {pgw.statusKepatuhan === 'selesai_program' && <Award className="w-3.5 h-3.5 text-purple-600" />}
-              {pgw.statusKepatuhan === 'tidak_patuh_mangkir' && <AlertOctagon className="w-3.5 h-3.5 text-rose-600" />}
+              {pgw.statusKepatuhan === 'sangat_patuh' && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />}
+              {pgw.statusKepatuhan === 'patuh' && <UserCheck className="w-3.5 h-3.5 text-[#38bdf8]" />}
+              {pgw.statusKepatuhan === 'dalam_peringatan' && <AlertTriangle className="w-3.5 h-3.5 text-[#F1C40F]" />}
+              {pgw.statusKepatuhan === 'selesai_program' && <Award className="w-3.5 h-3.5 text-purple-400" />}
+              {pgw.statusKepatuhan === 'tidak_patuh_mangkir' && <AlertOctagon className="w-3.5 h-3.5 text-rose-400" />}
               <span className="capitalize">{pgw.statusKepatuhan.replace(/_/g, ' ')}</span>
             </span>
           </div>
-          <div className="mt-3 pt-2 border-t border-slate-100 text-[11px] text-slate-500">
-            Jumlah Mangkir: <strong className={pgw.jumlahMangkir > 0 ? 'text-rose-600 font-bold' : 'text-slate-700'}>{pgw.jumlahMangkir} Kali</strong>
+          <div className="mt-3 pt-2 border-t border-[#1b3459] text-[11px] text-slate-400">
+            Jumlah Mangkir: <strong className={pgw.jumlahMangkir > 0 ? 'text-rose-400 font-bold' : 'text-slate-200'}>{pgw.jumlahMangkir} Kali</strong>
           </div>
         </div>
 
         {/* Card 2: Progress Sesi Kehadiran */}
-        <div className="bg-white border border-slate-200 rounded-xl p-4 flex flex-col justify-between">
+        <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl p-4 flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold uppercase text-slate-500">Progres Sesi Wajib</span>
-            <span className="text-xs font-bold text-slate-700">{progressPercent}%</span>
+            <span className="text-[11px] font-bold uppercase text-slate-400">Progres Sesi Wajib</span>
+            <span className="text-xs font-bold text-slate-200">{progressPercent}%</span>
           </div>
           <div className="mt-2">
-            <div className="text-lg font-extrabold text-slate-900">
-              {pgw.sesiTerselesaikan} <span className="text-xs font-medium text-slate-500">/ {pgw.totalSesiWajib} Sesi</span>
+            <div className="text-lg font-extrabold text-white">
+              {pgw.sesiTerselesaikan} <span className="text-xs font-medium text-slate-400">/ {pgw.totalSesiWajib} Sesi</span>
             </div>
-            <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden mt-1.5">
+            <div className="w-full bg-[#081224] h-2 rounded-full overflow-hidden mt-1.5 border border-[#1b3459]">
               <div
                 className={`h-full transition-all duration-300 ${
-                  progressPercent >= 100 ? 'bg-emerald-500' : 'bg-teal-600'
+                  progressPercent >= 100 ? 'bg-emerald-400' : 'bg-teal-500'
                 }`}
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
           </div>
-          <div className="mt-3 pt-2 border-t border-slate-100 text-[11px] text-slate-500">
-            Modalitas: <strong>{pgw.modalitasLayanan} ({pgw.durasiBulan} Bulan)</strong>
+          <div className="mt-3 pt-2 border-t border-[#1b3459] text-[11px] text-slate-400">
+            Modalitas: <strong className="text-slate-200">{pgw.modalitasLayanan} ({pgw.durasiBulan} Bulan)</strong>
           </div>
         </div>
 
         {/* Card 3: Skrining Toksikologi Urin */}
-        <div className="bg-white border border-slate-200 rounded-xl p-4 flex flex-col justify-between">
-          <span className="text-[11px] font-bold uppercase text-slate-500">Skrining Toksikologi Urin</span>
+        <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl p-4 flex flex-col justify-between">
+          <span className="text-[11px] font-bold uppercase text-slate-400">Skrining Toksikologi Urin</span>
           <div className="mt-2">
-            <div className="text-lg font-extrabold text-slate-900 flex items-center space-x-1.5">
+            <div className="text-lg font-extrabold text-white flex items-center space-x-1.5">
               <span>{pgw.riwayatTesUrinBerkala.length}x Diuji</span>
               {pgw.riwayatTesUrinBerkala.every(t => t.hasil === 'Negatif') ? (
-                <span className="text-xs font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
+                <span className="text-xs font-bold text-emerald-300 bg-emerald-950/60 border border-emerald-500/40 px-2 py-0.5 rounded-full">
                   100% Bersih
                 </span>
               ) : (
-                <span className="text-xs font-bold text-rose-700 bg-rose-100 px-2 py-0.5 rounded-full">
+                <span className="text-xs font-bold text-rose-300 bg-rose-950/60 border border-rose-500/40 px-2 py-0.5 rounded-full">
                   Terindikasi Zat
                 </span>
               )}
             </div>
-            <p className="text-[11px] text-slate-500 mt-1">
+            <p className="text-[11px] text-slate-400 mt-1">
               Tes Terakhir: {pgw.riwayatTesUrinBerkala[0]?.tanggalTes || '-'} ({pgw.riwayatTesUrinBerkala[0]?.hasil || '-'})
             </p>
           </div>
-          <div className="mt-3 pt-2 border-t border-slate-100 text-[11px] text-slate-500">
+          <div className="mt-3 pt-2 border-t border-[#1b3459] text-[11px] text-slate-400">
             Parameter: AMP, MET, THC, BZO, MOP
           </div>
         </div>
 
         {/* Card 4: Rekomendasi Status Hukum */}
-        <div className="bg-white border border-slate-200 rounded-xl p-4 flex flex-col justify-between">
-          <span className="text-[11px] font-bold uppercase text-slate-500">Rekomendasi Hukum</span>
+        <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl p-4 flex flex-col justify-between">
+          <span className="text-[11px] font-bold uppercase text-slate-400">Rekomendasi Hukum</span>
           <div className="mt-2">
             <span className={`text-xs font-bold block ${
-              pgw.rekomendasiTindakLanjutHukum.includes('Pencabutan') ? 'text-rose-700' : 'text-slate-800'
+              pgw.rekomendasiTindakLanjutHukum.includes('Pencabutan') ? 'text-rose-400' : 'text-slate-200'
             }`}>
               {pgw.rekomendasiTindakLanjutHukum}
             </span>
-            <p className="text-[11px] text-slate-500 mt-0.5">
-              Target Tuntas: <strong>{pgw.tanggalTargetSelesai}</strong>
+            <p className="text-[11px] text-slate-400 mt-0.5">
+              Target Tuntas: <strong className="text-slate-200">{pgw.tanggalTargetSelesai}</strong>
             </p>
           </div>
-          <div className="mt-3 pt-2 border-t border-slate-100 text-[11px] text-slate-500">
-            Penyidik Pengawas: <strong>{pgw.penyidikPengawas}</strong>
+          <div className="mt-3 pt-2 border-t border-[#1b3459] text-[11px] text-slate-400">
+            Penyidik Pengawas: <strong className="text-slate-200">{pgw.penyidikPengawas}</strong>
           </div>
         </div>
       </div>
 
       {/* SURAT KETERANGAN SELESAI BANNER (IF ISSUED) */}
       {pgw.suratKeteranganSelesai && (
-        <div className="p-4 bg-emerald-50 border border-emerald-300 rounded-xl flex items-start space-x-3 text-emerald-900">
-          <Award className="w-6 h-6 text-emerald-600 shrink-0 mt-0.5" />
+        <div className="p-4 bg-emerald-950/30 border border-emerald-500/40 rounded-xl flex items-start space-x-3 text-emerald-200">
+          <Award className="w-6 h-6 text-emerald-400 shrink-0 mt-0.5" />
           <div className="flex-1 space-y-1">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-              <h4 className="font-bold text-sm">SURAT KETERANGAN SELESAI PROGRAM PASCA TAT (SKSP) TELAH DITERBITKAN</h4>
-              <span className="text-xs font-mono bg-emerald-100 px-2 py-0.5 rounded border border-emerald-300">
+              <h4 className="font-bold text-sm text-emerald-300">SURAT KETERANGAN SELESAI PROGRAM PASCA TAT (SKSP) TELAH DITERBITKAN</h4>
+              <span className="text-xs font-mono bg-[#0b172a] text-emerald-300 px-2 py-0.5 rounded border border-emerald-500/40">
                 {pgw.suratKeteranganSelesai.nomorSurat}
               </span>
             </div>
-            <p className="text-xs text-emerald-800">
+            <p className="text-xs text-emerald-200">
               Klien telah menuntaskan seluruh rangkaian rehabilitasi & kewajiban wajib lapor dengan predikat <strong>{pgw.suratKeteranganSelesai.predikat}</strong>. Dokumen ini sah digunakan oleh Penyidik dan Penuntut Umum sebagai bukti pemenuhan syarat Restorative Justice / diversi hukum.
             </p>
-            <div className="text-[11px] text-emerald-700 pt-1">
+            <div className="text-[11px] text-emerald-300/80 pt-1">
               Diterbitkan pada {pgw.suratKeteranganSelesai.tanggalTerbit} oleh {pgw.suratKeteranganSelesai.ditandatanganiOleh}.
             </div>
           </div>
@@ -495,25 +495,25 @@ export const PengawasanPascaTatSection: React.FC<PengawasanPascaTatSectionProps>
       {/* SURAT PERINGATAN (SP) LIST (IF ANY) */}
       {pgw.suratPeringatanList.length > 0 && (
         <div className="space-y-2">
-          <h4 className="text-xs font-bold text-slate-700 flex items-center space-x-1.5">
-            <AlertTriangle className="w-4 h-4 text-amber-600" />
+          <h4 className="text-xs font-bold text-slate-300 flex items-center space-x-1.5">
+            <AlertTriangle className="w-4 h-4 text-[#F1C40F]" />
             <span>Peringatan Resmi Kepatuhan Klien ({pgw.suratPeringatanList.length} Surat Diterbitkan)</span>
           </h4>
           {pgw.suratPeringatanList.map((sp, idx) => (
-            <div key={idx} className="p-3.5 bg-amber-50/70 border border-amber-200 rounded-xl space-y-1.5 text-xs">
+            <div key={idx} className="p-3.5 bg-amber-950/30 border border-amber-500/40 rounded-xl space-y-1.5 text-xs">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-                <span className="font-bold text-amber-900 flex items-center space-x-1.5">
-                  <BadgeAlert className="w-4 h-4 text-amber-700" />
+                <span className="font-bold text-amber-300 flex items-center space-x-1.5">
+                  <BadgeAlert className="w-4 h-4 text-amber-400" />
                   <span>{sp.tingkatSp}</span>
-                  <span className="font-mono text-[11px] font-normal text-amber-700">({sp.nomorSp})</span>
+                  <span className="font-mono text-[11px] font-normal text-amber-300/80">({sp.nomorSp})</span>
                 </span>
-                <span className="text-[11px] text-amber-700">Diterbitkan: {sp.tanggalSp}</span>
+                <span className="text-[11px] text-amber-300/80">Diterbitkan: {sp.tanggalSp}</span>
               </div>
-              <p className="text-slate-800 leading-relaxed bg-white/70 p-2.5 rounded-lg border border-amber-200">
+              <p className="text-slate-200 leading-relaxed bg-[#0b172a] p-2.5 rounded-lg border border-[#1b3459]">
                 {sp.alasan}
               </p>
-              <div className="text-[11px] text-slate-500">
-                Penanggung Jawab: <strong>{sp.diterbitkanOleh}</strong>
+              <div className="text-[11px] text-slate-400">
+                Penanggung Jawab: <strong className="text-slate-200">{sp.diterbitkanOleh}</strong>
               </div>
             </div>
           ))}
@@ -523,19 +523,19 @@ export const PengawasanPascaTatSection: React.FC<PengawasanPascaTatSectionProps>
       {/* TWO COLUMNS: LEFT = URINE TESTS, RIGHT = JURNAL PENGAWASAN */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* COLUMN 1: TES URIN BERKALA */}
-        <div className="bg-white border border-slate-200 rounded-xl p-5 space-y-4">
+        <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl p-5 space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h4 className="font-bold text-sm text-slate-900 flex items-center space-x-2">
-                <Stethoscope className="w-4 h-4 text-blue-600" />
+              <h4 className="font-bold text-sm text-white flex items-center space-x-2">
+                <Stethoscope className="w-4 h-4 text-[#38bdf8]" />
                 <span>Riwayat Pengujian Toksikologi Urin Berkala</span>
               </h4>
-              <p className="text-xs text-slate-500 mt-0.5">Uji laboratorium acak & terjadwal untuk menjamin zero-relapse.</p>
+              <p className="text-xs text-slate-400 mt-0.5">Uji laboratorium acak & terjadwal untuk menjamin zero-relapse.</p>
             </div>
             {canManage && (
               <button
                 onClick={() => setShowAddUrinModal(true)}
-                className="text-xs text-blue-600 hover:text-blue-800 font-semibold flex items-center space-x-1"
+                className="text-xs text-[#38bdf8] hover:text-white font-semibold flex items-center space-x-1 cursor-pointer transition-colors"
               >
                 <PlusCircle className="w-3.5 h-3.5" />
                 <span>Tambah Tes</span>
@@ -548,38 +548,38 @@ export const PengawasanPascaTatSection: React.FC<PengawasanPascaTatSectionProps>
               <div
                 key={tes.id}
                 className={`p-3 rounded-lg border text-xs space-y-1.5 ${
-                  tes.hasil === 'Negatif' ? 'bg-slate-50/70 border-slate-200' : 'bg-rose-50 border-rose-300'
+                  tes.hasil === 'Negatif' ? 'bg-[#081224] border-[#1b3459]' : 'bg-rose-950/30 border-rose-500/40'
                 }`}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
-                    <span className="font-bold text-slate-900">Uji Ke-{tes.tahapKe}</span>
-                    <span className="text-[10px] bg-slate-200 text-slate-700 px-1.5 py-0.5 rounded font-medium">
+                    <span className="font-bold text-white">Uji Ke-{tes.tahapKe}</span>
+                    <span className="text-[10px] bg-[#0b172a] border border-[#1b3459] text-slate-300 px-1.5 py-0.5 rounded font-medium">
                       {tes.jenisPemeriksaan}
                     </span>
                   </div>
                   <span
-                    className={`font-bold px-2 py-0.5 rounded text-[11px] ${
-                      tes.hasil === 'Negatif' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-200 text-rose-900'
+                    className={`font-bold px-2 py-0.5 rounded text-[11px] border ${
+                      tes.hasil === 'Negatif' ? 'bg-emerald-950/60 text-emerald-300 border-emerald-500/40' : 'bg-rose-950/60 text-rose-300 border-rose-500/40'
                     }`}
                   >
                     {tes.hasil.toUpperCase()}
                   </span>
                 </div>
-                <div className="flex items-center space-x-2 text-[11px] text-slate-500">
-                  <span>Tanggal: <strong>{tes.tanggalTes}</strong></span>
+                <div className="flex items-center space-x-2 text-[11px] text-slate-400">
+                  <span>Tanggal: <strong className="text-slate-200">{tes.tanggalTes}</strong></span>
                   <span>•</span>
                   <span>Pemeriksa: {tes.petugasPemeriksa}</span>
                 </div>
                 {tes.keterangan && (
-                  <p className="text-slate-600 text-[11px] pt-1 border-t border-slate-200/60">
+                  <p className="text-slate-300 text-[11px] pt-1 border-t border-[#1b3459]">
                     {tes.keterangan}
                   </p>
                 )}
                 <div className="flex items-center space-x-1 pt-1">
-                  <span className="text-[10px] text-slate-400">Parameter diuji:</span>
+                  <span className="text-[10px] text-slate-500">Parameter diuji:</span>
                   {tes.parameter.map(p => (
-                    <span key={p} className="text-[9px] bg-white border border-slate-200 text-slate-600 px-1 rounded">
+                    <span key={p} className="text-[9px] bg-[#0b172a] border border-[#1b3459] text-slate-300 px-1 rounded">
                       {p}
                     </span>
                   ))}
@@ -590,19 +590,19 @@ export const PengawasanPascaTatSection: React.FC<PengawasanPascaTatSectionProps>
         </div>
 
         {/* COLUMN 2: JURNAL PENGAWASAN & WAJIB LAPOR */}
-        <div className="bg-white border border-slate-200 rounded-xl p-5 space-y-4">
+        <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl p-5 space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h4 className="font-bold text-sm text-slate-900 flex items-center space-x-2">
-                <Calendar className="w-4 h-4 text-teal-600" />
+              <h4 className="font-bold text-sm text-white flex items-center space-x-2">
+                <Calendar className="w-4 h-4 text-teal-400" />
                 <span>Jurnal Pengawasan, Konseling & Wajib Lapor</span>
               </h4>
-              <p className="text-xs text-slate-500 mt-0.5">Catatan kehadiran sesi dan perkembangan psikososial klien.</p>
+              <p className="text-xs text-slate-400 mt-0.5">Catatan kehadiran sesi dan perkembangan psikososial klien.</p>
             </div>
             {canManage && (
               <button
                 onClick={() => setShowAddJurnalModal(true)}
-                className="text-xs text-teal-600 hover:text-teal-800 font-semibold flex items-center space-x-1"
+                className="text-xs text-teal-400 hover:text-white font-semibold flex items-center space-x-1 cursor-pointer transition-colors"
               >
                 <PlusCircle className="w-3.5 h-3.5" />
                 <span>Catat Sesi</span>
@@ -621,28 +621,28 @@ export const PengawasanPascaTatSection: React.FC<PengawasanPascaTatSectionProps>
                   key={jrn.id}
                   className={`p-3 rounded-lg border text-xs space-y-1.5 ${
                     isMangkir
-                      ? 'bg-rose-50/50 border-rose-200'
+                      ? 'bg-rose-950/30 border-rose-500/40'
                       : isIzin
-                      ? 'bg-amber-50/50 border-amber-200'
-                      : 'bg-slate-50/70 border-slate-200'
+                      ? 'bg-amber-950/30 border-amber-500/40'
+                      : 'bg-[#081224] border-[#1b3459]'
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-slate-900">{jrn.jenisKegiatan}</span>
+                    <span className="font-bold text-white">{jrn.jenisKegiatan}</span>
                     <span
-                      className={`text-[10px] font-bold px-2 py-0.5 rounded ${
+                      className={`text-[10px] font-bold px-2 py-0.5 rounded border ${
                         isHadir
-                          ? 'bg-emerald-100 text-emerald-800'
+                          ? 'bg-emerald-950/60 text-emerald-300 border-emerald-500/40'
                           : isIzin
-                          ? 'bg-amber-100 text-amber-800'
-                          : 'bg-rose-100 text-rose-800'
+                          ? 'bg-amber-950/60 text-amber-300 border-amber-500/40'
+                          : 'bg-rose-950/60 text-rose-300 border-rose-500/40'
                       }`}
                     >
                       {jrn.statusKehadiran}
                     </span>
                   </div>
-                  <p className="text-slate-700 leading-relaxed">{jrn.catatanPerkembangan}</p>
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[10px] text-slate-500 pt-1 border-t border-slate-200/60">
+                  <p className="text-slate-300 leading-relaxed">{jrn.catatanPerkembangan}</p>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[10px] text-slate-400 pt-1 border-t border-[#1b3459]">
                     <span>Petugas: {jrn.petugasPengawas} ({jrn.instansiPengawas})</span>
                     <span>{jrn.tanggal}</span>
                   </div>
@@ -654,43 +654,43 @@ export const PengawasanPascaTatSection: React.FC<PengawasanPascaTatSectionProps>
       </div>
 
       {/* TEAM PENGAWASAN CARD */}
-      <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 text-xs space-y-2">
-        <h4 className="font-bold text-slate-900 flex items-center space-x-2">
-          <Shield className="w-4 h-4 text-blue-600" />
+      <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl p-4 text-xs space-y-2">
+        <h4 className="font-bold text-white flex items-center space-x-2">
+          <Shield className="w-4 h-4 text-[#38bdf8]" />
           <span>Tim Koordinasi Pengawasan Klien Terpadu</span>
         </h4>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
-          <div className="bg-white p-3 rounded-lg border border-slate-200">
+          <div className="bg-[#081224] p-3 rounded-lg border border-[#1b3459]">
             <span className="text-[10px] font-bold uppercase text-slate-400 block">Lembaga Rehabilitasi</span>
-            <span className="font-bold text-slate-800 block mt-0.5">{pgw.instansiPelaksanaRehab}</span>
-            <span className="text-slate-500 block text-[11px]">Konselor: {pgw.konselorPendamping}</span>
+            <span className="font-bold text-white block mt-0.5">{pgw.instansiPelaksanaRehab}</span>
+            <span className="text-slate-400 block text-[11px]">Konselor: {pgw.konselorPendamping}</span>
           </div>
 
-          <div className="bg-white p-3 rounded-lg border border-slate-200">
+          <div className="bg-[#081224] p-3 rounded-lg border border-[#1b3459]">
             <span className="text-[10px] font-bold uppercase text-slate-400 block">Penyidik Pengawas</span>
-            <span className="font-bold text-slate-800 block mt-0.5">{permohonan.instansiPengaju}</span>
-            <span className="text-slate-500 block text-[11px]">Penyidik: {pgw.penyidikPengawas}</span>
+            <span className="font-bold text-white block mt-0.5">{permohonan.instansiPengaju}</span>
+            <span className="text-slate-400 block text-[11px]">Penyidik: {pgw.penyidikPengawas}</span>
           </div>
 
-          <div className="bg-white p-3 rounded-lg border border-slate-200">
+          <div className="bg-[#081224] p-3 rounded-lg border border-[#1b3459]">
             <span className="text-[10px] font-bold uppercase text-slate-400 block">Pengawasan Bapas / Eksternal</span>
-            <span className="font-bold text-slate-800 block mt-0.5">
+            <span className="font-bold text-white block mt-0.5">
               {pgw.petugasBapas || 'Pengawasan Melekat Satresnarkoba & Keluarga'}
             </span>
-            <span className="text-slate-500 block text-[11px]">Koordinasi Kejaksaan & Pengadilan</span>
+            <span className="text-slate-400 block text-[11px]">Koordinasi Kejaksaan & Pengadilan</span>
           </div>
         </div>
       </div>
 
       {/* MODAL: ADD JURNAL ENTRY */}
       {showAddJurnalModal && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-5 space-y-4 shadow-xl">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-200">
-              <h4 className="font-bold text-sm text-slate-900">Catat Sesi / Wajib Lapor Klien</h4>
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl">
+            <div className="flex items-center justify-between pb-2 border-b border-[#1b3459]">
+              <h4 className="font-bold text-sm text-white">Catat Sesi / Wajib Lapor Klien</h4>
               <button
                 onClick={() => setShowAddJurnalModal(false)}
-                className="text-slate-400 hover:text-slate-600 text-sm"
+                className="text-slate-400 hover:text-white text-sm cursor-pointer"
               >
                 ✕
               </button>
@@ -698,11 +698,11 @@ export const PengawasanPascaTatSection: React.FC<PengawasanPascaTatSectionProps>
 
             <form onSubmit={handleSaveJurnal} className="space-y-3 text-xs">
               <div>
-                <label className="font-bold text-slate-700 block mb-1">Jenis Kegiatan Pengawasan</label>
+                <label className="font-bold text-slate-300 block mb-1">Jenis Kegiatan Pengawasan</label>
                 <select
                   value={jurnalKegiatan}
                   onChange={e => setJurnalKegiatan(e.target.value as any)}
-                  className="w-full border border-slate-300 rounded-lg p-2 bg-white"
+                  className="w-full border border-[#1b3459] rounded-lg p-2 bg-[#081224] text-white focus:outline-none focus:border-[#38bdf8]"
                 >
                   <option value="Wajib Lapor Mingguan">Wajib Lapor Mingguan</option>
                   <option value="Konseling Individu">Konseling Individu</option>
@@ -714,11 +714,11 @@ export const PengawasanPascaTatSection: React.FC<PengawasanPascaTatSectionProps>
               </div>
 
               <div>
-                <label className="font-bold text-slate-700 block mb-1">Status Kehadiran Klien</label>
+                <label className="font-bold text-slate-300 block mb-1">Status Kehadiran Klien</label>
                 <select
                   value={jurnalKehadiran}
                   onChange={e => setJurnalKehadiran(e.target.value as any)}
-                  className="w-full border border-slate-300 rounded-lg p-2 bg-white font-medium"
+                  className="w-full border border-[#1b3459] rounded-lg p-2 bg-[#081224] text-white font-medium focus:outline-none focus:border-[#38bdf8]"
                 >
                   <option value="Hadir">Hadir (Memenuhi Kewajiban)</option>
                   <option value="Izin Sah">Izin Sah (Dengan Surat Sakit / Tugas Resmi)</option>
@@ -727,28 +727,28 @@ export const PengawasanPascaTatSection: React.FC<PengawasanPascaTatSectionProps>
               </div>
 
               <div>
-                <label className="font-bold text-slate-700 block mb-1">Catatan Perkembangan & Keterangan</label>
+                <label className="font-bold text-slate-300 block mb-1">Catatan Perkembangan & Keterangan</label>
                 <textarea
                   rows={3}
                   required
                   placeholder="Tuliskan catatan kondisi emosional, kepatuhan, atau alasan ketidakhadiran..."
                   value={jurnalCatatan}
                   onChange={e => setJurnalCatatan(e.target.value)}
-                  className="w-full border border-slate-300 rounded-lg p-2"
+                  className="w-full border border-[#1b3459] rounded-lg p-2 bg-[#081224] text-white placeholder-slate-500 focus:outline-none focus:border-[#38bdf8]"
                 />
               </div>
 
-              <div className="flex justify-end space-x-2 pt-2 border-t border-slate-200">
+              <div className="flex justify-end space-x-2 pt-2 border-t border-[#1b3459]">
                 <button
                   type="button"
                   onClick={() => setShowAddJurnalModal(false)}
-                  className="px-3 py-1.5 border border-slate-300 text-slate-700 rounded-lg"
+                  className="px-3 py-1.5 border border-[#1b3459] text-slate-300 rounded-lg hover:bg-[#14233c] cursor-pointer"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
-                  className="bg-teal-600 hover:bg-teal-700 text-white font-semibold px-4 py-1.5 rounded-lg"
+                  className="bg-teal-600 hover:bg-teal-700 text-white font-semibold px-4 py-1.5 rounded-lg cursor-pointer"
                 >
                   Simpan Catatan
                 </button>
@@ -760,13 +760,13 @@ export const PengawasanPascaTatSection: React.FC<PengawasanPascaTatSectionProps>
 
       {/* MODAL: ADD URINE TEST */}
       {showAddUrinModal && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-5 space-y-4 shadow-xl">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-200">
-              <h4 className="font-bold text-sm text-slate-900">Input Hasil Tes Toksikologi Urin Berkala</h4>
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl">
+            <div className="flex items-center justify-between pb-2 border-b border-[#1b3459]">
+              <h4 className="font-bold text-sm text-white">Input Hasil Tes Toksikologi Urin Berkala</h4>
               <button
                 onClick={() => setShowAddUrinModal(false)}
-                className="text-slate-400 hover:text-slate-600 text-sm"
+                className="text-slate-400 hover:text-white text-sm cursor-pointer"
               >
                 ✕
               </button>
@@ -774,9 +774,9 @@ export const PengawasanPascaTatSection: React.FC<PengawasanPascaTatSectionProps>
 
             <form onSubmit={handleSaveUrin} className="space-y-3 text-xs">
               <div>
-                <label className="font-bold text-slate-700 block mb-1">Jenis Pemeriksaan</label>
-                <div className="flex space-x-4">
-                  <label className="flex items-center space-x-1.5">
+                <label className="font-bold text-slate-300 block mb-1">Jenis Pemeriksaan</label>
+                <div className="flex space-x-4 text-slate-200">
+                  <label className="flex items-center space-x-1.5 cursor-pointer">
                     <input
                       type="radio"
                       name="urinJenis"
@@ -785,7 +785,7 @@ export const PengawasanPascaTatSection: React.FC<PengawasanPascaTatSectionProps>
                     />
                     <span>Terjadwal (Sesuai Kalender)</span>
                   </label>
-                  <label className="flex items-center space-x-1.5">
+                  <label className="flex items-center space-x-1.5 cursor-pointer">
                     <input
                       type="radio"
                       name="urinJenis"
@@ -798,9 +798,9 @@ export const PengawasanPascaTatSection: React.FC<PengawasanPascaTatSectionProps>
               </div>
 
               <div>
-                <label className="font-bold text-slate-700 block mb-1">Hasil Skrining Laboratorium</label>
+                <label className="font-bold text-slate-300 block mb-1">Hasil Skrining Laboratorium</label>
                 <div className="flex space-x-4">
-                  <label className="flex items-center space-x-1.5">
+                  <label className="flex items-center space-x-1.5 cursor-pointer">
                     <input
                       type="radio"
                       name="urinHasil"
@@ -810,9 +810,9 @@ export const PengawasanPascaTatSection: React.FC<PengawasanPascaTatSectionProps>
                         setUrinKeterangan('Hasil uji toksikologi urin negatif / non-reaktif.');
                       }}
                     />
-                    <span className="text-emerald-700 font-bold">NEGATIF (Bersih)</span>
+                    <span className="text-emerald-400 font-bold">NEGATIF (Bersih)</span>
                   </label>
-                  <label className="flex items-center space-x-1.5">
+                  <label className="flex items-center space-x-1.5 cursor-pointer">
                     <input
                       type="radio"
                       name="urinHasil"
@@ -822,32 +822,32 @@ export const PengawasanPascaTatSection: React.FC<PengawasanPascaTatSectionProps>
                         setUrinKeterangan('Indikasi kekambuhan (relapse): Terdeteksi zat metabolit narkotika.');
                       }}
                     />
-                    <span className="text-rose-700 font-bold">POSITIF (Relapse)</span>
+                    <span className="text-rose-400 font-bold">POSITIF (Relapse)</span>
                   </label>
                 </div>
               </div>
 
               <div>
-                <label className="font-bold text-slate-700 block mb-1">Catatan Analisis Lab</label>
+                <label className="font-bold text-slate-300 block mb-1">Catatan Analisis Lab</label>
                 <textarea
                   rows={3}
                   value={urinKeterangan}
                   onChange={e => setUrinKeterangan(e.target.value)}
-                  className="w-full border border-slate-300 rounded-lg p-2"
+                  className="w-full border border-[#1b3459] rounded-lg p-2 bg-[#081224] text-white focus:outline-none focus:border-[#38bdf8]"
                 />
               </div>
 
-              <div className="flex justify-end space-x-2 pt-2 border-t border-slate-200">
+              <div className="flex justify-end space-x-2 pt-2 border-t border-[#1b3459]">
                 <button
                   type="button"
                   onClick={() => setShowAddUrinModal(false)}
-                  className="px-3 py-1.5 border border-slate-300 text-slate-700 rounded-lg"
+                  className="px-3 py-1.5 border border-[#1b3459] text-slate-300 rounded-lg hover:bg-[#14233c] cursor-pointer"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-1.5 rounded-lg"
+                  className="bg-gradient-to-r from-[#144782] via-[#17549c] to-[#1c64b8] hover:from-[#175194] hover:via-[#1c60b0] hover:to-[#2274d4] text-white font-semibold px-4 py-1.5 rounded-lg border border-[#2d7ad6]/60 cursor-pointer"
                 >
                   Simpan Hasil Tes
                 </button>
@@ -859,16 +859,16 @@ export const PengawasanPascaTatSection: React.FC<PengawasanPascaTatSectionProps>
 
       {/* MODAL: ISSUE WARNING (SP) */}
       {showIssueSpModal && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-5 space-y-4 shadow-xl">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-200">
-              <h4 className="font-bold text-sm text-rose-900 flex items-center space-x-1.5">
-                <AlertTriangle className="w-4 h-4 text-rose-600" />
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl">
+            <div className="flex items-center justify-between pb-2 border-b border-[#1b3459]">
+              <h4 className="font-bold text-sm text-amber-300 flex items-center space-x-1.5">
+                <AlertTriangle className="w-4 h-4 text-[#F1C40F]" />
                 <span>Terbitkan Surat Peringatan Kepatuhan (SP)</span>
               </h4>
               <button
                 onClick={() => setShowIssueSpModal(false)}
-                className="text-slate-400 hover:text-slate-600 text-sm"
+                className="text-slate-400 hover:text-white text-sm cursor-pointer"
               >
                 ✕
               </button>
@@ -876,11 +876,11 @@ export const PengawasanPascaTatSection: React.FC<PengawasanPascaTatSectionProps>
 
             <form onSubmit={handleIssueSp} className="space-y-3 text-xs">
               <div>
-                <label className="font-bold text-slate-700 block mb-1">Tingkat Surat Peringatan</label>
+                <label className="font-bold text-slate-300 block mb-1">Tingkat Surat Peringatan</label>
                 <select
                   value={spTingkat}
                   onChange={e => setSpTingkat(e.target.value as any)}
-                  className="w-full border border-slate-300 rounded-lg p-2 bg-white font-medium"
+                  className="w-full border border-[#1b3459] rounded-lg p-2 bg-[#081224] text-white font-medium focus:outline-none focus:border-[#38bdf8]"
                 >
                   <option value="SP-1 (Peringatan Awal)">SP-1 (Peringatan Awal - Mangkir 1x)</option>
                   <option value="SP-2 (Peringatan Keras)">SP-2 (Peringatan Keras - Mangkir 2x)</option>
@@ -889,31 +889,31 @@ export const PengawasanPascaTatSection: React.FC<PengawasanPascaTatSectionProps>
               </div>
 
               <div>
-                <label className="font-bold text-slate-700 block mb-1">Alasan / Uraian Pelanggaran</label>
+                <label className="font-bold text-slate-300 block mb-1">Alasan / Uraian Pelanggaran</label>
                 <textarea
                   rows={4}
                   required
                   value={spAlasan}
                   onChange={e => setSpAlasan(e.target.value)}
-                  className="w-full border border-slate-300 rounded-lg p-2"
+                  className="w-full border border-[#1b3459] rounded-lg p-2 bg-[#081224] text-white focus:outline-none focus:border-[#38bdf8]"
                 />
               </div>
 
-              <div className="p-3 bg-amber-50 rounded-lg border border-amber-200 text-[11px] text-amber-900">
+              <div className="p-3 bg-amber-950/40 rounded-lg border border-amber-500/40 text-[11px] text-amber-200">
                 Penerbitan SP akan tercatat pada sistem e-TAT dan ditembuskan ke Penyidik Polresta/BNN serta Jaksa Penuntut Umum.
               </div>
 
-              <div className="flex justify-end space-x-2 pt-2 border-t border-slate-200">
+              <div className="flex justify-end space-x-2 pt-2 border-t border-[#1b3459]">
                 <button
                   type="button"
                   onClick={() => setShowIssueSpModal(false)}
-                  className="px-3 py-1.5 border border-slate-300 text-slate-700 rounded-lg"
+                  className="px-3 py-1.5 border border-[#1b3459] text-slate-300 rounded-lg hover:bg-[#14233c] cursor-pointer"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
-                  className="bg-rose-600 hover:bg-rose-700 text-white font-semibold px-4 py-1.5 rounded-lg"
+                  className="bg-rose-600 hover:bg-rose-700 text-white font-semibold px-4 py-1.5 rounded-lg cursor-pointer"
                 >
                   Terbitkan Peringatan
                 </button>
@@ -925,53 +925,53 @@ export const PengawasanPascaTatSection: React.FC<PengawasanPascaTatSectionProps>
 
       {/* MODAL: FINISH PROGRAM & CERTIFICATE */}
       {showFinishModal && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-5 space-y-4 shadow-xl">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-200">
-              <h4 className="font-bold text-sm text-emerald-900 flex items-center space-x-1.5">
-                <Award className="w-4 h-4 text-emerald-600" />
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl">
+            <div className="flex items-center justify-between pb-2 border-b border-[#1b3459]">
+              <h4 className="font-bold text-sm text-emerald-300 flex items-center space-x-1.5">
+                <Award className="w-4 h-4 text-emerald-400" />
                 <span>Terbitkan Surat Keterangan Selesai Program (SKSP)</span>
               </h4>
               <button
                 onClick={() => setShowFinishModal(false)}
-                className="text-slate-400 hover:text-slate-600 text-sm"
+                className="text-slate-400 hover:text-white text-sm cursor-pointer"
               >
                 ✕
               </button>
             </div>
 
             <form onSubmit={handleCompleteProgram} className="space-y-3 text-xs">
-              <p className="text-slate-600">
+              <p className="text-slate-300">
                 Tindakan ini menyatakan bahwa klien terperiksa telah menyelesaikan durasi rehabilitasi serta seluruh sesi pengawasan pasca TAT.
               </p>
 
               <div>
-                <label className="font-bold text-slate-700 block mb-1">Predikat Kelulusan Program</label>
+                <label className="font-bold text-slate-300 block mb-1">Predikat Kelulusan Program</label>
                 <select
                   value={skspPredikat}
                   onChange={e => setSkspPredikat(e.target.value as any)}
-                  className="w-full border border-slate-300 rounded-lg p-2 bg-white font-semibold"
+                  className="w-full border border-[#1b3459] rounded-lg p-2 bg-[#081224] text-white font-semibold focus:outline-none focus:border-[#38bdf8]"
                 >
                   <option value="Selesai Baik (Pulih Produktif)">Selesai Baik (Pulih Produktif & Nihil Relapse)</option>
                   <option value="Selesai Cukup">Selesai Cukup (Kompensasi Sesi Terpenuhi)</option>
                 </select>
               </div>
 
-              <div className="p-3 bg-emerald-50 rounded-lg border border-emerald-200 text-[11px] text-emerald-900">
+              <div className="p-3 bg-emerald-950/40 rounded-lg border border-emerald-500/40 text-[11px] text-emerald-200">
                 Dokumen SKSP akan diterbitkan secara sah dan dilampirkan pada laporan akhir pengawasan untuk diserahkan ke Penyidik & Pengadilan.
               </div>
 
-              <div className="flex justify-end space-x-2 pt-2 border-t border-slate-200">
+              <div className="flex justify-end space-x-2 pt-2 border-t border-[#1b3459]">
                 <button
                   type="button"
                   onClick={() => setShowFinishModal(false)}
-                  className="px-3 py-1.5 border border-slate-300 text-slate-700 rounded-lg"
+                  className="px-3 py-1.5 border border-[#1b3459] text-slate-300 rounded-lg hover:bg-[#14233c] cursor-pointer"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
-                  className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-4 py-1.5 rounded-lg"
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-4 py-1.5 rounded-lg cursor-pointer"
                 >
                   Terbitkan Sertifikat SKSP
                 </button>

@@ -17,10 +17,13 @@ export const AsesmenMedisView: React.FC<AsesmenMedisViewProps> = ({
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-slate-900 flex items-center space-x-2">
-            <Stethoscope className="w-5 h-5 text-emerald-600" />
-            <span>Asesmen Medis</span>
+          <h1 className="text-xl font-bold text-white flex items-center space-x-2 font-['Cinzel',serif]">
+            <Stethoscope className="w-5 h-5 text-[#38bdf8]" />
+            <span>Asesmen Medis & Psikiatri</span>
           </h1>
+          <p className="text-xs text-slate-400 mt-1">
+            Pemeriksaan fisik, diagnosis ICD-10 (F10-F19), uji urin konfirmasi, dan pemetaan tingkat adiksi instrumen WHO ASSIST.
+          </p>
         </div>
       </div>
 
@@ -31,38 +34,38 @@ export const AsesmenMedisView: React.FC<AsesmenMedisViewProps> = ({
             <div
               key={item.id}
               onClick={() => onSelectPermohonan(item.id)}
-              className="bg-white border border-slate-200 hover:border-emerald-400 rounded-xl p-5 transition-all cursor-pointer space-y-3"
+              className="bg-[#0b172a] border border-[#1b3459] hover:border-[#38bdf8] rounded-xl p-5 transition-all cursor-pointer space-y-3 shadow-lg shadow-black/20 group"
             >
               <div className="flex items-start justify-between">
                 <div>
-                  <span className="font-bold text-sm text-slate-900">{item.nomorPermohonan}</span>
-                  <p className="text-xs font-semibold text-slate-700 mt-0.5">{item.terperiksa.namaLengkap} ({item.terperiksa.usia} th)</p>
-                  <p className="text-[11px] text-slate-500">BB: {item.perkara.barangBuktiList.map(b => `${b.jenisZat} ${b.beratBersihGram}g`).join(', ')}</p>
+                  <span className="font-bold text-sm text-white group-hover:text-[#38bdf8] font-mono transition-colors">{item.nomorPermohonan}</span>
+                  <p className="text-xs font-semibold text-slate-200 mt-0.5">{item.terperiksa.namaLengkap} ({item.terperiksa.usia} th)</p>
+                  <p className="text-[11px] text-slate-400">BB: {item.perkara.barangBuktiList.map(b => `${b.jenisZat} ${b.beratBersihGram}g`).join(', ')}</p>
                 </div>
                 <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${
-                  hasMedis ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : 'bg-amber-100 text-amber-800 border-amber-300'
+                  hasMedis ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40' : 'bg-amber-500/20 text-amber-300 border-amber-500/40'
                 }`}>
                   {hasMedis ? 'Asesmen Selesai' : 'Perlu Pemeriksaan'}
                 </span>
               </div>
 
               {hasMedis ? (
-                <div className="bg-slate-50 rounded-lg p-3 text-xs space-y-1 text-slate-700 border border-slate-100">
-                  <p>Diagnosis: <strong className="text-slate-900">{item.asesmenMedis?.diagnosisKlinisIcd}</strong></p>
-                  <p>ASSIST: <strong>{item.asesmenMedis?.skorInstrumen} Poin</strong> ({item.asesmenMedis?.tingkatRisikoInstrumen})</p>
-                  <p>Rekomendasi Medis: <strong className="text-emerald-700">{item.asesmenMedis?.kebutuhanRawat} ({item.asesmenMedis?.durasiUsulanBulan} Bulan)</strong></p>
+                <div className="bg-[#081224] rounded-lg p-3 text-xs space-y-1 text-slate-300 border border-[#1b3459]">
+                  <p>Diagnosis: <strong className="text-white">{item.asesmenMedis?.diagnosisKlinisIcd}</strong></p>
+                  <p>ASSIST: <strong className="text-white">{item.asesmenMedis?.skorInstrumen} Poin</strong> ({item.asesmenMedis?.tingkatRisikoInstrumen})</p>
+                  <p>Rekomendasi Medis: <strong className="text-emerald-300">{item.asesmenMedis?.kebutuhanRawat} ({item.asesmenMedis?.durasiUsulanBulan} Bulan)</strong></p>
                 </div>
               ) : (
-                <div className="bg-amber-50 rounded-lg p-3 text-xs text-amber-900 border border-amber-100">
+                <div className="bg-amber-500/10 rounded-lg p-3 text-xs text-amber-200 border border-amber-500/30">
                   Pemeriksaan fisik & wawancara klinis belum diinput. Klik untuk membuka formulir asesmen medis.
                 </div>
               )}
 
-              <div className="flex items-center justify-between text-[11px] text-slate-400 pt-1 border-t border-slate-100">
+              <div className="flex items-center justify-between text-[11px] text-slate-400 pt-1 border-t border-[#1b3459]">
                 <span>Dokter: {item.asesmenMedis?.asesorNama || 'Belum diisi'}</span>
-                <span className="text-emerald-700 font-semibold flex items-center space-x-1">
+                <span className="text-[#38bdf8] font-semibold flex items-center space-x-1 group-hover:translate-x-0.5 transition-transform">
                   <span>Buka Lembar Medis</span>
-                  <ArrowRight className="w-3 h-3" />
+                  <ArrowRight className="w-3 h-3 text-[#F1C40F]" />
                 </span>
               </div>
             </div>

@@ -96,7 +96,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               label: 'Daftar Berkas',
               icon: <FileSpreadsheet className="w-4 h-4" />,
               badge: badgeCounts.perluPerbaikan > 0 ? badgeCounts.perluPerbaikan : undefined,
-              badgeColor: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+              badgeColor: 'bg-[#1E2D4A] text-slate-200 border-[#2A3F6D]',
               category: 'utama'
             },
             {
@@ -104,7 +104,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               label: 'Perbaikan Berkas',
               icon: <FileCheck2 className="w-4 h-4" />,
               badge: badgeCounts.perluPerbaikan > 0 ? badgeCounts.perluPerbaikan : undefined,
-              badgeColor: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+              badgeColor: 'bg-[#1E2D4A] text-slate-200 border-[#2A3F6D]',
               category: 'utama'
             },
             {
@@ -188,7 +188,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               label: 'Rujukan & Fasilitas',
               icon: <Share2 className="w-4 h-4" />,
               badge: badgeCounts.tindakLanjutTerhambat > 0 ? badgeCounts.tindakLanjutTerhambat : undefined,
-              badgeColor: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+              badgeColor: 'bg-[#1E2D4A] text-slate-200 border-[#2A3F6D]',
               category: 'output'
             },
             {
@@ -323,7 +323,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               label: 'Rujukan & Fasilitas',
               icon: <Share2 className="w-4 h-4" />,
               badge: badgeCounts.tindakLanjutTerhambat > 0 ? badgeCounts.tindakLanjutTerhambat : undefined,
-              badgeColor: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+              badgeColor: 'bg-[#1E2D4A] text-slate-200 border-[#2A3F6D]',
               category: 'utama'
             },
             {
@@ -366,7 +366,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               label: 'Rujukan & Fasilitas',
               icon: <Share2 className="w-4 h-4" />,
               badge: badgeCounts.tindakLanjutTerhambat > 0 ? badgeCounts.tindakLanjutTerhambat : undefined,
-              badgeColor: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+              badgeColor: 'bg-[#1E2D4A] text-slate-200 border-[#2A3F6D]',
               category: 'kelola'
             },
             {
@@ -397,7 +397,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               label: 'Rujukan Klien',
               icon: <Share2 className="w-4 h-4" />,
               badge: badgeCounts.tindakLanjutTerhambat > 0 ? badgeCounts.tindakLanjutTerhambat : undefined,
-              badgeColor: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+              badgeColor: 'bg-[#1E2D4A] text-slate-200 border-[#2A3F6D]',
               category: 'output'
             },
             {
@@ -525,7 +525,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               onOpenNewModal();
               if (onCloseMobile) onCloseMobile();
             }}
-            className="w-full flex items-center justify-center space-x-2 bg-gradient-to-r from-[#D4AF37] to-[#AA7C11] hover:brightness-110 text-slate-950 font-extrabold py-2.5 px-3.5 rounded-xl border border-[#FFF2B2]/40 shadow-md shadow-[#D4AF37]/15 transition-all text-xs cursor-pointer"
+            className="w-full flex items-center justify-center space-x-2 bg-[#133863] hover:bg-[#1a4a82] text-white font-bold py-2.5 px-3.5 rounded-xl border border-[#235594] shadow-md transition-all text-xs cursor-pointer"
           >
             <Plus className="w-4 h-4 stroke-[2.5]" />
             <span>{navConfig.buttonLabel}</span>
@@ -548,7 +548,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 onClick={() => handleItemClick(item.id)}
                 className={`w-full group flex items-center justify-between px-3 py-2 text-xs font-semibold rounded-xl transition-all duration-150 text-left cursor-pointer ${
                   isActive
-                    ? 'bg-[#14213D] text-[#F3E5AB] font-bold border-l-3 border-[#D4AF37] shadow-sm'
+                    ? 'bg-[#14213D] text-white font-bold border-l-3 border-[#38bdf8] shadow-sm'
                     : 'text-slate-300 hover:text-white hover:bg-[#14213D]/60'
                 }`}
               >
@@ -556,7 +556,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <span
                     className={`shrink-0 transition-colors ${
                       isActive
-                        ? 'text-[#D4AF37]'
+                        ? 'text-[#38bdf8]'
                         : 'text-slate-400 group-hover:text-slate-200'
                     }`}
                   >
@@ -587,9 +587,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <button
               type="button"
               onClick={onGoToLanding}
-              className="w-full flex items-center space-x-2.5 px-3 py-2 text-xs font-semibold text-slate-300 hover:text-[#D4AF37] hover:bg-[#14213D] rounded-xl transition-colors cursor-pointer border border-transparent hover:border-[#2A3F6D]"
+              className="w-full flex items-center space-x-2.5 px-3 py-2 text-xs font-semibold text-slate-300 hover:text-white hover:bg-[#14213D] rounded-xl transition-colors cursor-pointer border border-transparent hover:border-[#2A3F6D]"
             >
-              <Globe className="w-4 h-4 text-[#D4AF37]" />
+              <Globe className="w-4 h-4 text-slate-400" />
               <span>Portal Publik Utama</span>
             </button>
           )}
@@ -597,9 +597,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <button
               type="button"
               onClick={onLogout}
-              className="w-full flex items-center space-x-2.5 px-3 py-2 text-xs font-semibold text-rose-300 hover:text-rose-200 hover:bg-rose-950/40 rounded-xl transition-colors cursor-pointer border border-transparent hover:border-rose-900/40"
+              className="w-full flex items-center space-x-2.5 px-3 py-2 text-xs font-semibold text-slate-400 hover:text-white hover:bg-[#14213D] rounded-xl transition-colors cursor-pointer border border-transparent hover:border-[#2A3F6D]"
             >
-              <LogOut className="w-4 h-4 text-rose-400" />
+              <LogOut className="w-4 h-4 text-slate-400" />
               <span>Ganti Akun / Logout</span>
             </button>
           )}

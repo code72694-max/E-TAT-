@@ -65,7 +65,7 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
             <PoliceEmblem size="sm" />
             <div className="flex items-center space-x-2 min-w-0">
               <span className="font-extrabold text-base sm:text-lg tracking-wider text-white font-['Cinzel',serif] truncate">
-                E-TAT <span className="text-[#F1C40F]">PRESISI</span>
+                E-TAT <span className="text-[#D4AF37]">PRESISI</span>
               </span>
               <span className="hidden sm:inline-block text-[#1b3459]">|</span>
               <span className="hidden sm:inline-block text-xs font-semibold text-slate-300">
@@ -74,52 +74,52 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
             </div>
           </div>
 
-          {/* Navigation Links (Desktop) */}
-          <nav className="hidden md:flex items-center space-x-6 text-xs font-semibold text-slate-300">
-            <a href="#pantauan-tat" className="hover:text-white transition-colors flex items-center space-x-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#38bdf8] shadow-[0_0_6px_#38bdf8]" />
-              <span className="text-[#38bdf8]">Pantauan Kinerja</span>
-            </a>
-            <a href="#gerakan-sekorna" className="hover:text-white transition-colors flex items-center space-x-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#F1C40F]" />
-              <span>Inisiatif SEKORNA</span>
-            </a>
-            <a href="#alur-layanan" className="hover:text-white transition-colors">
-              Alur SOP
-            </a>
-            <a href="#lacak-berkas" className="hover:text-white transition-colors">
-              Lacak Berkas
-            </a>
-            <a href="#pengawasan" className="hover:text-white transition-colors">
-              Pengawasan
-            </a>
-            <a href="#dasar-hukum" className="hover:text-white transition-colors">
-              Dasar Regulasi
-            </a>
-          </nav>
+          {/* Right Navigation & Action - Mepet Kanan & Clean */}
+          <div className="flex items-center space-x-5 lg:space-x-6 shrink-0">
+            {/* Navigation Links (Desktop) */}
+            <nav className="hidden md:flex items-center space-x-5 lg:space-x-6 text-xs font-medium text-slate-300">
+              <a href="#pantauan-tat" className="hover:text-white transition-colors duration-150">
+                Pantauan Kinerja
+              </a>
+              <a href="#gerakan-sekorna" className="hover:text-white transition-colors duration-150">
+                Inisiatif SEKORNA
+              </a>
+              <a href="#alur-layanan" className="hover:text-white transition-colors duration-150">
+                Alur SOP
+              </a>
+              <a href="#lacak-berkas" className="hover:text-white transition-colors duration-150">
+                Lacak Berkas
+              </a>
+              <a href="#pengawasan" className="hover:text-white transition-colors duration-150">
+                Pengawasan
+              </a>
+              <a href="#dasar-hukum" className="hover:text-white transition-colors duration-150">
+                Dasar Regulasi
+              </a>
+            </nav>
 
-          {/* Primary Action Button */}
-          <div className="flex items-center space-x-2 shrink-0">
+            {/* Subtle Divider before Action */}
+            <div className="hidden md:block h-4 w-px bg-[#1b3459]" />
+
+            {/* Primary Action Button */}
             <button
               onClick={() => onGoToLogin()}
-              className="bg-gradient-to-r from-[#144782] via-[#17549c] to-[#1c64b8] hover:from-[#175194] hover:via-[#1c60b0] hover:to-[#2274d4] text-white font-semibold text-xs px-3.5 py-2 sm:px-4 sm:py-2 rounded-lg shadow-[0_2px_10px_rgba(20,83,154,0.35)] flex items-center space-x-1.5 transition-all cursor-pointer border border-[#2d7ad6]/60 hover:border-[#4392f2]/80 hover:shadow-[0_0_15px_rgba(45,122,214,0.4)]"
+              className="bg-[#133863] hover:bg-[#1a4a82] text-white font-semibold text-xs px-3.5 py-2 sm:px-4 sm:py-2 rounded-lg shadow-md flex items-center space-x-1.5 transition-all cursor-pointer border border-[#235594]"
             >
-              <LogIn className="w-3.5 h-3.5 text-[#F1C40F]" />
+              <LogIn className="w-3.5 h-3.5 text-white" />
               <span>Masuk Portal</span>
             </button>
           </div>
         </div>
 
         {/* Mobile Quick Subnav Bar */}
-        <div className="md:hidden flex items-center space-x-4 px-4 py-2 bg-[#0a182f] border-t border-[#1b3459] overflow-x-auto scrollbar-none text-[11px] font-semibold text-slate-300 whitespace-nowrap">
-          <a href="#pantauan-tat" className="text-[#38bdf8] flex items-center space-x-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#38bdf8]" />
-            <span>Pantauan Kinerja</span>
+        <div className="md:hidden flex items-center space-x-4 px-4 py-2 bg-[#0a182f] border-t border-[#1b3459] overflow-x-auto scrollbar-none text-[11px] font-medium text-slate-300 whitespace-nowrap">
+          <a href="#pantauan-tat" className="hover:text-white">
+            Pantauan Kinerja
           </a>
           <span className="text-slate-600">·</span>
-          <a href="#gerakan-sekorna" className="hover:text-white flex items-center space-x-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#F1C40F]" />
-            <span>Inisiatif SEKORNA</span>
+          <a href="#gerakan-sekorna" className="hover:text-white">
+            Inisiatif SEKORNA
           </a>
           <span className="text-slate-600">·</span>
           <a href="#alur-layanan" className="hover:text-white">
@@ -140,61 +140,39 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
         </div>
       </header>
 
-      {/* HERO SECTION - Ultra Clean, Centered, Authoritative & Focused (Full Screen Viewport) */}
-      <section className="relative overflow-hidden min-h-[calc(100vh-65px)] flex flex-col justify-center items-center py-10 sm:py-16 bg-[#071326] border-b border-[#1b3459]">
-        <div className="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6 sm:space-y-8 my-auto">
-          {/* Acronym Badge - Staggered 1 */}
-          <div className="animate-hero-badge inline-flex items-center space-x-2 bg-[#0d1f38] text-slate-200 px-3.5 py-1.5 rounded-full text-[11px] sm:text-xs font-bold tracking-wide border border-[#1b3459] shadow-md">
-            <span className="w-2 h-2 rounded-full bg-[#F1C40F] shadow-[0_0_8px_#F1C40F]" />
-            <span className="font-extrabold text-[#F1C40F] font-mono tracking-wider">SEKORNA</span>
-            <span className="text-slate-500">·</span>
-            <span className="text-slate-300">Sentra Asesmen Terpadu Narkotika</span>
-          </div>
+      {/* HERO SECTION - Pure Clean & Authoritative (No Silhouettes, No Graphics, No Colorful Highlights) */}
+      <section className="relative overflow-hidden min-h-[calc(100vh-65px)] flex flex-col justify-center items-center py-12 sm:py-20 bg-[#071326] border-b border-[#1b3459]">
+        {/* Subtle Ambient Radial Glow (Clean, Zero Clutter, No Silhouettes) */}
+        <div className="absolute inset-0 pointer-events-none select-none z-0">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(20,70,130,0.18)_0%,rgba(7,19,38,0.7)_55%,#071326_100%)]" />
+        </div>
 
-          {/* Grand Centered Headline - STRICTLY LOCKED TO EXACTLY 2 LINES with Staggered 2 & 3 */}
+        {/* Content Container */}
+        <div className="relative z-10 max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6 sm:space-y-8 my-auto">
+          {/* Grand Centered Headline */}
           <h1 className="text-[clamp(1.15rem,3.5vw,2.85rem)] font-extrabold text-white tracking-tight sm:tracking-wider leading-[1.3] font-['Cinzel',serif] max-w-full mx-auto px-1">
             <span className="block whitespace-nowrap animate-hero-title-1">
-              SELAMATKAN KORBAN, <span className="text-[#F1C40F] drop-shadow-[0_2px_12px_rgba(241,196,15,0.25)]">PULIHKAN</span>
+              SELAMATKAN KORBAN, <span className="text-[#D4AF37]">PULIHKAN</span>
             </span>
             <span className="block whitespace-nowrap animate-hero-title-2">
-              <span className="text-[#F1C40F] drop-shadow-[0_2px_12px_rgba(241,196,15,0.25)]">MASA DEPAN,</span> SIKAT HABIS SINDIKAT.
+              <span className="text-[#D4AF37]">MASA DEPAN,</span> SIKAT HABIS SINDIKAT.
             </span>
           </h1>
 
-          {/* Concise, High-Impact Description - Staggered 4 */}
+          {/* Concise, High-Impact Description */}
           <p className="animate-hero-desc text-slate-300 text-xs sm:text-sm md:text-base leading-relaxed max-w-2xl mx-auto font-normal px-2">
             Sinergi penegakan hukum terpadu: Merehabilitasi korban penyalahguna secara medis dan sosial, serta menindak tegas pengedar demi kepastian hukum.
           </p>
-
-          {/* Action Buttons (Centered) - Staggered 5 */}
-          <div className="animate-hero-actions flex flex-col sm:flex-row sm:items-center justify-center gap-3.5 pt-2 w-full sm:w-auto">
-            <button
-              onClick={() => onGoToLogin()}
-              className="w-full sm:w-auto bg-gradient-to-r from-[#144782] via-[#17549c] to-[#1c64b8] hover:from-[#175194] hover:via-[#1c60b0] hover:to-[#2274d4] text-white font-bold text-xs sm:text-sm px-7 py-3 rounded-xl shadow-[0_4px_20px_rgba(20,83,154,0.45)] hover:shadow-[0_0_25px_rgba(45,122,214,0.55)] flex items-center justify-center space-x-2 transition-all cursor-pointer border border-[#2d7ad6]/70 hover:border-[#4392f2] hover:scale-[1.01]"
-            >
-              <LogIn className="w-4 h-4 text-[#F1C40F]" />
-              <span>Akses Portal Petugas</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
-
-            <a
-              href="#lacak-berkas"
-              className="w-full sm:w-auto bg-[#0d1f38] hover:bg-[#122846] text-slate-200 border border-[#1b3459] font-semibold text-xs sm:text-sm px-6 py-3 rounded-xl flex items-center justify-center space-x-2 transition-all shadow-md hover:border-slate-500"
-            >
-              <Search className="w-4 h-4 text-[#38bdf8]" />
-              <span>Lacak Berkas Perkara</span>
-            </a>
-          </div>
         </div>
       </section>
 
-      {/* COMMAND CENTER MONITORING SECTION (LIVE ANALYTICS MATCHING REFERENCE THEME) */}
+      {/* COMMAND CENTER MONITORING SECTION */}
       <section id="pantauan-tat" className="py-12 sm:py-16 bg-[#081225] border-b border-[#1b3459]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
           <div className="text-center max-w-3xl mx-auto space-y-2.5">
-            <div className="inline-flex items-center space-x-2 text-[10px] sm:text-xs font-bold uppercase tracking-wider text-[#38bdf8] bg-[#0d1f38] px-3.5 py-1.5 rounded-lg border border-[#1b3459]">
-              <Activity className="w-3.5 h-3.5 text-[#38bdf8]" />
-              <span>PANTAUAN INTELIJEN & KINERJA OPERASIONAL e-TAT</span>
+            <div className="inline-flex items-center space-x-2 text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-300 bg-[#0d1f38] px-3.5 py-1.5 rounded-lg border border-[#1b3459]">
+              <Activity className="w-3.5 h-3.5 text-slate-400" />
+              <span>PANTAUAN OPERASIONAL e-TAT</span>
             </div>
             <h2 className="text-xl sm:text-3xl font-extrabold text-white tracking-tight font-['Cinzel',serif]">
               Dasbor Kinerja Penegakan Hukum & Pemulihan
@@ -214,11 +192,11 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 sm:space-y-10">
           <div className="text-center max-w-3xl mx-auto space-y-2.5 sm:space-y-3">
             <div className="inline-flex items-center space-x-2 text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-300 bg-[#0d1f38] px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-lg border border-[#1b3459]">
-              <LifeBuoy className="w-3.5 h-3.5 text-[#F1C40F]" />
+              <LifeBuoy className="w-3.5 h-3.5 text-slate-400" />
               <span>DOKTRIN & FILOSOFI PENYELAMATAN GENERASI</span>
             </div>
             <h2 className="text-xl sm:text-3xl font-extrabold text-white tracking-tight font-['Cinzel',serif] px-1">
-              Inisiatif <span className="text-[#F1C40F]">SEKORNA</span>: SElamatkan KORban NArkotika
+              Inisiatif SEKORNA: SElamatkan KORban NArkotika
             </h2>
             <p className="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-2xl mx-auto px-2">
               Singkatan kata <strong className="text-white">SEKORNA</strong> merangkum tekad moral Tim Asesmen Terpadu Polri & BNN: <em className="text-slate-200">memulihkan korban kecanduan dengan rehabilitasi, seraya menumpas pengedar dan bandar tanpa kompromi</em>.
@@ -228,12 +206,12 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
           {/* 3 Pillar Cards Deconstructing the Acronym */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
             {/* SE - Selamatkan */}
-            <div className="bg-[#0d1f38] border border-[#1b3459] rounded-2xl p-5 sm:p-6 space-y-3.5 hover:border-blue-400/50 transition-all shadow-lg">
+            <div className="bg-[#0d1f38] border border-[#1b3459] rounded-2xl p-5 sm:p-6 space-y-3.5 hover:border-[#2a4d80] transition-all shadow-lg">
               <div className="flex items-center justify-between">
                 <span className="font-mono text-2xl sm:text-3xl font-black text-white bg-[#0a182f] border border-[#1b3459] w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center">
                   SE
                 </span>
-                <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-300 bg-[#0a182f] px-2.5 py-1 rounded-md border border-[#1b3459]">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-300 bg-[#0a182f] px-2.5 py-1 rounded-md border border-[#1b3459]">
                   PILAR PERTAMA
                 </span>
               </div>
@@ -246,18 +224,18 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
                 </p>
               </div>
               <div className="pt-3 border-t border-[#1b3459] text-[11px] font-semibold text-slate-300 flex items-center space-x-1.5">
-                <HeartHandshake className="w-3.5 h-3.5 text-blue-400" />
+                <HeartHandshake className="w-3.5 h-3.5 text-slate-400" />
                 <span>Amanat Pasal 54 UU No. 35/2009</span>
               </div>
             </div>
 
             {/* KOR - Korban Dipulihkan */}
-            <div className="bg-[#0d1f38] border border-[#1b3459] rounded-2xl p-5 sm:p-6 space-y-3.5 hover:border-[#F1C40F]/50 transition-all shadow-lg">
+            <div className="bg-[#0d1f38] border border-[#1b3459] rounded-2xl p-5 sm:p-6 space-y-3.5 hover:border-[#2a4d80] transition-all shadow-lg">
               <div className="flex items-center justify-between">
                 <span className="font-mono text-2xl sm:text-3xl font-black text-white bg-[#0a182f] border border-[#1b3459] w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center">
                   KOR
                 </span>
-                <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#F1C40F] bg-[#0a182f] px-2.5 py-1 rounded-md border border-[#F1C40F]/30">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-300 bg-[#0a182f] px-2.5 py-1 rounded-md border border-[#1b3459]">
                   PILAR KEDUA
                 </span>
               </div>
@@ -270,18 +248,18 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
                 </p>
               </div>
               <div className="pt-3 border-t border-[#1b3459] text-[11px] font-semibold text-slate-300 flex items-center space-x-1.5">
-                <Scale className="w-3.5 h-3.5 text-[#F1C40F]" />
+                <Scale className="w-3.5 h-3.5 text-slate-400" />
                 <span>Keadilan Restoratif Perpol 08/2021</span>
               </div>
             </div>
 
             {/* NA - Narkotika Diberantas */}
-            <div className="bg-[#0d1f38] border border-[#1b3459] rounded-2xl p-5 sm:p-6 space-y-3.5 hover:border-emerald-400/50 transition-all shadow-lg">
+            <div className="bg-[#0d1f38] border border-[#1b3459] rounded-2xl p-5 sm:p-6 space-y-3.5 hover:border-[#2a4d80] transition-all shadow-lg">
               <div className="flex items-center justify-between">
                 <span className="font-mono text-2xl sm:text-3xl font-black text-white bg-[#0a182f] border border-[#1b3459] w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center">
                   NA
                 </span>
-                <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-300 bg-[#0a182f] px-2.5 py-1 rounded-md border border-[#1b3459]">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-300 bg-[#0a182f] px-2.5 py-1 rounded-md border border-[#1b3459]">
                   PILAR KETIGA
                 </span>
               </div>
@@ -294,7 +272,7 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
                 </p>
               </div>
               <div className="pt-3 border-t border-[#1b3459] text-[11px] font-semibold text-slate-300 flex items-center space-x-1.5">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                <ShieldCheck className="w-3.5 h-3.5 text-slate-400" />
                 <span>SEMA 04/2010 & UU 35/2009</span>
               </div>
             </div>
@@ -303,11 +281,11 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
           {/* Moral Manifesto Banner */}
           <div className="bg-[#071326] text-white rounded-2xl p-5 sm:p-7 flex flex-col md:flex-row items-center justify-between gap-5 sm:gap-6 border border-[#1b3459] text-center md:text-left shadow-xl">
             <div className="flex flex-col md:flex-row items-center space-y-3 md:space-y-0 md:space-x-4">
-              <div className="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center shrink-0">
-                <LifeBuoy className="w-6 h-6 text-[#38bdf8]" />
+              <div className="w-12 h-12 rounded-xl bg-[#0a182f] border border-[#1b3459] flex items-center justify-center shrink-0">
+                <LifeBuoy className="w-6 h-6 text-slate-300" />
               </div>
               <div>
-                <span className="text-[10px] uppercase font-bold tracking-widest text-[#F1C40F] block font-mono">
+                <span className="text-[10px] uppercase font-bold tracking-widest text-slate-400 block font-mono">
                   KOMITMEN MORAL PENEGAK HUKUM INDONESIA
                 </span>
                 <h4 className="text-sm sm:text-lg font-bold text-white mt-0.5">
@@ -321,10 +299,10 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
 
             <button
               onClick={() => onGoToLogin()}
-              className="w-full md:w-auto bg-[#F1C40F] hover:bg-[#d4ac0d] text-slate-950 font-bold text-xs px-5 py-3 rounded-xl shrink-0 transition-all cursor-pointer flex items-center justify-center space-x-2 shadow-md"
+              className="w-full md:w-auto bg-[#133863] hover:bg-[#1a4a82] text-white font-bold text-xs px-5 py-3 rounded-xl shrink-0 transition-all cursor-pointer flex items-center justify-center space-x-2 border border-[#235594]"
             >
               <span>Akses Portal Penanganan Berkas</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <ArrowRight className="w-3.5 h-3.5 text-white" />
             </button>
           </div>
         </div>
@@ -360,9 +338,9 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
               </div>
               <button
                 type="submit"
-                className="w-full sm:w-auto bg-gradient-to-r from-[#144782] via-[#17549c] to-[#1c64b8] hover:from-[#175194] hover:via-[#1c60b0] hover:to-[#2274d4] text-white text-xs sm:text-sm font-bold px-6 py-2.5 rounded-xl flex items-center justify-center space-x-2 cursor-pointer transition-all shrink-0 shadow-[0_2px_12px_rgba(20,83,154,0.4)] border border-[#2d7ad6]/70 hover:border-[#4392f2]"
+                className="w-full sm:w-auto bg-[#133863] hover:bg-[#1a4a82] text-white text-xs sm:text-sm font-bold px-6 py-2.5 rounded-xl flex items-center justify-center space-x-2 cursor-pointer transition-all shrink-0 border border-[#235594]"
               >
-                <Search className="w-4 h-4 text-[#F1C40F]" />
+                <Search className="w-4 h-4 text-white" />
                 <span>Cari Doket</span>
               </button>
             </div>
@@ -433,18 +411,18 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
               <div className="flex justify-end pt-1">
                 <button
                   onClick={() => onGoToLogin()}
-                  className="w-full sm:w-auto bg-gradient-to-r from-[#144782] via-[#17549c] to-[#1c64b8] hover:from-[#175194] hover:via-[#1c60b0] hover:to-[#2274d4] text-white text-xs font-bold px-4 py-2.5 rounded-xl flex items-center justify-center space-x-2 transition-all cursor-pointer shadow-[0_2px_12px_rgba(20,83,154,0.4)] border border-[#2d7ad6]/70 hover:border-[#4392f2]"
+                  className="w-full sm:w-auto bg-[#133863] hover:bg-[#1a4a82] text-white text-xs font-bold px-4 py-2.5 rounded-xl flex items-center justify-center space-x-2 transition-all cursor-pointer border border-[#235594]"
                 >
                   <span>Buka Berkas di Portal Petugas</span>
-                  <ArrowRight className="w-3.5 h-3.5 text-[#F1C40F]" />
+                  <ArrowRight className="w-3.5 h-3.5 text-white" />
                 </button>
               </div>
             </div>
           )}
 
           {trackedResult === 'not_found' && (
-            <div className="mt-4 p-3.5 sm:p-4 bg-amber-500/10 border border-amber-500/30 rounded-xl text-xs text-amber-300 flex items-start sm:items-center space-x-2.5">
-              <AlertCircle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5 sm:mt-0" />
+            <div className="mt-4 p-3.5 sm:p-4 bg-[#0a182f] border border-[#1b3459] rounded-xl text-xs text-slate-300 flex items-start sm:items-center space-x-2.5">
+              <AlertCircle className="w-4 h-4 text-slate-400 shrink-0 mt-0.5 sm:mt-0" />
               <span>Nomor registrasi doket perkara atau nama tersangka tidak ditemukan dalam basis data e-TAT. Mohon periksa kembali nomor permohonan Anda.</span>
             </div>
           )}
@@ -473,67 +451,67 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
                 title: 'Registrasi Tangkapan 1x24 Jam',
                 actor: 'Penyidik Satresnarkoba / BNN',
                 desc: 'Maksimal 1x24 jam sejak tersangka diamankan dengan unggah 7 berkas formil persyaratan hukum.',
-                icon: <FileCheck className="w-5 h-5 text-[#38bdf8]" />
+                icon: <FileCheck className="w-5 h-5 text-slate-300" />
               },
               {
                 step: '02',
                 title: 'Uji Formil Berkas Legalitas',
                 actor: 'Sekretariat TAT',
                 desc: 'Pemeriksaan keabsahan Sprintik, BAP, BA Penangkapan, BA Penggeledahan, dan Surat Permohonan.',
-                icon: <CheckCircle2 className="w-5 h-5 text-[#4ade80]" />
+                icon: <CheckCircle2 className="w-5 h-5 text-slate-300" />
               },
               {
                 step: '03',
                 title: 'Disposisi Surat Perintah Asesmen',
                 actor: 'Sekretariat & Koordinator',
                 desc: 'Penetapan Surat Perintah Tugas Asesor Medis, Asesor Hukum, ruang klinis, dan jadwal waktu.',
-                icon: <Calendar className="w-5 h-5 text-[#fbbf24]" />
+                icon: <Calendar className="w-5 h-5 text-slate-300" />
               },
               {
                 step: '04',
                 title: 'Pemeriksaan Forensik & Yuridis',
                 actor: 'Tim Asesor Medis & Hukum',
                 desc: 'Wawancara instrumen WHO ASSIST, uji skrining urin laboratorium, serta telaah batas berat SEMA 04/2010.',
-                icon: <Stethoscope className="w-5 h-5 text-indigo-400" />
+                icon: <Stethoscope className="w-5 h-5 text-slate-300" />
               },
               {
                 step: '05',
                 title: 'Sidang Pleno Komparatif',
                 actor: 'Koordinator & Seluruh Asesor',
                 desc: 'Musyawarah pleno menyatukan diagnosis medis dan status hukum peran perkara tersangka.',
-                icon: <Users className="w-5 h-5 text-purple-400" />
+                icon: <Users className="w-5 h-5 text-slate-300" />
               },
               {
                 step: '06',
                 title: 'Pengesahan Rekomendasi Terpadu',
                 actor: '3 Pihak: Koordinator, Medis, Hukum',
                 desc: 'Penandatanganan digital resmi dan penerbitan sertifikat QR Code anti-pemalsuan siber.',
-                icon: <FileSignature className="w-5 h-5 text-[#F1C40F]" />
+                icon: <FileSignature className="w-5 h-5 text-slate-300" />
               },
               {
                 step: '07',
                 title: 'Koordinasi Rujukan & Eksekusi',
                 actor: 'Balai Rehabilitasi & Penyidik',
                 desc: 'Konfirmasi kuota kamar, pengawalan tersangka ke balai rehabilitasi, serta pelimpahan berkas P-21.',
-                icon: <Share2 className="w-5 h-5 text-teal-400" />
+                icon: <Share2 className="w-5 h-5 text-slate-300" />
               },
               {
                 step: '08',
                 title: 'Pengawasan Kepatuhan Pasca TAT',
                 actor: 'Konselor, Penyidik & Bapas',
                 desc: 'Pemantauan wajib lapor mingguan, uji skrining urin acak bebas relapse, sanksi SP, dan SKSP kelulusan.',
-                icon: <Activity className="w-5 h-5 text-emerald-400" />
+                icon: <Activity className="w-5 h-5 text-slate-300" />
               }
             ].map(item => (
               <div
                 key={item.step}
-                className="bg-[#0d1f38] p-4 sm:p-5 rounded-xl sm:rounded-2xl border border-[#1b3459] space-y-2.5 hover:border-blue-400/50 hover:bg-[#112644] transition-all group shadow-md"
+                className="bg-[#0d1f38] p-4 sm:p-5 rounded-xl sm:rounded-2xl border border-[#1b3459] space-y-2.5 hover:border-[#2a4d80] transition-all group shadow-md"
               >
                 <div className="flex items-center justify-between">
                   <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#0a182f] border border-[#1b3459] flex items-center justify-center">
                     {item.icon}
                   </div>
-                  <span className="font-mono font-extrabold text-xs sm:text-sm text-slate-500 group-hover:text-[#38bdf8] transition-colors">{item.step}</span>
+                  <span className="font-mono font-extrabold text-xs sm:text-sm text-slate-500 group-hover:text-slate-300 transition-colors">{item.step}</span>
                 </div>
                 <div>
                   <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wide">{item.actor}</span>
@@ -571,11 +549,11 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
                     <span className="text-[10px] sm:text-[11px] text-slate-400 font-normal">Acak Bebas Relapse</span>
                   </div>
                   <div className="bg-[#0a182f] p-2.5 sm:p-3 rounded-xl border border-[#1b3459] text-center">
-                    <span className="text-amber-400 font-bold block text-xs sm:text-sm">Sanksi SP-1/3</span>
+                    <span className="text-white font-bold block text-xs sm:text-sm">Sanksi SP-1/3</span>
                     <span className="text-[10px] sm:text-[11px] text-slate-400 font-normal">Pencabutan Hak RJ</span>
                   </div>
                   <div className="bg-[#0a182f] p-2.5 sm:p-3 rounded-xl border border-[#1b3459] text-center">
-                    <span className="text-emerald-400 font-bold block text-xs sm:text-sm">Sertifikat SKSP</span>
+                    <span className="text-white font-bold block text-xs sm:text-sm">Sertifikat SKSP</span>
                     <span className="text-[10px] sm:text-[11px] text-slate-400 font-normal">Kelulusan Resmi</span>
                   </div>
                 </div>
@@ -584,9 +562,9 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
               <div className="lg:col-span-4 flex flex-col justify-center space-y-3">
                 <button
                   onClick={() => onGoToLogin()}
-                  className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs sm:text-sm py-3 sm:py-3.5 px-6 rounded-xl flex items-center justify-center space-x-2 transition-all cursor-pointer shadow-lg"
+                  className="w-full bg-[#133863] hover:bg-[#1a4a82] text-white font-bold text-xs sm:text-sm py-3 sm:py-3.5 px-6 rounded-xl flex items-center justify-center space-x-2 transition-all cursor-pointer border border-[#235594]"
                 >
-                  <LogIn className="w-4 h-4 text-[#F1C40F]" />
+                  <LogIn className="w-4 h-4 text-white" />
                   <span>Buka Buku Pengawasan</span>
                 </button>
               </div>
@@ -600,7 +578,7 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 sm:space-y-8">
           <div className="text-center max-w-2xl mx-auto space-y-2">
             <h2 className="text-lg sm:text-2xl font-bold text-white flex items-center justify-center space-x-2 font-['Cinzel',serif] px-2">
-              <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 text-[#F1C40F] shrink-0" />
+              <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 text-slate-400 shrink-0" />
               <span>Landasan Hukum Operasional Perkara</span>
             </h2>
             <p className="text-xs text-slate-400 px-2">
@@ -638,7 +616,7 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
               <span className="font-bold text-white block text-xs sm:text-sm font-['Cinzel',serif]">
                 E-TAT PRESISI · INISIATIF SEKORNA
               </span>
-              <span className="text-[10px] sm:text-[11px] text-[#F1C40F]">
+              <span className="text-[10px] sm:text-[11px] text-slate-400">
                 SElamatkan KORban NArkotika · Sentra Terpadu Polri & BNN
               </span>
             </div>

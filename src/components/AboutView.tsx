@@ -214,8 +214,8 @@ export const AboutView: React.FC<AboutViewProps> = ({
     pengaju: {
       name: 'Penyidik Pengaju',
       agency: 'Satresnarkoba Polri / BNN Kabupaten/Kota',
-      badgeColor: 'bg-blue-100 text-blue-800 border-blue-200',
-      icon: <FileSpreadsheet className="w-5 h-5 text-blue-600" />,
+      badgeColor: 'bg-blue-900/60 text-blue-300 border-blue-700/60',
+      icon: <FileSpreadsheet className="w-5 h-5 text-[#38bdf8]" />,
       overview:
         'Penyidik yang menangani perkara tindak pidana narkotika dan mengajukan permohonan asesmen terpadu guna mendapatkan rekomendasi resmi bagi tersangka penyalahguna.',
       keyResponsibilities: [
@@ -244,8 +244,8 @@ export const AboutView: React.FC<AboutViewProps> = ({
     sekretariat: {
       name: 'Sekretariat TAT',
       agency: 'Sekretariat Bersama Tim Asesmen Terpadu BNN / Kepolisian',
-      badgeColor: 'bg-emerald-100 text-emerald-800 border-emerald-200',
-      icon: <FileCheck className="w-5 h-5 text-emerald-600" />,
+      badgeColor: 'bg-emerald-900/60 text-emerald-300 border-emerald-700/60',
+      icon: <FileCheck className="w-5 h-5 text-emerald-400" />,
       overview:
         'Koordinator operasional dan gatekeeper alur administrasi e-TAT. Bertanggung jawab memastikan seluruh persyaratan formal terpenuhi dan proses berjalan sesuai SLA 6 hari kerja.',
       keyResponsibilities: [
@@ -275,8 +275,8 @@ export const AboutView: React.FC<AboutViewProps> = ({
     medis: {
       name: 'Asesor Medis & Psikologis',
       agency: 'Dokter Spesialis Kedokteran Jiwa / Dokter Umum / Psikolog Klinis BNN/Dinkes',
-      badgeColor: 'bg-teal-100 text-teal-800 border-teal-200',
-      icon: <Stethoscope className="w-5 h-5 text-teal-600" />,
+      badgeColor: 'bg-teal-900/60 text-teal-300 border-teal-700/60',
+      icon: <Stethoscope className="w-5 h-5 text-teal-400" />,
       overview:
         'Tenaga kesehatan profesional yang melakukan asesmen fisik, kejiwaan, dan derajat ketergantungan narkotika secara independen berdasarkan standar medis internasional.',
       keyResponsibilities: [
@@ -305,8 +305,8 @@ export const AboutView: React.FC<AboutViewProps> = ({
     hukum: {
       name: 'Asesor Hukum',
       agency: 'Penyidik Senior / Jaksa Penuntut Umum / Penelaah Hukum BNN',
-      badgeColor: 'bg-purple-100 text-purple-800 border-purple-200',
-      icon: <Scale className="w-5 h-5 text-purple-600" />,
+      badgeColor: 'bg-purple-900/60 text-purple-300 border-purple-700/60',
+      icon: <Scale className="w-5 h-5 text-purple-400" />,
       overview:
         'Penelaah aspek yuridis yang bertugas mengkaji fakta penangkapan, peran tersangka, dan kepemilikan barang bukti sesuai batasan undang-undang dan yurisprudensi Mahkamah Agung.',
       keyResponsibilities: [
@@ -334,8 +334,8 @@ export const AboutView: React.FC<AboutViewProps> = ({
     koordinator: {
       name: 'Ketua / Koordinator TAT',
       agency: 'Pimpinan Tim Asesmen Terpadu (BNN Provinsi / BNN Kota / Polres)',
-      badgeColor: 'bg-indigo-100 text-indigo-800 border-indigo-200',
-      icon: <Users className="w-5 h-5 text-indigo-600" />,
+      badgeColor: 'bg-indigo-900/60 text-indigo-300 border-indigo-700/60',
+      icon: <Users className="w-5 h-5 text-indigo-400" />,
       overview:
         'Pemimpin musyawarah pleno terpadu dan penanggung jawab tertinggi penerbitan surat rekomendasi resmi e-TAT.',
       keyResponsibilities: [
@@ -363,8 +363,8 @@ export const AboutView: React.FC<AboutViewProps> = ({
     rehabilitasi: {
       name: 'Petugas Fasilitas Rehabilitasi',
       agency: 'Balai/Loka Rehabilitasi BNN, RSKO, RSUD, atau Lembaga Rehabilitasi Komponen Masyarakat (LRKM)',
-      badgeColor: 'bg-teal-100 text-teal-800 border-teal-200',
-      icon: <Share2 className="w-5 h-5 text-teal-600" />,
+      badgeColor: 'bg-cyan-900/60 text-cyan-300 border-cyan-700/60',
+      icon: <Share2 className="w-5 h-5 text-cyan-400" />,
       overview:
         'Pengelola layanan rujukan di institusi penerima klien hasil rekomendasi TAT untuk pelaksanaan program pemulihan adiksi.',
       keyResponsibilities: [
@@ -391,8 +391,8 @@ export const AboutView: React.FC<AboutViewProps> = ({
     pimpinan: {
       name: 'Pimpinan / Pengawas Mutu',
       agency: 'Kepala BNNP / BNNK, Direktur Reserse Narkoba Polda, Kapolres, Kepala Kejaksaan',
-      badgeColor: 'bg-amber-100 text-amber-800 border-amber-200',
-      icon: <BarChart3 className="w-5 h-5 text-amber-600" />,
+      badgeColor: 'bg-amber-900/60 text-amber-300 border-amber-700/60',
+      icon: <BarChart3 className="w-5 h-5 text-amber-400" />,
       overview:
         'Pihak pimpinan yang memiliki kewenangan pengawasan terhadap kepatuhan hukum, integritas, dan efektivitas implementasi kebijakan asesmen terpadu.',
       keyResponsibilities: [
@@ -419,8 +419,8 @@ export const AboutView: React.FC<AboutViewProps> = ({
     admin: {
       name: 'Administrator Sistem (IT)',
       agency: 'Pusat Informasi & Data BNN / Pengelola Infrastruktur TI Kepolisian',
-      badgeColor: 'bg-slate-100 text-slate-800 border-slate-200',
-      icon: <ShieldCheck className="w-5 h-5 text-slate-600" />,
+      badgeColor: 'bg-slate-800 text-slate-300 border-slate-700',
+      icon: <ShieldCheck className="w-5 h-5 text-slate-300" />,
       overview:
         'Pengelola infrastruktur teknis sistem e-TAT, keamanan data, manajemen pengguna, dan penjaminan keberlanjutan layanan digital.',
       keyResponsibilities: [
@@ -562,30 +562,28 @@ export const AboutView: React.FC<AboutViewProps> = ({
   return (
     <div className="space-y-6 pb-12">
       {/* Top Header Banner */}
-      <div className="bg-white border border-slate-200/90 rounded-2xl p-6 sm:p-7 relative overflow-hidden shadow-xs">
-        <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-br from-blue-50/70 via-indigo-50/40 to-transparent rounded-full blur-3xl pointer-events-none -mr-20 -mt-20" />
-        
+      <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl p-6 sm:p-7 relative overflow-hidden shadow-xs">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-5">
           <div className="space-y-2 max-w-3xl">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
-                <Sparkles className="w-3 h-3 text-blue-600" />
+              <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#0d213d] text-[#38bdf8] border border-[#1b3459]">
+                <Sparkles className="w-3 h-3 text-[#F1C40F]" />
                 <span>e-TAT Platform v1.2</span>
               </span>
-              <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                <Clock className="w-3 h-3 text-emerald-600" />
+              <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-950/40 text-emerald-300 border border-emerald-500/40">
+                <Clock className="w-3 h-3 text-emerald-400" />
                 <span>Standar SLA 6 Hari Kerja</span>
               </span>
-              <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-slate-100 text-slate-700 border border-slate-200">
-                <Building2 className="w-3 h-3 text-slate-500" />
+              <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[#081224] text-slate-300 border border-[#1b3459]">
+                <Building2 className="w-3 h-3 text-slate-400" />
                 <span>Kolaborasi Lintas Instansi</span>
               </span>
             </div>
 
-            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
               Tentang Sistem e-TAT & Panduan Operasional
             </h1>
-            <p className="text-sm text-slate-600 leading-relaxed">
+            <p className="text-sm text-slate-300 leading-relaxed">
               Sistem Pengelolaan Layanan Tim Asesmen Terpadu (e-TAT) adalah platform digital terintegrasi 
               untuk memfasilitasi koordinasi cepat, akuntabel, dan transparan antara Penyidik Polri/BNN, 
               Tim Asesor Medis, Tim Asesor Hukum, Kejaksaan, dan Fasilitas Rehabilitasi dalam menentukan 
@@ -594,51 +592,51 @@ export const AboutView: React.FC<AboutViewProps> = ({
           </div>
 
           <div className="shrink-0 flex md:flex-col items-start md:items-end gap-2 text-xs">
-            <div className="bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-left md:text-right">
+            <div className="bg-[#081224] border border-[#1b3459] rounded-xl px-3.5 py-2.5 text-left md:text-right">
               <span className="text-[10px] uppercase font-semibold text-slate-400 block">Peran Aktif Anda</span>
-              <span className="font-bold text-slate-900 block mt-0.5 capitalize">{currentUser.name}</span>
-              <span className="text-blue-700 font-semibold block text-[11px]">{rolesDetails[currentUser.role]?.name}</span>
+              <span className="font-bold text-white block mt-0.5 capitalize">{currentUser.name}</span>
+              <span className="text-[#38bdf8] font-semibold block text-[11px]">{rolesDetails[currentUser.role]?.name}</span>
             </div>
           </div>
         </div>
 
         {/* Quick Highlights Strip */}
-        <div className="mt-6 pt-5 border-t border-slate-100 grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
-          <div className="bg-slate-50/80 rounded-xl p-3 border border-slate-100">
-            <span className="text-2xl font-bold text-blue-700 block">8</span>
-            <span className="text-xs font-semibold text-slate-700">Tahap Alur Layanan</span>
+        <div className="mt-6 pt-5 border-t border-[#1b3459] grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+          <div className="bg-[#081224] rounded-xl p-3 border border-[#1b3459]">
+            <span className="text-2xl font-bold text-[#38bdf8] block">8</span>
+            <span className="text-xs font-semibold text-slate-200">Tahap Alur Layanan</span>
             <span className="text-[10px] text-slate-400 block mt-0.5">Termasuk Pasca TAT</span>
           </div>
-          <div className="bg-slate-50/80 rounded-xl p-3 border border-slate-100">
-            <span className="text-2xl font-bold text-emerald-700 block">8</span>
-            <span className="text-xs font-semibold text-slate-700">Peran Pengguna</span>
+          <div className="bg-[#081224] rounded-xl p-3 border border-[#1b3459]">
+            <span className="text-2xl font-bold text-emerald-400 block">8</span>
+            <span className="text-xs font-semibold text-slate-200">Peran Pengguna</span>
             <span className="text-[10px] text-slate-400 block mt-0.5">Hak Akses Tersegregasi</span>
           </div>
-          <div className="bg-slate-50/80 rounded-xl p-3 border border-slate-100">
-            <span className="text-2xl font-bold text-purple-700 block">8</span>
-            <span className="text-xs font-semibold text-slate-700">Output Resmi</span>
+          <div className="bg-[#081224] rounded-xl p-3 border border-[#1b3459]">
+            <span className="text-2xl font-bold text-purple-400 block">8</span>
+            <span className="text-xs font-semibold text-slate-200">Output Resmi</span>
             <span className="text-[10px] text-slate-400 block mt-0.5">Dokumen, SP & SKSP</span>
           </div>
-          <div className="bg-slate-50/80 rounded-xl p-3 border border-slate-100">
-            <span className="text-2xl font-bold text-amber-700 block">6 Hari</span>
-            <span className="text-xs font-semibold text-slate-700">Batas Waktu SLA</span>
+          <div className="bg-[#081224] rounded-xl p-3 border border-[#1b3459]">
+            <span className="text-2xl font-bold text-[#F1C40F] block">6 Hari</span>
+            <span className="text-xs font-semibold text-slate-200">Batas Waktu SLA</span>
             <span className="text-[10px] text-slate-400 block mt-0.5">Kepatuhan Berkas Perkara</span>
           </div>
         </div>
       </div>
 
       {/* Navigation Tabs for About Page */}
-      <div className="flex items-center space-x-2 border-b border-slate-200 pb-1 overflow-x-auto scrollbar-none">
+      <div className="flex items-center space-x-2 border-b border-[#1b3459] pb-1 overflow-x-auto scrollbar-none">
         <button
           id="tab-about-roadmap"
           onClick={() => setActiveSection('roadmap')}
           className={`flex items-center space-x-2 px-4 py-2.5 text-xs font-semibold rounded-lg transition-all shrink-0 cursor-pointer ${
             activeSection === 'roadmap'
-              ? 'bg-blue-600 text-white shadow-xs'
-              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              ? 'bg-gradient-to-r from-[#144782] via-[#17549c] to-[#1c64b8] text-white border border-[#2d7ad6]/70 shadow-[0_2px_10px_rgba(20,83,154,0.35)]'
+              : 'text-slate-400 hover:text-white hover:bg-[#0f274a] border border-transparent'
           }`}
         >
-          <GitCommit className="w-4 h-4" />
+          <GitCommit className="w-4 h-4 text-[#38bdf8]" />
           <span>Roadmap Alur Layanan (Flow)</span>
         </button>
 
@@ -647,11 +645,11 @@ export const AboutView: React.FC<AboutViewProps> = ({
           onClick={() => setActiveSection('roles')}
           className={`flex items-center space-x-2 px-4 py-2.5 text-xs font-semibold rounded-lg transition-all shrink-0 cursor-pointer ${
             activeSection === 'roles'
-              ? 'bg-blue-600 text-white shadow-xs'
-              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              ? 'bg-gradient-to-r from-[#144782] via-[#17549c] to-[#1c64b8] text-white border border-[#2d7ad6]/70 shadow-[0_2px_10px_rgba(20,83,154,0.35)]'
+              : 'text-slate-400 hover:text-white hover:bg-[#0f274a] border border-transparent'
           }`}
         >
-          <Users className="w-4 h-4" />
+          <Users className="w-4 h-4 text-[#38bdf8]" />
           <span>8 Peran Pengguna & Tanggung Jawab</span>
         </button>
 
@@ -660,11 +658,11 @@ export const AboutView: React.FC<AboutViewProps> = ({
           onClick={() => setActiveSection('outputs')}
           className={`flex items-center space-x-2 px-4 py-2.5 text-xs font-semibold rounded-lg transition-all shrink-0 cursor-pointer ${
             activeSection === 'outputs'
-              ? 'bg-blue-600 text-white shadow-xs'
-              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              ? 'bg-gradient-to-r from-[#144782] via-[#17549c] to-[#1c64b8] text-white border border-[#2d7ad6]/70 shadow-[0_2px_10px_rgba(20,83,154,0.35)]'
+              : 'text-slate-400 hover:text-white hover:bg-[#0f274a] border border-transparent'
           }`}
         >
-          <Award className="w-4 h-4" />
+          <Award className="w-4 h-4 text-[#38bdf8]" />
           <span>Daftar Output & Dokumen Resmi</span>
         </button>
 
@@ -673,11 +671,11 @@ export const AboutView: React.FC<AboutViewProps> = ({
           onClick={() => setActiveSection('pengawasan')}
           className={`flex items-center space-x-2 px-4 py-2.5 text-xs font-semibold rounded-lg transition-all shrink-0 cursor-pointer ${
             activeSection === 'pengawasan'
-              ? 'bg-blue-600 text-white shadow-xs'
-              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              ? 'bg-gradient-to-r from-[#144782] via-[#17549c] to-[#1c64b8] text-white border border-[#2d7ad6]/70 shadow-[0_2px_10px_rgba(20,83,154,0.35)]'
+              : 'text-slate-400 hover:text-white hover:bg-[#0f274a] border border-transparent'
           }`}
         >
-          <Activity className="w-4 h-4" />
+          <Activity className="w-4 h-4 text-[#38bdf8]" />
           <span>Mekanisme Pengawasan Klien Pasca TAT</span>
         </button>
 
@@ -686,11 +684,11 @@ export const AboutView: React.FC<AboutViewProps> = ({
           onClick={() => setActiveSection('regulasi')}
           className={`flex items-center space-x-2 px-4 py-2.5 text-xs font-semibold rounded-lg transition-all shrink-0 cursor-pointer ${
             activeSection === 'regulasi'
-              ? 'bg-blue-600 text-white shadow-xs'
-              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              ? 'bg-gradient-to-r from-[#144782] via-[#17549c] to-[#1c64b8] text-white border border-[#2d7ad6]/70 shadow-[0_2px_10px_rgba(20,83,154,0.35)]'
+              : 'text-slate-400 hover:text-white hover:bg-[#0f274a] border border-transparent'
           }`}
         >
-          <BookOpen className="w-4 h-4" />
+          <BookOpen className="w-4 h-4 text-[#38bdf8]" />
           <span>Dasar Hukum & Batasan Sistem</span>
         </button>
       </div>
@@ -698,18 +696,18 @@ export const AboutView: React.FC<AboutViewProps> = ({
       {/* SECTION 1: ROADMAP & ALUR ALIR LAYANAN (FLOW) */}
       {activeSection === 'roadmap' && (
         <div className="space-y-6">
-          <div className="bg-white border border-slate-200 rounded-xl p-5">
+          <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl p-5">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
               <div>
-                <h2 className="text-base font-bold text-slate-900 flex items-center space-x-2">
-                  <GitCommit className="w-5 h-5 text-blue-600" />
+                <h2 className="text-base font-bold text-white flex items-center space-x-2">
+                  <GitCommit className="w-5 h-5 text-[#38bdf8]" />
                   <span>Roadmap Alur End-to-End Layanan e-TAT</span>
                 </h2>
-                <p className="text-xs text-slate-500 mt-0.5">
+                <p className="text-xs text-slate-400 mt-0.5">
                   Dari pengajuan perkara oleh penyidik hingga realisasi admisi rehabilitasi dan pemenuhan berkas peradilan (SLA 6 Hari Kerja).
                 </p>
               </div>
-              <span className="text-[11px] bg-blue-50 text-blue-700 font-bold px-3 py-1 rounded-full border border-blue-200 self-start">
+              <span className="text-[11px] bg-[#0d213d] text-[#38bdf8] font-bold px-3 py-1 rounded-full border border-[#234b7d] self-start">
                 Pilih Tahap untuk Rincian
               </span>
             </div>
@@ -725,14 +723,14 @@ export const AboutView: React.FC<AboutViewProps> = ({
                     onClick={() => setSelectedStage(stage.step)}
                     className={`text-left p-3 rounded-xl border transition-all cursor-pointer ${
                       isSelected
-                        ? 'bg-blue-50 border-blue-500 shadow-xs ring-1 ring-blue-500/20'
-                        : 'bg-slate-50/70 border-slate-200 hover:bg-slate-100/80 hover:border-slate-300'
+                        ? 'bg-[#0d2342] border-[#38bdf8] shadow-[0_0_12px_rgba(56,189,248,0.25)] ring-1 ring-[#38bdf8]/40'
+                        : 'bg-[#081224] border-[#1b3459] hover:bg-[#0f274a] hover:border-[#234b7d]'
                     }`}
                   >
                     <div className="flex items-center justify-between">
                       <span
                         className={`w-6 h-6 rounded-lg text-xs font-bold flex items-center justify-center ${
-                          isSelected ? 'bg-blue-600 text-white' : 'bg-slate-200 text-slate-700'
+                          isSelected ? 'bg-[#38bdf8] text-[#071326]' : 'bg-[#0b172a] text-slate-300 border border-[#1b3459]'
                         }`}
                       >
                         {stage.step}
@@ -743,12 +741,12 @@ export const AboutView: React.FC<AboutViewProps> = ({
                     </div>
                     <span
                       className={`text-xs font-bold block mt-2 line-clamp-2 leading-snug ${
-                        isSelected ? 'text-blue-900' : 'text-slate-800'
+                        isSelected ? 'text-[#38bdf8]' : 'text-white'
                       }`}
                     >
                       {stage.title}
                     </span>
-                    <span className="text-[10px] text-slate-500 block mt-1 truncate">
+                    <span className="text-[10px] text-slate-400 block mt-1 truncate">
                       {stage.actor.split('(')[0]}
                     </span>
                   </button>
@@ -760,39 +758,39 @@ export const AboutView: React.FC<AboutViewProps> = ({
             {(() => {
               const current = workflowStages.find((s) => s.step === selectedStage) || workflowStages[0];
               return (
-                <div className="mt-4 bg-slate-50/70 border border-slate-200/90 rounded-xl p-5 sm:p-6 space-y-4">
-                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 pb-3 border-b border-slate-200">
+                <div className="mt-4 bg-[#081224] border border-[#1b3459] rounded-xl p-5 sm:p-6 space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 pb-3 border-b border-[#1b3459]">
                     <div>
                       <div className="flex items-center space-x-2">
-                        <span className="px-2.5 py-0.5 rounded text-xs font-bold bg-blue-600 text-white">
+                        <span className="px-2.5 py-0.5 rounded text-xs font-bold bg-[#17549c] text-white border border-[#2d7ad6]">
                           Tahap {current.step} dari 7
                         </span>
-                        <h3 className="text-base font-bold text-slate-900">{current.title}</h3>
+                        <h3 className="text-base font-bold text-white">{current.title}</h3>
                       </div>
-                      <p className="text-xs text-slate-600 mt-1">{current.summary}</p>
+                      <p className="text-xs text-slate-300 mt-1">{current.summary}</p>
                     </div>
 
                     <div className="text-right sm:shrink-0">
-                      <span className="text-[11px] font-semibold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded border border-emerald-200 block">
+                      <span className="text-[11px] font-semibold text-emerald-300 bg-emerald-950/40 px-2.5 py-1 rounded border border-emerald-500/40 block">
                         ⏱️ {current.timeframe}
                       </span>
-                      <span className="text-[10px] text-slate-500 block mt-1">
-                        Aktor: <strong className="text-slate-700">{current.actor}</strong>
+                      <span className="text-[10px] text-slate-400 block mt-1">
+                        Aktor: <strong className="text-slate-200">{current.actor}</strong>
                       </span>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
                     {/* Input Dokumen */}
-                    <div className="bg-white border border-slate-200 rounded-lg p-3.5 space-y-2">
-                      <div className="flex items-center space-x-1.5 font-bold text-slate-800 pb-1 border-b border-slate-100">
-                        <FileSpreadsheet className="w-4 h-4 text-blue-600" />
+                    <div className="bg-[#0b172a] border border-[#1b3459] rounded-lg p-3.5 space-y-2">
+                      <div className="flex items-center space-x-1.5 font-bold text-white pb-1 border-b border-[#1b3459]">
+                        <FileSpreadsheet className="w-4 h-4 text-[#38bdf8]" />
                         <span>Dokumen Input & Persyaratan</span>
                       </div>
-                      <ul className="space-y-1.5 text-slate-600">
+                      <ul className="space-y-1.5 text-slate-300">
                         {current.inputs.map((inp, idx) => (
                           <li key={idx} className="flex items-start space-x-1.5">
-                            <span className="text-blue-500 font-bold">•</span>
+                            <span className="text-[#38bdf8] font-bold">•</span>
                             <span>{inp}</span>
                           </li>
                         ))}
@@ -800,15 +798,15 @@ export const AboutView: React.FC<AboutViewProps> = ({
                     </div>
 
                     {/* Aksi yang Dilakukan */}
-                    <div className="bg-white border border-slate-200 rounded-lg p-3.5 space-y-2">
-                      <div className="flex items-center space-x-1.5 font-bold text-slate-800 pb-1 border-b border-slate-100">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                    <div className="bg-[#0b172a] border border-[#1b3459] rounded-lg p-3.5 space-y-2">
+                      <div className="flex items-center space-x-1.5 font-bold text-white pb-1 border-b border-[#1b3459]">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-400" />
                         <span>Aktivitas & Langkah Utama</span>
                       </div>
-                      <ul className="space-y-1.5 text-slate-600">
+                      <ul className="space-y-1.5 text-slate-300">
                         {current.actions.map((act, idx) => (
                           <li key={idx} className="flex items-start space-x-1.5">
-                            <span className="text-emerald-500 font-bold">•</span>
+                            <span className="text-emerald-400 font-bold">•</span>
                             <span>{act}</span>
                           </li>
                         ))}
@@ -816,19 +814,19 @@ export const AboutView: React.FC<AboutViewProps> = ({
                     </div>
 
                     {/* Output & Status */}
-                    <div className="bg-white border border-slate-200 rounded-lg p-3.5 space-y-2">
-                      <div className="flex items-center space-x-1.5 font-bold text-slate-800 pb-1 border-b border-slate-100">
-                        <Award className="w-4 h-4 text-purple-600" />
+                    <div className="bg-[#0b172a] border border-[#1b3459] rounded-lg p-3.5 space-y-2">
+                      <div className="flex items-center space-x-1.5 font-bold text-white pb-1 border-b border-[#1b3459]">
+                        <Award className="w-4 h-4 text-purple-400" />
                         <span>Hasil Output & Perubahan Status</span>
                       </div>
-                      <div className="space-y-2 text-slate-600">
+                      <div className="space-y-2 text-slate-300">
                         <div>
                           <span className="text-[10px] uppercase font-bold text-slate-400 block">Artefak Output:</span>
-                          <span className="font-semibold text-slate-900 block mt-0.5">{current.output}</span>
+                          <span className="font-semibold text-white block mt-0.5">{current.output}</span>
                         </div>
                         <div>
                           <span className="text-[10px] uppercase font-bold text-slate-400 block">Perpindahan Status:</span>
-                          <span className="font-mono text-xs text-blue-700 font-bold bg-blue-50 px-2 py-0.5 rounded border border-blue-200 inline-block mt-0.5">
+                          <span className="font-mono text-xs text-[#38bdf8] font-bold bg-[#081224] px-2 py-0.5 rounded border border-[#1b3459] inline-block mt-0.5">
                             {current.statusResult}
                           </span>
                         </div>
@@ -841,7 +839,7 @@ export const AboutView: React.FC<AboutViewProps> = ({
                     <button
                       disabled={selectedStage === 1}
                       onClick={() => setSelectedStage((prev) => Math.max(1, prev - 1))}
-                      className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-700 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 cursor-pointer"
+                      className="px-3 py-1.5 rounded-lg border border-[#1b3459] bg-[#0b172a] text-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#0f274a] hover:text-white cursor-pointer"
                     >
                       ← Tahap Sebelumnya
                     </button>
@@ -849,7 +847,7 @@ export const AboutView: React.FC<AboutViewProps> = ({
                     <button
                       disabled={selectedStage === 7}
                       onClick={() => setSelectedStage((prev) => Math.min(7, prev + 1))}
-                      className="px-3 py-1.5 rounded-lg bg-blue-600 text-white font-semibold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-blue-700 cursor-pointer"
+                      className="px-3 py-1.5 rounded-lg bg-[#17549c] hover:bg-[#1c64b8] text-white font-semibold disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer border border-[#2d7ad6]"
                     >
                       Tahap Selanjutnya →
                     </button>
@@ -860,40 +858,40 @@ export const AboutView: React.FC<AboutViewProps> = ({
           </div>
 
           {/* 4 Status Tiers Architecture Card */}
-          <div className="bg-white border border-slate-200 rounded-xl p-5 space-y-3">
-            <h3 className="text-sm font-bold text-slate-900 flex items-center space-x-2">
-              <ShieldCheck className="w-4 h-4 text-blue-600" />
+          <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl p-5 space-y-3">
+            <h3 className="text-sm font-bold text-white flex items-center space-x-2">
+              <ShieldCheck className="w-4 h-4 text-[#38bdf8]" />
               <span>Arsitektur 4 Kelompok Status Terpisah (Multi-Tier Status Model)</span>
             </h3>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-slate-400">
               Sistem e-TAT tidak menggunakan status tunggal yang rancu, melainkan memisahkan proses menjadi 4 dimensi status independen:
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs pt-1">
-              <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 space-y-1">
-                <span className="text-[10px] uppercase font-bold text-blue-700 block">1. Status Proses Utama</span>
-                <p className="text-slate-600 text-[11px]">
+              <div className="bg-[#081224] border border-[#1b3459] rounded-lg p-3 space-y-1">
+                <span className="text-[10px] uppercase font-bold text-[#38bdf8] block">1. Status Proses Utama</span>
+                <p className="text-slate-300 text-[11px]">
                   Mengendalikan tahapan berkas dari <em>diajukan</em>, <em>verifikasi_berkas</em>, <em>penugasan_jadwal</em>, <em>asesmen_berlangsung</em>, <em>siap_pleno</em>, hingga <em>rekomendasi_terbit</em>.
                 </p>
               </div>
 
-              <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 space-y-1">
-                <span className="text-[10px] uppercase font-bold text-emerald-700 block">2. Status Medis & Hukum</span>
-                <p className="text-slate-600 text-[11px]">
+              <div className="bg-[#081224] border border-[#1b3459] rounded-lg p-3 space-y-1">
+                <span className="text-[10px] uppercase font-bold text-emerald-400 block">2. Status Medis & Hukum</span>
+                <p className="text-slate-300 text-[11px]">
                   Melacak kemajuan independen pemeriksaan medis (urin, wawancara ASSIST) dan telaah hukum (analisis peran, gramatur SEMA) tanpa saling memblokir.
                 </p>
               </div>
 
-              <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 space-y-1">
-                <span className="text-[10px] uppercase font-bold text-purple-700 block">3. Status Dokumen Rekomendasi</span>
-                <p className="text-slate-600 text-[11px]">
+              <div className="bg-[#081224] border border-[#1b3459] rounded-lg p-3 space-y-1">
+                <span className="text-[10px] uppercase font-bold text-purple-400 block">3. Status Dokumen Rekomendasi</span>
+                <p className="text-slate-300 text-[11px]">
                   Status keabsahan fisik & digital dokumen rekomendasi (<em>draf</em>, <em>menunggu_pengesahan</em>, hingga <em>resmi_terbit</em> dan ber-QR code).
                 </p>
               </div>
 
-              <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 space-y-1">
-                <span className="text-[10px] uppercase font-bold text-teal-700 block">4. Status Tindak Lanjut Rujukan</span>
-                <p className="text-slate-600 text-[11px]">
+              <div className="bg-[#081224] border border-[#1b3459] rounded-lg p-3 space-y-1">
+                <span className="text-[10px] uppercase font-bold text-teal-400 block">4. Status Tindak Lanjut Rujukan</span>
+                <p className="text-slate-300 text-[11px]">
                   Memantau eksekusi pasca terbit rekomendasi: apakah klien sudah diterima admisi di balai rehabilitasi atau mengalami kendala kuota fasilitas.
                 </p>
               </div>
@@ -906,12 +904,12 @@ export const AboutView: React.FC<AboutViewProps> = ({
       {activeSection === 'roles' && (
         <div className="space-y-6">
           {/* Role Selection Grid */}
-          <div className="bg-white border border-slate-200 rounded-xl p-5">
-            <h2 className="text-base font-bold text-slate-900 flex items-center space-x-2 mb-1">
-              <Users className="w-5 h-5 text-blue-600" />
+          <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl p-5">
+            <h2 className="text-base font-bold text-white flex items-center space-x-2 mb-1">
+              <Users className="w-5 h-5 text-[#38bdf8]" />
               <span>Matriks 8 Peran Pengguna Lintas Instansi</span>
             </h2>
-            <p className="text-xs text-slate-500 mb-4">
+            <p className="text-xs text-slate-400 mb-4">
               Setiap peran memiliki wewenang, antarmuka kerja, dan batasan akses data yang berbeda untuk menjamin independensi dan integritas hukum.
             </p>
 
@@ -927,22 +925,22 @@ export const AboutView: React.FC<AboutViewProps> = ({
                     onClick={() => setSelectedRoleDetail(rKey)}
                     className={`text-left p-3 rounded-xl border transition-all cursor-pointer ${
                       isSelected
-                        ? 'bg-blue-50 border-blue-500 ring-1 ring-blue-500/20 shadow-xs'
-                        : 'bg-slate-50 border-slate-200 hover:bg-slate-100 hover:border-slate-300'
+                        ? 'bg-[#0d2342] border-[#38bdf8] ring-1 ring-[#38bdf8]/40 shadow-[0_0_12px_rgba(56,189,248,0.25)]'
+                        : 'bg-[#081224] border-[#1b3459] hover:bg-[#0f274a] hover:border-[#234b7d]'
                     }`}
                   >
                     <div className="flex items-center justify-between mb-1.5">
-                      <div className="p-1.5 rounded-lg bg-white border border-slate-200">
+                      <div className="p-1.5 rounded-lg bg-[#0b172a] border border-[#1b3459]">
                         {r.icon}
                       </div>
                       {isCurrent && (
-                        <span className="text-[9px] font-bold bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded">
+                        <span className="text-[9px] font-bold bg-emerald-900/60 text-emerald-300 border border-emerald-700/60 px-1.5 py-0.5 rounded">
                           Role Anda
                         </span>
                       )}
                     </div>
-                    <span className="text-xs font-bold text-slate-900 block truncate">{r.name}</span>
-                    <span className="text-[10px] text-slate-500 block truncate">{r.agency.split('/')[0]}</span>
+                    <span className="text-xs font-bold text-white block truncate">{r.name}</span>
+                    <span className="text-[10px] text-slate-400 block truncate">{r.agency.split('/')[0]}</span>
                   </button>
                 );
               })}
@@ -952,39 +950,39 @@ export const AboutView: React.FC<AboutViewProps> = ({
             {(() => {
               const r = rolesDetails[selectedRoleDetail];
               return (
-                <div className="mt-5 bg-slate-50/80 border border-slate-200 rounded-xl p-5 sm:p-6 space-y-4">
-                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 pb-3 border-b border-slate-200">
+                <div className="mt-5 bg-[#081224] border border-[#1b3459] rounded-xl p-5 sm:p-6 space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 pb-3 border-b border-[#1b3459]">
                     <div className="flex items-center space-x-3">
-                      <div className="p-3 bg-white rounded-xl border border-slate-200">
+                      <div className="p-3 bg-[#0b172a] rounded-xl border border-[#1b3459]">
                         {r.icon}
                       </div>
                       <div>
                         <div className="flex items-center space-x-2">
-                          <h3 className="text-base font-bold text-slate-900">{r.name}</h3>
+                          <h3 className="text-base font-bold text-white">{r.name}</h3>
                           <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${r.badgeColor}`}>
                             {selectedRoleDetail}
                           </span>
                         </div>
-                        <p className="text-xs text-slate-500 mt-0.5">{r.agency}</p>
+                        <p className="text-xs text-slate-400 mt-0.5">{r.agency}</p>
                       </div>
                     </div>
                   </div>
 
-                  <p className="text-xs text-slate-700 leading-relaxed bg-white border border-slate-200 rounded-lg p-3">
+                  <p className="text-xs text-slate-200 leading-relaxed bg-[#0b172a] border border-[#1b3459] rounded-lg p-3">
                     {r.overview}
                   </p>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
                     {/* Tugas & Tanggung Jawab Utama */}
-                    <div className="bg-white border border-slate-200 rounded-lg p-4 space-y-2">
-                      <h4 className="font-bold text-slate-900 flex items-center space-x-1.5 text-xs pb-1 border-b border-slate-100">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                    <div className="bg-[#0b172a] border border-[#1b3459] rounded-lg p-4 space-y-2">
+                      <h4 className="font-bold text-white flex items-center space-x-1.5 text-xs pb-1 border-b border-[#1b3459]">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-400" />
                         <span>Tugas Pokok & Wewenang Kerja</span>
                       </h4>
-                      <ul className="space-y-1.5 text-slate-600">
+                      <ul className="space-y-1.5 text-slate-300">
                         {r.keyResponsibilities.map((item, idx) => (
                           <li key={idx} className="flex items-start space-x-2">
-                            <span className="text-emerald-500 font-bold">•</span>
+                            <span className="text-emerald-400 font-bold">•</span>
                             <span>{item}</span>
                           </li>
                         ))}
@@ -992,15 +990,15 @@ export const AboutView: React.FC<AboutViewProps> = ({
                     </div>
 
                     {/* Batasan & Larangan (Guardrails) */}
-                    <div className="bg-white border border-slate-200 rounded-lg p-4 space-y-2">
-                      <h4 className="font-bold text-slate-900 flex items-center space-x-1.5 text-xs pb-1 border-b border-slate-100">
-                        <AlertTriangle className="w-4 h-4 text-amber-600" />
+                    <div className="bg-[#0b172a] border border-[#1b3459] rounded-lg p-4 space-y-2">
+                      <h4 className="font-bold text-white flex items-center space-x-1.5 text-xs pb-1 border-b border-[#1b3459]">
+                        <AlertTriangle className="w-4 h-4 text-[#F1C40F]" />
                         <span>Batasan Kewenangan & Etika Kerahasiaan</span>
                       </h4>
-                      <ul className="space-y-1.5 text-slate-600">
+                      <ul className="space-y-1.5 text-slate-300">
                         {r.boundaries.map((item, idx) => (
                           <li key={idx} className="flex items-start space-x-2">
-                            <span className="text-amber-500 font-bold">•</span>
+                            <span className="text-[#F1C40F] font-bold">•</span>
                             <span>{item}</span>
                           </li>
                         ))}
@@ -1008,15 +1006,15 @@ export const AboutView: React.FC<AboutViewProps> = ({
                     </div>
 
                     {/* Cakupan Akses Modul */}
-                    <div className="bg-white border border-slate-200 rounded-lg p-4 space-y-2">
-                      <h4 className="font-bold text-slate-900 flex items-center space-x-1.5 text-xs pb-1 border-b border-slate-100">
-                        <ShieldCheck className="w-4 h-4 text-blue-600" />
+                    <div className="bg-[#0b172a] border border-[#1b3459] rounded-lg p-4 space-y-2">
+                      <h4 className="font-bold text-white flex items-center space-x-1.5 text-xs pb-1 border-b border-[#1b3459]">
+                        <ShieldCheck className="w-4 h-4 text-[#38bdf8]" />
                         <span>Hak Akses Menu & Data</span>
                       </h4>
-                      <ul className="space-y-1.5 text-slate-600">
+                      <ul className="space-y-1.5 text-slate-300">
                         {r.accessRights.map((item, idx) => (
                           <li key={idx} className="flex items-start space-x-2">
-                            <span className="text-blue-500 font-bold">•</span>
+                            <span className="text-[#38bdf8] font-bold">•</span>
                             <span>{item}</span>
                           </li>
                         ))}
@@ -1024,15 +1022,15 @@ export const AboutView: React.FC<AboutViewProps> = ({
                     </div>
 
                     {/* Output yang Dihasilkan */}
-                    <div className="bg-white border border-slate-200 rounded-lg p-4 space-y-2">
-                      <h4 className="font-bold text-slate-900 flex items-center space-x-1.5 text-xs pb-1 border-b border-slate-100">
-                        <Award className="w-4 h-4 text-purple-600" />
+                    <div className="bg-[#0b172a] border border-[#1b3459] rounded-lg p-4 space-y-2">
+                      <h4 className="font-bold text-white flex items-center space-x-1.5 text-xs pb-1 border-b border-[#1b3459]">
+                        <Award className="w-4 h-4 text-purple-400" />
                         <span>Output & Dokumen yang Diproduksi</span>
                       </h4>
-                      <ul className="space-y-1.5 text-slate-600">
+                      <ul className="space-y-1.5 text-slate-300">
                         {r.keyOutputs.map((item, idx) => (
                           <li key={idx} className="flex items-start space-x-2">
-                            <span className="text-purple-500 font-bold">•</span>
+                            <span className="text-purple-400 font-bold">•</span>
                             <span>{item}</span>
                           </li>
                         ))}
@@ -1049,12 +1047,12 @@ export const AboutView: React.FC<AboutViewProps> = ({
       {/* SECTION 3: DAFTAR OUTPUT & DOKUMEN RESMI */}
       {activeSection === 'outputs' && (
         <div className="space-y-6">
-          <div className="bg-white border border-slate-200 rounded-xl p-5">
-            <h2 className="text-base font-bold text-slate-900 flex items-center space-x-2 mb-1">
-              <Award className="w-5 h-5 text-blue-600" />
+          <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl p-5">
+            <h2 className="text-base font-bold text-white flex items-center space-x-2 mb-1">
+              <Award className="w-5 h-5 text-[#38bdf8]" />
               <span>Daftar Output Resmi yang Diproduksi Sistem e-TAT</span>
             </h2>
-            <p className="text-xs text-slate-500 mb-5">
+            <p className="text-xs text-slate-400 mb-5">
               Setiap tahapan layanan menghasilkan artefak resmi berlandaskan hukum yang sah dan memiliki nilai pembuktian otentik di persidangan.
             </p>
 
@@ -1062,36 +1060,36 @@ export const AboutView: React.FC<AboutViewProps> = ({
               {officialOutputs.map((out) => (
                 <div
                   key={out.id}
-                  className="bg-slate-50/80 border border-slate-200 rounded-xl p-5 flex flex-col justify-between space-y-4 hover:border-slate-300 transition-all"
+                  className="bg-[#081224] border border-[#1b3459] rounded-xl p-5 flex flex-col justify-between space-y-4 hover:border-[#234b7d] transition-all"
                 >
                   <div className="space-y-3">
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-center space-x-2.5">
-                        <div className="p-2.5 rounded-xl bg-white border border-slate-200">
+                        <div className="p-2.5 rounded-xl bg-[#0b172a] border border-[#1b3459]">
                           {out.icon}
                         </div>
                         <div>
                           <span className="text-[10px] uppercase font-bold text-slate-400 block">
                             {out.category}
                           </span>
-                          <h3 className="text-sm font-bold text-slate-900">{out.title}</h3>
+                          <h3 className="text-sm font-bold text-white">{out.title}</h3>
                         </div>
                       </div>
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-800 shrink-0">
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-[#0d213d] text-[#38bdf8] border border-[#1b3459] shrink-0">
                         {out.badge}
                       </span>
                     </div>
 
-                    <p className="text-xs text-slate-600 leading-relaxed">
+                    <p className="text-xs text-slate-300 leading-relaxed">
                       {out.description}
                     </p>
 
-                    <div className="space-y-1.5 pt-2 border-t border-slate-200/80">
-                      <span className="text-[10px] uppercase font-bold text-slate-500 block">Komponen Utama:</span>
-                      <ul className="space-y-1 text-xs text-slate-600">
+                    <div className="space-y-1.5 pt-2 border-t border-[#1b3459]">
+                      <span className="text-[10px] uppercase font-bold text-slate-400 block">Komponen Utama:</span>
+                      <ul className="space-y-1 text-xs text-slate-300">
                         {out.components.map((c, i) => (
                           <li key={i} className="flex items-start space-x-1.5">
-                            <span className="text-blue-500 font-bold">•</span>
+                            <span className="text-[#38bdf8] font-bold">•</span>
                             <span className="text-[11px]">{c}</span>
                           </li>
                         ))}
@@ -1099,9 +1097,9 @@ export const AboutView: React.FC<AboutViewProps> = ({
                     </div>
                   </div>
 
-                  <div className="pt-3 border-t border-slate-200 text-xs bg-white/70 rounded-lg p-2.5">
-                    <span className="text-[10px] uppercase font-bold text-slate-500 block">Kegunaan Hukum:</span>
-                    <p className="text-[11px] text-slate-700 mt-0.5">{out.usage}</p>
+                  <div className="pt-3 border-t border-[#1b3459] text-xs bg-[#0b172a] rounded-lg p-2.5 border border-[#1b3459]">
+                    <span className="text-[10px] uppercase font-bold text-[#38bdf8] block">Kegunaan Hukum:</span>
+                    <p className="text-[11px] text-slate-300 mt-0.5">{out.usage}</p>
                   </div>
                 </div>
               ))}
@@ -1114,140 +1112,140 @@ export const AboutView: React.FC<AboutViewProps> = ({
       {activeSection === 'pengawasan' && (
         <div className="space-y-6">
           {/* Header Banner */}
-          <div className="bg-white border border-slate-200 rounded-xl p-6 space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200">
+          <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl p-6 space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#1b3459]">
               <div>
-                <h2 className="text-base sm:text-lg font-bold text-slate-900 flex items-center space-x-2">
-                  <Activity className="w-5 h-5 text-teal-600" />
+                <h2 className="text-base sm:text-lg font-bold text-white flex items-center space-x-2">
+                  <Activity className="w-5 h-5 text-teal-400" />
                   <span>Mekanisme Pengawasan Klien Pasca TAT (Aftercare & Kepatuhan Hukum)</span>
                 </h2>
-                <p className="text-xs text-slate-500 mt-1">
+                <p className="text-xs text-slate-400 mt-1">
                   Pedoman operasional pemantauan berkala tersangka yang direhabilitasi dalam kerangka Keadilan Restoratif (Restorative Justice) dan Diversi Anak.
                 </p>
               </div>
-              <span className="self-start text-[11px] font-bold bg-teal-100 text-teal-800 border border-teal-300 px-3 py-1 rounded-full flex items-center space-x-1.5">
-                <ShieldCheck className="w-3.5 h-3.5 text-teal-700" />
+              <span className="self-start text-[11px] font-bold bg-teal-950/40 text-teal-300 border border-teal-500/40 px-3 py-1 rounded-full flex items-center space-x-1.5">
+                <ShieldCheck className="w-3.5 h-3.5 text-teal-400" />
                 <span>Zero Relapse & Kepatuhan Hukum</span>
               </span>
             </div>
 
             {/* Konsep Filosofis */}
-            <div className="bg-teal-50/70 border border-teal-200 rounded-xl p-4 text-xs space-y-2 text-teal-900">
-              <span className="font-bold flex items-center space-x-1.5">
-                <Info className="w-4 h-4 text-teal-700" />
+            <div className="bg-teal-950/30 border border-teal-500/40 rounded-xl p-4 text-xs space-y-2 text-teal-200">
+              <span className="font-bold flex items-center space-x-1.5 text-teal-300">
+                <Info className="w-4 h-4 text-teal-400" />
                 <span>Prinsip Kunci: Rekomendasi TAT Adalah Titik Awal Komitmen Pemulihan, Bukan Pembebasan Murni</span>
               </span>
-              <p className="leading-relaxed text-teal-800">
+              <p className="leading-relaxed text-teal-200">
                 Penyelesaian perkara melalui pendekatan Keadilan Restoratif (Perpol No. 08/2021 dan Perja No. 15/2020) menuntut kepatuhan nyata dari tersangka untuk menjalani pemulihan. Tanpa pengawasan terpadu antara <strong>Konselor Rehabilitasi</strong>, <strong>Penyidik Satresnarkoba</strong>, dan <strong>Bapas/Kejaksaan</strong>, hak keadilan restoratif rawan dimanipulasi atau ditinggalkan (drop out). Sistem e-TAT menyediakan <strong>Buku Catatan Pengawasan Digital</strong> guna mendokumentasikan setiap sesi dan hasil tes secara transparan dan berlandaskan hukum.
               </p>
             </div>
           </div>
 
           {/* 4 PILAR MEKANISME CARA MENGAWASI */}
-          <div className="bg-white border border-slate-200 rounded-xl p-6 space-y-4">
-            <h3 className="text-sm font-bold text-slate-900 flex items-center space-x-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+          <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl p-6 space-y-4">
+            <h3 className="text-sm font-bold text-white flex items-center space-x-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
               <span>4 Pilar Mekanisme Pengawasan Klien (Bagaimana Cara Mengawasi)</span>
             </h3>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-slate-400">
               Pengawasan tidak bersifat administratif pasif, melainkan intervensi aktif melalui 4 instrumen pembinaan:
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
               {/* Pilar 1 */}
-              <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2">
+              <div className="bg-[#081224] border border-[#1b3459] rounded-xl p-4 space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-xs text-slate-900 flex items-center space-x-1.5">
-                    <CalendarCheck className="w-4 h-4 text-blue-600" />
+                  <span className="font-bold text-xs text-white flex items-center space-x-1.5">
+                    <CalendarCheck className="w-4 h-4 text-[#38bdf8]" />
                     <span>1. Wajib Lapor Mingguan & Konseling</span>
                   </span>
-                  <span className="text-[10px] bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-bold">Mingguan</span>
+                  <span className="text-[10px] bg-blue-900/60 text-blue-300 border border-blue-700/60 px-2 py-0.5 rounded font-bold">Mingguan</span>
                 </div>
-                <p className="text-xs text-slate-600 leading-relaxed">
+                <p className="text-xs text-slate-300 leading-relaxed">
                   Klien yang menjalani rawat jalan diwajibkan hadir fisik ke klinik/fasilitas rehabilitasi minimal 1 kali setiap minggu untuk konseling individu, evaluasi pemicu stres (trigger management), dan pencatatan absensi di sistem.
                 </p>
-                <div className="text-[11px] text-slate-500 bg-white p-2 rounded border border-slate-200">
-                  <strong>Output:</strong> Catatan Jurnal Pengawasan (Status Kehadiran: Hadir / Izin Sah / Mangkir).
+                <div className="text-[11px] text-slate-300 bg-[#0b172a] p-2 rounded border border-[#1b3459]">
+                  <strong className="text-white">Output:</strong> Catatan Jurnal Pengawasan (Status Kehadiran: Hadir / Izin Sah / Mangkir).
                 </div>
               </div>
 
               {/* Pilar 2 */}
-              <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2">
+              <div className="bg-[#081224] border border-[#1b3459] rounded-xl p-4 space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-xs text-slate-900 flex items-center space-x-1.5">
-                    <Stethoscope className="w-4 h-4 text-purple-600" />
+                  <span className="font-bold text-xs text-white flex items-center space-x-1.5">
+                    <Stethoscope className="w-4 h-4 text-purple-400" />
                     <span>2. Skrining Toksikologi Urin (Terjadwal & Acak)</span>
                   </span>
-                  <span className="text-[10px] bg-purple-100 text-purple-800 px-2 py-0.5 rounded font-bold">Berkala</span>
+                  <span className="text-[10px] bg-purple-900/60 text-purple-300 border border-purple-700/60 px-2 py-0.5 rounded font-bold">Berkala</span>
                 </div>
-                <p className="text-xs text-slate-600 leading-relaxed">
+                <p className="text-xs text-slate-300 leading-relaxed">
                   Pemeriksaan laboratorium menggunakan rapid test multi-panel 5 parameter zat (AMP, MET, THC, BZO, MOP). Pengujian dilakukan terjadwal setiap akhir bulan <strong>serta uji acak (unannounced / random screen)</strong> tanpa pemberitahuan sebelumnya demi mencegah manipulasi hidrasi sampel urin.
                 </p>
-                <div className="text-[11px] text-slate-500 bg-white p-2 rounded border border-slate-200">
-                  <strong>Standar:</strong> Wajib 100% Negatif. Hasil positif langsung memicu eskalasi pelanggaran.
+                <div className="text-[11px] text-slate-300 bg-[#0b172a] p-2 rounded border border-[#1b3459]">
+                  <strong className="text-white">Standar:</strong> Wajib 100% Negatif. Hasil positif langsung memicu eskalasi pelanggaran.
                 </div>
               </div>
 
               {/* Pilar 3 */}
-              <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2">
+              <div className="bg-[#081224] border border-[#1b3459] rounded-xl p-4 space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-xs text-slate-900 flex items-center space-x-1.5">
-                    <Users className="w-4 h-4 text-amber-600" />
+                  <span className="font-bold text-xs text-white flex items-center space-x-1.5">
+                    <Users className="w-4 h-4 text-[#F1C40F]" />
                     <span>3. Home Visit & Kolaborasi Keluarga</span>
                   </span>
-                  <span className="text-[10px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded font-bold">Insidentil</span>
+                  <span className="text-[10px] bg-amber-900/60 text-amber-300 border border-amber-700/60 px-2 py-0.5 rounded font-bold">Insidentil</span>
                 </div>
-                <p className="text-xs text-slate-600 leading-relaxed">
+                <p className="text-xs text-slate-300 leading-relaxed">
                   Konselor bersama petugas pendamping mengunjungi domisili tempat tinggal klien. Keluarga bertindak sebagai penjamin sosial (guarantor) yang menandatangani pakta integritas dan melaporkan jika timbul perilaku mencurigakan atau indikasi bergaul kembali dengan jaringan narkotika.
                 </p>
-                <div className="text-[11px] text-slate-500 bg-white p-2 rounded border border-slate-200">
-                  <strong>Fokus:</strong> Verifikasi kestabilan lingkungan tempat tinggal dan dukungan pemulihan.
+                <div className="text-[11px] text-slate-300 bg-[#0b172a] p-2 rounded border border-[#1b3459]">
+                  <strong className="text-white">Fokus:</strong> Verifikasi kestabilan lingkungan tempat tinggal dan dukungan pemulihan.
                 </div>
               </div>
 
               {/* Pilar 4 */}
-              <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2">
+              <div className="bg-[#081224] border border-[#1b3459] rounded-xl p-4 space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-xs text-slate-900 flex items-center space-x-1.5">
-                    <Award className="w-4 h-4 text-emerald-600" />
+                  <span className="font-bold text-xs text-white flex items-center space-x-1.5">
+                    <Award className="w-4 h-4 text-emerald-400" />
                     <span>4. Evaluasi Vokasional & Kesiapan Sosial</span>
                   </span>
-                  <span className="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-bold">Tahap Akhir</span>
+                  <span className="text-[10px] bg-emerald-900/60 text-emerald-300 border border-emerald-700/60 px-2 py-0.5 rounded font-bold">Tahap Akhir</span>
                 </div>
-                <p className="text-xs text-slate-600 leading-relaxed">
+                <p className="text-xs text-slate-300 leading-relaxed">
                   Klien diarahkan mengikuti kegiatan produktif vokasional (pelatihan kerja, wirausaha mikro, atau kembali bersekolah/kuliah bagi usia anak/remaja) agar tidak terisolasi sosial yang memicu kekambuhan (relapse).
                 </p>
-                <div className="text-[11px] text-slate-500 bg-white p-2 rounded border border-slate-200">
-                  <strong>Indikator:</strong> Klien pulih, berfungsi sosial, dan memiliki rutinitas harian positif.
+                <div className="text-[11px] text-slate-300 bg-[#0b172a] p-2 rounded border border-[#1b3459]">
+                  <strong className="text-white">Indikator:</strong> Klien pulih, berfungsi sosial, dan memiliki rutinitas harian positif.
                 </div>
               </div>
             </div>
           </div>
 
           {/* MEKANISME PENEGAKAN DISIPLIN & SURAT PERINGATAN (SP) */}
-          <div className="bg-white border border-slate-200 rounded-xl p-6 space-y-4">
-            <h3 className="text-sm font-bold text-slate-900 flex items-center space-x-2">
-              <AlertTriangle className="w-4 h-4 text-rose-600" />
+          <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl p-6 space-y-4">
+            <h3 className="text-sm font-bold text-white flex items-center space-x-2">
+              <AlertTriangle className="w-4 h-4 text-[#F1C40F]" />
               <span>Mekanisme Penegakan Disiplin & Eskalasi Sanksi (Bagan Alur Pelanggaran)</span>
             </h3>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-slate-400">
               Tindakan berjenjang apabila klien tidak memenuhi kewajiban wajib lapor atau terbukti mengonsumsi narkotika:
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
               {/* SP-1 */}
-              <div className="bg-amber-50/60 border border-amber-300 rounded-xl p-4 space-y-2">
+              <div className="bg-amber-950/40 border border-amber-500/40 rounded-xl p-4 space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-xs text-amber-900 flex items-center space-x-1.5">
-                    <BadgeAlert className="w-4 h-4 text-amber-700" />
+                  <span className="font-bold text-xs text-amber-300 flex items-center space-x-1.5">
+                    <BadgeAlert className="w-4 h-4 text-amber-400" />
                     <span>SP-1 (Peringatan Awal)</span>
                   </span>
-                  <span className="text-[10px] bg-amber-200 text-amber-900 px-2 py-0.5 rounded font-bold">Mangkir 1x</span>
+                  <span className="text-[10px] bg-amber-900/60 text-amber-200 border border-amber-700/60 px-2 py-0.5 rounded font-bold">Mangkir 1x</span>
                 </div>
-                <p className="text-xs text-slate-700 leading-relaxed">
+                <p className="text-xs text-amber-100 leading-relaxed">
                   Diterbitkan ketika klien tidak hadir pada sesi wajib lapor terjadwal tanpa surat izin atau surat keterangan sakit sah.
                 </p>
-                <div className="pt-2 border-t border-amber-200 text-[11px] text-amber-900 space-y-1">
+                <div className="pt-2 border-t border-amber-500/40 text-[11px] text-amber-200 space-y-1">
                   <div>• Konselor memanggil penjamin keluarga dalam 1x24 jam</div>
                   <div>• Klien diwajibkan mengganti sesi (kompensasi ganda)</div>
                   <div>• Tembusan SP-1 otomatis terkirim ke Penyidik e-TAT</div>
@@ -1255,18 +1253,18 @@ export const AboutView: React.FC<AboutViewProps> = ({
               </div>
 
               {/* SP-2 */}
-              <div className="bg-orange-50/60 border border-orange-300 rounded-xl p-4 space-y-2">
+              <div className="bg-orange-950/40 border border-orange-500/40 rounded-xl p-4 space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-xs text-orange-900 flex items-center space-x-1.5">
-                    <AlertTriangle className="w-4 h-4 text-orange-700" />
+                  <span className="font-bold text-xs text-orange-300 flex items-center space-x-1.5">
+                    <AlertTriangle className="w-4 h-4 text-orange-400" />
                     <span>SP-2 (Peringatan Keras)</span>
                   </span>
-                  <span className="text-[10px] bg-orange-200 text-orange-900 px-2 py-0.5 rounded font-bold">Mangkir 2x</span>
+                  <span className="text-[10px] bg-orange-900/60 text-orange-200 border border-orange-700/60 px-2 py-0.5 rounded font-bold">Mangkir 2x</span>
                 </div>
-                <p className="text-xs text-slate-700 leading-relaxed">
+                <p className="text-xs text-orange-100 leading-relaxed">
                   Diterbitkan ketika klien mengabaikan SP-1 dan kembali mangkir pada minggu berikutnya tanpa konfirmasi.
                 </p>
-                <div className="pt-2 border-t border-orange-200 text-[11px] text-orange-900 space-y-1">
+                <div className="pt-2 border-t border-orange-500/40 text-[11px] text-orange-200 space-y-1">
                   <div>• Pemanggilan resmi bersama Penyidik Satresnarkoba</div>
                   <div>• Pelaksanaan tes urin wajib mendadak di kantor penyidik</div>
                   <div>• Peringatan terakhir sebelum pembatalan restorative justice</div>
@@ -1274,18 +1272,18 @@ export const AboutView: React.FC<AboutViewProps> = ({
               </div>
 
               {/* SP-3 */}
-              <div className="bg-rose-50/60 border border-rose-300 rounded-xl p-4 space-y-2">
+              <div className="bg-rose-950/40 border border-rose-500/40 rounded-xl p-4 space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-xs text-rose-900 flex items-center space-x-1.5">
-                    <AlertOctagon className="w-4 h-4 text-rose-700" />
+                  <span className="font-bold text-xs text-rose-300 flex items-center space-x-1.5">
+                    <AlertOctagon className="w-4 h-4 text-rose-400" />
                     <span>SP-3 (Pencabutan Hak RJ)</span>
                   </span>
-                  <span className="text-[10px] bg-rose-200 text-rose-900 px-2 py-0.5 rounded font-bold">Drop Out / Positif</span>
+                  <span className="text-[10px] bg-rose-900/60 text-rose-200 border border-rose-700/60 px-2 py-0.5 rounded font-bold">Drop Out / Positif</span>
                 </div>
-                <p className="text-xs text-slate-700 leading-relaxed">
+                <p className="text-xs text-rose-100 leading-relaxed">
                   Diterbitkan apabila klien mangkir 3 kali ATAU <strong>terbukti positif narkoba (relapse)</strong> dalam uji laboratorium urin.
                 </p>
-                <div className="pt-2 border-t border-rose-200 text-[11px] text-rose-900 space-y-1">
+                <div className="pt-2 border-t border-rose-500/40 text-[11px] text-rose-200 space-y-1">
                   <div>• Rekomendasi Restorative Justice / diversi resmi dicabut</div>
                   <div>• Status kepatuhan beralih menjadi <em>tidak_patuh_mangkir</em></div>
                   <div>• Berkas perkara dilimpahkan ke Penuntut Umum untuk sidang pengadilan pidana umum</div>
@@ -1295,33 +1293,33 @@ export const AboutView: React.FC<AboutViewProps> = ({
           </div>
 
           {/* MEKANISME KELULUSAN & PENGHENTIAN PERKARA TETAP */}
-          <div className="bg-emerald-50/70 border border-emerald-300 rounded-xl p-6 space-y-4">
-            <h3 className="text-sm font-bold text-emerald-950 flex items-center space-x-2">
-              <Award className="w-5 h-5 text-emerald-700" />
+          <div className="bg-emerald-950/30 border border-emerald-500/40 rounded-xl p-6 space-y-4">
+            <h3 className="text-sm font-bold text-emerald-300 flex items-center space-x-2">
+              <Award className="w-5 h-5 text-emerald-400" />
               <span>Mekanisme Kelulusan Program & Penghentian Penuntutan Tetap (SKSP)</span>
             </h3>
-            <p className="text-xs text-emerald-900 leading-relaxed">
+            <p className="text-xs text-emerald-200 leading-relaxed">
               Apabila klien memenuhi seluruh persyaratan pengawasan hingga akhir masa rehabilitasi:
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1 text-xs">
-              <div className="bg-white p-3.5 rounded-xl border border-emerald-200 space-y-1.5">
-                <span className="font-bold text-slate-900 block">1. Evaluasi Akhir Pleno Terpadu</span>
-                <p className="text-slate-600">
+              <div className="bg-[#0b172a] p-3.5 rounded-xl border border-emerald-500/30 space-y-1.5">
+                <span className="font-bold text-white block">1. Evaluasi Akhir Pleno Terpadu</span>
+                <p className="text-slate-300">
                   Konselor dan Tim Asesor Medis melakukan evaluasi akhir tingkat kepulihan (skor ASSIST pasca terapi) dan uji toksikologi konfirmasi akhir.
                 </p>
               </div>
 
-              <div className="bg-white p-3.5 rounded-xl border border-emerald-200 space-y-1.5">
-                <span className="font-bold text-slate-900 block">2. Penerbitan SKSP Resmi</span>
-                <p className="text-slate-600">
+              <div className="bg-[#0b172a] p-3.5 rounded-xl border border-emerald-500/30 space-y-1.5">
+                <span className="font-bold text-white block">2. Penerbitan SKSP Resmi</span>
+                <p className="text-slate-300">
                   Diterbitkan <strong>Surat Keterangan Selesai Program (SKSP)</strong> bernomor seri resmi yang ditandatangani oleh pimpinan fasilitas rehabilitasi dan Koordinator TAT.
                 </p>
               </div>
 
-              <div className="bg-white p-3.5 rounded-xl border border-emerald-200 space-y-1.5">
-                <span className="font-bold text-slate-900 block">3. Penetapan SP3 / SKP2 Tetap</span>
-                <p className="text-slate-600">
+              <div className="bg-[#0b172a] p-3.5 rounded-xl border border-emerald-500/30 space-y-1.5">
+                <span className="font-bold text-white block">3. Penetapan SP3 / SKP2 Tetap</span>
+                <p className="text-slate-300">
                   SKSP diserahkan kepada Penyidik Polri sebagai dasar penerbitan SP3 (Surat Perintah Penghentian Penyidikan) atau kepada Jaksa Penuntut Umum untuk SKP2 Restorative Justice permanen.
                 </p>
               </div>
@@ -1329,40 +1327,40 @@ export const AboutView: React.FC<AboutViewProps> = ({
           </div>
 
           {/* MATRIKS KOORDINASI LINTAS PERAN DALAM PENGAWASAN */}
-          <div className="bg-white border border-slate-200 rounded-xl p-6 space-y-4">
-            <h3 className="text-sm font-bold text-slate-900 flex items-center space-x-2">
-              <Scale className="w-4 h-4 text-blue-600" />
+          <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl p-6 space-y-4">
+            <h3 className="text-sm font-bold text-white flex items-center space-x-2">
+              <Scale className="w-4 h-4 text-[#38bdf8]" />
               <span>Matriks Pembagian Peran Pengawasan di Aplikasi e-TAT</span>
             </h3>
             <div className="overflow-x-auto text-xs">
-              <table className="w-full text-left border border-slate-200 rounded-lg overflow-hidden">
-                <thead className="bg-slate-100 text-slate-700 font-semibold border-b border-slate-200">
+              <table className="w-full text-left border border-[#1b3459] rounded-lg overflow-hidden">
+                <thead className="bg-[#081224] text-slate-300 font-semibold border-b border-[#1b3459]">
                   <tr>
                     <th className="p-3">Peran Pengguna</th>
                     <th className="p-3">Tindakan Utama pada Tab Pengawasan</th>
                     <th className="p-3">Keluaran / Tanggung Jawab</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-200 bg-white">
+                <tbody className="divide-y divide-[#1b3459] bg-[#0b172a]">
                   <tr>
-                    <td className="p-3 font-semibold text-slate-900">Petugas / Konselor Rehabilitasi</td>
-                    <td className="p-3 text-slate-600">Mencatat jurnal mingguan, menginput hasil tes urin, dan menerbitkan draf SP jika mangkir</td>
-                    <td className="p-3 text-teal-700 font-medium">Buku log kehadiran, rekap toksikologi & penerbitan SKSP</td>
+                    <td className="p-3 font-semibold text-white">Petugas / Konselor Rehabilitasi</td>
+                    <td className="p-3 text-slate-300">Mencatat jurnal mingguan, menginput hasil tes urin, dan menerbitkan draf SP jika mangkir</td>
+                    <td className="p-3 text-teal-300 font-medium">Buku log kehadiran, rekap toksikologi & penerbitan SKSP</td>
                   </tr>
                   <tr>
-                    <td className="p-3 font-semibold text-slate-900">Penyidik Pengaju (Satresnarkoba)</td>
-                    <td className="p-3 text-slate-600">Memantau kepatuhan terperiksa secara real-time dan melakukan penjemputan jika terbit SP-2</td>
-                    <td className="p-3 text-blue-700 font-medium">Pengawasan legalitas proses pidana & pemenuhan syarat Restorative Justice</td>
+                    <td className="p-3 font-semibold text-white">Penyidik Pengaju (Satresnarkoba)</td>
+                    <td className="p-3 text-slate-300">Memantau kepatuhan terperiksa secara real-time dan melakukan penjemputan jika terbit SP-2</td>
+                    <td className="p-3 text-[#38bdf8] font-medium">Pengawasan legalitas proses pidana & pemenuhan syarat Restorative Justice</td>
                   </tr>
                   <tr>
-                    <td className="p-3 font-semibold text-slate-900">Sekretariat TAT</td>
-                    <td className="p-3 text-slate-600">Mendistribusikan tembusan SP ke Kejaksaan dan mendokumentasikan arsip pengawasan perkara</td>
-                    <td className="p-3 text-slate-700 font-medium">Tertib administrasi & sinkronisasi berkas perkara</td>
+                    <td className="p-3 font-semibold text-white">Sekretariat TAT</td>
+                    <td className="p-3 text-slate-300">Mendistribusikan tembusan SP ke Kejaksaan dan mendokumentasikan arsip pengawasan perkara</td>
+                    <td className="p-3 text-slate-300 font-medium">Tertib administrasi & sinkronisasi berkas perkara</td>
                   </tr>
                   <tr>
-                    <td className="p-3 font-semibold text-slate-900">Koordinator TAT & Pimpinan</td>
-                    <td className="p-3 text-slate-600">Memonitor dasbor kepatuhan agregat, mengevaluasi angka keberhasilan pemulihan (zero relapse)</td>
-                    <td className="p-3 text-purple-700 font-medium">Audit pengawasan, laporan berkala pimpinan & kepatuhan SLA</td>
+                    <td className="p-3 font-semibold text-white">Koordinator TAT & Pimpinan</td>
+                    <td className="p-3 text-slate-300">Memonitor dasbor kepatuhan agregat, mengevaluasi angka keberhasilan pemulihan (zero relapse)</td>
+                    <td className="p-3 text-purple-300 font-medium">Audit pengawasan, laporan berkala pimpinan & kepatuhan SLA</td>
                   </tr>
                 </tbody>
               </table>
@@ -1374,82 +1372,82 @@ export const AboutView: React.FC<AboutViewProps> = ({
       {/* SECTION 5: DASAR HUKUM & BATASAN SISTEM */}
       {activeSection === 'regulasi' && (
         <div className="space-y-6">
-          <div className="bg-white border border-slate-200 rounded-xl p-5 space-y-4">
-            <h2 className="text-base font-bold text-slate-900 flex items-center space-x-2">
-              <BookOpen className="w-5 h-5 text-blue-600" />
+          <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl p-5 space-y-4">
+            <h2 className="text-base font-bold text-white flex items-center space-x-2">
+              <BookOpen className="w-5 h-5 text-[#38bdf8]" />
               <span>Landasan Hukum & Regulasi Pelayanan Tim Asesmen Terpadu</span>
             </h2>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-slate-400">
               Sistem e-TAT dirancang secara ketat mengacu pada kerangka hukum penanganan tindak pidana narkotika di Republik Indonesia:
             </p>
 
             <div className="space-y-3 text-xs">
-              <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-1.5">
+              <div className="bg-[#081224] border border-[#1b3459] rounded-xl p-4 space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-slate-900 text-sm">
+                  <span className="font-bold text-white text-sm">
                     1. Undang-Undang Nomor 35 Tahun 2009 tentang Narkotika
                   </span>
-                  <span className="text-[10px] font-bold bg-blue-100 text-blue-800 px-2 py-0.5 rounded">
+                  <span className="text-[10px] font-bold bg-blue-900/60 text-blue-300 border border-blue-700/60 px-2 py-0.5 rounded">
                     UU Utama
                   </span>
                 </div>
-                <p className="text-slate-600 text-xs leading-relaxed">
+                <p className="text-slate-300 text-xs leading-relaxed">
                   Pasal 54 mengamanatkan bahwa pecandu narkotika dan korban penyalahgunaan narkotika wajib menjalani rehabilitasi medis dan rehabilitasi sosial. Pasal 103 memberikan kewenangan kepada Hakim untuk menjatuhkan vonis rehabilitasi baik terbukti bersalah maupun tidak bersalah.
                 </p>
               </div>
 
-              <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-1.5">
+              <div className="bg-[#081224] border border-[#1b3459] rounded-xl p-4 space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-slate-900 text-sm">
+                  <span className="font-bold text-white text-sm">
                     2. Surat Edaran Mahkamah Agung (SEMA) No. 04 Tahun 2010
                   </span>
-                  <span className="text-[10px] font-bold bg-purple-100 text-purple-800 px-2 py-0.5 rounded">
+                  <span className="text-[10px] font-bold bg-purple-900/60 text-purple-300 border border-purple-700/60 px-2 py-0.5 rounded">
                     Yurisprudensi MA
                   </span>
                 </div>
-                <p className="text-slate-600 text-xs leading-relaxed">
+                <p className="text-slate-300 text-xs leading-relaxed">
                   Menetapkan ambang batas maksimal barang bukti pemakaian 1 (satu) hari bagi penyalahguna untuk dapat ditempatkan dalam lembaga rehabilitasi (misal: Sabu/Metamfetamina maksimal 1 gram, Ganja maksimal 5 gram, Ekstasi/MDMA maksimal 8 butir / 2.4 gram).
                 </p>
               </div>
 
-              <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-1.5">
+              <div className="bg-[#081224] border border-[#1b3459] rounded-xl p-4 space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-slate-900 text-sm">
+                  <span className="font-bold text-white text-sm">
                     3. Peraturan Bersama 7 Lembaga Negara Tahun 2014
                   </span>
-                  <span className="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded">
+                  <span className="text-[10px] font-bold bg-emerald-900/60 text-emerald-300 border border-emerald-700/60 px-2 py-0.5 rounded">
                     Peraturan Bersama
                   </span>
                 </div>
-                <p className="text-slate-600 text-xs leading-relaxed">
+                <p className="text-slate-300 text-xs leading-relaxed">
                   Ditandatangani oleh Ketua Mahkamah Agung, Menkumham, Menkes, Mensos, Jaksa Agung, Kapolri, dan Kepala BNN tentang Penanganan Pecandu Narkotika dan Korban Penyalahgunaan Narkotika ke dalam Lembaga Rehabilitasi melalui pembentukan Tim Asesmen Terpadu (TAT).
                 </p>
               </div>
 
-              <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-1.5">
+              <div className="bg-[#081224] border border-[#1b3459] rounded-xl p-4 space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-slate-900 text-sm">
+                  <span className="font-bold text-white text-sm">
                     4. Peraturan BNN Nomor 11 Tahun 2021
                   </span>
-                  <span className="text-[10px] font-bold bg-teal-100 text-teal-800 px-2 py-0.5 rounded">
+                  <span className="text-[10px] font-bold bg-teal-900/60 text-teal-300 border border-teal-700/60 px-2 py-0.5 rounded">
                     SOP Teknis BNN
                   </span>
                 </div>
-                <p className="text-slate-600 text-xs leading-relaxed">
+                <p className="text-slate-300 text-xs leading-relaxed">
                   Mengatur tata kerja operasional Tim Asesmen Terpadu, prosedur pendaftaran permohonan 1x24 jam, pemisahan tim medis dan tim hukum, mekanisme sidang pleno mufakat, dan batasan waktu penyelesaian berkas rekomendasi maksimal 6 (enam) hari kerja.
                 </p>
               </div>
             </div>
 
             {/* SLA Table Summary */}
-            <div className="pt-4 border-t border-slate-200">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 mb-2 flex items-center space-x-1.5">
-                <Clock className="w-4 h-4 text-blue-600" />
+            <div className="pt-4 border-t border-[#1b3459]">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-300 mb-2 flex items-center space-x-1.5">
+                <Clock className="w-4 h-4 text-[#38bdf8]" />
                 <span>Rincian Standar Waktu Layanan (SLA 6 Hari Kerja)</span>
               </h3>
               <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs border border-slate-200 rounded-lg overflow-hidden">
-                  <thead className="bg-slate-100/80 text-slate-700 font-semibold border-b border-slate-200">
+                <table className="w-full text-left text-xs border border-[#1b3459] rounded-lg overflow-hidden">
+                  <thead className="bg-[#081224] text-slate-300 font-semibold border-b border-[#1b3459]">
                     <tr>
                       <th className="p-2.5">Tahapan Layanan</th>
                       <th className="p-2.5">Penanggung Jawab</th>
@@ -1457,54 +1455,54 @@ export const AboutView: React.FC<AboutViewProps> = ({
                       <th className="p-2.5">Keluaran (Output)</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-200 bg-white">
+                  <tbody className="divide-y divide-[#1b3459] bg-[#0b172a]">
                     <tr>
-                      <td className="p-2.5 font-medium text-slate-900">1. Registrasi Permohonan</td>
-                      <td className="p-2.5 text-slate-600">Penyidik Pengaju</td>
-                      <td className="p-2.5 text-blue-700 font-semibold">1x24 Jam pasca tangkap</td>
-                      <td className="p-2.5 text-slate-600">Berkas perkara terdaftar</td>
+                      <td className="p-2.5 font-medium text-white">1. Registrasi Permohonan</td>
+                      <td className="p-2.5 text-slate-300">Penyidik Pengaju</td>
+                      <td className="p-2.5 text-[#38bdf8] font-semibold">1x24 Jam pasca tangkap</td>
+                      <td className="p-2.5 text-slate-300">Berkas perkara terdaftar</td>
                     </tr>
                     <tr>
-                      <td className="p-2.5 font-medium text-slate-900">2. Verifikasi Berkas Persyaratan</td>
-                      <td className="p-2.5 text-slate-600">Sekretariat TAT</td>
-                      <td className="p-2.5 text-blue-700 font-semibold">Hari ke-1 s/d Hari ke-2</td>
-                      <td className="p-2.5 text-slate-600">Disposisi kelengkapan formil</td>
+                      <td className="p-2.5 font-medium text-white">2. Verifikasi Berkas Persyaratan</td>
+                      <td className="p-2.5 text-slate-300">Sekretariat TAT</td>
+                      <td className="p-2.5 text-[#38bdf8] font-semibold">Hari ke-1 s/d Hari ke-2</td>
+                      <td className="p-2.5 text-slate-300">Disposisi kelengkapan formil</td>
                     </tr>
                     <tr>
-                      <td className="p-2.5 font-medium text-slate-900">3. Penugasan & Penjadwalan</td>
-                      <td className="p-2.5 text-slate-600">Sekretariat & Koordinator</td>
-                      <td className="p-2.5 text-blue-700 font-semibold">Hari ke-2</td>
-                      <td className="p-2.5 text-slate-600">Surat tugas & jadwal asesmen</td>
+                      <td className="p-2.5 font-medium text-white">3. Penugasan & Penjadwalan</td>
+                      <td className="p-2.5 text-slate-300">Sekretariat & Koordinator</td>
+                      <td className="p-2.5 text-[#38bdf8] font-semibold">Hari ke-2</td>
+                      <td className="p-2.5 text-slate-300">Surat tugas & jadwal asesmen</td>
                     </tr>
                     <tr>
-                      <td className="p-2.5 font-medium text-slate-900">4. Asesmen Medis & Telaah Hukum</td>
-                      <td className="p-2.5 text-slate-600">Tim Medis & Tim Hukum</td>
-                      <td className="p-2.5 text-blue-700 font-semibold">Hari ke-2 s/d Hari ke-4</td>
-                      <td className="p-2.5 text-slate-600">Catatan klinis & analisis peran</td>
+                      <td className="p-2.5 font-medium text-white">4. Asesmen Medis & Telaah Hukum</td>
+                      <td className="p-2.5 text-slate-300">Tim Medis & Tim Hukum</td>
+                      <td className="p-2.5 text-[#38bdf8] font-semibold">Hari ke-2 s/d Hari ke-4</td>
+                      <td className="p-2.5 text-slate-300">Catatan klinis & analisis peran</td>
                     </tr>
                     <tr>
-                      <td className="p-2.5 font-medium text-slate-900">5. Sidang Pleno Musyawarah</td>
-                      <td className="p-2.5 text-slate-600">Koordinator TAT & Tim</td>
-                      <td className="p-2.5 text-blue-700 font-semibold">Hari ke-4 s/d Hari ke-5</td>
-                      <td className="p-2.5 text-slate-600">Risalah kesepakatan pleno</td>
+                      <td className="p-2.5 font-medium text-white">5. Sidang Pleno Musyawarah</td>
+                      <td className="p-2.5 text-slate-300">Koordinator TAT & Tim</td>
+                      <td className="p-2.5 text-[#38bdf8] font-semibold">Hari ke-4 s/d Hari ke-5</td>
+                      <td className="p-2.5 text-slate-300">Risalah kesepakatan pleno</td>
                     </tr>
                     <tr>
-                      <td className="p-2.5 font-medium text-slate-900">6. Pengesahan 3 Pihak & QR Code</td>
-                      <td className="p-2.5 text-slate-600">Koordinator, Medis, Hukum</td>
-                      <td className="p-2.5 text-blue-700 font-semibold">Hari ke-5 s/d Hari ke-6</td>
-                      <td className="p-2.5 text-emerald-700 font-bold">Surat Rekomendasi Resmi</td>
+                      <td className="p-2.5 font-medium text-white">6. Pengesahan 3 Pihak & QR Code</td>
+                      <td className="p-2.5 text-slate-300">Koordinator, Medis, Hukum</td>
+                      <td className="p-2.5 text-[#38bdf8] font-semibold">Hari ke-5 s/d Hari ke-6</td>
+                      <td className="p-2.5 text-emerald-400 font-bold">Surat Rekomendasi Resmi</td>
                     </tr>
                     <tr>
-                      <td className="p-2.5 font-medium text-slate-900">7. Koordinasi Rujukan & Admisi</td>
-                      <td className="p-2.5 text-slate-600">Fasilitas Rehab & Penyidik</td>
-                      <td className="p-2.5 text-blue-700 font-semibold">Maks. Hari ke-14</td>
-                      <td className="p-2.5 text-slate-600">Tiket rujukan & tanggal masuk rawat</td>
+                      <td className="p-2.5 font-medium text-white">7. Koordinasi Rujukan & Admisi</td>
+                      <td className="p-2.5 text-slate-300">Fasilitas Rehab & Penyidik</td>
+                      <td className="p-2.5 text-[#38bdf8] font-semibold">Maks. Hari ke-14</td>
+                      <td className="p-2.5 text-slate-300">Tiket rujukan & tanggal masuk rawat</td>
                     </tr>
                     <tr>
-                      <td className="p-2.5 font-medium text-slate-900">8. Pengawasan Pasca TAT (Aftercare)</td>
-                      <td className="p-2.5 text-slate-600">Konselor, Penyidik & Bapas</td>
-                      <td className="p-2.5 text-blue-700 font-semibold">1 s/d 12 Bulan</td>
-                      <td className="p-2.5 text-teal-700 font-bold">Jurnal lapor, tes urin & SKSP tuntas</td>
+                      <td className="p-2.5 font-medium text-white">8. Pengawasan Pasca TAT (Aftercare)</td>
+                      <td className="p-2.5 text-slate-300">Konselor, Penyidik & Bapas</td>
+                      <td className="p-2.5 text-[#38bdf8] font-semibold">1 s/d 12 Bulan</td>
+                      <td className="p-2.5 text-teal-300 font-bold">Jurnal lapor, tes urin & SKSP tuntas</td>
                     </tr>
                   </tbody>
                 </table>

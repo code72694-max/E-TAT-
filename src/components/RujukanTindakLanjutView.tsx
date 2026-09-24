@@ -45,15 +45,15 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-slate-900 flex items-center space-x-2">
-            <Share2 className="w-5 h-5 text-teal-600" />
+          <h1 className="text-xl font-bold text-white flex items-center space-x-2 font-['Cinzel',serif]">
+            <Share2 className="w-5 h-5 text-[#38bdf8]" />
             <span>
               {isRehab
                 ? 'Penerimaan Rujukan & Pengawasan Klien Pasca TAT'
                 : 'Koordinasi Rujukan & Pengawasan Klien Pasca TAT'}
             </span>
           </h1>
-          <p className="text-xs text-slate-500 mt-1">
+          <p className="text-xs text-slate-400 mt-1">
             {isRehab
               ? 'Kelola penerimaan admisi rujukan rekomendasi TAT, pantau kapasitas layanan, serta awasi kepatuhan sesi & hasil tes urin berkala klien.'
               : 'Memastikan kesinambungan intervensi: dari koordinasi ketersediaan bed hingga pemantauan kepatuhan program hukum berkeadilan restoratif.'}
@@ -61,27 +61,27 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
         </div>
 
         {/* Tab Switcher */}
-        <div className="flex bg-slate-200/80 p-1 rounded-xl text-xs font-semibold self-start">
+        <div className="flex bg-[#0b172a] border border-[#1b3459] p-1 rounded-xl text-xs font-semibold self-start shadow-sm">
           <button
             onClick={() => setActiveSubTab('rujukan')}
-            className={`px-3 py-1.5 rounded-lg flex items-center space-x-1.5 transition-all ${
+            className={`px-3 py-1.5 rounded-lg flex items-center space-x-1.5 transition-all cursor-pointer ${
               activeSubTab === 'rujukan'
-                ? 'bg-white text-slate-900 shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-[#1b3459] text-white font-bold border border-[#2d5289]'
+                : 'text-slate-400 hover:text-white'
             }`}
           >
-            <Building2 className="w-3.5 h-3.5 text-blue-600" />
+            <Building2 className="w-3.5 h-3.5 text-[#38bdf8]" />
             <span>Alur Rujukan & Kuota ({tindakLanjutList.length})</span>
           </button>
           <button
             onClick={() => setActiveSubTab('pengawasan')}
-            className={`px-3 py-1.5 rounded-lg flex items-center space-x-1.5 transition-all ${
+            className={`px-3 py-1.5 rounded-lg flex items-center space-x-1.5 transition-all cursor-pointer ${
               activeSubTab === 'pengawasan'
-                ? 'bg-white text-slate-900 shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-[#1b3459] text-white font-bold border border-[#2d5289]'
+                : 'text-slate-400 hover:text-white'
             }`}
           >
-            <Activity className="w-3.5 h-3.5 text-teal-600" />
+            <Activity className="w-3.5 h-3.5 text-[#38bdf8]" />
             <span>Pengawasan Pasca TAT ({pengawasanList.length})</span>
           </button>
         </div>
@@ -91,9 +91,9 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
       {activeSubTab === 'rujukan' && (
         <div className="space-y-6">
           {/* Facilities Capacity Monitor */}
-          <div className="bg-white border border-slate-200 rounded-xl p-5 space-y-3">
-            <h3 className="text-sm font-bold text-slate-900 flex items-center space-x-2">
-              <Building2 className="w-4 h-4 text-blue-600" />
+          <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl p-5 space-y-3 shadow-lg shadow-black/20">
+            <h3 className="text-sm font-bold text-white flex items-center space-x-2 font-['Cinzel',serif]">
+              <Building2 className="w-4 h-4 text-[#38bdf8]" />
               <span>Ketersediaan Kuota & Kapasitas Fasilitas Rehabilitasi Mitra</span>
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
@@ -103,25 +103,25 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
                   <div
                     key={f.id}
                     className={`p-3.5 rounded-xl border flex flex-col justify-between ${
-                      isFull ? 'bg-rose-50 border-rose-200' : 'bg-slate-50 border-slate-200'
+                      isFull ? 'bg-rose-950/20 border-rose-800/50' : 'bg-[#081224] border-[#1b3459]'
                     }`}
                   >
                     <div>
                       <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-bold uppercase text-slate-500">{f.tipe}</span>
-                        <span className={`text-[10px] font-bold px-1.5 py-0.2 rounded ${
-                          isFull ? 'bg-rose-200 text-rose-800' : 'bg-emerald-100 text-emerald-800'
+                        <span className="text-[10px] font-bold uppercase text-slate-400">{f.tipe}</span>
+                        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded border ${
+                          isFull ? 'bg-rose-500/20 text-rose-300 border-rose-500/40' : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
                         }`}>
                           {isFull ? 'Penuh' : 'Tersedia'}
                         </span>
                       </div>
-                      <h4 className="font-bold text-xs text-slate-900 mt-1 leading-snug">{f.nama}</h4>
-                      <p className="text-[11px] text-slate-500 mt-0.5">{f.alamat}</p>
+                      <h4 className="font-bold text-xs text-white mt-1 leading-snug">{f.nama}</h4>
+                      <p className="text-[11px] text-slate-400 mt-0.5">{f.alamat}</p>
                     </div>
 
-                    <div className="mt-3 pt-2 border-t border-slate-200/80 flex items-center justify-between text-xs">
-                      <span className="text-slate-600">Sisa Kuota:</span>
-                      <span className={`font-bold ${isFull ? 'text-rose-700 font-extrabold' : 'text-slate-900'}`}>
+                    <div className="mt-3 pt-2 border-t border-[#1b3459] flex items-center justify-between text-xs">
+                      <span className="text-slate-400">Sisa Kuota:</span>
+                      <span className={`font-bold ${isFull ? 'text-rose-400 font-extrabold' : 'text-slate-200'}`}>
                         {f.kapasitasTersedia} / {f.kapasitasTotal} Slot
                       </span>
                     </div>
@@ -133,7 +133,7 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
 
           {/* Active Referrals List */}
           <div className="space-y-3">
-            <h3 className="text-sm font-bold text-slate-900">Daftar Klien dalam Alur Rujukan & Tindak Lanjut</h3>
+            <h3 className="text-sm font-bold text-white font-['Cinzel',serif]">Daftar Klien dalam Alur Rujukan & Tindak Lanjut</h3>
             {tindakLanjutList.map(item => {
               const tl = item.tindakLanjut!;
               const isStuck = tl.statusRujukan === 'kapasitas_penuh';
@@ -143,51 +143,51 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
                 <div
                   key={item.id}
                   onClick={() => onSelectPermohonan(item.id)}
-                  className={`p-5 rounded-xl border transition-all cursor-pointer space-y-3 ${
+                  className={`p-5 rounded-xl border transition-all cursor-pointer space-y-3 shadow-lg shadow-black/20 group ${
                     isStuck
-                      ? 'bg-rose-50/40 border-rose-300 hover:border-rose-400'
+                      ? 'bg-[#0b172a] border-rose-700/60 hover:border-rose-500'
                       : isEnrolled
-                      ? 'bg-emerald-50/30 border-emerald-200 hover:border-emerald-400'
-                      : 'bg-white border-slate-200 hover:border-blue-400'
+                      ? 'bg-[#0b172a] border-emerald-700/50 hover:border-emerald-400'
+                      : 'bg-[#0b172a] border-[#1b3459] hover:border-[#38bdf8]'
                   }`}
                 >
                   <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
                     <div>
                       <div className="flex items-center space-x-2">
-                        <span className="font-bold text-sm text-slate-900">{item.nomorPermohonan}</span>
-                        <span className="text-xs text-slate-600">• Terperiksa: <strong>{item.terperiksa.namaLengkap}</strong></span>
+                        <span className="font-bold text-sm text-white group-hover:text-[#38bdf8] font-mono transition-colors">{item.nomorPermohonan}</span>
+                        <span className="text-xs text-slate-300">• Terperiksa: <strong className="text-white">{item.terperiksa.namaLengkap}</strong></span>
                       </div>
-                      <p className="text-xs text-slate-500 mt-0.5">
-                        Fasilitas Rujukan: <strong className="text-slate-800">{tl.namaFasilitasTujuan}</strong> ({tl.kontakFasilitas})
+                      <p className="text-xs text-slate-400 mt-0.5">
+                        Fasilitas Rujukan: <strong className="text-slate-200">{tl.namaFasilitasTujuan}</strong> ({tl.kontakFasilitas})
                       </p>
                     </div>
 
                     <span className={`text-xs font-bold px-3 py-1 rounded-full border ${
                       isStuck
-                        ? 'bg-rose-100 text-rose-800 border-rose-300'
+                        ? 'bg-rose-500/20 text-rose-300 border-rose-500/40'
                         : isEnrolled
-                        ? 'bg-emerald-100 text-emerald-800 border-emerald-300'
-                        : 'bg-blue-100 text-blue-800 border-blue-300'
+                        ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                        : 'bg-sky-500/20 text-sky-300 border-sky-500/40'
                     }`}>
                       {tl.statusRujukan.replace(/_/g, ' ').toUpperCase()}
                     </span>
                   </div>
 
                   {tl.hambatanPelaksanaan && (
-                    <div className="p-3 bg-white rounded-lg border border-rose-200 text-xs text-rose-900 flex items-start space-x-2">
-                      <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+                    <div className="p-3 bg-rose-950/30 rounded-lg border border-rose-800/50 text-xs text-rose-200 flex items-start space-x-2">
+                      <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
                       <div>
-                        <span className="font-bold block">Hambatan Penempatan Rujukan:</span>
+                        <span className="font-bold block text-rose-300">Hambatan Penempatan Rujukan:</span>
                         <span>{tl.hambatanPelaksanaan}</span>
                       </div>
                     </div>
                   )}
 
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs text-slate-600 pt-1 border-t border-slate-200/80">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs text-slate-400 pt-1 border-t border-[#1b3459]">
                     <span>Status Proses Hukum: {tl.statusProsesHukumTerkait || 'Penyidikan aktif'}</span>
-                    <span className="text-blue-600 font-semibold flex items-center space-x-1">
+                    <span className="text-[#38bdf8] font-semibold flex items-center space-x-1 group-hover:translate-x-0.5 transition-transform">
                       <span>Lihat Detail Koordinasi</span>
-                      <ArrowRight className="w-3 h-3" />
+                      <ArrowRight className="w-3 h-3 text-[#F1C40F]" />
                     </span>
                   </div>
                 </div>
@@ -202,44 +202,44 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
         <div className="space-y-6">
           {/* Summary Scorecards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            <div className="bg-white border border-slate-200 rounded-xl p-4">
-              <span className="text-[11px] font-bold uppercase text-slate-500 block">Total Klien Diawasi</span>
-              <div className="text-2xl font-extrabold text-slate-900 mt-1">{totalKlienDiawasi} Orang</div>
-              <span className="text-[11px] text-slate-500 mt-0.5 block">Pasca rekomendasi & admisi</span>
+            <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl p-4 shadow-lg shadow-black/20">
+              <span className="text-[11px] font-bold uppercase text-slate-400 block">Total Klien Diawasi</span>
+              <div className="text-2xl font-extrabold text-white mt-1">{totalKlienDiawasi} Orang</div>
+              <span className="text-[11px] text-slate-400 mt-0.5 block">Pasca rekomendasi & admisi</span>
             </div>
 
-            <div className="bg-white border border-slate-200 rounded-xl p-4">
-              <span className="text-[11px] font-bold uppercase text-slate-500 block">Klien Patuh / Bersih</span>
-              <div className="text-2xl font-extrabold text-emerald-600 mt-1">{klienPatuh} Orang</div>
-              <span className="text-[11px] text-emerald-700 mt-0.5 block">Nihil mangkir & tes urin negatif</span>
+            <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl p-4 shadow-lg shadow-black/20">
+              <span className="text-[11px] font-bold uppercase text-emerald-400 block">Klien Patuh / Bersih</span>
+              <div className="text-2xl font-extrabold text-emerald-400 mt-1">{klienPatuh} Orang</div>
+              <span className="text-[11px] text-slate-400 mt-0.5 block">Nihil mangkir & tes urin negatif</span>
             </div>
 
-            <div className="bg-white border border-slate-200 rounded-xl p-4">
-              <span className="text-[11px] font-bold uppercase text-slate-500 block">Dalam Peringatan (SP)</span>
-              <div className="text-2xl font-extrabold text-amber-600 mt-1">{klienPeringatan} Orang</div>
-              <span className="text-[11px] text-amber-700 mt-0.5 block">Mangkir sesi / terbit SP-1</span>
+            <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl p-4 shadow-lg shadow-black/20">
+              <span className="text-[11px] font-bold uppercase text-amber-400 block">Dalam Peringatan (SP)</span>
+              <div className="text-2xl font-extrabold text-amber-400 mt-1">{klienPeringatan} Orang</div>
+              <span className="text-[11px] text-slate-400 mt-0.5 block">Mangkir sesi / terbit SP-1</span>
             </div>
 
-            <div className="bg-white border border-slate-200 rounded-xl p-4">
-              <span className="text-[11px] font-bold uppercase text-slate-500 block">Selesai Program (SKSP)</span>
-              <div className="text-2xl font-extrabold text-purple-600 mt-1">{klienSelesai} Orang</div>
-              <span className="text-[11px] text-purple-700 mt-0.5 block">Tuntas memenuhi syarat hukum</span>
+            <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl p-4 shadow-lg shadow-black/20">
+              <span className="text-[11px] font-bold uppercase text-[#38bdf8] block">Selesai Program (SKSP)</span>
+              <div className="text-2xl font-extrabold text-[#38bdf8] mt-1">{klienSelesai} Orang</div>
+              <span className="text-[11px] text-slate-400 mt-0.5 block">Tuntas memenuhi syarat hukum</span>
             </div>
           </div>
 
           {/* List Klien dalam Pengawasan */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold text-slate-900">
+              <h3 className="text-sm font-bold text-white font-['Cinzel',serif]">
                 Daftar Klien dalam Monitoring & Pengawasan Pasca TAT
               </h3>
-              <span className="text-xs text-slate-500">
+              <span className="text-xs text-slate-400">
                 Menampilkan seluruh klien yang memiliki catatan wajib lapor aktif
               </span>
             </div>
 
             {pengawasanList.length === 0 ? (
-              <div className="bg-white border border-slate-200 rounded-xl p-8 text-center text-slate-500 text-xs">
+              <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl p-8 text-center text-slate-400 text-xs">
                 Belum ada klien yang terdaftar dalam program pengawasan pasca TAT.
               </div>
             ) : (
@@ -254,39 +254,39 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
                   <div
                     key={item.id}
                     onClick={() => onSelectPermohonan(item.id)}
-                    className={`p-5 rounded-xl border transition-all cursor-pointer space-y-3 ${
+                    className={`p-5 rounded-xl border transition-all cursor-pointer space-y-3 shadow-lg shadow-black/20 group ${
                       isWarning
-                        ? 'bg-amber-50/40 border-amber-300 hover:border-amber-400'
+                        ? 'bg-[#0b172a] border-amber-500/50 hover:border-amber-400'
                         : isFinished
-                        ? 'bg-purple-50/40 border-purple-300 hover:border-purple-400'
-                        : 'bg-white border-slate-200 hover:border-teal-400'
+                        ? 'bg-[#0b172a] border-[#38bdf8]/50 hover:border-[#38bdf8]'
+                        : 'bg-[#0b172a] border-[#1b3459] hover:border-[#38bdf8]'
                     }`}
                   >
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
                       <div>
                         <div className="flex items-center space-x-2">
-                          <span className="font-bold text-sm text-slate-900">{item.nomorPermohonan}</span>
-                          <span className="text-xs text-slate-600">• Klien: <strong>{item.terperiksa.namaLengkap}</strong></span>
-                          <span className="text-[11px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded border border-slate-200">
+                          <span className="font-bold text-sm text-white group-hover:text-[#38bdf8] font-mono transition-colors">{item.nomorPermohonan}</span>
+                          <span className="text-xs text-slate-300">• Klien: <strong className="text-white">{item.terperiksa.namaLengkap}</strong></span>
+                          <span className="text-[11px] bg-[#081224] text-slate-300 px-2 py-0.5 rounded border border-[#1b3459]">
                             {pgw.modalitasLayanan} ({pgw.durasiBulan} Bulan)
                           </span>
                         </div>
-                        <p className="text-xs text-slate-500 mt-0.5">
-                          Lembaga: <strong className="text-slate-800">{pgw.instansiPelaksanaRehab}</strong> • Konselor: {pgw.konselorPendamping} • Penyidik Pengawas: {pgw.penyidikPengawas}
+                        <p className="text-xs text-slate-400 mt-0.5">
+                          Lembaga: <strong className="text-slate-200">{pgw.instansiPelaksanaRehab}</strong> • Konselor: {pgw.konselorPendamping} • Penyidik: {pgw.penyidikPengawas}
                         </p>
                       </div>
 
                       <span
                         className={`text-xs font-bold px-3 py-1 rounded-full border ${
                           pgw.statusKepatuhan === 'sangat_patuh'
-                            ? 'bg-emerald-100 text-emerald-800 border-emerald-300'
+                            ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
                             : pgw.statusKepatuhan === 'patuh'
-                            ? 'bg-blue-100 text-blue-800 border-blue-300'
+                            ? 'bg-sky-500/20 text-sky-300 border-sky-500/40'
                             : pgw.statusKepatuhan === 'dalam_peringatan'
-                            ? 'bg-amber-100 text-amber-800 border-amber-300'
+                            ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
                             : pgw.statusKepatuhan === 'selesai_program'
-                            ? 'bg-purple-100 text-purple-800 border-purple-300'
-                            : 'bg-rose-100 text-rose-800 border-rose-300'
+                            ? 'bg-purple-500/20 text-purple-300 border-purple-500/40'
+                            : 'bg-rose-500/20 text-rose-300 border-rose-500/40'
                         }`}
                       >
                         {pgw.statusKepatuhan.replace(/_/g, ' ').toUpperCase()}
@@ -294,23 +294,23 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
                     </div>
 
                     {/* Progress Sesi & Tes Urin */}
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-slate-200/80 text-xs">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-[#1b3459] text-xs">
                       <div>
-                        <span className="text-[11px] text-slate-500 block">Progres Sesi Wajib Lapor:</span>
+                        <span className="text-[11px] text-slate-400 block">Progres Sesi Wajib Lapor:</span>
                         <div className="flex items-center space-x-2 mt-0.5">
-                          <div className="flex-1 bg-slate-200 h-2 rounded-full overflow-hidden">
-                            <div className="bg-teal-600 h-full" style={{ width: `${percent}%` }} />
+                          <div className="flex-1 bg-[#081224] h-2 rounded-full overflow-hidden border border-[#1b3459]">
+                            <div className="bg-gradient-to-r from-[#17549c] to-[#38bdf8] h-full" style={{ width: `${percent}%` }} />
                           </div>
-                          <span className="font-bold text-slate-800">{pgw.sesiTerselesaikan}/{pgw.totalSesiWajib} ({percent}%)</span>
+                          <span className="font-bold text-slate-200">{pgw.sesiTerselesaikan}/{pgw.totalSesiWajib} ({percent}%)</span>
                         </div>
                       </div>
 
                       <div>
-                        <span className="text-[11px] text-slate-500 block">Skrining Toksikologi Urin:</span>
+                        <span className="text-[11px] text-slate-400 block">Skrining Toksikologi Urin:</span>
                         <div className="font-bold mt-0.5 flex items-center space-x-1.5">
-                          <span>{pgw.riwayatTesUrinBerkala.length}x Diuji</span>
-                          <span className={`text-[10px] px-1.5 py-0.2 rounded font-bold ${
-                            lastTest?.hasil === 'Negatif' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
+                          <span className="text-slate-200">{pgw.riwayatTesUrinBerkala.length}x Diuji</span>
+                          <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold border ${
+                            lastTest?.hasil === 'Negatif' ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40' : 'bg-rose-500/20 text-rose-300 border-rose-500/40'
                           }`}>
                             Terakhir: {lastTest ? `${lastTest.hasil} (${lastTest.tanggalTes})` : '-'}
                           </span>
@@ -318,8 +318,8 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
                       </div>
 
                       <div>
-                        <span className="text-[11px] text-slate-500 block">Rekomendasi Tindak Lanjut:</span>
-                        <span className="font-bold text-slate-800 mt-0.5 block">
+                        <span className="text-[11px] text-slate-400 block">Rekomendasi Tindak Lanjut:</span>
+                        <span className="font-bold text-slate-200 mt-0.5 block">
                           {pgw.rekomendasiTindakLanjutHukum}
                         </span>
                       </div>
@@ -327,18 +327,18 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
 
                     {/* Warning note if SP exists */}
                     {pgw.suratPeringatanList.length > 0 && (
-                      <div className="p-2.5 bg-white rounded-lg border border-amber-300 text-xs text-amber-900 flex items-start space-x-2">
-                        <BadgeAlert className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                      <div className="p-2.5 bg-amber-950/30 rounded-lg border border-amber-600/50 text-xs text-amber-200 flex items-start space-x-2">
+                        <BadgeAlert className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
                         <div>
-                          <span className="font-bold">{pgw.suratPeringatanList[0].tingkatSp}:</span> {pgw.suratPeringatanList[0].alasan}
+                          <span className="font-bold text-amber-300">{pgw.suratPeringatanList[0].tingkatSp}:</span> {pgw.suratPeringatanList[0].alasan}
                         </div>
                       </div>
                     )}
 
                     <div className="flex justify-end pt-1">
-                      <span className="text-teal-600 text-xs font-semibold flex items-center space-x-1">
+                      <span className="text-[#38bdf8] text-xs font-semibold flex items-center space-x-1 group-hover:translate-x-0.5 transition-transform">
                         <span>Buka Buku Pengawasan & Log Urin</span>
-                        <ArrowRight className="w-3 h-3" />
+                        <ArrowRight className="w-3 h-3 text-[#F1C40F]" />
                       </span>
                     </div>
                   </div>

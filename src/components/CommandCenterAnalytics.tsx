@@ -79,7 +79,7 @@ export const CommandCenterAnalytics: React.FC = () => {
         <div className="lg:col-span-7 bg-[#0d1f38] border border-[#1b3459] rounded-2xl p-5 sm:p-6 shadow-xl relative overflow-hidden flex flex-col justify-between">
           <div className="flex items-center justify-between pb-3 border-b border-[#1b3459]/60">
             <div className="flex items-center space-x-2.5">
-              <div className="p-1.5 rounded-lg bg-blue-500/10 border border-blue-500/20 text-[#38bdf8]">
+              <div className="p-1.5 rounded-lg bg-[#0a182f] border border-[#1b3459] text-slate-300">
                 <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5" />
               </div>
               <h3 className="text-sm sm:text-base font-bold text-white tracking-wide">
@@ -148,7 +148,7 @@ export const CommandCenterAnalytics: React.FC = () => {
                 );
               })}
 
-              {/* Line 1: Peserta Aktif (Blue) */}
+              {/* Line 1: Peserta Aktif (Sky Blue) */}
               <path
                 d={makePath(pointsBlue)}
                 fill="none"
@@ -169,11 +169,11 @@ export const CommandCenterAnalytics: React.FC = () => {
                 />
               ))}
 
-              {/* Line 2: Menyelesaikan Program (Green) */}
+              {/* Line 2: Menyelesaikan Program (Cobalt Blue) */}
               <path
                 d={makePath(pointsGreen)}
                 fill="none"
-                stroke="#4ade80"
+                stroke="#60a5fa"
                 strokeWidth="2.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -185,16 +185,16 @@ export const CommandCenterAnalytics: React.FC = () => {
                   cy={p.y}
                   r="3.5"
                   fill="#0d1f38"
-                  stroke="#4ade80"
+                  stroke="#60a5fa"
                   strokeWidth="2"
                 />
               ))}
 
-              {/* Line 3: Pascarehabilitasi (Amber) */}
+              {/* Line 3: Pascarehabilitasi (Slate Blue) */}
               <path
                 d={makePath(pointsAmber)}
                 fill="none"
-                stroke="#fbbf24"
+                stroke="#94a3b8"
                 strokeWidth="2.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -206,31 +206,31 @@ export const CommandCenterAnalytics: React.FC = () => {
                   cy={p.y}
                   r="3.5"
                   fill="#0d1f38"
-                  stroke="#fbbf24"
+                  stroke="#94a3b8"
                   strokeWidth="2"
                 />
               ))}
 
               {/* Badges on End Points */}
-              {/* Blue 232 badge */}
+              {/* Sky 232 badge */}
               <g transform="translate(460, 24)">
-                <rect x="5" y="-12" width="34" height="18" rx="4" fill="#2563eb" />
+                <rect x="5" y="-12" width="34" height="18" rx="4" fill="#0284c7" />
                 <text x="22" y="1" fill="#ffffff" fontSize="10" fontWeight="bold" textAnchor="middle">
                   232
                 </text>
               </g>
 
-              {/* Green 189 badge */}
+              {/* Blue 189 badge */}
               <g transform="translate(460, 46)">
-                <rect x="5" y="-12" width="34" height="18" rx="4" fill="#16a34a" />
+                <rect x="5" y="-12" width="34" height="18" rx="4" fill="#2563eb" />
                 <text x="22" y="1" fill="#ffffff" fontSize="10" fontWeight="bold" textAnchor="middle">
                   189
                 </text>
               </g>
 
-              {/* Amber 142 badge */}
+              {/* Slate 142 badge */}
               <g transform="translate(460, 72)">
-                <rect x="5" y="-12" width="34" height="18" rx="4" fill="#d97706" />
+                <rect x="5" y="-12" width="34" height="18" rx="4" fill="#475569" />
                 <text x="22" y="1" fill="#ffffff" fontSize="10" fontWeight="bold" textAnchor="middle">
                   142
                 </text>
@@ -245,11 +245,11 @@ export const CommandCenterAnalytics: React.FC = () => {
               <span className="text-slate-300 font-medium">Peserta Aktif</span>
             </div>
             <div className="flex items-center space-x-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#4ade80] ring-2 ring-[#4ade80]/30" />
+              <span className="w-2.5 h-2.5 rounded-full bg-[#60a5fa] ring-2 ring-[#60a5fa]/30" />
               <span className="text-slate-300 font-medium">Menyelesaikan Program</span>
             </div>
             <div className="flex items-center space-x-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#fbbf24] ring-2 ring-[#fbbf24]/30" />
+              <span className="w-2.5 h-2.5 rounded-full bg-[#94a3b8] ring-2 ring-[#94a3b8]/30" />
               <span className="text-slate-300 font-medium">Pascarehabilitasi</span>
             </div>
           </div>
@@ -258,7 +258,7 @@ export const CommandCenterAnalytics: React.FC = () => {
         {/* CARD 2: STATUS KASUS TAT (DONUT CHART) */}
         <div className="lg:col-span-5 bg-[#0d1f38] border border-[#1b3459] rounded-2xl p-5 sm:p-6 shadow-xl flex flex-col justify-between">
           <div className="flex items-center space-x-2.5 pb-3 border-b border-[#1b3459]/60">
-            <div className="p-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-[#4ade80]">
+            <div className="p-1.5 rounded-lg bg-[#0a182f] border border-[#1b3459] text-slate-300">
               <ClipboardList className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
             <h3 className="text-sm sm:text-base font-bold text-white tracking-wide">
@@ -279,7 +279,7 @@ export const CommandCenterAnalytics: React.FC = () => {
                     cy="50"
                     r="36"
                     fill="transparent"
-                    stroke="#4ade80"
+                    stroke="#38bdf8"
                     strokeWidth="14"
                     strokeDasharray="54.9 238.76"
                     strokeDashoffset="0"
@@ -290,7 +290,7 @@ export const CommandCenterAnalytics: React.FC = () => {
                     cy="50"
                     r="36"
                     fill="transparent"
-                    stroke="#3b82f6"
+                    stroke="#2563eb"
                     strokeWidth="14"
                     strokeDasharray="71.6 238.76"
                     strokeDashoffset="-54.9"
@@ -301,7 +301,7 @@ export const CommandCenterAnalytics: React.FC = () => {
                     cy="50"
                     r="36"
                     fill="transparent"
-                    stroke="#f59e0b"
+                    stroke="#60a5fa"
                     strokeWidth="14"
                     strokeDasharray="40.5 238.76"
                     strokeDashoffset="-126.5"
@@ -312,7 +312,7 @@ export const CommandCenterAnalytics: React.FC = () => {
                     cy="50"
                     r="36"
                     fill="transparent"
-                    stroke="#a855f7"
+                    stroke="#1d4ed8"
                     strokeWidth="14"
                     strokeDasharray="38.2 238.76"
                     strokeDashoffset="-167"
@@ -346,7 +346,7 @@ export const CommandCenterAnalytics: React.FC = () => {
             <div className="sm:col-span-7 space-y-2 text-xs">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#4ade80]" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#38bdf8]" />
                   <span className="text-slate-300">Pemulihan Berjalan</span>
                 </div>
                 <span className="font-bold text-white font-mono">289 <span className="text-slate-400 font-normal">(23%)</span></span>
@@ -354,7 +354,7 @@ export const CommandCenterAnalytics: React.FC = () => {
 
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#3b82f6]" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#2563eb]" />
                   <span className="text-slate-300">Asesmen Berjalan</span>
                 </div>
                 <span className="font-bold text-white font-mono">376 <span className="text-slate-400 font-normal">(30%)</span></span>
@@ -362,7 +362,7 @@ export const CommandCenterAnalytics: React.FC = () => {
 
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#f59e0b]" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#60a5fa]" />
                   <span className="text-slate-300">Menunggu Rekomendasi</span>
                 </div>
                 <span className="font-bold text-white font-mono">214 <span className="text-slate-400 font-normal">(17%)</span></span>
@@ -370,7 +370,7 @@ export const CommandCenterAnalytics: React.FC = () => {
 
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#a855f7]" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#1d4ed8]" />
                   <span className="text-slate-300">Pascarehabilitasi</span>
                 </div>
                 <span className="font-bold text-white font-mono">198 <span className="text-slate-400 font-normal">(16%)</span></span>
@@ -391,7 +391,7 @@ export const CommandCenterAnalytics: React.FC = () => {
         <div className="lg:col-span-7 bg-[#0d1f38] border border-[#1b3459] rounded-2xl p-5 sm:p-6 shadow-xl flex flex-col justify-between">
           <div className="flex items-center justify-between pb-3 border-b border-[#1b3459]/60">
             <div className="flex items-center space-x-2.5">
-              <div className="p-1.5 rounded-lg bg-sky-500/10 border border-sky-500/20 text-[#38bdf8]">
+              <div className="p-1.5 rounded-lg bg-[#0a182f] border border-[#1b3459] text-slate-300">
                 <Clock className="w-4 h-4 sm:w-5 sm:h-5" />
               </div>
               <h3 className="text-sm sm:text-base font-bold text-white tracking-wide">
@@ -411,31 +411,31 @@ export const CommandCenterAnalytics: React.FC = () => {
                 time: '12:24',
                 desc: 'Hasil asesmen medis selesai diverifikasi',
                 caseId: 'A.n. RAH - 00123',
-                dotColor: 'bg-[#4ade80]'
+                dotColor: 'bg-[#38bdf8]'
               },
               {
                 time: '11:15',
                 desc: 'Rencana pemulihan telah disusun',
                 caseId: 'A.n. DDN - 00789',
-                dotColor: 'bg-[#4ade80]'
+                dotColor: 'bg-[#38bdf8]'
               },
               {
                 time: '10:42',
                 desc: 'Peserta memulai program rehabilitasi',
                 caseId: 'A.n. BGS - 00567',
-                dotColor: 'bg-[#4ade80]'
+                dotColor: 'bg-[#38bdf8]'
               },
               {
                 time: '09:18',
                 desc: 'Laporan pascarehabilitasi diterima',
                 caseId: 'A.n. WSD - 00411',
-                dotColor: 'bg-[#3b82f6]'
+                dotColor: 'bg-[#60a5fa]'
               },
               {
                 time: '08:50',
                 desc: 'Permohonan TAT baru masuk',
                 caseId: 'A.n. FTR - 00890',
-                dotColor: 'bg-[#f59e0b]'
+                dotColor: 'bg-[#60a5fa]'
               }
             ].map((act, idx) => (
               <div key={idx} className="py-2.5 flex items-center justify-between text-xs gap-3">
@@ -456,7 +456,7 @@ export const CommandCenterAnalytics: React.FC = () => {
         <div className="lg:col-span-5 bg-[#0d1f38] border border-[#1b3459] rounded-2xl p-5 sm:p-6 shadow-xl flex flex-col justify-between">
           <div className="flex items-center justify-between pb-3 border-b border-[#1b3459]/60">
             <div className="flex items-center space-x-2.5">
-              <div className="p-1.5 rounded-lg bg-amber-500/10 border border-amber-500/20 text-[#fbbf24]">
+              <div className="p-1.5 rounded-lg bg-[#0a182f] border border-[#1b3459] text-slate-300">
                 <FileText className="w-4 h-4 sm:w-5 sm:h-5" />
               </div>
               <h3 className="text-sm sm:text-base font-bold text-white tracking-wide">
@@ -482,7 +482,7 @@ export const CommandCenterAnalytics: React.FC = () => {
           <div className="grid grid-cols-2 gap-3 py-3">
             {/* Stat 1 */}
             <div className="p-3.5 bg-[#0a182f] rounded-xl border border-[#1b3459] space-y-1">
-              <div className="w-7 h-7 rounded-lg bg-blue-500/15 text-blue-400 flex items-center justify-center">
+              <div className="w-7 h-7 rounded-lg bg-[#0d1f38] border border-[#1b3459] text-slate-300 flex items-center justify-center">
                 <FileCheck className="w-4 h-4" />
               </div>
               <div className="text-xl sm:text-2xl font-extrabold text-white font-mono pt-1">
@@ -495,7 +495,7 @@ export const CommandCenterAnalytics: React.FC = () => {
 
             {/* Stat 2 */}
             <div className="p-3.5 bg-[#0a182f] rounded-xl border border-[#1b3459] space-y-1">
-              <div className="w-7 h-7 rounded-lg bg-emerald-500/15 text-emerald-400 flex items-center justify-center">
+              <div className="w-7 h-7 rounded-lg bg-[#0d1f38] border border-[#1b3459] text-slate-300 flex items-center justify-center">
                 <Sprout className="w-4 h-4" />
               </div>
               <div className="text-xl sm:text-2xl font-extrabold text-white font-mono pt-1">
@@ -508,7 +508,7 @@ export const CommandCenterAnalytics: React.FC = () => {
 
             {/* Stat 3 */}
             <div className="p-3.5 bg-[#0a182f] rounded-xl border border-[#1b3459] space-y-1">
-              <div className="w-7 h-7 rounded-lg bg-purple-500/15 text-purple-400 flex items-center justify-center">
+              <div className="w-7 h-7 rounded-lg bg-[#0d1f38] border border-[#1b3459] text-slate-300 flex items-center justify-center">
                 <Users className="w-4 h-4" />
               </div>
               <div className="text-xl sm:text-2xl font-extrabold text-white font-mono pt-1">
@@ -521,7 +521,7 @@ export const CommandCenterAnalytics: React.FC = () => {
 
             {/* Stat 4 */}
             <div className="p-3.5 bg-[#0a182f] rounded-xl border border-[#1b3459] space-y-1">
-              <div className="w-7 h-7 rounded-lg bg-sky-500/15 text-sky-400 flex items-center justify-center">
+              <div className="w-7 h-7 rounded-lg bg-[#0d1f38] border border-[#1b3459] text-slate-300 flex items-center justify-center">
                 <Activity className="w-4 h-4" />
               </div>
               <div className="text-xl sm:text-2xl font-extrabold text-white font-mono pt-1">
