@@ -188,9 +188,9 @@ export const PermohonanList: React.FC<PermohonanListProps> = ({
           <button
             id="btn-tambah-permohonan"
             onClick={onOpenNewModal}
-            className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-4 py-2.5 rounded-lg flex items-center justify-center space-x-2 transition-all shrink-0 border border-blue-700"
+            className="bg-gradient-to-r from-[#144782] via-[#17549c] to-[#1c64b8] hover:from-[#175194] hover:via-[#1c60b0] hover:to-[#2274d4] text-white text-xs font-bold px-4 py-2.5 rounded-xl flex items-center justify-center space-x-2 transition-all shrink-0 border border-[#2d7ad6]/70 shadow-[0_2px_10px_rgba(20,83,154,0.35)] cursor-pointer"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-4 h-4 text-[#F1C40F]" />
             <span>{headerInfo.createLabel}</span>
           </button>
         )}

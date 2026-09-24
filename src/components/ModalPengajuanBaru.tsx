@@ -596,10 +596,10 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
           {step < 4 ? (
             <button
               onClick={() => setStep(step + 1)}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg text-xs font-semibold flex items-center space-x-1 border border-blue-700"
+              className="bg-gradient-to-r from-[#144782] via-[#17549c] to-[#1c64b8] hover:from-[#175194] hover:via-[#1c60b0] hover:to-[#2274d4] text-white px-5 py-2 rounded-xl text-xs font-bold flex items-center space-x-1.5 border border-[#2d7ad6]/70 shadow-[0_2px_10px_rgba(20,83,154,0.35)] cursor-pointer transition-all"
             >
               <span>Lanjutkan</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <ArrowRight className="w-3.5 h-3.5 text-[#F1C40F]" />
             </button>
           ) : (
             <button

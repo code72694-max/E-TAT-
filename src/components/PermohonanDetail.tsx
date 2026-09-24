@@ -512,9 +512,9 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
         {permohonan.rekomendasiResmi && (
           <button
             onClick={() => onOpenQrModal(permohonan)}
-            className="bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold px-3.5 py-2 rounded-lg flex items-center space-x-2 border border-slate-800 transition-all shrink-0"
+            className="bg-gradient-to-r from-[#144782] via-[#17549c] to-[#1c64b8] hover:from-[#175194] hover:via-[#1c60b0] hover:to-[#2274d4] text-white text-xs font-bold px-3.5 py-2 rounded-xl flex items-center space-x-2 border border-[#2d7ad6]/70 shadow-[0_2px_10px_rgba(20,83,154,0.35)] cursor-pointer transition-all shrink-0"
           >
-            <QrCode className="w-4 h-4 text-blue-400" />
+            <QrCode className="w-4 h-4 text-[#F1C40F]" />
             <span>Verifikasi Keabsahan (QR)</span>
           </button>
         )}
@@ -1373,9 +1373,9 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
                     </div>
                     <button
                       onClick={handlePengajuSignReceipt}
-                      className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg border border-blue-700 flex items-center space-x-1.5 shrink-0 shadow-none transition-all"
+                      className="bg-gradient-to-r from-[#144782] via-[#17549c] to-[#1c64b8] hover:from-[#175194] hover:via-[#1c60b0] hover:to-[#2274d4] text-white font-bold text-xs px-4 py-2 rounded-xl border border-[#2d7ad6]/70 shadow-[0_2px_10px_rgba(20,83,154,0.35)] flex items-center space-x-1.5 shrink-0 cursor-pointer transition-all"
                     >
-                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      <CheckCircle2 className="w-3.5 h-3.5 text-[#F1C40F]" />
                       <span>Tandatangani Tanda Terima</span>
                     </button>
                   </div>
@@ -1564,9 +1564,9 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
                 <button
                   type="submit"
                   disabled={!pertanyaanInput.trim()}
-                  className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-xs font-semibold px-4 py-2 rounded-lg flex items-center space-x-1.5 border border-blue-700"
+                  className="bg-gradient-to-r from-[#144782] via-[#17549c] to-[#1c64b8] hover:from-[#175194] hover:via-[#1c60b0] hover:to-[#2274d4] disabled:opacity-50 text-white text-xs font-bold px-4 py-2 rounded-xl flex items-center space-x-1.5 border border-[#2d7ad6]/70 shadow-[0_2px_10px_rgba(20,83,154,0.35)] cursor-pointer transition-all"
                 >
-                  <Send className="w-3.5 h-3.5" />
+                  <Send className="w-3.5 h-3.5 text-[#F1C40F]" />
                   <span>Kirim Klarifikasi</span>
                 </button>
               </div>

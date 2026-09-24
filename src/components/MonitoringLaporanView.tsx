@@ -1,5 +1,6 @@
 import React from 'react';
 import { PermohonanAsesmen, UserProfile } from '../types';
+import { CommandCenterAnalytics } from './CommandCenterAnalytics';
 import {
   BarChart3,
   Clock,
@@ -37,11 +38,27 @@ export const MonitoringLaporanView: React.FC<MonitoringLaporanViewProps> = ({
 
         <button
           onClick={() => alert('Laporan Kinerja e-TAT Periode September 2026 diekspor ke format PDF/Excel.')}
-          className="bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold px-4 py-2 rounded-lg flex items-center space-x-2 border border-slate-800"
+          className="bg-gradient-to-r from-[#144782] via-[#17549c] to-[#1c64b8] hover:from-[#175194] hover:via-[#1c60b0] hover:to-[#2274d4] text-white text-xs font-bold px-4 py-2 rounded-xl flex items-center space-x-2 border border-[#2d7ad6]/70 shadow-[0_2px_10px_rgba(20,83,154,0.35)] cursor-pointer transition-all"
         >
-          <Download className="w-4 h-4 text-blue-400" />
+          <Download className="w-4 h-4 text-[#F1C40F]" />
           <span>Unduh Laporan Kinerja (PDF/XLS)</span>
         </button>
+      </div>
+
+      {/* Real-time Command Center Live Analytics Board */}
+      <div className="bg-[#071326] p-4 sm:p-6 rounded-2xl border border-[#1b3459] shadow-xl">
+        <div className="mb-4 pb-2 border-b border-[#1b3459] flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_#34d399]" />
+            <h2 className="text-sm font-bold text-white uppercase tracking-wider font-['Cinzel',serif]">
+              PUSAT KENDALI OPERASIONAL TERPADU (LIVE COMMAND CENTER)
+            </h2>
+          </div>
+          <span className="text-[10px] text-slate-400 font-mono">
+            SYNC DATA: OTOMATIS
+          </span>
+        </div>
+        <CommandCenterAnalytics />
       </div>
 
       {/* 8 Indikator Keberhasilan (Dokumen 1 Bab 8.2) */}

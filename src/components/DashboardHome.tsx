@@ -70,9 +70,9 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({
                           {item.tindakanBerikutnyaLabel}
                         </p>
                       </div>
-                      <button className="text-xs bg-slate-900 hover:bg-slate-800 text-white font-semibold px-3 py-1.5 rounded-lg flex items-center space-x-1 shrink-0 transition-colors">
+                      <button className="text-xs bg-gradient-to-r from-[#144782] via-[#17549c] to-[#1c64b8] hover:from-[#175194] hover:via-[#1c60b0] hover:to-[#2274d4] text-white font-bold px-3.5 py-1.5 rounded-xl flex items-center space-x-1 shrink-0 transition-all border border-[#2d7ad6]/70 shadow-[0_2px_8px_rgba(20,83,154,0.3)] cursor-pointer">
                         <span>Unggah Perbaikan</span>
-                        <ArrowRight className="w-3.5 h-3.5 text-[#D4AF37]" />
+                        <ArrowRight className="w-3.5 h-3.5 text-[#F1C40F]" />
                       </button>
                     </div>
                   ))}
@@ -383,10 +383,10 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({
               <div className="flex items-center space-x-2">
                 <button 
                   onClick={() => onNavigateToTab('monitoring')}
-                  className="text-xs bg-slate-900 hover:bg-slate-800 text-white font-semibold px-4 py-2.5 rounded-xl flex items-center space-x-2 transition-colors cursor-pointer"
+                  className="text-xs bg-gradient-to-r from-[#144782] via-[#17549c] to-[#1c64b8] hover:from-[#175194] hover:via-[#1c60b0] hover:to-[#2274d4] text-white font-bold px-4 py-2.5 rounded-xl flex items-center space-x-2 transition-all cursor-pointer border border-[#2d7ad6]/70 shadow-[0_2px_10px_rgba(20,83,154,0.35)]"
                 >
                   <span>Buka Dasbor Monitoring & Laporan Intelijen</span>
-                  <ArrowRight className="w-3.5 h-3.5 text-[#D4AF37]" />
+                  <ArrowRight className="w-3.5 h-3.5 text-[#F1C40F]" />
                 </button>
               </div>
             </div>
@@ -423,9 +423,9 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({
               <div className="flex flex-wrap items-center gap-2.5">
                 <button
                   onClick={() => onNavigateToTab('administrasi')}
-                  className="text-xs bg-slate-900 hover:bg-slate-800 text-white font-semibold px-4 py-2.5 rounded-xl flex items-center space-x-2 cursor-pointer transition-colors"
+                  className="text-xs bg-gradient-to-r from-[#144782] via-[#17549c] to-[#1c64b8] hover:from-[#175194] hover:via-[#1c60b0] hover:to-[#2274d4] text-white font-bold px-4 py-2.5 rounded-xl flex items-center space-x-2 cursor-pointer transition-all border border-[#2d7ad6]/70 shadow-[0_2px_10px_rgba(20,83,154,0.35)]"
                 >
-                  <Users className="w-3.5 h-3.5 text-[#D4AF37]" />
+                  <Users className="w-3.5 h-3.5 text-[#F1C40F]" />
                   <span>Kelola Akun Otoritas</span>
                 </button>
                 <button

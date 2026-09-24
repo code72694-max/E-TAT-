@@ -1,1 +1,39 @@
 @import "tailwindcss";
+
+@keyframes heroElegantReveal {
+  0% {
+    opacity: 0;
+    transform: translateY(18px);
+    filter: blur(4px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+.animate-hero-badge {
+  opacity: 0;
+  animation: heroElegantReveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.15s forwards;
+}
+
+.animate-hero-title-1 {
+  opacity: 0;
+  animation: heroElegantReveal 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards;
+}
+
+.animate-hero-title-2 {
+  opacity: 0;
+  animation: heroElegantReveal 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.48s forwards;
+}
+
+.animate-hero-desc {
+  opacity: 0;
+  animation: heroElegantReveal 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.65s forwards;
+}
+
+.animate-hero-actions {
+  opacity: 0;
+  animation: heroElegantReveal 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.82s forwards;
+}
