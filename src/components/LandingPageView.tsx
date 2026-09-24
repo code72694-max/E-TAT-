@@ -22,7 +22,9 @@ import {
   ChevronRight,
   Shield,
   LifeBuoy,
-  HeartHandshake
+  HeartHandshake,
+  Menu,
+  X
 } from 'lucide-react';
 
 interface LandingPageViewProps {
@@ -35,6 +37,7 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
   onGoToLogin,
   permohonanList
 }) => {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [trackingNumber, setTrackingNumber] = useState('');
   const [trackedResult, setTrackedResult] = useState<PermohonanAsesmen | null | 'not_found'>(null);
 
@@ -75,7 +78,7 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
           </div>
 
           {/* Right Navigation & Action - Mepet Kanan & Clean */}
-          <div className="flex items-center space-x-5 lg:space-x-6 shrink-0">
+          <div className="flex items-center space-x-2 sm:space-x-5 lg:space-x-6 shrink-0">
             {/* Navigation Links (Desktop) */}
             <nav className="hidden md:flex items-center space-x-5 lg:space-x-6 text-xs font-medium text-slate-300">
               <a href="#pantauan-tat" className="hover:text-white transition-colors duration-150">
@@ -101,61 +104,155 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
             {/* Subtle Divider before Action */}
             <div className="hidden md:block h-4 w-px bg-[#1b3459]" />
 
-            {/* Primary Action Button */}
+            {/* Primary Action Button (Desktop only on small screens) */}
             <button
               onClick={() => onGoToLogin()}
-              className="bg-[#133863] hover:bg-[#1a4a82] text-white font-semibold text-xs px-3.5 py-2 sm:px-4 sm:py-2 rounded-lg shadow-md flex items-center space-x-1.5 transition-all cursor-pointer border border-[#235594]"
+              className="hidden md:flex bg-[#133863] hover:bg-[#1a4a82] text-white font-semibold text-xs px-3.5 py-2 sm:px-4 sm:py-2 rounded-lg shadow-md items-center space-x-1.5 transition-all cursor-pointer border border-[#235594]"
             >
               <LogIn className="w-3.5 h-3.5 text-white" />
               <span>Masuk Portal</span>
             </button>
-          </div>
-        </div>
 
-        {/* Mobile Quick Subnav Bar */}
-        <div className="md:hidden flex items-center space-x-4 px-4 py-2 bg-[#0a182f] border-t border-[#1b3459] overflow-x-auto scrollbar-none text-[11px] font-medium text-slate-300 whitespace-nowrap">
-          <a href="#pantauan-tat" className="hover:text-white">
-            Pantauan Kinerja
-          </a>
-          <span className="text-slate-600">·</span>
-          <a href="#gerakan-sekorna" className="hover:text-white">
-            Inisiatif SEKORNA
-          </a>
-          <span className="text-slate-600">·</span>
-          <a href="#alur-layanan" className="hover:text-white">
-            Alur SOP
-          </a>
-          <span className="text-slate-600">·</span>
-          <a href="#lacak-berkas" className="hover:text-white">
-            Lacak Berkas
-          </a>
-          <span className="text-slate-600">·</span>
-          <a href="#pengawasan" className="hover:text-white">
-            Pengawasan
-          </a>
-          <span className="text-slate-600">·</span>
-          <a href="#dasar-hukum" className="hover:text-white">
-            Dasar Regulasi
-          </a>
+            {/* Hamburger Button (Mobile only) */}
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(true)}
+              aria-label="Buka Menu Navigasi"
+              className="md:hidden p-2 rounded-lg bg-[#0d1f38] hover:bg-[#142d52] text-slate-300 hover:text-white border border-[#1b3459] transition-colors cursor-pointer"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+          </div>
         </div>
       </header>
 
+      {/* Mobile Off-Canvas Sidebar Drawer */}
+      {mobileMenuOpen && (
+        <div className="fixed inset-0 z-50 md:hidden">
+          {/* Backdrop Overlay */}
+          <div
+            className="fixed inset-0 bg-black/70 backdrop-blur-sm transition-opacity"
+            onClick={() => setMobileMenuOpen(false)}
+            aria-hidden="true"
+          />
+
+          {/* Sidebar Drawer Sheet */}
+          <aside className="fixed inset-y-0 right-0 w-full max-w-[280px] bg-[#071325] border-l border-[#1b3459] shadow-2xl flex flex-col justify-between p-5 z-10 animate-in slide-in-from-right duration-200">
+            <div className="space-y-6">
+              {/* Drawer Header */}
+              <div className="flex items-center justify-between pb-4 border-b border-[#1b3459]">
+                <div className="flex items-center space-x-2.5">
+                  <PoliceEmblem size="sm" />
+                  <div>
+                    <span className="font-extrabold text-sm tracking-wider text-white font-['Cinzel',serif] block">
+                      E-TAT <span className="text-[#D4AF37]">PRESISI</span>
+                    </span>
+                    <span className="text-[10px] text-slate-400 font-medium">Navigasi Terpadu</span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setMobileMenuOpen(false)}
+                  aria-label="Tutup Menu"
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-[#0d1f38] border border-transparent hover:border-[#1b3459] transition-colors cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Navigation Links in Sidebar */}
+              <nav className="space-y-1.5">
+                <a
+                  href="#pantauan-tat"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 hover:text-white hover:bg-[#0d1f38] border border-transparent hover:border-[#1b3459] transition-all"
+                >
+                  <Activity className="w-4 h-4 text-slate-400" />
+                  <span>Pantauan Kinerja</span>
+                </a>
+                <a
+                  href="#gerakan-sekorna"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 hover:text-white hover:bg-[#0d1f38] border border-transparent hover:border-[#1b3459] transition-all"
+                >
+                  <LifeBuoy className="w-4 h-4 text-slate-400" />
+                  <span>Inisiatif SEKORNA</span>
+                </a>
+                <a
+                  href="#alur-layanan"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 hover:text-white hover:bg-[#0d1f38] border border-transparent hover:border-[#1b3459] transition-all"
+                >
+                  <FileCheck className="w-4 h-4 text-slate-400" />
+                  <span>Alur SOP Layanan</span>
+                </a>
+                <a
+                  href="#lacak-berkas"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 hover:text-white hover:bg-[#0d1f38] border border-transparent hover:border-[#1b3459] transition-all"
+                >
+                  <Search className="w-4 h-4 text-slate-400" />
+                  <span>Lacak Berkas</span>
+                </a>
+                <a
+                  href="#pengawasan"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 hover:text-white hover:bg-[#0d1f38] border border-transparent hover:border-[#1b3459] transition-all"
+                >
+                  <ShieldCheck className="w-4 h-4 text-slate-400" />
+                  <span>Pengawasan & SOP</span>
+                </a>
+                <a
+                  href="#dasar-hukum"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 hover:text-white hover:bg-[#0d1f38] border border-transparent hover:border-[#1b3459] transition-all"
+                >
+                  <BookOpen className="w-4 h-4 text-slate-400" />
+                  <span>Dasar Regulasi</span>
+                </a>
+              </nav>
+            </div>
+
+            {/* Bottom Action in Sidebar */}
+            <div className="pt-4 border-t border-[#1b3459] space-y-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  onGoToLogin();
+                }}
+                className="w-full bg-[#133863] hover:bg-[#1a4a82] text-white font-semibold text-xs py-2.5 px-4 rounded-xl shadow-md flex items-center justify-center space-x-2 transition-all cursor-pointer border border-[#235594]"
+              >
+                <LogIn className="w-4 h-4 text-white" />
+                <span>Masuk Portal Presisi</span>
+              </button>
+              <div className="text-[10px] text-slate-400 text-center font-mono">
+                Sistem Terpadu SEKORNA &copy; 2026
+              </div>
+            </div>
+          </aside>
+        </div>
+      )}
+
       {/* HERO SECTION - Pure Clean & Authoritative (No Silhouettes, No Graphics, No Colorful Highlights) */}
-      <section className="relative overflow-hidden min-h-[calc(100vh-65px)] flex flex-col justify-center items-center py-12 sm:py-20 bg-[#071326] border-b border-[#1b3459]">
+      <section className="relative overflow-hidden min-h-[calc(100vh-65px)] flex flex-col justify-start sm:justify-center items-center pt-28 pb-16 sm:py-20 bg-[#071326] border-b border-[#1b3459]">
         {/* Subtle Ambient Radial Glow (Clean, Zero Clutter, No Silhouettes) */}
         <div className="absolute inset-0 pointer-events-none select-none z-0">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(20,70,130,0.18)_0%,rgba(7,19,38,0.7)_55%,#071326_100%)]" />
         </div>
 
         {/* Content Container */}
-        <div className="relative z-10 max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6 sm:space-y-8 my-auto">
-          {/* Grand Centered Headline */}
-          <h1 className="text-[clamp(1.15rem,3.5vw,2.85rem)] font-extrabold text-white tracking-tight sm:tracking-wider leading-[1.3] font-['Cinzel',serif] max-w-full mx-auto px-1">
-            <span className="block whitespace-nowrap animate-hero-title-1">
-              SELAMATKAN KORBAN, <span className="text-[#D4AF37]">PULIHKAN</span>
+        <div className="relative z-10 max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6 sm:space-y-8 sm:my-auto">
+          {/* Grand Centered Headline - 3 Lines, Bold on Mobile, Elegant on Desktop */}
+          <h1 className="text-[clamp(1.5rem,5.5vw,2.5rem)] lg:text-[2.65rem] font-extrabold text-white tracking-normal sm:tracking-wider leading-[1.25] sm:leading-[1.28] font-['Cinzel',serif] max-w-4xl mx-auto px-2">
+            <span className="block animate-hero-title-1">
+              SELAMATKAN KORBAN,
             </span>
-            <span className="block whitespace-nowrap animate-hero-title-2">
-              <span className="text-[#D4AF37]">MASA DEPAN,</span> SIKAT HABIS SINDIKAT.
+            <span className="block animate-hero-title-2 text-[#D4AF37]">
+              PULIHKAN MASA DEPAN,
+            </span>
+            <span className="block animate-hero-title-3">
+              SIKAT HABIS SINDIKAT.
             </span>
           </h1>
 

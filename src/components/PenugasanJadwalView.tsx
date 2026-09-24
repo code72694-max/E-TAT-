@@ -81,39 +81,39 @@ export const PenugasanJadwalView: React.FC<PenugasanJadwalViewProps> = ({
               <div className="space-y-2 text-xs border-t border-[#1b3459] pt-3">
                 <div className="flex items-center justify-between p-2.5 rounded-lg bg-[#081224] border border-[#1b3459]">
                   <div className="flex items-center space-x-2">
-                    <Stethoscope className="w-3.5 h-3.5 text-emerald-400" />
+                    <Stethoscope className="w-3.5 h-3.5 text-slate-300" />
                     <div>
                       <span className="font-bold text-slate-200">{tim.asesorMedisNama}</span>
                       <p className="text-[10px] text-slate-400">Jadwal Medis: {tim.jadwalPemeriksaanMedis}</p>
                     </div>
                   </div>
-                  <span className="text-[10px] bg-emerald-500/20 text-emerald-300 font-semibold px-2 py-0.5 rounded border border-emerald-500/30">
+                  <span className="text-[10px] bg-[#142847] text-slate-200 font-semibold px-2 py-0.5 rounded border border-[#1e3c6a]">
                     Tercatat
                   </span>
                 </div>
 
                 <div className="flex items-center justify-between p-2.5 rounded-lg bg-[#081224] border border-[#1b3459]">
                   <div className="flex items-center space-x-2">
-                    <Scale className="w-3.5 h-3.5 text-purple-400" />
+                    <Scale className="w-3.5 h-3.5 text-slate-300" />
                     <div>
                       <span className="font-bold text-slate-200">{tim.asesorHukumNama}</span>
                       <p className="text-[10px] text-slate-400">Jadwal Hukum: {tim.jadwalPemeriksaanHukum}</p>
                     </div>
                   </div>
-                  <span className="text-[10px] bg-purple-500/20 text-purple-300 font-semibold px-2 py-0.5 rounded border border-purple-500/30">
+                  <span className="text-[10px] bg-[#142847] text-slate-200 font-semibold px-2 py-0.5 rounded border border-[#1e3c6a]">
                     Tercatat
                   </span>
                 </div>
 
-                <div className="flex items-center justify-between p-2.5 rounded-lg bg-[#0d1f3d] border border-[#234577]">
+                <div className="flex items-center justify-between p-2.5 rounded-lg bg-[#0a1b33] border border-[#1c3c66]">
                   <div className="flex items-center space-x-2">
                     <Users className="w-3.5 h-3.5 text-[#38bdf8]" />
                     <div>
                       <span className="font-bold text-white">Sidang Pleno Terpadu</span>
-                      <p className="text-[10px] text-sky-200">{tim.jadwalPleno || 'Belum Dijadwalkan'}</p>
+                      <p className="text-[10px] text-slate-300">{tim.jadwalPleno || 'Belum Dijadwalkan'}</p>
                     </div>
                   </div>
-                  <span className="text-[10px] bg-[#38bdf8]/20 text-[#38bdf8] font-bold px-2 py-0.5 rounded border border-[#38bdf8]/40">
+                  <span className="text-[10px] bg-[#143058] text-[#7dd3fc] font-semibold px-2 py-0.5 rounded border border-[#234d85]">
                     Ruang TAT
                   </span>
                 </div>
@@ -121,9 +121,9 @@ export const PenugasanJadwalView: React.FC<PenugasanJadwalViewProps> = ({
 
               <div className="flex items-center justify-between pt-2 text-[11px] text-slate-400">
                 <span>Lokasi: {tim.lokasiPemeriksaan}</span>
-                <span className="text-[#38bdf8] font-semibold flex items-center space-x-1 group-hover:translate-x-0.5 transition-transform">
+                <span className="text-slate-300 group-hover:text-white font-semibold flex items-center space-x-1 group-hover:translate-x-0.5 transition-transform">
                   <span>Buka Berkas</span>
-                  <ArrowRight className="w-3 h-3 text-[#F1C40F]" />
+                  <ArrowRight className="w-3 h-3 text-[#38bdf8]" />
                 </span>
               </div>
             </div>

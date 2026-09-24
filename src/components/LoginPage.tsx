@@ -9,9 +9,9 @@ import {
   Mail,
   Eye,
   EyeOff,
-  ShieldCheck,
-  CheckCircle2,
-  Zap
+  Shield,
+  KeyRound,
+  UserCheck
 } from 'lucide-react';
 
 interface LoginPageProps {
@@ -29,26 +29,26 @@ export const LoginPage: React.FC<LoginPageProps> = ({
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
 
-  const getRoleRankBadge = (role: UserRole) => {
+  const getRoleLabel = (role: UserRole) => {
     switch (role) {
       case 'pimpinan':
-        return 'PATI BINTANG 1';
+        return 'Pimpinan / Kepala BNNP';
       case 'koordinator':
-        return 'PAMEN MELATI 3';
+        return 'Koordinator Tim Asesmen (TAT)';
       case 'hukum':
-        return 'PAMEN MELATI 1';
+        return 'Asesor Hukum (Kejaksaan/Polri)';
       case 'pengaju':
-        return 'PAMA BALAK 3 (AKP)';
+        return 'Penyidik Pengaju (Polri/BNN)';
       case 'medis':
-        return 'DOKTER SP.KJ';
+        return 'Dokter Asesor Medis / Psikiater';
       case 'sekretariat':
-        return 'SEKRETARIAT TAT';
+        return 'Sekretariat Tata Usaha TAT';
       case 'rehabilitasi':
-        return 'BALAI REHABILITASI';
+        return 'Petugas Balai Rehabilitasi';
       case 'admin':
-        return 'PUSDATIN SIBER';
+        return 'Pusdatin / Administrator Sistem';
       default:
-        return 'PETUGAS RESMI';
+        return 'Petugas Resmi';
     }
   };
 
@@ -60,14 +60,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({
     }
   };
 
-  const handleBypassSubmit = () => {
-    const user = MOCK_USERS.find(u => u.id === selectedUserId) || MOCK_USERS[1];
-    onLogin(user);
-  };
-
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Match by entered email or fallback to selected user
     const matchedUser = MOCK_USERS.find(
       u => u.email.toLowerCase() === emailInput.trim().toLowerCase()
     ) || MOCK_USERS.find(u => u.id === selectedUserId) || MOCK_USERS[1];
@@ -75,179 +69,149 @@ export const LoginPage: React.FC<LoginPageProps> = ({
     onLogin(matchedUser);
   };
 
+  const selectedUser = MOCK_USERS.find(u => u.id === selectedUserId) || MOCK_USERS[1];
+
   return (
-    <div className="min-h-screen bg-[#071326] text-slate-100 flex flex-col antialiased selection:bg-[#38bdf8] selection:text-slate-950 font-sans">
-      {/* Top Protocol Bar */}
-      <div className="bg-[#071325]/95 border-b border-[#1b3459] px-4 sm:px-8 py-2.5 flex items-center justify-between shadow-md">
+    <div className="min-h-screen bg-[#071326] text-slate-100 flex flex-col justify-between antialiased selection:bg-[#38bdf8] selection:text-slate-950 font-sans">
+      {/* Top Header Bar */}
+      <header className="bg-[#071325]/95 border-b border-[#1b3459] px-4 sm:px-8 py-3 flex items-center justify-between sticky top-0 z-20 backdrop-blur-sm">
         <button
           onClick={onBackToLanding}
-          className="inline-flex items-center space-x-2 text-xs font-semibold text-slate-300 hover:text-white bg-[#0d1f38] hover:bg-[#122846] px-3 py-1.5 rounded-lg border border-[#1b3459] transition-colors cursor-pointer"
+          className="inline-flex items-center space-x-2 text-xs font-semibold text-slate-300 hover:text-white px-2 py-1.5 rounded-lg transition-colors cursor-pointer hover:bg-white/5"
         >
-          <ArrowLeft className="w-3.5 h-3.5 text-slate-400" />
-          <span>Kembali ke Beranda Utama</span>
+          <ArrowLeft className="w-4 h-4 text-slate-400 group-hover:text-white" />
+          <span>Kembali ke Beranda</span>
         </button>
 
-        <div className="flex items-center space-x-2 text-xs text-slate-300">
+        <div className="flex items-center space-x-2.5">
           <PoliceEmblem size="sm" />
-          <span className="font-bold text-white tracking-wide font-['Cinzel',serif]">
-            PORTAL OTORISASI E-TAT PRESISI
+          <span className="font-extrabold text-xs sm:text-sm tracking-wide text-white font-['Cinzel',serif]">
+            E-TAT <span className="text-[#D4AF37]">PRESISI</span>
           </span>
         </div>
-      </div>
+      </header>
 
-      {/* Main Container - Compact and immediately visible */}
-      <main className="flex-1 max-w-4xl mx-auto w-full px-4 sm:px-6 py-6 sm:py-8 flex flex-col justify-center space-y-5">
-        {/* Header Title */}
-        <div className="text-center max-w-2xl mx-auto space-y-1.5">
-          <PoliceEmblem size="md" className="mx-auto" />
-          <h1 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight font-['Cinzel',serif]">
-            SENTRA KOMANDO OTORITAS PENGGUNA e-TAT
-          </h1>
-          <p className="text-xs text-slate-400 max-w-lg mx-auto">
-            Masukkan kredensial akun kedinasan Anda atau pilih wewenang jabatan untuk mengakses dasbor operasional e-TAT Presisi.
-          </p>
-        </div>
+      {/* Main Content Area */}
+      <main className="flex-1 flex items-center justify-center px-4 sm:px-6 py-8 sm:py-12">
+        <div className="w-full max-w-md space-y-6">
+          {/* Card Header & Branding */}
+          <div className="text-center space-y-1">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight font-['Cinzel',serif]">
+              LOGIN
+            </h1>
+          </div>
 
-        {/* Clean Login Form Card */}
-        <div className="w-full max-w-md mx-auto bg-[#0d1f38] rounded-2xl p-5 sm:p-6 border border-[#1b3459] shadow-2xl space-y-4">
-          {/* Standard Login Form: Email & Password */}
-          <form onSubmit={handleFormSubmit} className="space-y-3.5">
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">
-                Alamat Email Kedinasan / NRP
+          {/* Clean Card Surface */}
+          <div className="bg-[#09172e] rounded-2xl border border-[#1b3459] p-6 sm:p-7 shadow-2xl shadow-black/40 space-y-5">
+            {/* Quick Role Preset Picker */}
+            <div className="space-y-1.5 pb-4 border-b border-[#1b3459]">
+              <label className="flex items-center justify-between text-[11px] font-semibold text-slate-300">
+                <span className="flex items-center space-x-1.5">
+                  <UserCheck className="w-3.5 h-3.5 text-[#38bdf8]" />
+                  <span>Pilih Profil Akun Kedinasan (Simulasi):</span>
+                </span>
+                <span className="text-[10px] text-slate-400 font-mono">8 Otoritas</span>
               </label>
-              <div className="relative">
-                <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
-                <input
-                  type="email"
-                  required
-                  value={emailInput}
-                  onChange={e => setEmailInput(e.target.value)}
-                  placeholder="nrp.nama@polri.go.id"
-                  className="w-full bg-[#0a182f] text-white pl-9 pr-3 py-2 rounded-lg border border-[#1b3459] text-xs sm:text-sm focus:outline-none focus:border-[#38bdf8] font-medium placeholder-slate-500"
-                />
+
+              <select
+                value={selectedUserId}
+                onChange={e => handleDropdownChange(e.target.value)}
+                className="w-full bg-[#061021] text-white border border-[#1b3459] focus:border-[#38bdf8] rounded-xl px-3 py-2.5 text-xs font-medium focus:outline-none transition-colors cursor-pointer truncate"
+              >
+                {MOCK_USERS.map(user => (
+                  <option key={user.id} value={user.id}>
+                    {user.name} — {getRoleLabel(user.role)}
+                  </option>
+                ))}
+              </select>
+
+              <div className="text-[11px] text-slate-400 flex items-center space-x-1.5 pt-1">
+                <span className="text-slate-500 font-mono">Instansi:</span>
+                <span className="text-slate-300 font-medium truncate">{selectedUser.agency}</span>
               </div>
             </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">
-                Kata Sandi Kedinasan
-              </label>
-              <div className="relative">
-                <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  required
-                  value={passwordInput}
-                  onChange={e => setPasswordInput(e.target.value)}
-                  placeholder="Masukkan kata sandi..."
-                  className="w-full bg-[#0a182f] text-white pl-9 pr-9 py-2 rounded-lg border border-[#1b3459] text-xs sm:text-sm focus:outline-none focus:border-[#38bdf8] font-medium placeholder-slate-500"
-                />
+            {/* Credential Inputs Form */}
+            <form onSubmit={handleFormSubmit} className="space-y-4">
+              <div className="space-y-1.5">
+                <label className="block text-xs font-semibold text-slate-200">
+                  Email Kedinasan / NRP
+                </label>
+                <div className="relative">
+                  <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-3 pointer-events-none" />
+                  <input
+                    type="email"
+                    required
+                    value={emailInput}
+                    onChange={e => setEmailInput(e.target.value)}
+                    placeholder="nama.nrp@polri.go.id"
+                    className="w-full bg-[#061021] text-white pl-10 pr-3.5 py-2.5 rounded-xl border border-[#1b3459] text-xs focus:outline-none focus:border-[#38bdf8] placeholder-slate-500 transition-colors"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="block text-xs font-semibold text-slate-200">
+                  Kata Sandi Kedinasan
+                </label>
+                <div className="relative">
+                  <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3 pointer-events-none" />
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    value={passwordInput}
+                    onChange={e => setPasswordInput(e.target.value)}
+                    placeholder="Masukkan sandi..."
+                    className="w-full bg-[#061021] text-white pl-10 pr-10 py-2.5 rounded-xl border border-[#1b3459] text-xs focus:outline-none focus:border-[#38bdf8] placeholder-slate-500 transition-colors"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3.5 top-2.5 text-slate-400 hover:text-white p-0.5 rounded cursor-pointer transition-colors"
+                    aria-label={showPassword ? "Sembunyikan sandi" : "Tampilkan sandi"}
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between text-xs pt-0.5">
+                <label className="flex items-center space-x-2 text-slate-400 hover:text-slate-300 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={rememberMe}
+                    onChange={e => setRememberMe(e.target.checked)}
+                    className="w-3.5 h-3.5 rounded border-[#1b3459] bg-[#061021] text-[#38bdf8] focus:ring-0 focus:ring-offset-0 cursor-pointer"
+                  />
+                  <span>Ingat di perangkat ini</span>
+                </label>
                 <button
                   type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-200 cursor-pointer"
+                  onClick={() => alert("Silakan hubungi Administrator PUSDATIN SIBER untuk reset kata sandi dinas.")}
+                  className="text-slate-400 hover:text-[#38bdf8] transition-colors cursor-pointer text-xs"
                 >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  Bantuan Sandi
                 </button>
               </div>
-            </div>
 
-            <div className="flex items-center justify-between text-xs">
-              <label className="flex items-center space-x-2 text-slate-400 cursor-pointer select-none">
-                <input
-                  type="checkbox"
-                  checked={rememberMe}
-                  onChange={e => setRememberMe(e.target.checked)}
-                  className="rounded border-[#1b3459] bg-[#0a182f] text-blue-500 focus:ring-0"
-                />
-                <span>Ingat kredensial saya</span>
-              </label>
-              <span className="text-slate-400 hover:text-slate-200 cursor-pointer">
-                Lupa Sandi?
-              </span>
-            </div>
-
-            <button
-              type="submit"
-              className="w-full bg-gradient-to-r from-[#144782] via-[#17549c] to-[#1c64b8] hover:from-[#175194] hover:via-[#1c60b0] hover:to-[#2274d4] text-white font-bold text-xs sm:text-sm py-2.5 rounded-xl flex items-center justify-center space-x-2 transition-all cursor-pointer shadow-[0_4px_16px_rgba(20,83,154,0.4)] hover:shadow-[0_0_20px_rgba(45,122,214,0.5)] border border-[#2d7ad6]/70 hover:border-[#4392f2]"
-            >
-              <LogIn className="w-4 h-4 text-[#F1C40F]" />
-              <span>Masuk ke Portal e-TAT</span>
-            </button>
-          </form>
-
-          {/* Clean Divider */}
-          <div className="relative my-3">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-[#1b3459]" />
-            </div>
-            <div className="relative flex justify-center text-[11px]">
-              <span className="bg-[#0d1f38] px-2.5 text-slate-400 font-medium uppercase tracking-wider">
-                Atau Pilih Role Cepat (Bypass)
-              </span>
-            </div>
-          </div>
-
-          {/* Quick Role Selection Dropdown + Immediate Bypass Login */}
-          <div className="bg-[#0a182f] border border-[#1b3459] rounded-xl p-3 space-y-2">
-            <div className="flex items-center justify-between">
-              <label className="text-[11px] font-semibold text-slate-300 flex items-center space-x-1">
-                <Zap className="w-3.5 h-3.5 text-[#F1C40F]" />
-                <span>Pilih Otoritas Akun Kedinasan:</span>
-              </label>
-              <span className="text-[10px] font-bold text-[#38bdf8] bg-[#0d1f38] px-1.5 py-0.5 rounded border border-[#1b3459]">
-                8 PILAR
-              </span>
-            </div>
-
-            <div className="space-y-2">
-              <div className="w-full min-w-0">
-                <select
-                  value={selectedUserId}
-                  onChange={e => handleDropdownChange(e.target.value)}
-                  className="w-full min-w-0 bg-[#0d1f38] text-white border border-[#1b3459] rounded-lg px-2.5 py-2 text-xs font-semibold focus:outline-none focus:border-[#38bdf8] truncate"
-                >
-                  {MOCK_USERS.map(user => (
-                    <option key={user.id} value={user.id}>
-                      [{getRoleRankBadge(user.role)}] {user.name} ({user.agency})
-                    </option>
-                  ))}
-                </select>
-              </div>
-
+              {/* Clean Primary Login Button */}
               <button
-                type="button"
-                onClick={handleBypassSubmit}
-                className="w-full bg-[#F1C40F] hover:bg-[#d4ac0d] text-slate-950 font-bold text-xs py-2 px-3 rounded-lg flex items-center justify-center space-x-2 transition-all cursor-pointer shadow-md"
+                type="submit"
+                className="w-full bg-[#133863] hover:bg-[#1a4a82] text-white font-bold text-xs sm:text-sm py-2.5 rounded-xl flex items-center justify-center space-x-2 transition-all cursor-pointer border border-[#235594] shadow-md shadow-black/30 hover:border-[#3b82f6]"
               >
-                <LogIn className="w-3.5 h-3.5" />
-                <span>Bypass Masuk sebagai Role Terpilih</span>
+                <LogIn className="w-4 h-4 text-white" />
+                <span>Masuk ke Dashboard</span>
               </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Security & Protocol Guarantee */}
-        <div className="max-w-xl mx-auto text-center space-y-1 pt-2 text-xs text-slate-400">
-          <div className="flex items-center justify-center space-x-3 text-[11px] font-semibold text-slate-400">
-            <span className="flex items-center space-x-1">
-              <ShieldCheck className="w-3.5 h-3.5 text-[#38bdf8]" />
-              <span>Enkripsi TLS 1.3</span>
-            </span>
-            <span>·</span>
-            <span className="flex items-center space-x-1">
-              <Lock className="w-3.5 h-3.5 text-[#F1C40F]" />
-              <span>Audit Trail Forensik Siber</span>
-            </span>
-            <span>·</span>
-            <span className="flex items-center space-x-1">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Interkoneksi 4 Pilar</span>
-            </span>
+            </form>
           </div>
         </div>
       </main>
+
+      {/* Subtle Copyright Bottom */}
+      <footer className="py-4 text-center border-t border-[#1b3459] text-[11px] text-slate-400 font-mono">
+        Sistem e-TAT Presisi &copy; 2026 Inisiatif SEKORNA
+      </footer>
     </div>
   );
 };
+
