@@ -118,14 +118,14 @@ export const Header: React.FC<HeaderProps> = ({
               <div>
                 <div className="flex items-center space-x-2">
                   <span className="font-extrabold text-base tracking-wider text-white font-['Cinzel',serif] block leading-tight">
-                    E-TAT <span className="text-[#D4AF37]">PRESISI</span>
+                    E-TAT <span className="text-[#D4AF37]">SIAP PULIH</span>
                   </span>
                   <span className="hidden sm:inline-block text-[9px] uppercase font-mono font-bold bg-[#D4AF37]/15 text-[#F3E5AB] px-1.5 py-0.2 rounded border border-[#D4AF37]/30">
-                    POLRI · BNN
+                    BNNP KALTIM
                   </span>
                 </div>
                 <p className="text-[10px] text-slate-400 hidden sm:block leading-tight mt-0.5">
-                  Sentra Pelayanan Asesmen Terpadu & Restorative Justice
+                  Sistem Integrasi Asesmen & Pantauan Pemulihan
                 </p>
               </div>
             </div>

@@ -30,14 +30,23 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({
   onNavigateToTab
 }) => {
   const role = currentUser.role;
+  const [selectedPeriod, setSelectedPeriod] = React.useState<'semua' | 'bulan_ini' | 'triwulan' | 'tahun'>('semua');
+
+  // Filter based on selected period
+  const filteredByPeriod = permohonanList.filter(p => {
+    if (selectedPeriod === 'bulan_ini') return p.tanggalPengajuan.startsWith('2026-09');
+    if (selectedPeriod === 'triwulan') return p.tanggalPengajuan.startsWith('2026-07') || p.tanggalPengajuan.startsWith('2026-08') || p.tanggalPengajuan.startsWith('2026-09');
+    if (selectedPeriod === 'tahun') return p.tanggalPengajuan.startsWith('2026');
+    return true;
+  });
 
   // Filter dynamic lists based on roles
-  const perluPerbaikanList = permohonanList.filter(p => p.statusProsesUtama === 'perlu_perbaikan');
-  const siapVerifikasiList = permohonanList.filter(p => p.statusProsesUtama === 'verifikasi_berkas' || p.statusProsesUtama === 'diajukan');
-  const siapPlenoList = permohonanList.filter(p => p.statusProsesUtama === 'siap_pleno');
-  const menungguPengesahanList = permohonanList.filter(p => p.statusProsesUtama === 'pengesahan_rekomendasi');
-  const terhambatList = permohonanList.filter(p => p.statusTindakLanjut === 'terhambat');
-  const mendekatiTenggatList = permohonanList.filter(p => p.isMendekatiTenggat || p.isMelewatiTenggat);
+  const perluPerbaikanList = filteredByPeriod.filter(p => p.statusProsesUtama === 'perlu_perbaikan');
+  const siapVerifikasiList = filteredByPeriod.filter(p => p.statusProsesUtama === 'verifikasi_berkas' || p.statusProsesUtama === 'diajukan');
+  const siapPlenoList = filteredByPeriod.filter(p => p.statusProsesUtama === 'siap_pleno');
+  const menungguPengesahanList = filteredByPeriod.filter(p => p.statusProsesUtama === 'pengesahan_rekomendasi');
+  const terhambatList = filteredByPeriod.filter(p => p.statusTindakLanjut === 'terhambat');
+  const mendekatiTenggatList = filteredByPeriod.filter(p => p.isMendekatiTenggat || p.isMelewatiTenggat);
 
   // Render role-specific task highlights with clean, unified styling
   const renderRoleSpecificTasks = () => {
@@ -336,7 +345,7 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({
                       Kapasitas Penuh
                     </span>
                   </div>
-                  <p className="text-xs text-slate-300 mt-1">Usulan: Rawat Inap 6 Bulan di Balai Lido &bull; Ketersediaan Kuota Kamar: 0 slot (Perlu Relokasi)</p>
+                  <p className="text-xs text-slate-300 mt-1">Usulan: Rawat Inap 6 Bulan di Balai Tanah Merah Samarinda &bull; Ketersediaan Kuota Kamar: 0 slot (Perlu Relokasi)</p>
                 </div>
                 <button className="text-xs bg-[#133863] hover:bg-[#1a4a82] text-white font-semibold px-3.5 py-2 rounded-xl flex items-center space-x-1 shrink-0 transition-colors border border-[#235594]">
                   <span>Kelola Slot</span>
@@ -451,7 +460,7 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({
             <div>
               <div className="flex items-center space-x-2">
                 <span className="text-[10px] uppercase font-bold tracking-wider text-slate-300 bg-[#081224] px-2.5 py-0.5 rounded border border-[#1b3459] font-mono">
-                  SENTRA KOMANDO E-TAT PRESISI
+                  SENTRA KOMANDO E-TAT SIAP PULIH
                 </span>
                 <span className="text-[10px] text-slate-400 font-mono">
                   SLA 6 HARI KERJA
@@ -468,13 +477,71 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({
 
           <div className="flex items-center space-x-3 shrink-0">
             <div className="bg-[#081224] border border-[#1b3459] px-4 py-2.5 rounded-xl text-center">
-              <span className="text-[10px] text-slate-400 uppercase block font-medium">Kasus Berjalan</span>
-              <span className="text-lg font-bold text-white font-mono">{permohonanList.length}</span>
+              <span className="text-[10px] text-slate-400 uppercase block font-medium">Kasus Aktif</span>
+              <span className="text-lg font-bold text-white font-mono">{filteredByPeriod.length}</span>
             </div>
             <div className="bg-[#081224] border border-[#1b3459] px-4 py-2.5 rounded-xl text-center">
               <span className="text-[10px] text-slate-400 uppercase block font-medium">Atensi Khusus</span>
-              <span className="text-lg font-bold text-white font-mono">{perluPerbaikanList.length + terhambatList.length}</span>
+              <span className="text-lg font-bold text-rose-400 font-mono">{perluPerbaikanList.length + terhambatList.length}</span>
             </div>
+          </div>
+        </div>
+
+        {/* Interactive Filter Bar according to Proposal Bab 07 */}
+        <div className="mt-5 pt-4 border-t border-[#1b3459] flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center space-x-1.5 text-xs text-slate-400">
+            <Clock className="w-3.5 h-3.5 text-[#38bdf8]" />
+            <span className="font-semibold text-slate-300">Filter Periode:</span>
+            <div className="inline-flex rounded-lg bg-[#081224] p-0.5 border border-[#1b3459]">
+              <button
+                type="button"
+                onClick={() => setSelectedPeriod('semua')}
+                className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition-all cursor-pointer ${
+                  selectedPeriod === 'semua'
+                    ? 'bg-[#133863] text-white shadow-xs'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                Semua Data
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelectedPeriod('bulan_ini')}
+                className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition-all cursor-pointer ${
+                  selectedPeriod === 'bulan_ini'
+                    ? 'bg-[#133863] text-white shadow-xs'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                Bulan Ini (Sep 2026)
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelectedPeriod('triwulan')}
+                className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition-all cursor-pointer ${
+                  selectedPeriod === 'triwulan'
+                    ? 'bg-[#133863] text-white shadow-xs'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                Triwulan III
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelectedPeriod('tahun')}
+                className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition-all cursor-pointer ${
+                  selectedPeriod === 'tahun'
+                    ? 'bg-[#133863] text-white shadow-xs'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                Tahun 2026
+              </button>
+            </div>
+          </div>
+
+          <div className="text-[11px] text-slate-400 flex items-center space-x-2">
+            <span>Menampilkan <strong className="text-white font-mono">{filteredByPeriod.length}</strong> dari <strong className="text-white font-mono">{permohonanList.length}</strong> total perkara</span>
           </div>
         </div>
       </div>

@@ -143,13 +143,13 @@ export const PoliceEmblem: React.FC<PoliceEmblemProps> = ({
           x="50"
           y="81.5"
           textAnchor="middle"
-          fontSize="5.2"
+          fontSize="4.8"
           fontWeight="900"
           fontFamily="sans-serif"
-          letterSpacing="0.08em"
+          letterSpacing="0.06em"
           fill="#FFF2B2"
         >
-          PRESISI · E-TAT
+          SIAP PULIH · TAT
         </text>
       </svg>
     </div>

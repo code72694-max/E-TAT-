@@ -97,7 +97,7 @@ export const PermohonanList: React.FC<PermohonanListProps> = ({
       case 'pengaju':
         return {
           title: 'Berkas Pengajuan Asesmen Saya',
-          desc: 'Daftar permohonan yang diajukan oleh unit kerja Anda (Sat Resnarkoba Polresta Bandung). Lacak progres, penuhi koreksi, dan unduh rekomendasi.',
+          desc: 'Daftar permohonan yang diajukan oleh unit kerja Anda (Sat Resnarkoba Polresta Samarinda). Lacak progres, penuhi koreksi, dan unduh rekomendasi.',
           canCreate: true,
           createLabel: 'Pengajuan Asesmen Baru'
         };

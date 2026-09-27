@@ -35,7 +35,7 @@ export const DokumenPengesahanView: React.FC<DokumenPengesahanViewProps> = ({
         <div>
           <h1 className="text-xl font-bold text-white flex items-center space-x-2 font-['Cinzel',serif]">
             <FileSignature className="w-5 h-5 text-[#38bdf8]" />
-            <span>Dokumen Rekomendasi Terpadu & TTE QR Presisi</span>
+            <span>Dokumen Rekomendasi Terpadu & TTE QR SIAP PULIH</span>
           </h1>
           <p className="text-xs text-slate-400 mt-1">
             Penerbitan surat rekomendasi resmi berkekuatan hukum, tanda tangan elektronik terpadu 3 pihak, dan verifikasi barcode.

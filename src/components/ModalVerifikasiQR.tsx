@@ -44,7 +44,7 @@ export const ModalVerifikasiQR: React.FC<ModalVerifikasiQRProps> = ({
             <div>
               <h4 className="text-xs font-bold text-emerald-300">DOKUMEN DINYATAKAN ASLI & VALID</h4>
               <p className="text-[11px] text-emerald-400/90 mt-0.5">
-                Tercatat resmi dalam pangkalan data Tim Asesmen Terpadu Provinsi Jawa Barat.
+                Tercatat resmi dalam pangkalan data Tim Asesmen Terpadu BNNP Kalimantan Timur.
               </p>
             </div>
           </div>

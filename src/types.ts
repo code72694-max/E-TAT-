@@ -18,7 +18,7 @@ export interface UserProfile {
   name: string;
   nip: string;
   role: UserRole;
-  agency: string; // e.g., 'Polresta Bandung', 'BNN Provinsi Jawa Barat', 'RSKO Jakarta'
+  agency: string; // e.g., 'Polresta Samarinda', 'BNN Provinsi Kalimantan Timur', 'Balai Rehabilitasi Tanah Merah'
   avatar?: string;
   email: string;
   phone: string;

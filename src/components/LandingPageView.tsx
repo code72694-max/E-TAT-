@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { PermohonanAsesmen } from '../types';
 import { PoliceEmblem } from './PoliceEmblem';
-import { CommandCenterAnalytics } from './CommandCenterAnalytics';
 import {
   ShieldCheck,
   ArrowRight,
@@ -20,6 +19,7 @@ import {
   FileCheck,
   AlertCircle,
   ChevronRight,
+  ChevronLeft,
   Shield,
   LifeBuoy,
   HeartHandshake,
@@ -58,8 +58,99 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
 
   const sampleNumbers = ['TAT-089', 'TAT-074', 'TAT-068', 'TAT-055'];
 
+  // Hero Carousel State (siapsespimpolri.id style with auto-slide & distinct content)
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
+
+  const heroSlides = [
+    {
+      id: 0,
+      titlePart1: 'SELAMATKAN KORBAN,',
+      titleHighlight: 'PULIHKAN MASA DEPAN,',
+      titlePart2: 'SIKAT HABIS SINDIKAT.',
+      description:
+        'Sinergi penegakan hukum terpadu Tim Asesmen Terpadu (TAT) Ditresnarkoba Polda & BNNP Kalimantan Timur: Merehabilitasi korban penyalahguna secara medis dan sosial, serta menindak tegas sindikat demi kepastian hukum berkeadilan.',
+      image: '/images/hero/slide-asesmen.jpg',
+      imageAlt: 'Pertemuan Koordinasi Tim Asesmen Terpadu BNN & Polri'
+    },
+    {
+      id: 1,
+      titlePart1: 'HARAPAN BARU,',
+      titleHighlight: 'PULIH BERSAMA LAYANAN REHABILITASI,',
+      titlePart2: 'MENUJU MASA DEPAN GEMILANG.',
+      description:
+        'Pendampingan medis dan psikososial berstandar nasional bersama Klinik Pratama BNN dan Balai Rehabilitasi Tanah Merah untuk memutus siklus adiksi narkotika serta mengembalikan martabat generasi bangsa.',
+      image: '/images/hero/slide-rehabilitasi.jpg',
+      imageAlt: 'Konsultasi Medis dan Rehabilitasi Penyalahguna Narkotika Klinik Pratama BNN'
+    },
+    {
+      id: 2,
+      titlePart1: 'UJI LABORATORIUM,',
+      titleHighlight: 'FORENSIK PRESISI & TRANSPARAN,',
+      titlePart2: 'BEBAS DARI INTERVENSI.',
+      description:
+        'Pengujian toksikologi urin dan verifikasi barang bukti narkotika bersama Puslabfor Bareskrim Polri dan Laboratorium BNN secara ilmiah, akuntabel, dan mengedepankan integritas pembuktian hukum.',
+      image: '/images/hero/slide-forensik.jpg',
+      imageAlt: 'Uji Laboratorium Forensik Narkotika dan Toksikologi Puslabfor Polri'
+    }
+  ];
+
+  // Auto sliding timer (5.5 seconds per slide, pause on hover)
+  useEffect(() => {
+    if (isPaused) return;
+    const interval = setInterval(() => {
+      setCurrentSlide(prev => (prev + 1) % heroSlides.length);
+    }, 5500);
+    return () => clearInterval(interval);
+  }, [isPaused, heroSlides.length]);
+
+  const goToNextSlide = () => {
+    setCurrentSlide(prev => (prev + 1) % heroSlides.length);
+  };
+
+  const goToPrevSlide = () => {
+    setCurrentSlide(prev => (prev - 1 + heroSlides.length) % heroSlides.length);
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStartX(e.touches[0].clientX);
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX === null) return;
+    const touchEndX = e.changedTouches[0].clientX;
+    const diff = touchStartX - touchEndX;
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) {
+        goToNextSlide();
+      } else {
+        goToPrevSlide();
+      }
+    }
+    setTouchStartX(null);
+  };
+
   return (
-    <div className="min-h-screen bg-[#071326] text-slate-100 flex flex-col antialiased selection:bg-[#38bdf8] selection:text-slate-950 font-sans">
+    <div className="min-h-screen bg-[#071326] text-slate-100 flex flex-col antialiased selection:bg-[#D4AF37]/30 selection:text-white font-sans">
+      <style>{`
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(20px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in-up {
+          opacity: 0;
+          animation: fadeInUp 0.55s ease forwards;
+        }
+        .fade-in-up-delay-1 { animation-delay: 0.08s; }
+        .fade-in-up-delay-2 { animation-delay: 0.16s; }
+        .fade-in-up-delay-3 { animation-delay: 0.24s; }
+        .fade-in-up-delay-4 { animation-delay: 0.32s; }
+        .fade-in-up-delay-5 { animation-delay: 0.40s; }
+        .fade-in-up-delay-6 { animation-delay: 0.48s; }
+        .fade-in-up-delay-7 { animation-delay: 0.56s; }
+        .fade-in-up-delay-8 { animation-delay: 0.64s; }
+      `}</style>
       {/* Main Clean Header */}
       <header className="sticky top-0 z-40 bg-[#071325]/95 backdrop-blur-md border-b border-[#1b3459]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
@@ -68,11 +159,11 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
             <PoliceEmblem size="sm" />
             <div className="flex items-center space-x-2 min-w-0">
               <span className="font-extrabold text-base sm:text-lg tracking-wider text-white font-['Cinzel',serif] truncate">
-                E-TAT <span className="text-[#D4AF37]">PRESISI</span>
+                E-TAT <span className="text-[#D4AF37]">SIAP PULIH</span>
               </span>
               <span className="hidden sm:inline-block text-[#1b3459]">|</span>
-              <span className="hidden sm:inline-block text-xs font-semibold text-slate-300">
-                SEKORNA <span className="text-slate-400 font-normal">· Asesmen Terpadu</span>
+              <span className="hidden sm:inline-block text-xs text-slate-400 font-medium">
+                BNNP Kalimantan Timur
               </span>
             </div>
           </div>
@@ -81,11 +172,11 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
           <div className="flex items-center space-x-2 sm:space-x-5 lg:space-x-6 shrink-0">
             {/* Navigation Links (Desktop) */}
             <nav className="hidden md:flex items-center space-x-5 lg:space-x-6 text-xs font-medium text-slate-300">
-              <a href="#pantauan-tat" className="hover:text-white transition-colors duration-150">
-                Pantauan Kinerja
+              <a href="#tentang-tat" className="hover:text-white transition-colors duration-150">
+                Tentang E-TAT
               </a>
               <a href="#gerakan-sekorna" className="hover:text-white transition-colors duration-150">
-                Inisiatif SEKORNA
+                Konsep SIAP PULIH
               </a>
               <a href="#alur-layanan" className="hover:text-white transition-colors duration-150">
                 Alur SOP
@@ -145,9 +236,9 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
                   <PoliceEmblem size="sm" />
                   <div>
                     <span className="font-extrabold text-sm tracking-wider text-white font-['Cinzel',serif] block">
-                      E-TAT <span className="text-[#D4AF37]">PRESISI</span>
+                      E-TAT <span className="text-[#D4AF37]">SIAP PULIH</span>
                     </span>
-                    <span className="text-[10px] text-slate-400 font-medium">Navigasi Terpadu</span>
+                    <span className="text-[10px] text-slate-400 font-medium">BNNP Kalimantan Timur</span>
                   </div>
                 </div>
                 <button
@@ -163,12 +254,12 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
               {/* Navigation Links in Sidebar */}
               <nav className="space-y-1.5">
                 <a
-                  href="#pantauan-tat"
+                  href="#tentang-tat"
                   onClick={() => setMobileMenuOpen(false)}
                   className="flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 hover:text-white hover:bg-[#0d1f38] border border-transparent hover:border-[#1b3459] transition-all"
                 >
-                  <Activity className="w-4 h-4 text-slate-400" />
-                  <span>Pantauan Kinerja</span>
+                  <ShieldCheck className="w-4 h-4 text-[#D4AF37]" />
+                  <span>Tentang E-TAT</span>
                 </a>
                 <a
                   href="#gerakan-sekorna"
@@ -176,7 +267,7 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
                   className="flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 hover:text-white hover:bg-[#0d1f38] border border-transparent hover:border-[#1b3459] transition-all"
                 >
                   <LifeBuoy className="w-4 h-4 text-slate-400" />
-                  <span>Inisiatif SEKORNA</span>
+                  <span>Konsep SIAP PULIH</span>
                 </a>
                 <a
                   href="#alur-layanan"
@@ -224,237 +315,262 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
                 className="w-full bg-[#133863] hover:bg-[#1a4a82] text-white font-semibold text-xs py-2.5 px-4 rounded-xl shadow-md flex items-center justify-center space-x-2 transition-all cursor-pointer border border-[#235594]"
               >
                 <LogIn className="w-4 h-4 text-white" />
-                <span>Masuk Portal Presisi</span>
+                <span>Masuk Portal SIAP PULIH</span>
               </button>
               <div className="text-[10px] text-slate-400 text-center font-mono">
-                Sistem Terpadu SEKORNA &copy; 2026
+                Sistem e-TAT SIAP PULIH &copy; 2026 BNNP Kaltim
               </div>
             </div>
           </aside>
         </div>
       )}
 
-      {/* HERO SECTION - Pure Clean & Authoritative (No Silhouettes, No Graphics, No Colorful Highlights) */}
-      <section className="relative overflow-hidden min-h-[calc(100vh-65px)] flex flex-col justify-start sm:justify-center items-center pt-28 pb-16 sm:py-20 bg-[#071326] border-b border-[#1b3459]">
-        {/* Subtle Ambient Radial Glow (Clean, Zero Clutter, No Silhouettes) */}
-        <div className="absolute inset-0 pointer-events-none select-none z-0">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(20,70,130,0.18)_0%,rgba(7,19,38,0.7)_55%,#071326_100%)]" />
-        </div>
-
-        {/* Content Container */}
-        <div className="relative z-10 max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6 sm:space-y-8 sm:my-auto">
-          {/* Grand Centered Headline - 3 Lines, Bold on Mobile, Elegant on Desktop */}
-          <h1 className="text-[clamp(1.5rem,5.5vw,2.5rem)] lg:text-[2.65rem] font-extrabold text-white tracking-normal sm:tracking-wider leading-[1.25] sm:leading-[1.28] font-['Cinzel',serif] max-w-4xl mx-auto px-2">
-            <span className="block animate-hero-title-1">
-              SELAMATKAN KORBAN,
-            </span>
-            <span className="block animate-hero-title-2 text-[#D4AF37]">
-              PULIHKAN MASA DEPAN,
-            </span>
-            <span className="block animate-hero-title-3">
-              SIKAT HABIS SINDIKAT.
-            </span>
-          </h1>
-
-          {/* Concise, High-Impact Description */}
-          <p className="animate-hero-desc text-slate-300 text-xs sm:text-sm md:text-base leading-relaxed max-w-2xl mx-auto font-normal px-2">
-            Sinergi penegakan hukum terpadu: Merehabilitasi korban penyalahguna secara medis dan sosial, serta menindak tegas pengedar demi kepastian hukum.
-          </p>
-        </div>
-      </section>
-
-      {/* COMMAND CENTER MONITORING SECTION */}
-      <section id="pantauan-tat" className="py-12 sm:py-16 bg-[#081225] border-b border-[#1b3459]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-          <div className="text-center max-w-3xl mx-auto space-y-2.5">
-            <div className="inline-flex items-center space-x-2 text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-300 bg-[#0d1f38] px-3.5 py-1.5 rounded-lg border border-[#1b3459]">
-              <Activity className="w-3.5 h-3.5 text-slate-400" />
-              <span>PANTAUAN OPERASIONAL e-TAT</span>
-            </div>
-            <h2 className="text-xl sm:text-3xl font-extrabold text-white tracking-tight font-['Cinzel',serif]">
-              Dasbor Kinerja Penegakan Hukum & Pemulihan
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-400 leading-relaxed max-w-2xl mx-auto">
-              Statistik pemulihan berkala, status distribusi kasus, log aktivitas waktu-nyata, dan indikator kunci pelayanan Tim Asesmen Terpadu.
-            </p>
-          </div>
-
-          {/* Embed CommandCenterAnalytics widget */}
-          <CommandCenterAnalytics />
-        </div>
-      </section>
-
-      {/* GERAKAN SEKORNA PHILOSOPHY & ACRONYM SECTION */}
-      <section id="gerakan-sekorna" className="py-12 sm:py-16 bg-[#0a182f] border-b border-[#1b3459]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 sm:space-y-10">
-          <div className="text-center max-w-3xl mx-auto space-y-2.5 sm:space-y-3">
-            <div className="inline-flex items-center space-x-2 text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-300 bg-[#0d1f38] px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-lg border border-[#1b3459]">
-              <LifeBuoy className="w-3.5 h-3.5 text-slate-400" />
-              <span>DOKTRIN & FILOSOFI PENYELAMATAN GENERASI</span>
-            </div>
-            <h2 className="text-xl sm:text-3xl font-extrabold text-white tracking-tight font-['Cinzel',serif] px-1">
-              Inisiatif SEKORNA: SElamatkan KORban NArkotika
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-2xl mx-auto px-2">
-              Singkatan kata <strong className="text-white">SEKORNA</strong> merangkum tekad moral Tim Asesmen Terpadu Polri & BNN: <em className="text-slate-200">memulihkan korban kecanduan dengan rehabilitasi, seraya menumpas pengedar dan bandar tanpa kompromi</em>.
-            </p>
-          </div>
-
-          {/* 3 Pillar Cards Deconstructing the Acronym */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
-            {/* SE - Selamatkan */}
-            <div className="bg-[#0d1f38] border border-[#1b3459] rounded-2xl p-5 sm:p-6 space-y-3.5 hover:border-[#2a4d80] transition-all shadow-lg">
-              <div className="flex items-center justify-between">
-                <span className="font-mono text-2xl sm:text-3xl font-black text-white bg-[#0a182f] border border-[#1b3459] w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center">
-                  SE
-                </span>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-300 bg-[#0a182f] px-2.5 py-1 rounded-md border border-[#1b3459]">
-                  PILAR PERTAMA
-                </span>
-              </div>
-              <div>
-                <h3 className="text-sm sm:text-base font-bold text-white">
-                  SElamatkan Jiwa & Hak Hidup
-                </h3>
-                <p className="text-xs text-slate-300 mt-1.5 leading-relaxed">
-                  Penyalahguna dan pecandu adalah korban zat adiktif yang sedang sakit dan membutuhkan intervensi medis serta psikologis sesegera mungkin (maksimal 1x24 jam sejak diamankan). Menyelamatkan mereka berarti menyelamatkan masa depan keluarga dan bangsa.
-                </p>
-              </div>
-              <div className="pt-3 border-t border-[#1b3459] text-[11px] font-semibold text-slate-300 flex items-center space-x-1.5">
-                <HeartHandshake className="w-3.5 h-3.5 text-slate-400" />
-                <span>Amanat Pasal 54 UU No. 35/2009</span>
-              </div>
-            </div>
-
-            {/* KOR - Korban Dipulihkan */}
-            <div className="bg-[#0d1f38] border border-[#1b3459] rounded-2xl p-5 sm:p-6 space-y-3.5 hover:border-[#2a4d80] transition-all shadow-lg">
-              <div className="flex items-center justify-between">
-                <span className="font-mono text-2xl sm:text-3xl font-black text-white bg-[#0a182f] border border-[#1b3459] w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center">
-                  KOR
-                </span>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-300 bg-[#0a182f] px-2.5 py-1 rounded-md border border-[#1b3459]">
-                  PILAR KEDUA
-                </span>
-              </div>
-              <div>
-                <h3 className="text-sm sm:text-base font-bold text-white">
-                  KORban Dilindungi, Bukan Dikriminalisasi
-                </h3>
-                <p className="text-xs text-slate-300 mt-1.5 leading-relaxed">
-                  Melalui instrumen WHO ASSIST dan uji laboratorium toksikologi, Tim Asesmen memverifikasi status tersangka secara objektif. Korban murni diarahkan ke rehabilitasi medis dan sosial, menghindarkan mereka dari penularan kriminalitas lapas.
-                </p>
-              </div>
-              <div className="pt-3 border-t border-[#1b3459] text-[11px] font-semibold text-slate-300 flex items-center space-x-1.5">
-                <Scale className="w-3.5 h-3.5 text-slate-400" />
-                <span>Keadilan Restoratif Perpol 08/2021</span>
-              </div>
-            </div>
-
-            {/* NA - Narkotika Diberantas */}
-            <div className="bg-[#0d1f38] border border-[#1b3459] rounded-2xl p-5 sm:p-6 space-y-3.5 hover:border-[#2a4d80] transition-all shadow-lg">
-              <div className="flex items-center justify-between">
-                <span className="font-mono text-2xl sm:text-3xl font-black text-white bg-[#0a182f] border border-[#1b3459] w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center">
-                  NA
-                </span>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-300 bg-[#0a182f] px-2.5 py-1 rounded-md border border-[#1b3459]">
-                  PILAR KETIGA
-                </span>
-              </div>
-              <div>
-                <h3 className="text-sm sm:text-base font-bold text-white">
-                  NArkotika Diberantas, Bandar Dihukum Maksimal
-                </h3>
-                <p className="text-xs text-slate-300 mt-1.5 leading-relaxed">
-                  Penyelamatan korban berjalan beriringan dengan penegakan hukum tanpa ampun terhadap produsen dan pengedar gelap narkotika. Batas ketat berat barang bukti (SEMA 04/2010) memastikan sindikat tidak dapat menyamar sebagai korban.
-                </p>
-              </div>
-              <div className="pt-3 border-t border-[#1b3459] text-[11px] font-semibold text-slate-300 flex items-center space-x-1.5">
-                <ShieldCheck className="w-3.5 h-3.5 text-slate-400" />
-                <span>SEMA 04/2010 & UU 35/2009</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Moral Manifesto Banner */}
-          <div className="bg-[#071326] text-white rounded-2xl p-5 sm:p-7 flex flex-col md:flex-row items-center justify-between gap-5 sm:gap-6 border border-[#1b3459] text-center md:text-left shadow-xl">
-            <div className="flex flex-col md:flex-row items-center space-y-3 md:space-y-0 md:space-x-4">
-              <div className="w-12 h-12 rounded-xl bg-[#0a182f] border border-[#1b3459] flex items-center justify-center shrink-0">
-                <LifeBuoy className="w-6 h-6 text-slate-300" />
-              </div>
-              <div>
-                <span className="text-[10px] uppercase font-bold tracking-widest text-slate-400 block font-mono">
-                  KOMITMEN MORAL PENEGAK HUKUM INDONESIA
-                </span>
-                <h4 className="text-sm sm:text-lg font-bold text-white mt-0.5">
-                  "Satu Nyawa yang Kita Pulihkan adalah Satu Masa Depan Bangsa yang Kita Selamatkan."
-                </h4>
-                <p className="text-xs text-slate-400 mt-1">
-                  Rehabilitasi adalah wujud kehadiran negara melindungi generasi penerus dari kehancuran narkotika.
-                </p>
-              </div>
-            </div>
-
-            <button
-              onClick={() => onGoToLogin()}
-              className="w-full md:w-auto bg-[#133863] hover:bg-[#1a4a82] text-white font-bold text-xs px-5 py-3 rounded-xl shrink-0 transition-all cursor-pointer flex items-center justify-center space-x-2 border border-[#235594]"
+      {/* HERO SLIDER SECTION - SIAP SESPIM STYLE WITH AUTO SLIDE, FULL-PAGE HEIGHT & CLEAN POLICE/REHAB IMAGERY */}
+      <section
+        id="hero-carousel"
+        className="relative overflow-hidden h-[calc(100vh-4rem)] min-h-[580px] flex items-center bg-[#071326] border-b border-[#1b3459] select-none"
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
+        {/* Background Slides */}
+        {heroSlides.map((slide, idx) => {
+          const isActive = idx === currentSlide;
+          return (
+            <div
+              key={slide.id}
+              className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+                isActive ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
+              }`}
             >
-              <span>Akses Portal Penanganan Berkas</span>
-              <ArrowRight className="w-3.5 h-3.5 text-white" />
-            </button>
+              {/* Photo Background with subtle zoom effect */}
+              <div
+                className={`absolute inset-0 bg-cover bg-center transition-transform duration-7000 ease-out ${
+                  isActive ? 'scale-105' : 'scale-100'
+                }`}
+                style={{ backgroundImage: `url('${slide.image}')` }}
+                role="img"
+                aria-label={slide.imageAlt}
+              />
+
+              {/* Dark Gradient Overlays for High Contrast & Clean Text Legibility */}
+              <div className="absolute inset-0 bg-gradient-to-r from-[#071326] via-[#071326]/85 to-[#071326]/30 lg:to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#071326] via-transparent to-[#071326]/70" />
+              <div className="absolute inset-0 bg-[#071326]/20 backdrop-blur-[0.5px]" />
+            </div>
+          );
+        })}
+
+        {/* Content Container - Shifted higher up for clean balance */}
+        <div className="relative z-20 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 -translate-y-6 sm:-translate-y-10 lg:-translate-y-12">
+          <div className="max-w-2xl space-y-4">
+            {/* Animated Slide Content Box - Clean without label badges */}
+            <div key={currentSlide} className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
+              {/* Clean Headline */}
+              <h1 className="text-xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-wide leading-snug font-['Cinzel',serif] drop-shadow-md">
+                <span className="block text-slate-100">
+                  {heroSlides[currentSlide].titlePart1}
+                </span>
+                <span className="block text-[#D4AF37] my-1">
+                  {heroSlides[currentSlide].titleHighlight}
+                </span>
+                <span className="block text-slate-200 text-lg sm:text-2xl lg:text-3xl font-bold">
+                  {heroSlides[currentSlide].titlePart2}
+                </span>
+              </h1>
+
+              {/* Clean Description */}
+              <p className="text-slate-300 text-xs sm:text-sm md:text-base leading-relaxed max-w-xl font-normal drop-shadow-sm">
+                {heroSlides[currentSlide].description}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Carousel Prev & Next Navigation Buttons (Like siapsespimpolri.id carousel-control-prev/next) */}
+        <button
+          type="button"
+          onClick={goToPrevSlide}
+          aria-label="Slide sebelumnya"
+          className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 z-30 p-2.5 sm:p-3 rounded-full bg-[#071326]/70 hover:bg-[#0d1f38] text-white/80 hover:text-white border border-[#1b3459] hover:border-[#D4AF37]/60 backdrop-blur-md shadow-xl transition-all cursor-pointer group"
+        >
+          <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 transition-transform group-hover:-translate-x-0.5" />
+        </button>
+
+        <button
+          type="button"
+          onClick={goToNextSlide}
+          aria-label="Slide berikutnya"
+          className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 z-30 p-2.5 sm:p-3 rounded-full bg-[#071326]/70 hover:bg-[#0d1f38] text-white/80 hover:text-white border border-[#1b3459] hover:border-[#D4AF37]/60 backdrop-blur-md shadow-xl transition-all cursor-pointer group"
+        >
+          <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 transition-transform group-hover:translate-x-0.5" />
+        </button>
+
+        {/* Bottom Carousel Indicators */}
+        <div className="absolute bottom-8 sm:bottom-10 inset-x-0 z-30 flex justify-center pointer-events-auto">
+          {/* Slide Indicator Pills */}
+          <div className="flex items-center space-x-2 bg-[#071326]/80 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-[#1b3459]">
+            {heroSlides.map((slide, idx) => {
+              const isActive = idx === currentSlide;
+              return (
+                <button
+                  key={slide.id}
+                  type="button"
+                  onClick={() => setCurrentSlide(idx)}
+                  aria-label={`Pindah ke slide ${idx + 1}`}
+                  className={`transition-all duration-300 rounded-full cursor-pointer ${
+                    isActive
+                      ? 'w-7 sm:w-8 h-2.5 bg-[#D4AF37] shadow-lg shadow-[#D4AF37]/40'
+                      : 'w-2.5 h-2.5 bg-slate-500/60 hover:bg-slate-300'
+                  }`}
+                />
+              );
+            })}
           </div>
         </div>
       </section>
 
-      {/* TRACKING DOCK SECTION - Clean Docket Search */}
-      <section id="lacak-berkas" className="py-12 sm:py-16 bg-[#071326] border-b border-[#1b3459]">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6">
-          <div className="text-center space-y-2 mb-6 sm:mb-7">
-            <div className="inline-flex items-center space-x-2 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-300 bg-[#0d1f38] px-3 py-1 rounded-md border border-[#1b3459]">
-              <Search className="w-3.5 h-3.5 text-[#38bdf8]" />
-              <span>TERMINAL PELACAKAN DOKET PERKARA</span>
-            </div>
-            <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-              Pemeriksaan Status Berkas Asesmen Terpadu
+      {/* ABOUT SECTION */}
+      <section id="tentang-tat" className="py-20 sm:py-24 bg-[#081225] border-b border-[#1b3459]/60">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12 sm:mb-16">
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#D4AF37] block mb-3">Tentang Sistem</span>
+            <h2 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight font-['Cinzel',serif] mb-4">
+              E-TAT <span className="text-[#D4AF37]">SIAP PULIH</span>
             </h2>
-            <p className="text-xs text-slate-400 max-w-xl mx-auto px-2">
-              Akses transparan bagi Penyidik Satresnarkoba, Kejaksaan, dan penasihat hukum untuk memeriksa status pemenuhan berkas serta jadwal sidang pleno.
+            <p className="text-sm text-slate-400 max-w-xl mx-auto leading-relaxed">
+              Sarana digital terpadu BNNP Kalimantan Timur &amp; Polda Kaltim untuk asesmen, rekomendasi, dan pemantauan pemulihan narkotika.
             </p>
           </div>
 
-          <form onSubmit={handleTrack} className="bg-[#0d1f38] border border-[#1b3459] rounded-2xl p-4 sm:p-5 space-y-3.5 shadow-xl">
-            <div className="flex flex-col sm:flex-row gap-2.5">
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 sm:gap-8 items-start">
+            {/* Left: Core Mission */}
+            <div className="lg:col-span-2 bg-[#0b172a] border border-[#1b3459]/80 rounded-2xl p-6 sm:p-8 space-y-5 flex flex-col justify-between">
+              <div className="space-y-4">
+                <Shield className="w-7 h-7 text-[#D4AF37]" />
+                <h3 className="text-lg font-bold text-white font-['Cinzel',serif] leading-snug">
+                  Satu Sistem,<br />Satu Data, Satu Keputusan
+                </h3>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  E-TAT menyatukan penyidik, tim medis, dan tim hukum dalam satu alur kerja digital â€” menghilangkan redundansi berkas, memastikan SLA 6 hari kerja, dan menjamin transparansi penuh sesuai UU No. 35/2009 &amp; Perpol 08/2021.
+                </p>
+              </div>
+              <div className="pt-4 border-t border-[#1b3459]/60 space-y-2">
+                <div className="flex items-center justify-between text-[11px] font-mono">
+                  <span className="text-slate-500">Status Asesmen</span>
+                  <span className="text-[#D4AF37] font-bold">Rekomendasi Terbit</span>
+                </div>
+                <div className="flex items-center justify-between text-[11px] font-mono">
+                  <span className="text-slate-500">Status Pemulihan</span>
+                  <span className="text-white font-bold">Dalam Pemantauan</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Right: 4 Pillars */}
+            <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              {[
+                { icon: <FileCheck className="w-4 h-4" />, title: 'Satu Data Berkas', sub: '7 berkas formil terpadu', desc: 'Eliminasi pencatatan ganda â€” LP, BAP, bukti lab, NIK, semua dalam satu perkara digital.' },
+                { icon: <Calendar className="w-4 h-4" />, title: 'SLA 6 Hari Kerja', sub: 'Registrasi s.d. rekomendasi', desc: 'Waktu layanan terukur dari 1Ã—24 jam registrasi hingga sidang pleno penetapan.' },
+                { icon: <Users className="w-4 h-4" />, title: 'Tim Multidisiplin', sub: '6 peran terpisah', desc: 'Penyidik, medis, hukum, sekretariat, pimpinan, &amp; pemantau â€” independen &amp; terstruktur.' },
+                { icon: <HeartHandshake className="w-4 h-4" />, title: 'Monitoring Pasca Rehab', sub: 'Berkelanjutan', desc: 'Pantauan rujukan Balai BNN, uji urin berkala, dan rekam kepatuhan hingga SKSP terbit.' },
+              ].map((p, i) => (
+                <div key={i} className={`fade-in-up fade-in-up-delay-${i + 1} bg-[#071326] border border-[#1b3459]/70 rounded-xl p-4 sm:p-5 space-y-2 hover:border-[#D4AF37]/30 transition-colors duration-300`}>
+                  <div className="flex items-center justify-between">
+                    <div className="w-8 h-8 rounded-lg bg-[#0d1f38] border border-[#1b3459] flex items-center justify-center text-slate-400">
+                      {p.icon}
+                    </div>
+                    <span className="text-[9px] font-mono text-slate-600 uppercase tracking-wider">{p.sub}</span>
+                  </div>
+                  <h4 className="text-sm font-bold text-white">{p.title}</h4>
+                  <p className="text-[11px] text-slate-500 leading-relaxed">{p.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* SIAP PULIH TEGAS â€” 3 Pilar */}
+      <section id="gerakan-sekorna" className="py-20 sm:py-24 bg-[#071326] border-b border-[#1b3459]/60">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#D4AF37] block mb-3">Doktrin Operasional</span>
+            <h2 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight font-['Cinzel',serif]">
+              SIAP · PULIH · TEGAS
+            </h2>
+            <p className="text-sm text-slate-400 mt-3 max-w-md mx-auto">Tiga komitmen Tim Asesmen Terpadu BNNP Kalimantan Timur.</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+            {[
+              { word: 'SIAP', pillar: 'I', title: 'Sinergi Integrasi Asesmen', sub: 'UU 35/2009 · Perpol 08/2021', desc: 'Penyidik, dokter, jaksa bekerja terpadu dalam satu data. SLA 6 hari kerja dijamin sistem.', icon: <HeartHandshake className="w-4 h-4" /> },
+              { word: 'PULIH', pillar: 'II', title: 'Pantauan Pemulihan Klien', sub: 'Balai BNN · RSUD · Klinik Pratama', desc: 'Pemantauan ketat pasca-asesmen dengan tes urin berkala dan evaluasi kepatuhan program rehab.', icon: <Scale className="w-4 h-4" /> },
+              { word: 'TEGAS', pillar: 'III', title: 'Penegakan Hukum Tanpa Kompromi', sub: 'SEMA 04/2010 · Kepastian Peradilan', desc: 'Penindakan maksimal sindikat pengedar, dipisah jelas dari penyelamatan korban penyalahguna.', icon: <ShieldCheck className="w-4 h-4" /> },
+            ].map((p, i) => (
+              <div key={i} className={`fade-in-up fade-in-up-delay-${i + 1} group bg-[#0d1f38] border border-[#1b3459]/70 rounded-2xl p-6 sm:p-7 hover:border-[#D4AF37]/25 transition-colors duration-300`}>
+                <div className="flex items-start justify-between mb-5">
+                  <span className="font-mono font-black text-2xl sm:text-3xl text-[#D4AF37] leading-none tracking-tight">{p.word}</span>
+                  <span className="text-[9px] font-mono text-slate-600 mt-1">PILAR {p.pillar}</span>
+                </div>
+                <h3 className="text-sm font-bold text-white mb-2">{p.title}</h3>
+                <p className="text-[11px] text-slate-500 leading-relaxed mb-5">{p.desc}</p>
+                <div className="flex items-center space-x-1.5 text-[10px] text-slate-600 border-t border-[#1b3459]/60 pt-4">
+                  <div className="shrink-0">{p.icon}</div>
+                  <span>{p.sub}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Quote */}
+          <div className="mt-8 sm:mt-10 border border-[#1b3459]/60 rounded-2xl p-6 sm:p-8 bg-[#0b172a] text-center">
+            <p className="text-sm sm:text-base font-semibold text-white italic leading-relaxed max-w-2xl mx-auto">
+              "Satu Nyawa yang Kita Pulihkan adalah Satu Masa Depan Bangsa yang Kita Selamatkan."
+            </p>
+            <span className="text-[10px] text-slate-500 mt-2 block uppercase tracking-widest font-mono">Komitmen Moral Penegak Hukum Indonesia</span>
+          </div>
+        </div>
+      </section>
+
+      {/* LACAK BERKAS */}
+      <section id="lacak-berkas" className="py-20 sm:py-24 bg-[#081225] border-b border-[#1b3459]/60">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-10">
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#D4AF37] block mb-3">Pelacakan Perkara</span>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight font-['Cinzel',serif]">Cek Status Berkas</h2>
+            <p className="text-xs text-slate-400 mt-3 max-w-sm mx-auto">Akses transparan untuk Penyidik, Jaksa, dan penasihat hukum.</p>
+          </div>
+
+          <form onSubmit={handleTrack} className="space-y-3">
+            <div className="flex gap-2.5">
               <div className="relative flex-1">
-                <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
+                <Search className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
                   value={trackingNumber}
                   onChange={e => setTrackingNumber(e.target.value)}
-                  placeholder="Ketik Nomor Permohonan (misal: TAT-089 atau nama)..."
-                  className="w-full bg-[#0a182f] text-white pl-10 pr-4 py-2.5 rounded-xl border border-[#1b3459] text-xs sm:text-sm focus:outline-none focus:border-[#38bdf8] font-medium placeholder-slate-500"
+                  placeholder="Nomor permohonan atau nama terperiksa..."
+                  className="w-full bg-[#071326] text-white pl-10 pr-4 py-3 rounded-xl border border-[#1b3459] text-sm focus:outline-none focus:border-[#D4AF37]/50 placeholder-slate-600 transition-colors"
                 />
               </div>
               <button
                 type="submit"
-                className="w-full sm:w-auto bg-[#133863] hover:bg-[#1a4a82] text-white text-xs sm:text-sm font-bold px-6 py-2.5 rounded-xl flex items-center justify-center space-x-2 cursor-pointer transition-all shrink-0 border border-[#235594]"
+                className="shrink-0 bg-[#D4AF37] hover:bg-[#c4a030] text-[#071326] font-bold text-xs px-5 py-3 rounded-xl flex items-center space-x-1.5 cursor-pointer transition-colors"
               >
-                <Search className="w-4 h-4 text-white" />
-                <span>Cari Doket</span>
+                <Search className="w-3.5 h-3.5" />
+                <span>Cari</span>
               </button>
             </div>
-
-            {/* Quick Sample Buttons */}
-            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-xs pt-1">
-              <span className="text-slate-400 text-[11px] sm:text-xs">Contoh Doket:</span>
+            <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
+              <span className="text-slate-600">Contoh:</span>
               {sampleNumbers.map(num => (
                 <button
                   key={num}
                   type="button"
-                  onClick={() => {
-                    setTrackingNumber(num);
-                    const found = permohonanList.find(p => p.nomorPermohonan.includes(num));
-                    setTrackedResult(found || 'not_found');
-                  }}
-                  className="text-[11px] font-mono font-bold bg-[#0a182f] text-slate-300 hover:text-white hover:bg-[#122846] border border-[#1b3459] px-2.5 py-0.5 rounded cursor-pointer transition-colors"
+                  onClick={() => { setTrackingNumber(num); const found = permohonanList.find(p => p.nomorPermohonan.includes(num)); setTrackedResult(found || 'not_found'); }}
+                  className="font-mono text-slate-400 hover:text-[#D4AF37] bg-[#0d1f38] border border-[#1b3459] px-2 py-0.5 rounded cursor-pointer transition-colors"
                 >
                   {num}
                 </button>
@@ -462,266 +578,164 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
             </div>
           </form>
 
-          {/* Search Result Display - Clean Docket Style */}
           {trackedResult && trackedResult !== 'not_found' && (
-            <div className="mt-5 sm:mt-6 p-4 sm:p-6 bg-[#0d1f38] border border-[#1b3459] rounded-2xl space-y-4 sm:space-y-5 animate-in fade-in duration-200 shadow-xl">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-3 sm:pb-4 border-b border-[#1b3459]">
+            <div className="mt-5 bg-[#0d1f38] border border-[#1b3459] rounded-2xl p-5 space-y-4 animate-in fade-in duration-200">
+              <div className="flex items-start justify-between pb-3 border-b border-[#1b3459]/60 gap-3">
                 <div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="font-mono font-bold text-sm sm:text-base text-white">{trackedResult.nomorPermohonan}</span>
-                    <span className="text-[10px] bg-[#0a182f] text-slate-300 font-bold px-2 py-0.5 rounded border border-[#1b3459] uppercase tracking-wider">
-                      {trackedResult.statusProsesUtama.replace(/_/g, ' ')}
-                    </span>
+                  <span className="font-mono font-bold text-white text-sm">{trackedResult.nomorPermohonan}</span>
+                  <p className="text-[11px] text-slate-400 mt-0.5">{trackedResult.terperiksa.namaLengkap} · {trackedResult.instansiPengaju}</p>
+                </div>
+                <span className="text-[9px] bg-[#071326] text-slate-400 font-bold px-2 py-1 rounded border border-[#1b3459] uppercase tracking-wider shrink-0">
+                  {trackedResult.statusProsesUtama.replace(/_/g, ' ')}
+                </span>
+              </div>
+              <div className="grid grid-cols-3 gap-2 text-center">
+                {[
+                  { label: 'Dokumen', val: `${trackedResult.dokumenList.filter(d => d.statusVerifikasi === 'sesuai').length}/7` },
+                  { label: 'Asesmen', val: trackedResult.asesmenMedis && trackedResult.asesmenHukum ? 'Selesai' : 'Proses' },
+                  { label: 'Rekomendasi', val: trackedResult.rekomendasiResmi ? 'Terbit' : 'Pending' },
+                ].map((s, i) => (
+                  <div key={i} className="bg-[#071326] rounded-lg p-2.5 border border-[#1b3459]/60">
+                    <span className="text-slate-500 block text-[10px] uppercase tracking-wider">{s.label}</span>
+                    <span className="font-bold text-white text-xs font-mono">{s.val}</span>
                   </div>
-                  <p className="text-xs text-slate-300 mt-1">
-                    Terperiksa: <strong className="text-white">{trackedResult.terperiksa.namaLengkap}</strong> · Instansi: <span className="text-slate-400">{trackedResult.instansiPengaju}</span>
-                  </p>
-                </div>
-                <div className="text-left sm:text-right text-xs">
-                  <span className="text-slate-400">Tanggal Pengajuan:</span>
-                  <div className="font-bold text-white font-mono">{trackedResult.tanggalPengajuan}</div>
-                </div>
+                ))}
               </div>
-
-              {/* Progress 3 Indicators */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3 text-xs">
-                <div className="bg-[#0a182f] p-3 sm:p-3.5 rounded-xl border border-[#1b3459]">
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Kepatuhan Formil Legalitas</span>
-                  <span className="font-bold text-white block mt-1 font-mono">
-                    {trackedResult.dokumenList.filter(d => d.statusVerifikasi === 'sesuai').length} / 7 Dokumen Sah
-                  </span>
-                </div>
-                <div className="bg-[#0a182f] p-3 sm:p-3.5 rounded-xl border border-[#1b3459]">
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Asesmen Medis & Hukum</span>
-                  <span className="font-bold text-white block mt-1">
-                    {trackedResult.asesmenMedis && trackedResult.asesmenHukum ? 'Selesai Dilaksanakan' : 'Dalam Proses Telaah'}
-                  </span>
-                </div>
-                <div className="bg-[#0a182f] p-3 sm:p-3.5 rounded-xl border border-[#1b3459]">
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Status Rekomendasi</span>
-                  <span className="font-bold text-white block mt-1">
-                    {trackedResult.rekomendasiResmi ? 'Sah Diterbitkan (QR Siber)' : 'Menunggu Sidang Pleno'}
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex justify-end pt-1">
-                <button
-                  onClick={() => onGoToLogin()}
-                  className="w-full sm:w-auto bg-[#133863] hover:bg-[#1a4a82] text-white text-xs font-bold px-4 py-2.5 rounded-xl flex items-center justify-center space-x-2 transition-all cursor-pointer border border-[#235594]"
-                >
-                  <span>Buka Berkas di Portal Petugas</span>
-                  <ArrowRight className="w-3.5 h-3.5 text-white" />
-                </button>
-              </div>
+              <button onClick={() => onGoToLogin()} className="w-full text-xs font-semibold text-slate-400 hover:text-white py-2.5 flex items-center justify-center space-x-1.5 transition-colors cursor-pointer border border-[#1b3459] rounded-xl hover:border-[#1b3459]">
+                <span>Buka di Portal Petugas</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
             </div>
           )}
 
           {trackedResult === 'not_found' && (
-            <div className="mt-4 p-3.5 sm:p-4 bg-[#0a182f] border border-[#1b3459] rounded-xl text-xs text-slate-300 flex items-start sm:items-center space-x-2.5">
-              <AlertCircle className="w-4 h-4 text-slate-400 shrink-0 mt-0.5 sm:mt-0" />
-              <span>Nomor registrasi doket perkara atau nama tersangka tidak ditemukan dalam basis data e-TAT. Mohon periksa kembali nomor permohonan Anda.</span>
+            <div className="mt-4 p-4 bg-[#071326] border border-[#1b3459]/60 rounded-xl text-[11px] text-slate-500 flex items-center space-x-2">
+              <AlertCircle className="w-4 h-4 text-slate-600 shrink-0" />
+              <span>Nomor atau nama tersangka tidak ditemukan dalam basis data e-TAT.</span>
             </div>
           )}
         </div>
       </section>
 
-      {/* 8 STAGES OF WORKFLOW SOP - Deep Navy Grid */}
-      <section id="alur-layanan" className="py-12 sm:py-16 bg-[#0a182f] border-b border-[#1b3459]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 sm:space-y-10">
-          <div className="text-center max-w-3xl mx-auto space-y-2">
-            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-300 bg-[#0d1f38] px-3 py-1 rounded-md border border-[#1b3459]">
-              STANDAR OPERASIONAL PROSEDUR (SOP)
-            </span>
-            <h2 className="text-xl sm:text-3xl font-bold text-white tracking-tight font-['Cinzel',serif] px-1">
-              8 Tahapan Alur Terpadu Penanganan Perkara e-TAT
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-400 px-2">
-              Siklus akuntabilitas penegakan hukum dari pendaftaran tangkapan 1x24 jam hingga pengawasan pasca asesmen.
-            </p>
+      {/* ALUR SOP */}
+      <section id="alur-layanan" className="py-20 sm:py-24 bg-[#071326] border-b border-[#1b3459]/60">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#D4AF37] block mb-3">Alur Terpadu</span>
+            <h2 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight font-['Cinzel',serif]">8 Tahapan SOP</h2>
+            <p className="text-sm text-slate-400 mt-3 max-w-sm mx-auto">Dari registrasi 1Ã—24 jam hingga kelulusan program pemulihan.</p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
             {[
-              {
-                step: '01',
-                title: 'Registrasi Tangkapan 1x24 Jam',
-                actor: 'Penyidik Satresnarkoba / BNN',
-                desc: 'Maksimal 1x24 jam sejak tersangka diamankan dengan unggah 7 berkas formil persyaratan hukum.',
-                icon: <FileCheck className="w-5 h-5 text-slate-300" />
-              },
-              {
-                step: '02',
-                title: 'Uji Formil Berkas Legalitas',
-                actor: 'Sekretariat TAT',
-                desc: 'Pemeriksaan keabsahan Sprintik, BAP, BA Penangkapan, BA Penggeledahan, dan Surat Permohonan.',
-                icon: <CheckCircle2 className="w-5 h-5 text-slate-300" />
-              },
-              {
-                step: '03',
-                title: 'Disposisi Surat Perintah Asesmen',
-                actor: 'Sekretariat & Koordinator',
-                desc: 'Penetapan Surat Perintah Tugas Asesor Medis, Asesor Hukum, ruang klinis, dan jadwal waktu.',
-                icon: <Calendar className="w-5 h-5 text-slate-300" />
-              },
-              {
-                step: '04',
-                title: 'Pemeriksaan Forensik & Yuridis',
-                actor: 'Tim Asesor Medis & Hukum',
-                desc: 'Wawancara instrumen WHO ASSIST, uji skrining urin laboratorium, serta telaah batas berat SEMA 04/2010.',
-                icon: <Stethoscope className="w-5 h-5 text-slate-300" />
-              },
-              {
-                step: '05',
-                title: 'Sidang Pleno Komparatif',
-                actor: 'Koordinator & Seluruh Asesor',
-                desc: 'Musyawarah pleno menyatukan diagnosis medis dan status hukum peran perkara tersangka.',
-                icon: <Users className="w-5 h-5 text-slate-300" />
-              },
-              {
-                step: '06',
-                title: 'Pengesahan Rekomendasi Terpadu',
-                actor: '3 Pihak: Koordinator, Medis, Hukum',
-                desc: 'Penandatanganan digital resmi dan penerbitan sertifikat QR Code anti-pemalsuan siber.',
-                icon: <FileSignature className="w-5 h-5 text-slate-300" />
-              },
-              {
-                step: '07',
-                title: 'Koordinasi Rujukan & Eksekusi',
-                actor: 'Balai Rehabilitasi & Penyidik',
-                desc: 'Konfirmasi kuota kamar, pengawalan tersangka ke balai rehabilitasi, serta pelimpahan berkas P-21.',
-                icon: <Share2 className="w-5 h-5 text-slate-300" />
-              },
-              {
-                step: '08',
-                title: 'Pengawasan Kepatuhan Pasca TAT',
-                actor: 'Konselor, Penyidik & Bapas',
-                desc: 'Pemantauan wajib lapor mingguan, uji skrining urin acak bebas relapse, sanksi SP, dan SKSP kelulusan.',
-                icon: <Activity className="w-5 h-5 text-slate-300" />
-              }
-            ].map(item => (
-              <div
-                key={item.step}
-                className="bg-[#0d1f38] p-4 sm:p-5 rounded-xl sm:rounded-2xl border border-[#1b3459] space-y-2.5 hover:border-[#2a4d80] transition-all group shadow-md"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#0a182f] border border-[#1b3459] flex items-center justify-center">
+              { step: '01', title: 'Registrasi', actor: 'Penyidik / BNN', icon: <FileCheck className="w-4 h-4" /> },
+              { step: '02', title: 'Verifikasi Berkas', actor: 'Sekretariat TAT', icon: <CheckCircle2 className="w-4 h-4" /> },
+              { step: '03', title: 'Surat Perintah', actor: 'Sek. & Koordinator', icon: <Calendar className="w-4 h-4" /> },
+              { step: '04', title: 'Forensik & Yuridis', actor: 'Tim Medis & Hukum', icon: <Stethoscope className="w-4 h-4" /> },
+              { step: '05', title: 'Sidang Pleno', actor: 'Koordinator & Asesor', icon: <Users className="w-4 h-4" /> },
+              { step: '06', title: 'Pengesahan QR', actor: '3 Pihak Resmi', icon: <FileSignature className="w-4 h-4" /> },
+              { step: '07', title: 'Rujukan & Eksekusi', actor: 'Balai Rehab & Penyidik', icon: <Share2 className="w-4 h-4" /> },
+              { step: '08', title: 'Pengawasan SKSP', actor: 'Konselor & Bapas', icon: <Activity className="w-4 h-4" /> },
+            ].map((item, i) => (
+              <div key={item.step} className={`fade-in-up fade-in-up-delay-${Math.min(i + 1, 8)} group bg-[#0d1f38] border border-[#1b3459]/70 rounded-xl p-4 sm:p-5 hover:border-[#D4AF37]/25 transition-colors duration-300`}>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[#071326] border border-[#1b3459]/60 flex items-center justify-center text-slate-500">
                     {item.icon}
                   </div>
-                  <span className="font-mono font-extrabold text-xs sm:text-sm text-slate-500 group-hover:text-slate-300 transition-colors">{item.step}</span>
+                  <span className="font-mono text-base font-black text-[#1b3459] group-hover:text-[#D4AF37]/40 transition-colors">{item.step}</span>
                 </div>
-                <div>
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wide">{item.actor}</span>
-                  <h3 className="font-bold text-xs sm:text-sm text-white mt-1">{item.title}</h3>
-                  <p className="text-[11px] sm:text-xs text-slate-300 mt-1 leading-relaxed">{item.desc}</p>
-                </div>
+                <h3 className="text-xs sm:text-sm font-bold text-white">{item.title}</h3>
+                <p className="text-[10px] text-slate-600 mt-0.5">{item.actor}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* PENGAWASAN PASCA TAT */}
-      <section id="pengawasan" className="py-12 sm:py-16 bg-[#071326] border-b border-[#1b3459]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-[#0d1f38] rounded-2xl sm:rounded-3xl p-5 sm:p-8 lg:p-12 border border-[#1b3459] shadow-xl">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-center">
-              <div className="lg:col-span-8 space-y-3.5 sm:space-y-4">
-                <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-300 bg-[#0a182f] px-3 py-1 rounded-md border border-[#1b3459]">
-                  PENEGAKAN INTEGRITAS KLIEN (AFTERCARE)
-                </span>
-                <h2 className="text-xl sm:text-3xl font-extrabold text-white tracking-tight font-['Cinzel',serif]">
-                  Mekanisme Pengawasan Kepatuhan & Sanksi Pencabutan Restorative Justice
+      {/* AFTERCARE + REGULASI */}
+      <section id="pengawasan" className="py-20 sm:py-24 bg-[#081225] border-b border-[#1b3459]/60">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 sm:gap-16">
+
+            {/* Aftercare */}
+            <div className="space-y-6">
+              <div>
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#D4AF37] block mb-3">Aftercare &amp; Integritas</span>
+                <h2 className="text-xl sm:text-3xl font-extrabold text-white tracking-tight font-['Cinzel',serif] leading-snug">
+                  Pengawasan Kepatuhan Pasca TAT
                 </h2>
-                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                  Penyelesaian perkara melalui Keadilan Restoratif bukanlah pembebasan tanpa syarat. Tersangka wajib menjalani program rehabilitasi dengan kepatuhan penuh. Sistem e-TAT mencatat buku monitoring wajib lapor berkala, uji urin acak bebas relapse, dan sanksi Surat Peringatan (SP-1, SP-2, SP-3) hingga rekomendasi pelimpahan kembali ke proses peradilan pidana jika melanggar komitmen.
+                <p className="text-xs text-slate-400 mt-3 leading-relaxed">
+                  Rekomendasi TAT bukan pembebasan tanpa syarat. Klien wajib menjalani program rehabilitasi dengan kepatuhan penuh di bawah pengawasan sistem.
                 </p>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 pt-2 text-xs font-semibold">
-                  <div className="bg-[#0a182f] p-2.5 sm:p-3 rounded-xl border border-[#1b3459] text-center">
-                    <span className="text-white font-bold block text-xs sm:text-sm">Wajib Lapor</span>
-                    <span className="text-[10px] sm:text-[11px] text-slate-400 font-normal">Mingguan / Berkala</span>
-                  </div>
-                  <div className="bg-[#0a182f] p-2.5 sm:p-3 rounded-xl border border-[#1b3459] text-center">
-                    <span className="text-white font-bold block text-xs sm:text-sm">Uji Toksikologi</span>
-                    <span className="text-[10px] sm:text-[11px] text-slate-400 font-normal">Acak Bebas Relapse</span>
-                  </div>
-                  <div className="bg-[#0a182f] p-2.5 sm:p-3 rounded-xl border border-[#1b3459] text-center">
-                    <span className="text-white font-bold block text-xs sm:text-sm">Sanksi SP-1/3</span>
-                    <span className="text-[10px] sm:text-[11px] text-slate-400 font-normal">Pencabutan Hak RJ</span>
-                  </div>
-                  <div className="bg-[#0a182f] p-2.5 sm:p-3 rounded-xl border border-[#1b3459] text-center">
-                    <span className="text-white font-bold block text-xs sm:text-sm">Sertifikat SKSP</span>
-                    <span className="text-[10px] sm:text-[11px] text-slate-400 font-normal">Kelulusan Resmi</span>
-                  </div>
-                </div>
               </div>
-
-              <div className="lg:col-span-4 flex flex-col justify-center space-y-3">
-                <button
-                  onClick={() => onGoToLogin()}
-                  className="w-full bg-[#133863] hover:bg-[#1a4a82] text-white font-bold text-xs sm:text-sm py-3 sm:py-3.5 px-6 rounded-xl flex items-center justify-center space-x-2 transition-all cursor-pointer border border-[#235594]"
-                >
-                  <LogIn className="w-4 h-4 text-white" />
-                  <span>Buka Buku Pengawasan</span>
-                </button>
+              <div className="grid grid-cols-2 gap-2.5">
+                {[
+                  { label: 'Wajib Lapor', val: 'Mingguan' },
+                  { label: 'Uji Toksikologi', val: 'Acak / Berkala' },
+                  { label: 'Sanksi', val: 'SP-1 · SP-2 · SP-3' },
+                  { label: 'Kelulusan', val: 'Sertifikat SKSP' },
+                ].map((item, i) => (
+                  <div key={i} className="bg-[#071326] border border-[#1b3459]/60 rounded-xl p-3 sm:p-4">
+                    <span className="text-[10px] text-slate-500 uppercase tracking-wider block">{item.label}</span>
+                    <span className="text-sm font-bold text-white mt-0.5 block">{item.val}</span>
+                  </div>
+                ))}
               </div>
+              <button
+                onClick={() => onGoToLogin()}
+                className="inline-flex items-center space-x-2 text-xs font-semibold text-[#D4AF37] hover:text-white transition-colors cursor-pointer group"
+              >
+                <LogIn className="w-3.5 h-3.5" />
+                <span>Masuk Portal Petugas</span>
+                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+              </button>
             </div>
-          </div>
-        </div>
-      </section>
 
-      {/* DASAR REGULASI RESMI */}
-      <section id="dasar-hukum" className="py-12 sm:py-16 bg-[#0a182f] border-b border-[#1b3459]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 sm:space-y-8">
-          <div className="text-center max-w-2xl mx-auto space-y-2">
-            <h2 className="text-lg sm:text-2xl font-bold text-white flex items-center justify-center space-x-2 font-['Cinzel',serif] px-2">
-              <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 text-slate-400 shrink-0" />
-              <span>Landasan Hukum Operasional Perkara</span>
-            </h2>
-            <p className="text-xs text-slate-400 px-2">
-              Dasar yuridis formal yang mengikat seluruh instansi dalam Tim Asesmen Terpadu Republik Indonesia.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 text-xs">
-            <div className="bg-[#0d1f38] p-3.5 sm:p-4 rounded-xl border border-[#1b3459] space-y-1">
-              <span className="font-bold text-white block text-xs sm:text-sm">UU No. 35 Tahun 2009</span>
-              <p className="text-slate-300 text-[11px] leading-relaxed">Pasal 54 & 103: Mandat rehabilitasi medis & sosial bagi pecandu dan korban penyalahgunaan narkotika.</p>
-            </div>
-            <div className="bg-[#0d1f38] p-3.5 sm:p-4 rounded-xl border border-[#1b3459] space-y-1">
-              <span className="font-bold text-white block text-xs sm:text-sm">SEMA No. 04 Tahun 2010</span>
-              <p className="text-slate-300 text-[11px] leading-relaxed">Pedoman batasan berat barang bukti untuk pemakaian 1 hari (sabu maksimal 1 gram).</p>
-            </div>
-            <div className="bg-[#0d1f38] p-3.5 sm:p-4 rounded-xl border border-[#1b3459] space-y-1">
-              <span className="font-bold text-white block text-xs sm:text-sm">Perpol No. 08 Tahun 2021</span>
-              <p className="text-slate-300 text-[11px] leading-relaxed">Penerapan Keadilan Restoratif (Restorative Justice) dalam penanganan tindak pidana di lingkungan Polri.</p>
-            </div>
-            <div className="bg-[#0d1f38] p-3.5 sm:p-4 rounded-xl border border-[#1b3459] space-y-1">
-              <span className="font-bold text-white block text-xs sm:text-sm">Perja No. 15 Tahun 2020</span>
-              <p className="text-slate-300 text-[11px] leading-relaxed">Penghentian penuntutan perkara pidana berdasarkan keadilan restoratif pada Kejaksaan RI.</p>
+            {/* Regulasi */}
+            <div id="dasar-hukum" className="space-y-6">
+              <div>
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#D4AF37] block mb-3">Landasan Hukum</span>
+                <h2 className="text-xl sm:text-3xl font-extrabold text-white tracking-tight font-['Cinzel',serif] leading-snug">
+                  Dasar Regulasi Operasional
+                </h2>
+                <p className="text-xs text-slate-400 mt-3 leading-relaxed">
+                  Dasar yuridis yang mengikat seluruh instansi dalam Tim Asesmen Terpadu RI.
+                </p>
+              </div>
+              <div className="space-y-2.5">
+                {[
+                  { ref: 'UU No. 35/2009', desc: 'Mandat rehabilitasi medis &amp; sosial bagi pecandu dan korban penyalahgunaan narkotika.' },
+                  { ref: 'SEMA No. 04/2010', desc: 'Batasan berat barang bukti pemakaian 1 hari â€” sabu maksimal 1 gram.' },
+                  { ref: 'Perpol No. 08/2021', desc: 'Penerapan Keadilan Restoratif dalam penanganan tindak pidana di lingkungan Polri.' },
+                  { ref: 'Perja No. 15/2020', desc: 'Penghentian penuntutan berdasarkan keadilan restoratif pada Kejaksaan RI.' },
+                ].map((reg, i) => (
+                  <div key={i} className="flex items-start gap-3 bg-[#071326] border border-[#1b3459]/60 rounded-xl p-3.5 sm:p-4">
+                    <BookOpen className="w-3.5 h-3.5 text-slate-600 shrink-0 mt-0.5" />
+                    <div>
+                      <span className="text-xs font-bold text-white block">{reg.ref}</span>
+                      <p className="text-[11px] text-slate-500 mt-0.5 leading-relaxed">{reg.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* FOOTER */}
-      <footer className="bg-[#050e1c] text-slate-400 text-xs py-8 sm:py-10 border-t border-[#12233c]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-5 sm:gap-6 text-center sm:text-left">
+      <footer className="bg-[#050e1c] border-t border-[#12233c]">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
           <div className="flex items-center space-x-3">
-            <PoliceEmblem size="md" />
+            <PoliceEmblem size="sm" />
             <div>
-              <span className="font-bold text-white block text-xs sm:text-sm font-['Cinzel',serif]">
-                E-TAT PRESISI · INISIATIF SEKORNA
-              </span>
-              <span className="text-[10px] sm:text-[11px] text-slate-400">
-                SElamatkan KORban NArkotika · Sentra Terpadu Polri & BNN
-              </span>
+              <span className="font-bold text-white text-xs font-['Cinzel',serif] block">E-TAT SIAP PULIH · BNNP KALIMANTAN TIMUR</span>
+              <span className="text-[10px] text-slate-500 block mt-0.5">BNNP Kaltim · Ditresnarkoba Polda Kaltim · Kejati Kaltim</span>
             </div>
           </div>
-
-          <div className="sm:text-right text-[10px] sm:text-[11px] space-y-0.5">
-            <p className="text-slate-300">© {new Date().getFullYear()} Kepolisian Negara Republik Indonesia & Badan Narkotika Nasional.</p>
-            <p className="text-slate-500">Rastra Sewakotama · Abdi Utama daripada Nusa dan Bangsa</p>
+          <div className="text-[10px] sm:text-right space-y-0.5">
+            <p className="text-slate-500">&copy; {new Date().getFullYear()} Badan Narkotika Nasional Provinsi Kalimantan Timur.</p>
+            <p className="text-[#D4AF37] font-semibold font-mono">WAR ON DRUGS · BERSINAR KALTIM</p>
           </div>
         </div>
       </footer>

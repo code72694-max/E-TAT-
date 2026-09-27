@@ -814,14 +814,50 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
         )}
 
         {/* TAB 2: ADMINISTRASI & VERIFIKASI BERKAS */}
-        {activeTab === 'administrasi' && (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-[#1b3459]">
-              <h3 className="text-sm font-bold text-white">Kelengkapan Berkas Persyaratan</h3>
-              <span className="text-xs text-slate-400">Role: <strong className="text-[#38bdf8] capitalize">{currentUser.role}</strong></span>
-            </div>
+        {activeTab === 'administrasi' && (() => {
+          const validDocsCount = permohonan.dokumenList.filter(d => d.statusVerifikasi === 'sesuai').length;
+          const invalidDocsCount = permohonan.dokumenList.filter(d => d.statusVerifikasi === 'perlu_perbaikan').length;
+          const totalDocsCount = permohonan.dokumenList.length;
+          const percentComplete = totalDocsCount > 0 ? Math.round((validDocsCount / totalDocsCount) * 100) : 0;
 
-            <div className="space-y-3">
+          return (
+            <div className="space-y-4">
+              {/* Completeness Summary Banner */}
+              <div className="bg-[#081224] border border-[#1b3459] rounded-xl p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div className="space-y-1">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-xs font-bold text-white uppercase font-['Cinzel',serif]">Status Kelengkapan Berkas Formil</span>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#0b172a] border border-[#1b3459] text-slate-300">
+                      SOP BAB 09
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-400">
+                    {validDocsCount} dari {totalDocsCount} berkas formil persyaratan dinyatakan valid oleh Sekretariat TAT BNNP Kaltim.
+                  </p>
+                </div>
+
+                <div className="flex items-center space-x-4">
+                  <div className="text-right">
+                    <span className="font-mono text-xl font-extrabold text-emerald-400 block">{percentComplete}%</span>
+                    <span className="text-[10px] text-slate-400">
+                      {validDocsCount} Sesuai &bull; {invalidDocsCount} Koreksi
+                    </span>
+                  </div>
+                  <div className="w-28 bg-[#0b172a] h-2.5 rounded-full overflow-hidden border border-[#1b3459]">
+                    <div
+                      className={`h-full transition-all duration-300 ${percentComplete === 100 ? 'bg-emerald-400' : percentComplete >= 50 ? 'bg-amber-400' : 'bg-rose-400'}`}
+                      style={{ width: `${percentComplete}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between pb-3 border-b border-[#1b3459]">
+                <h3 className="text-sm font-bold text-white">Daftar Dokumen Persyaratan Resmi</h3>
+                <span className="text-xs text-slate-400">Role Anda: <strong className="text-[#38bdf8] capitalize">{currentUser.role}</strong></span>
+              </div>
+
+              <div className="space-y-3">
               {permohonan.dokumenList.map((doc, idx) => (
                 <div
                   key={doc.id}
@@ -921,7 +957,8 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
               ))}
             </div>
           </div>
-        )}
+        );
+      })()}
 
         {/* TAB 3: PENUGASAN & JADWAL */}
         {activeTab === 'jadwal' && (
@@ -1284,10 +1321,10 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
                       TIM ASESMEN TERPADU (TAT) KORBAN PENYALAHGUNAAN NARKOTIKA
                     </p>
                     <p className="text-sm font-extrabold uppercase text-white">
-                      PROVINSI JAWA BARAT
+                      PROVINSI KALIMANTAN TIMUR
                     </p>
                     <p className="text-[10px] text-slate-400">
-                      Sekretariat: Kantor BNNP Jawa Barat, Jl. H. Hasan No. 1, Bandung
+                      Sekretariat: Kantor BNNP Kalimantan Timur, Jl. Rapak Indah No. 17, Karang Asam Ilir, Samarinda
                     </p>
                   </div>
 

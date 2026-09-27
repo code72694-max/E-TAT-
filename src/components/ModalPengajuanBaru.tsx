@@ -46,7 +46,7 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
   const [namaLengkap, setNamaLengkap] = useState('');
   const [alias, setAlias] = useState('');
   const [nik, setNik] = useState('');
-  const [tempatLahir, setTempatLahir] = useState('Bandung');
+  const [tempatLahir, setTempatLahir] = useState('Samarinda');
   const [tanggalLahir, setTanggalLahir] = useState('2001-05-14');
   const [usia, setUsia] = useState(25);
   const [jenisKelamin, setJenisKelamin] = useState<'Laki-laki' | 'Perempuan'>('Laki-laki');
@@ -57,13 +57,13 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
   const [statusKhusus, setStatusKhusus] = useState<'dewasa' | 'anak_berhadapan_hukum' | 'perlu_penerjemah'>('dewasa');
 
   // Form State: Step 2 (Perkara & Barang Bukti)
-  const [nomorLp, setNomorLp] = useState('LP/A/142/IX/2026/SPKT/POLRESTABES BDG');
+  const [nomorLp, setNomorLp] = useState('LP/A/142/IX/2026/SPKT/POLRESTA SMD');
   const [tanggalLp, setTanggalLp] = useState('2026-09-07');
   const [namaPenyidik, setNamaPenyidik] = useState(currentUser.name);
   const [nomorHpPenyidik, setNomorHpPenyidik] = useState('0812-3456-7890');
   const [pasal, setPasal] = useState('Pasal 127 ayat (1) huruf a UU No. 35 Tahun 2009');
-  const [tkp, setTkp] = useState('Jl. Merdeka No. 45, Bandung');
-  const [kronologi, setKronologi] = useState('Terperiksa diamankan saat menggunakan narkotika di kamar indekos.');
+  const [tkp, setTkp] = useState('Jl. Pahlawan No. 45, Samarinda');
+  const [kronologi, setKronologi] = useState('Terperiksa diamankan saat menggunakan narkotika di tempat tinggalnya.');
   
   // Barang bukti list
   const [barangBuktiList, setBarangBuktiList] = useState([
@@ -80,13 +80,17 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
   if (!isOpen) return null;
 
   const handleAddBb = () => {
-    if (!newBerat) return;
+    const beratVal = parseFloat(newBerat);
+    if (!newBerat || isNaN(beratVal) || beratVal <= 0) {
+      alert('Berat barang bukti harus berupa angka positif lebih dari 0 gram.');
+      return;
+    }
     setBarangBuktiList([
       ...barangBuktiList,
       {
         id: 'bb-' + Date.now(),
         jenisZat: newJenisZat,
-        beratBersihGram: parseFloat(newBerat),
+        beratBersihGram: beratVal,
         statusUjiLab: 'proses_lab',
         nomorSuratLab: '',
         keterangan: 'Menunggu hasil uji konfirmasi lab'
@@ -155,8 +159,8 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
         usia: Number(usia) || 24,
         jenisKelamin,
         pekerjaan,
-        alamatKtp: alamatKtp || 'Jl. Gatot Subroto No. 12, Bandung',
-        alamatDomisili: alamatKtp || 'Jl. Gatot Subroto No. 12, Bandung',
+        alamatKtp: alamatKtp || 'Jl. Rapak Indah No. 12, Samarinda',
+        alamatDomisili: alamatKtp || 'Jl. Rapak Indah No. 12, Samarinda',
         statusIdentitasKhusus: statusKhusus,
         namaWaliPendamping: namaWali || 'Orang Tua / Kuasa Hukum',
         kontakWali: kontakWali || '0813-9876-5432'

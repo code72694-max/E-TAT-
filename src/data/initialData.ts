@@ -6,7 +6,7 @@ export const MOCK_USERS: UserProfile[] = [
     name: 'Petugas Sekretariat Test-1',
     nip: '198403152006041002',
     role: 'sekretariat',
-    agency: 'Sekretariat TAT - BNN Kota Bandung',
+    agency: 'Sekretariat TAT - BNN Kota Samarinda',
     email: 'sekretariat.test1@bnn.go.id',
     phone: '0812-3456-7890'
   },
@@ -15,7 +15,7 @@ export const MOCK_USERS: UserProfile[] = [
     name: 'Penyidik Pengaju Test-1',
     nip: '198907122010121003',
     role: 'pengaju',
-    agency: 'Sat Resnarkoba Polresta Bandung',
+    agency: 'Sat Resnarkoba Polresta Samarinda',
     email: 'penyidik.test1@polri.go.id',
     phone: '0813-8899-1122'
   },
@@ -24,7 +24,7 @@ export const MOCK_USERS: UserProfile[] = [
     name: 'Dokter Asesor Medis Test-1',
     nip: '197908222005012004',
     role: 'medis',
-    agency: 'Tim Medis TAT / RSUD Kota Bandung',
+    agency: 'Tim Medis TAT / RSUD Kota Samarinda',
     email: 'dokter.test1@dinkes.go.id',
     phone: '0811-2233-4455'
   },
@@ -33,7 +33,7 @@ export const MOCK_USERS: UserProfile[] = [
     name: 'Asesor Hukum Test-1',
     nip: '198211052008011005',
     role: 'hukum',
-    agency: 'Tim Hukum TAT / Kejaksaan Negeri Bandung',
+    agency: 'Tim Hukum TAT / Kejaksaan Negeri Samarinda',
     email: 'hukum.test1@kejaksaan.go.id',
     phone: '0815-7766-5544'
   },
@@ -42,7 +42,7 @@ export const MOCK_USERS: UserProfile[] = [
     name: 'Koordinator TAT Test-1',
     nip: '197705142001121001',
     role: 'koordinator',
-    agency: 'Ketua Tim Asesmen Terpadu - BNNP Jabar',
+    agency: 'Ketua Tim Asesmen Terpadu - BNNP Kaltim',
     email: 'koordinator.test1@bnn.go.id',
     phone: '0811-9988-7766'
   },
@@ -51,7 +51,7 @@ export const MOCK_USERS: UserProfile[] = [
     name: 'Pimpinan Pengawas Test-1',
     nip: '196904121992031001',
     role: 'pimpinan',
-    agency: 'Kepala BNN Provinsi Jawa Barat',
+    agency: 'Kepala BNN Provinsi Kalimantan Timur',
     email: 'pimpinan.test1@bnn.go.id',
     phone: '0811-1234-5678'
   },
@@ -60,7 +60,7 @@ export const MOCK_USERS: UserProfile[] = [
     name: 'Petugas Fasilitas Rehab Test-1',
     nip: '198606182009122003',
     role: 'rehabilitasi',
-    agency: 'Balai Besar Rehabilitasi BNN Lido Bogor',
+    agency: 'Balai Besar Rehabilitasi BNN Tanah Merah Bogor',
     email: 'rehab.test1@lido.bnn.go.id',
     phone: '0813-4455-6677'
   },
@@ -91,7 +91,7 @@ export const STANDARD_DOCUMENTS: Omit<DokumenPersyaratan, 'id' | 'fileUrl' | 'fi
 export const REHAB_FACILITIES = [
   {
     id: 'fac-1',
-    nama: 'Balai Besar Rehabilitasi BNN Lido Bogor',
+    nama: 'Balai Besar Rehabilitasi BNN Tanah Merah Bogor',
     tipe: 'Rawat Inap Pemerintah (BNN)',
     alamat: 'Jl. Mayjen HR Edi Sukma Km 21, Watesjaya, Cigombong, Bogor',
     kapasitasTotal: 300,
@@ -111,9 +111,9 @@ export const REHAB_FACILITIES = [
   },
   {
     id: 'fac-3',
-    nama: 'Klinik Pratama BNN Kota Bandung (IPWL)',
+    nama: 'Klinik Pratama BNN Kota Samarinda (IPWL)',
     tipe: 'Rawat Jalan Pemerintah',
-    alamat: 'Jl. Ciungwanara No. 10, Tamansari, Bandung',
+    alamat: 'Jl. Ciungwanara No. 10, Tamansari, Samarinda',
     kapasitasTotal: 80,
     kapasitasTersedia: 28,
     kontak: '(022) 2503201 / 0813-2211-0099',
@@ -147,7 +147,7 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
     statusTindakLanjut: 'belum_dikonfirmasi',
     pengajuId: 'user-pengaju',
     pengajuNama: 'Penyidik Pengaju Test-1',
-    instansiPengaju: 'Sat Resnarkoba Polresta Bandung',
+    instansiPengaju: 'Sat Resnarkoba Polresta Samarinda',
     penanggungJawabBerikutnya: 'Penyidik Pengaju Test-1 (Sat Resnarkoba)',
     tindakanBerikutnyaLabel: 'Menunggu perbaikan dokumen KTP & Penimbangan BB oleh Pengaju',
     terperiksa: {
@@ -157,13 +157,13 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
       nik: '3273151804980003',
       isNikVerified: false,
       statusIdentitasKhusus: 'normal',
-      tempatLahir: 'Bandung',
+      tempatLahir: 'Samarinda',
       tanggalLahir: '1998-04-18',
       usia: 28,
       jenisKelamin: 'Laki-laki',
       pekerjaan: 'Karyawan Swasta (Ekspedisi)',
-      alamatKtp: 'Jl. Kiaracondong No. 142 RT 03/05, Kebon Kangkung, Bandung',
-      alamatDomisili: 'Jl. Kiaracondong No. 142, Bandung',
+      alamatKtp: 'Jl. Kiaracondong No. 142 RT 03/05, Kebon Kangkung, Samarinda',
+      alamatDomisili: 'Jl. Kiaracondong No. 142, Samarinda',
       namaWaliPendamping: 'Wali Terperiksa Test-1 (Keluarga)',
       kontakWali: '0812-2211-3344'
     },
@@ -171,11 +171,11 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
       id: 'perk-089',
       nomorLaporanPolisi: 'LP/A/142/IX/2026/SPKT.SATRESNARKOBA/POLRESTA BANDUNG',
       tanggalLp: '2026-09-06',
-      instansiPenyidik: 'Sat Resnarkoba Polresta Bandung',
+      instansiPenyidik: 'Sat Resnarkoba Polresta Samarinda',
       namaPenyidik: 'Penyidik Pengaju Test-1',
       nomorHpPenyidik: '0813-8899-1122',
       pasalDipersangkakan: 'Pasal 127 ayat (1) huruf a dan/atau Pasal 112 ayat (1) UU No. 35 Tahun 2009',
-      tempatKejadianPerkara: 'Kamar Kos No. 04, Jl. Babakan Sari, Kiaracondong, Kota Bandung',
+      tempatKejadianPerkara: 'Kamar Kos No. 04, Jl. Babakan Sari, Kiaracondong, Kota Samarinda',
       tanggalWaktuPenangkapan: '2026-09-06 21:30 WIB',
       kronologiSingkat: 'Terperiksa diamankan saat berada di dalam kamar kos. Saat penggeledahan ditemukan 1 bungkus plastik klip kecil berisi kristal putih diduga sabu yang disimpan di dalam saku celana.',
       barangBuktiList: [
@@ -302,7 +302,7 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
     statusTindakLanjut: 'belum_dikonfirmasi',
     pengajuId: 'user-pengaju',
     pengajuNama: 'Penyidik Pengaju Test-1',
-    instansiPengaju: 'Sat Resnarkoba Polresta Bandung',
+    instansiPengaju: 'Sat Resnarkoba Polresta Samarinda',
     penanggungJawabBerikutnya: 'Tim Asesor Hukum (Asesor Hukum Test-1)',
     tindakanBerikutnyaLabel: 'Menunggu hasil uji konfirmasi lab BNN & BAP saksi konfrontir',
     terperiksa: {
@@ -317,7 +317,7 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
       usia: 30,
       jenisKelamin: 'Laki-laki',
       pekerjaan: 'Freelance Desain Grafis',
-      alamatKtp: 'Komplek Permata Biru Blok C3 No. 12, Cileunyi, Kab. Bandung',
+      alamatKtp: 'Komplek Permata Biru Blok C3 No. 12, Cileunyi, Kab. Samarinda',
       alamatDomisili: 'Komplek Permata Biru Blok C3 No. 12, Cileunyi',
       namaWaliPendamping: 'Wali Terperiksa Test-2 (Keluarga)',
       kontakWali: '0813-7722-1100'
@@ -326,11 +326,11 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
       id: 'perk-085',
       nomorLaporanPolisi: 'LP/A/138/IX/2026/SPKT.SATRESNARKOBA/POLRESTA BANDUNG',
       tanggalLp: '2026-09-03',
-      instansiPenyidik: 'Sat Resnarkoba Polresta Bandung',
+      instansiPenyidik: 'Sat Resnarkoba Polresta Samarinda',
       namaPenyidik: 'Penyidik Pembantu Test-2',
       nomorHpPenyidik: '0812-3344-5566',
       pasalDipersangkakan: 'Pasal 127 ayat (1) huruf a UU No. 35 Tahun 2009',
-      tempatKejadianPerkara: 'Sebuah kafe di Jl. Riau (RE Martadinata), Cihapit, Bandung',
+      tempatKejadianPerkara: 'Sebuah kafe di Jl. Riau (RE Martadinata), Cihapit, Samarinda',
       tanggalWaktuPenangkapan: '2026-09-03 23:15 WIB',
       kronologiSingkat: 'Terperiksa ditangkap saat nongkrong bersama teman-temannya. Dilakukan penggeledahan tas ditemukan 1 klip kecil sabu sisa pakai 0.22 gram.',
       barangBuktiList: [
@@ -353,7 +353,7 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
       jadwalPemeriksaanMedis: '2026-09-05 09:30 WIB',
       jadwalPemeriksaanHukum: '2026-09-06 13:30 WIB',
       jadwalPleno: '2026-09-09 10:00 WIB (Tentatif)',
-      lokasiPemeriksaan: 'Ruang TAT BNN Kota Bandung'
+      lokasiPemeriksaan: 'Ruang TAT BNN Kota Samarinda'
     },
     dokumenList: [
       {
@@ -509,7 +509,7 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
     statusTindakLanjut: 'belum_dikonfirmasi',
     pengajuId: 'user-pengaju',
     pengajuNama: 'Penyidik Pengaju Test-1',
-    instansiPengaju: 'Sat Resnarkoba Polresta Bandung',
+    instansiPengaju: 'Sat Resnarkoba Polresta Samarinda',
     penanggungJawabBerikutnya: 'Ketua / Koordinator TAT (Koordinator TAT Test-1)',
     tindakanBerikutnyaLabel: 'Menunggu pelaksanaan Sidang Pleno TAT terjadwal hari ini',
     terperiksa: {
@@ -519,13 +519,13 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
       nik: '3273010502010008',
       isNikVerified: true,
       statusIdentitasKhusus: 'normal',
-      tempatLahir: 'Bandung',
+      tempatLahir: 'Samarinda',
       tanggalLahir: '2001-02-05',
       usia: 25,
       jenisKelamin: 'Laki-laki',
       pekerjaan: 'Mahasiswa Tingkat Akhir',
-      alamatKtp: 'Jl. Tubagus Ismail VII No. 45, Sekeloa, Coblong, Bandung',
-      alamatDomisili: 'Jl. Tubagus Ismail VII No. 45, Bandung',
+      alamatKtp: 'Jl. Tubagus Ismail VII No. 45, Sekeloa, Coblong, Samarinda',
+      alamatDomisili: 'Jl. Tubagus Ismail VII No. 45, Samarinda',
       namaWaliPendamping: 'Wali Terperiksa Test-3 (Keluarga)',
       kontakWali: '0811-2299-8800'
     },
@@ -533,11 +533,11 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
       id: 'perk-082',
       nomorLaporanPolisi: 'LP/A/135/IX/2026/SPKT.SATRESNARKOBA/POLRESTA BANDUNG',
       tanggalLp: '2026-09-01',
-      instansiPenyidik: 'Sat Resnarkoba Polresta Bandung',
+      instansiPenyidik: 'Sat Resnarkoba Polresta Samarinda',
       namaPenyidik: 'Penyidik Pembantu Test-3',
       nomorHpPenyidik: '0812-7788-9900',
       pasalDipersangkakan: 'Pasal 127 ayat (1) huruf a UU No. 35 Tahun 2009',
-      tempatKejadianPerkara: 'Sebuah apartemen di Cihampelas, Bandung',
+      tempatKejadianPerkara: 'Sebuah apartemen di Cihampelas, Samarinda',
       tanggalWaktuPenangkapan: '2026-09-01 19:45 WIB',
       kronologiSingkat: 'Terperiksa diamankan bersama barang bukti daun ganja kering seberat 2.15 gram bersih yang disimpan dalam toples kaca kecil di meja belajar.',
       barangBuktiList: [
@@ -560,7 +560,7 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
       jadwalPemeriksaanMedis: '2026-09-03 10:00 WIB',
       jadwalPemeriksaanHukum: '2026-09-04 14:00 WIB',
       jadwalPleno: '2026-09-08 13:30 WIB',
-      lokasiPemeriksaan: 'Ruang Rapat Tim Asesmen Terpadu BNNP Jawa Barat'
+      lokasiPemeriksaan: 'Ruang Rapat Tim Asesmen Terpadu BNNP Kalimantan Timur'
     },
     dokumenList: [
       {
@@ -629,7 +629,7 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
       interpretasiKlinis: 'Ketergantungan psikologis kronis terhadap ganja, mengganggu penyelesaian skripsi dan fungsi sosial harian.',
       kebutuhanRawat: 'Rawat Inap',
       durasiUsulanBulan: 3,
-      catatanKhusus: 'Diusulkan rehabilitasi medis & psikososial rawat inap di Balai Besar Lido atau RSKO untuk pemulihan intensif.',
+      catatanKhusus: 'Diusulkan rehabilitasi medis & psikososial rawat inap di Balai Besar Tanah Merah atau RSKO untuk pemulihan intensif.',
       terakhirDiperbarui: '2026-09-03 15:45'
     },
     asesmenHukum: {
@@ -660,21 +660,21 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
       id: 'pln-082',
       tanggalPleno: '2026-09-08',
       waktu: '13:30 - 15:00 WIB',
-      tempat: 'Ruang Sidang Pleno TAT Lantai 2, Gedung BNNP Jawa Barat',
-      nomorBeritaAcara: 'BA-PLENO/082/IX/2026/TAT-JABAR',
+      tempat: 'Ruang Sidang Pleno TAT Lantai 2, Gedung BNNP Kalimantan Timur',
+      nomorBeritaAcara: 'BA-PLENO/082/IX/2026/TAT-KALTIM',
       pimpinanPleno: 'Koordinator TAT Test-1',
       daftarHadir: [
-        { nama: 'Koordinator TAT Test-1', peran: 'Ketua / Koordinator', instansi: 'BNNP Jabar', hadir: true },
-        { nama: 'Dokter Asesor Medis Test-1', peran: 'Tim Asesor Medis', instansi: 'RSUD Bandung', hadir: true },
-        { nama: 'Asesor Hukum Test-1', peran: 'Tim Asesor Hukum', instansi: 'Kejari Bandung', hadir: true },
-        { nama: 'Penyidik Pengaju Test-1', peran: 'Penyidik Pengaju', instansi: 'Sat Resnarkoba Polresta Bandung', hadir: true }
+        { nama: 'Koordinator TAT Test-1', peran: 'Ketua / Koordinator', instansi: 'BNNP Kaltim', hadir: true },
+        { nama: 'Dokter Asesor Medis Test-1', peran: 'Tim Asesor Medis', instansi: 'RSUD Samarinda', hadir: true },
+        { nama: 'Asesor Hukum Test-1', peran: 'Tim Asesor Hukum', instansi: 'Kejari Samarinda', hadir: true },
+        { nama: 'Penyidik Pengaju Test-1', peran: 'Penyidik Pengaju', instansi: 'Sat Resnarkoba Polresta Samarinda', hadir: true }
       ],
-      pokokBahasan: 'Pembahasan sinkronisasi rekomendasi medis (Rawat Inap 3 bulan di Balai Lido) dan aspek hukum penyalahguna murni ganja 2.15 gram.',
+      pokokBahasan: 'Pembahasan sinkronisasi rekomendasi medis (Rawat Inap 3 bulan di Balai Tanah Merah) dan aspek hukum penyalahguna murni ganja 2.15 gram.',
       catatanPerbedaanPendapat: 'Tidak ada dissenting opinion. Seluruh tim sepakat atas indikasi ketergantungan ganja berat dan status penyalahguna murni.',
       kesepakatanRekomendasi: 'Disepakati pemberian rekomendasi Rehabilitasi Medis dan Sosial Rawat Inap selama 3 (tiga) bulan di fasilitas rehabilitasi pemerintah.',
       jenisRekomendasiFinal: 'Rehabilitasi Rawat Inap',
       durasiRehabBulan: 3,
-      fasilitasRujukanUsulan: 'Balai Besar Rehabilitasi BNN Lido Bogor / RSKO Cibubur',
+      fasilitasRujukanUsulan: 'Balai Besar Rehabilitasi BNN Tanah Merah Bogor / RSKO Cibubur',
       statusPleno: 'terjadwal'
     },
     klarifikasiList: [],
@@ -705,7 +705,7 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
     statusTindakLanjut: 'sedang_dikoordinasikan',
     pengajuId: 'user-pengaju',
     pengajuNama: 'Penyidik Pengaju Test-1',
-    instansiPengaju: 'Sat Resnarkoba Polresta Bandung',
+    instansiPengaju: 'Sat Resnarkoba Polresta Samarinda',
     penanggungJawabBerikutnya: 'Ketua Tim TAT (Koordinator TAT Test-1)',
     tindakanBerikutnyaLabel: 'Menunggu tanda tangan digital pengesahan akhir oleh Ketua Tim TAT',
     terperiksa: {
@@ -720,8 +720,8 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
       usia: 29,
       jenisKelamin: 'Perempuan',
       pekerjaan: 'Manajer Pemasaran',
-      alamatKtp: 'Jl. Dago Asri I No. 18, Coblong, Bandung',
-      alamatDomisili: 'Apartemen Grand Asia Afrika Tower B, Bandung',
+      alamatKtp: 'Jl. Dago Asri I No. 18, Coblong, Samarinda',
+      alamatDomisili: 'Apartemen Grand Asia Afrika Tower B, Samarinda',
       namaWaliPendamping: 'Wali Terperiksa Test-4 (Keluarga)',
       kontakWali: '0812-3344-5511'
     },
@@ -729,11 +729,11 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
       id: 'perk-079',
       nomorLaporanPolisi: 'LP/A/128/VIII/2026/SPKT.SATRESNARKOBA/POLRESTA BANDUNG',
       tanggalLp: '2026-08-27',
-      instansiPenyidik: 'Sat Resnarkoba Polresta Bandung',
+      instansiPenyidik: 'Sat Resnarkoba Polresta Samarinda',
       namaPenyidik: 'Penyidik Pembantu Test-2',
       nomorHpPenyidik: '0812-3344-5566',
       pasalDipersangkakan: 'Pasal 127 ayat (1) huruf a UU No. 35 Tahun 2009',
-      tempatKejadianPerkara: 'Kamar Apartemen Grand Asia Afrika, Jl. Karapitan, Bandung',
+      tempatKejadianPerkara: 'Kamar Apartemen Grand Asia Afrika, Jl. Karapitan, Samarinda',
       tanggalWaktuPenangkapan: '2026-08-27 22:00 WIB',
       kronologiSingkat: 'Ditemukan 2 butir pil ekstasi (MDMA) dengan berat bersih 0.54 gram dan sisa sabu 0.15 gram di laci meja rias.',
       barangBuktiList: [
@@ -753,7 +753,7 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
       asesorMedisNama: 'Dokter Asesor Medis Test-1',
       asesorHukumNama: 'Asesor Hukum Test-1',
       jadwalPleno: '2026-09-04 10:00 WIB',
-      lokasiPemeriksaan: 'Ruang Pleno BNNP Jabar'
+      lokasiPemeriksaan: 'Ruang Pleno BNNP Kaltim'
     },
     dokumenList: [
       {
@@ -837,14 +837,14 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
       id: 'pln-079',
       tanggalPleno: '2026-09-04',
       waktu: '10:00 - 11:45 WIB',
-      tempat: 'Ruang Sidang Pleno BNNP Jawa Barat',
-      nomorBeritaAcara: 'BA-PLENO/079/IX/2026/TAT-JABAR',
+      tempat: 'Ruang Sidang Pleno BNNP Kalimantan Timur',
+      nomorBeritaAcara: 'BA-PLENO/079/IX/2026/TAT-KALTIM',
       pimpinanPleno: 'Koordinator TAT Test-1',
       daftarHadir: [
-        { nama: 'Koordinator TAT Test-1', peran: 'Ketua / Koordinator', instansi: 'BNNP Jabar', hadir: true },
-        { nama: 'Dokter Asesor Medis Test-1', peran: 'Tim Asesor Medis', instansi: 'RSUD Bandung', hadir: true },
-        { nama: 'Asesor Hukum Test-1', peran: 'Tim Asesor Hukum', instansi: 'Kejari Bandung', hadir: true },
-        { nama: 'Penyidik Pengaju Test-1', peran: 'Penyidik Pengaju', instansi: 'Sat Resnarkoba Polresta Bandung', hadir: true }
+        { nama: 'Koordinator TAT Test-1', peran: 'Ketua / Koordinator', instansi: 'BNNP Kaltim', hadir: true },
+        { nama: 'Dokter Asesor Medis Test-1', peran: 'Tim Asesor Medis', instansi: 'RSUD Samarinda', hadir: true },
+        { nama: 'Asesor Hukum Test-1', peran: 'Tim Asesor Hukum', instansi: 'Kejari Samarinda', hadir: true },
+        { nama: 'Penyidik Pengaju Test-1', peran: 'Penyidik Pengaju', instansi: 'Sat Resnarkoba Polresta Samarinda', hadir: true }
       ],
       pokokBahasan: 'Penetapan rekomendasi penanganan adiksi dual-diagnosis bagi terperiksa Terperiksa Test-4.',
       catatanPerbedaanPendapat: 'Nihil. Seluruh unsur menyetujui rujukan ke fasilitas RSKO Cibubur.',
@@ -855,9 +855,9 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
       statusPleno: 'selesai_sepakat'
     },
     rekomendasiResmi: {
-      nomorSurat: 'REK-TAT/079/IX/2026/BNNP-JABAR',
+      nomorSurat: 'REK-TAT/079/IX/2026/BNNP-KALTIM',
       tanggalTerbit: '2026-09-04',
-      dibuatOleh: 'Sekretariat Tim Asesmen Terpadu BNNP Jawa Barat',
+      dibuatOleh: 'Sekretariat Tim Asesmen Terpadu BNNP Kalimantan Timur',
       ringkasanMedis: 'Terperiksa Terperiksa Test-4 mengalami Sindrom Ketergantungan Multipel Zat (MDMA & Metamfetamina) kategori sedang dengan komorbiditas depresi sedang (F19.2 + F32.1), memerlukan rawat inap 3 bulan.',
       ringkasanHukum: 'Terperiksa terbukti sebagai penyalahguna narkotika murni bagi diri sendiri (Pasal 127 UU 35/2009), bukan residivis, dan barang bukti di bawah batasan SEMA 04/2010.',
       rekomendasiFinalText: 'Menyimpulkan dan merekomendasikan kepada Penyidik agar Terperiksa ditempatkan di Fasilitas Rehabilitasi Medis & Sosial RSKO Cibubur Jakarta untuk menjalani rawat inap selama 3 (tiga) bulan.',
@@ -869,7 +869,7 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
           id: 'sign-1',
           nama: 'Dokter Asesor Medis Test-1',
           jabatan: 'Asesor Medis TAT',
-          instansi: 'RSUD Kota Bandung',
+          instansi: 'RSUD Kota Samarinda',
           status: 'disahkan',
           tanggalPengesahan: '2026-09-04 14:15',
           tandaTanganDigitalHash: 'SHA256:d41d8cd98f00b204e9800998ecf8427e_MEDIS'
@@ -878,7 +878,7 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
           id: 'sign-2',
           nama: 'Asesor Hukum Test-1',
           jabatan: 'Asesor Hukum TAT',
-          instansi: 'Kejaksaan Negeri Bandung',
+          instansi: 'Kejaksaan Negeri Samarinda',
           status: 'disahkan',
           tanggalPengesahan: '2026-09-04 15:30',
           tandaTanganDigitalHash: 'SHA256:e2fc714c4727ee9395f324cd2e7f331f_HUKUM'
@@ -887,7 +887,7 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
           id: 'sign-3',
           nama: 'Penyidik Pengaju Test-1',
           jabatan: 'Penyidik / Pemohon',
-          instansi: 'Sat Resnarkoba Polresta Bandung',
+          instansi: 'Sat Resnarkoba Polresta Samarinda',
           status: 'disahkan',
           tanggalPengesahan: '2026-09-04 16:45',
           tandaTanganDigitalHash: 'SHA256:c4ca4238a0b923820dcc509a6f75849b_PENYIDIK'
@@ -896,7 +896,7 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
           id: 'sign-4',
           nama: 'Koordinator TAT Test-1',
           jabatan: 'Ketua / Koordinator Tim Asesmen Terpadu',
-          instansi: 'BNN Provinsi Jawa Barat',
+          instansi: 'BNN Provinsi Kalimantan Timur',
           status: 'menunggu'
         }
       ]
@@ -907,7 +907,7 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
       namaFasilitasTujuan: 'RSKO (Rumah Sakit Ketergantungan Obat) Jakarta',
       kontakFasilitas: '(021) 87711968',
       statusRujukan: 'sedang_dikoordinasikan',
-      penanggungJawabTindakLanjut: 'Sekretariat TAT & Penyidik Polresta Bandung',
+      penanggungJawabTindakLanjut: 'Sekretariat TAT & Penyidik Polresta Samarinda',
       statusProsesHukumTerkait: 'Penyidikan tahap I tetap berproses sembari menanti penetapan diversi/rehab dari jaksa.',
       terakhirDiperbarui: '2026-09-04 17:00'
     },
@@ -932,7 +932,7 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
     ]
   },
 
-  // KASUS 5: REKOMENDASI TERBIT - TINDAK LANJUT TERHAMBAT (Kapasitas Balai Lido Penuh)
+  // KASUS 5: REKOMENDASI TERBIT - TINDAK LANJUT TERHAMBAT (Kapasitas Balai Tanah Merah Penuh)
   {
     id: 'tat-074',
     nomorPermohonan: 'TAT/2026/08/074',
@@ -947,9 +947,9 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
     statusTindakLanjut: 'terhambat',
     pengajuId: 'user-pengaju',
     pengajuNama: 'Penyidik Pengaju Test-1',
-    instansiPengaju: 'Sat Resnarkoba Polresta Bandung',
+    instansiPengaju: 'Sat Resnarkoba Polresta Samarinda',
     penanggungJawabBerikutnya: 'Sekretariat TAT (Petugas Sekretariat Test-1)',
-    tindakanBerikutnyaLabel: 'Kapasitas Balai Lido Penuh: Diperlukan koordinasi pengalihan fasilitas rujukan alternatif',
+    tindakanBerikutnyaLabel: 'Kapasitas Balai Tanah Merah Penuh: Diperlukan koordinasi pengalihan fasilitas rujukan alternatif',
     terperiksa: {
       id: 'trp-074',
       namaLengkap: 'Terperiksa Test-5',
@@ -962,8 +962,8 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
       usia: 34,
       jenisKelamin: 'Laki-laki',
       pekerjaan: 'Wiraswasta',
-      alamatKtp: 'Jl. Raya Soreang-Banjaran No. 88, Kab. Bandung',
-      alamatDomisili: 'Jl. Raya Soreang-Banjaran No. 88, Kab. Bandung',
+      alamatKtp: 'Jl. Raya Soreang-Banjaran No. 88, Kab. Samarinda',
+      alamatDomisili: 'Jl. Raya Soreang-Banjaran No. 88, Kab. Samarinda',
       namaWaliPendamping: 'Wali Terperiksa Test-5 (Keluarga)',
       kontakWali: '0812-9988-7711'
     },
@@ -971,11 +971,11 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
       id: 'perk-074',
       nomorLaporanPolisi: 'LP/A/119/VIII/2026/SPKT.SATRESNARKOBA/POLRESTA BANDUNG',
       tanggalLp: '2026-08-19',
-      instansiPenyidik: 'Sat Resnarkoba Polresta Bandung',
+      instansiPenyidik: 'Sat Resnarkoba Polresta Samarinda',
       namaPenyidik: 'Penyidik Pengaju Test-1',
       nomorHpPenyidik: '0813-8899-1122',
       pasalDipersangkakan: 'Pasal 127 ayat (1) huruf a UU No. 35 Tahun 2009',
-      tempatKejadianPerkara: 'Sebuah hotel di kawasan Pasteur, Bandung',
+      tempatKejadianPerkara: 'Sebuah hotel di kawasan Pasteur, Samarinda',
       tanggalWaktuPenangkapan: '2026-08-19 18:30 WIB',
       kronologiSingkat: 'Ditemukan sabu sisa pakai 0.35 gram di dalam bungkus rokok.',
       barangBuktiList: [
@@ -995,24 +995,24 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
       asesorMedisNama: 'Dokter Asesor Medis Test-1',
       asesorHukumNama: 'Asesor Hukum Test-1',
       jadwalPleno: '2026-08-25 09:00 WIB',
-      lokasiPemeriksaan: 'Ruang Pleno BNNP Jabar'
+      lokasiPemeriksaan: 'Ruang Pleno BNNP Kaltim'
     },
     dokumenList: [],
     rekomendasiResmi: {
-      nomorSurat: 'REK-TAT/074/VIII/2026/BNNP-JABAR',
+      nomorSurat: 'REK-TAT/074/VIII/2026/BNNP-KALTIM',
       tanggalTerbit: '2026-08-25',
-      dibuatOleh: 'Sekretariat TAT BNNP Jawa Barat',
+      dibuatOleh: 'Sekretariat TAT BNNP Kalimantan Timur',
       ringkasanMedis: 'Ketergantungan Sabu Kronis derajat berat (ASSIST Skor 29), memerlukan rawat inap 6 bulan.',
       ringkasanHukum: 'Penyalahguna murni narkotika, bukan pengedar, direkomendasikan rawat inap rehabilitasi.',
-      rekomendasiFinalText: 'Rekomendasi resmi penempatan di Balai Besar Rehabilitasi BNN Lido Bogor selama 6 (enam) bulan.',
+      rekomendasiFinalText: 'Rekomendasi resmi penempatan di Balai Besar Rehabilitasi BNN Tanah Merah Bogor selama 6 (enam) bulan.',
       isLengkapPengesahan: true,
       qrVerificationCode: 'ETAT-VERIF-2026-074-88A22B',
       filePdfSimulasiUrl: '#',
       daftarPengesah: [
-        { id: 's-1', nama: 'Dokter Asesor Medis Test-1', jabatan: 'Asesor Medis', instansi: 'RSUD Bandung', status: 'disahkan', tanggalPengesahan: '2026-08-25 11:00' },
-        { id: 's-2', nama: 'Asesor Hukum Test-1', jabatan: 'Asesor Hukum', instansi: 'Kejari Bandung', status: 'disahkan', tanggalPengesahan: '2026-08-25 11:30' },
-        { id: 's-3', nama: 'Penyidik Pengaju Test-1', jabatan: 'Penyidik', instansi: 'Polresta Bandung', status: 'disahkan', tanggalPengesahan: '2026-08-25 13:00' },
-        { id: 's-4', nama: 'Koordinator TAT Test-1', jabatan: 'Ketua TAT', instansi: 'BNNP Jabar', status: 'disahkan', tanggalPengesahan: '2026-08-25 14:00' }
+        { id: 's-1', nama: 'Dokter Asesor Medis Test-1', jabatan: 'Asesor Medis', instansi: 'RSUD Samarinda', status: 'disahkan', tanggalPengesahan: '2026-08-25 11:00' },
+        { id: 's-2', nama: 'Asesor Hukum Test-1', jabatan: 'Asesor Hukum', instansi: 'Kejari Samarinda', status: 'disahkan', tanggalPengesahan: '2026-08-25 11:30' },
+        { id: 's-3', nama: 'Penyidik Pengaju Test-1', jabatan: 'Penyidik', instansi: 'Polresta Samarinda', status: 'disahkan', tanggalPengesahan: '2026-08-25 13:00' },
+        { id: 's-4', nama: 'Koordinator TAT Test-1', jabatan: 'Ketua TAT', instansi: 'BNNP Kaltim', status: 'disahkan', tanggalPengesahan: '2026-08-25 14:00' }
       ],
       buktiPenerimaanPengaju: {
         diterimaOleh: 'Penyidik Pengaju Test-1',
@@ -1023,19 +1023,19 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
     tindakLanjut: {
       id: 'tl-074',
       jenisTindakLanjut: 'Rujukan Rehabilitasi',
-      namaFasilitasTujuan: 'Balai Besar Rehabilitasi BNN Lido Bogor',
+      namaFasilitasTujuan: 'Balai Besar Rehabilitasi BNN Tanah Merah Bogor',
       kontakFasilitas: '(0251) 8221010',
       statusRujukan: 'kapasitas_penuh',
       tanggalRujukanDikirim: '2026-08-26',
       tanggalKonfirmasiFasilitas: '2026-08-27',
-      hambatanPelaksanaan: 'Kapasitas bed rawat inap Balai Lido terisi penuh 100% sampai tanggal 25 September 2026. Antrean menunggu penempatan (waiting list #4).',
-      penanggungJawabTindakLanjut: 'Sekretariat TAT BNNP Jabar & Penyidik Polresta Bandung',
-      statusProsesHukumTerkait: 'Penyidik menitipkan terperiksa sementara di Ruang Tahanan Polresta Bandung menunggu relokasi fasilitas atau kuota kosong.',
+      hambatanPelaksanaan: 'Kapasitas bed rawat inap Balai Tanah Merah terisi penuh 100% sampai tanggal 25 September 2026. Antrean menunggu penempatan (waiting list #4).',
+      penanggungJawabTindakLanjut: 'Sekretariat TAT BNNP Kaltim & Penyidik Polresta Samarinda',
+      statusProsesHukumTerkait: 'Penyidik menitipkan terperiksa sementara di Ruang Tahanan Polresta Samarinda menunggu relokasi fasilitas atau kuota kosong.',
       terakhirDiperbarui: '2026-08-27 10:15'
     },
     catatanPengecualian: {
       tipe: 'fasilitas_penuh',
-      keterangan: 'Rujukan ke Balai Besar Lido terkendala kuota penuh. Koordinasi pengalihan ke RS Marzuki Mahdi Bogor atau RSKO Cibubur sedang diusulkan.'
+      keterangan: 'Rujukan ke Balai Besar Tanah Merah terkendala kuota penuh. Koordinasi pengalihan ke RS Marzuki Mahdi Bogor atau RSKO Cibubur sedang diusulkan.'
     },
     klarifikasiList: [
       {
@@ -1043,7 +1043,7 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
         dariNama: 'Petugas Fasilitas Rehab Test-1',
         dariPeran: 'rehabilitasi',
         kepadaPeran: 'sekretariat',
-        pertanyaan: 'Konfirmasi dari Bagian Admisi Balai Lido: Kuota penerimaan rujukan residen pria penuh 300 bed. Tersedia estimasi pembukaan slot pada tanggal 28 September.',
+        pertanyaan: 'Konfirmasi dari Bagian Admisi Balai Tanah Merah: Kuota penerimaan rujukan residen pria penuh 300 bed. Tersedia estimasi pembukaan slot pada tanggal 28 September.',
         tanggalTanya: '2026-08-27 09:30',
         jawaban: 'Terima kasih atas informasinya. Kami sedang berkoordinasi dengan penyidik untuk opsi pengalihan sementara ke RSKO Cibubur.',
         dijawabOleh: 'Petugas Sekretariat Test-1',
@@ -1086,7 +1086,7 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
     statusTindakLanjut: 'terlaksana',
     pengajuId: 'user-pengaju',
     pengajuNama: 'Penyidik Pengaju Test-1',
-    instansiPengaju: 'Sat Resnarkoba Polresta Bandung',
+    instansiPengaju: 'Sat Resnarkoba Polresta Samarinda',
     penanggungJawabBerikutnya: 'Layanan Selesai (Pemantauan Berkala Pasca-Rehab)',
     tindakanBerikutnyaLabel: 'Tindak lanjut terlaksana: Klien menjalani program rawat jalan di Klinik BNN & Diversi tercapai',
     terperiksa: {
@@ -1096,13 +1096,13 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
       nik: '3273050904100002',
       isNikVerified: true,
       statusIdentitasKhusus: 'anak_berhadapan_hukum',
-      tempatLahir: 'Bandung',
+      tempatLahir: 'Samarinda',
       tanggalLahir: '2010-04-09',
       usia: 16,
       jenisKelamin: 'Laki-laki',
       pekerjaan: 'Pelajar SMK Kelas 1',
-      alamatKtp: 'Kec. Bojongloa Kaler, Kota Bandung',
-      alamatDomisili: 'Kec. Bojongloa Kaler, Kota Bandung',
+      alamatKtp: 'Kec. Bojongloa Kaler, Kota Samarinda',
+      alamatDomisili: 'Kec. Bojongloa Kaler, Kota Samarinda',
       namaWaliPendamping: 'Wali Terperiksa Test-6 & Petugas BAPAS',
       kontakWali: '0813-2211-9988'
     },
@@ -1110,11 +1110,11 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
       id: 'perk-068',
       nomorLaporanPolisi: 'LP/A/105/VIII/2026/SPKT.SATRESNARKOBA/POLRESTA BANDUNG',
       tanggalLp: '2026-08-09',
-      instansiPenyidik: 'Unit PPA / Sat Resnarkoba Polresta Bandung',
+      instansiPenyidik: 'Unit PPA / Sat Resnarkoba Polresta Samarinda',
       namaPenyidik: 'Penyidik Pembantu Test-4',
       nomorHpPenyidik: '0812-4455-6677',
       pasalDipersangkakan: 'Pasal 127 ayat (1) huruf a UU No. 35/2009 jo UU No. 11/2012 tentang Sistem Peradilan Pidana Anak (SPPA)',
-      tempatKejadianPerkara: 'Area taman dekat sekolah, Bandung',
+      tempatKejadianPerkara: 'Area taman dekat sekolah, Samarinda',
       tanggalWaktuPenangkapan: '2026-08-09 16:00 WIB',
       kronologiSingkat: 'Terperiksa anak diamankan saat menggunakan obat keras daftar G (Tramadol / Trihexyphenidyl) bersama teman sebayanya.',
       barangBuktiList: [
@@ -1132,36 +1132,36 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
       asesorMedisNama: 'Dokter Asesor Medis Test-1',
       asesorHukumNama: 'Asesor Hukum Test-1',
       jadwalPleno: '2026-08-14 10:00 WIB',
-      lokasiPemeriksaan: 'Ruang Khusus Anak BNN Kota Bandung'
+      lokasiPemeriksaan: 'Ruang Khusus Anak BNN Kota Samarinda'
     },
     dokumenList: [],
     rekomendasiResmi: {
-      nomorSurat: 'REK-TAT/068/VIII/2026/BNNP-JABAR',
+      nomorSurat: 'REK-TAT/068/VIII/2026/BNNP-KALTIM',
       tanggalTerbit: '2026-08-14',
-      dibuatOleh: 'Sekretariat TAT BNNP Jawa Barat',
+      dibuatOleh: 'Sekretariat TAT BNNP Kalimantan Timur',
       ringkasanMedis: 'Penyalahgunaan zat sedatif/analgetik derajat ringan pada anak, membutuhkan konseling psikologis remaja dan pendampingan keluarga.',
       ringkasanHukum: 'Memenuhi syarat Diversi berdasarkan UU No. 11 Tahun 2012 tentang SPPA. Disepakati pengembalian ke orang tua dengan kewajiban rawat jalan di IPWL.',
-      rekomendasiFinalText: 'Rekomendasi diversi dan rehabilitasi rawat jalan selama 2 bulan di Klinik Pratama BNN Kota Bandung.',
+      rekomendasiFinalText: 'Rekomendasi diversi dan rehabilitasi rawat jalan selama 2 bulan di Klinik Pratama BNN Kota Samarinda.',
       isLengkapPengesahan: true,
       qrVerificationCode: 'ETAT-VERIF-2026-068-ABH91',
       filePdfSimulasiUrl: '#',
       daftarPengesah: [
-        { id: 's-68-1', nama: 'Dokter Asesor Medis Test-1', jabatan: 'Asesor Medis', instansi: 'RSUD Bandung', status: 'disahkan', tanggalPengesahan: '2026-08-14 11:00' },
-        { id: 's-68-2', nama: 'Asesor Hukum Test-1', jabatan: 'Asesor Hukum', instansi: 'Kejari Bandung', status: 'disahkan', tanggalPengesahan: '2026-08-14 11:30' },
-        { id: 's-68-3', nama: 'Koordinator TAT Test-1', jabatan: 'Ketua TAT', instansi: 'BNNP Jabar', status: 'disahkan', tanggalPengesahan: '2026-08-14 13:00' }
+        { id: 's-68-1', nama: 'Dokter Asesor Medis Test-1', jabatan: 'Asesor Medis', instansi: 'RSUD Samarinda', status: 'disahkan', tanggalPengesahan: '2026-08-14 11:00' },
+        { id: 's-68-2', nama: 'Asesor Hukum Test-1', jabatan: 'Asesor Hukum', instansi: 'Kejari Samarinda', status: 'disahkan', tanggalPengesahan: '2026-08-14 11:30' },
+        { id: 's-68-3', nama: 'Koordinator TAT Test-1', jabatan: 'Ketua TAT', instansi: 'BNNP Kaltim', status: 'disahkan', tanggalPengesahan: '2026-08-14 13:00' }
       ]
     },
     tindakLanjut: {
       id: 'tl-068',
       jenisTindakLanjut: 'Diversi / Restorative Justice',
-      namaFasilitasTujuan: 'Klinik Pratama BNN Kota Bandung (IPWL)',
+      namaFasilitasTujuan: 'Klinik Pratama BNN Kota Samarinda (IPWL)',
       kontakFasilitas: '(022) 2503201',
       statusRujukan: 'klien_mulai_layanan',
       tanggalRujukanDikirim: '2026-08-15',
       tanggalKonfirmasiFasilitas: '2026-08-16',
       tanggalMulaiLayanan: '2026-08-18',
       penanggungJawabTindakLanjut: 'Pembimbing Kemasyarakatan BAPAS & Dokter Klinik BNN',
-      statusProsesHukumTerkait: 'Kesepakatan Diversi disahkan oleh Pengadilan Negeri Bandung. Proses pidana dihentikan demi kepentingan terbaik anak.',
+      statusProsesHukumTerkait: 'Kesepakatan Diversi disahkan oleh Pengadilan Negeri Samarinda. Proses pidana dihentikan demi kepentingan terbaik anak.',
       terakhirDiperbarui: '2026-08-20 10:00'
     },
     pengawasanKlien: {
@@ -1171,10 +1171,10 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
       durasiBulan: 2,
       tanggalMulai: '2026-08-18',
       tanggalTargetSelesai: '2026-10-18',
-      instansiPelaksanaRehab: 'Klinik Pratama BNN Kota Bandung (IPWL)',
+      instansiPelaksanaRehab: 'Klinik Pratama BNN Kota Samarinda (IPWL)',
       konselorPendamping: 'Konselor Adiksi Pratama Test-1, S.Psi',
-      penyidikPengawas: 'Penyidik Pembantu Test-4 (Polresta Bandung)',
-      petugasBapas: 'Pembimbing Kemasyarakatan Bapas Bandung Test-1',
+      penyidikPengawas: 'Penyidik Pembantu Test-4 (Polresta Samarinda)',
+      petugasBapas: 'Pembimbing Kemasyarakatan Bapas Samarinda Test-1',
       totalSesiWajib: 12,
       sesiTerselesaikan: 8,
       jumlahMangkir: 0,
@@ -1219,7 +1219,7 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
           statusKehadiran: 'Hadir',
           catatanPerkembangan: 'Intake perdana. Klien berkomitmen mengikuti program diversi bersama wali.',
           petugasPengawas: 'Konselor Adiksi Pratama Test-1, S.Psi',
-          instansiPengawas: 'Klinik Pratama BNN Kota Bandung'
+          instansiPengawas: 'Klinik Pratama BNN Kota Samarinda'
         },
         {
           id: 'jrn-068-2',
@@ -1227,8 +1227,8 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
           jenisKegiatan: 'Wajib Lapor Mingguan',
           statusKehadiran: 'Hadir',
           catatanPerkembangan: 'Sesi wajib lapor didampingi ibu terperiksa. Menunjukkan kepatuhan jadwal sekolah.',
-          petugasPengawas: 'Pembimbing Kemasyarakatan Bapas Bandung Test-1',
-          instansiPengawas: 'Bapas Kelas I Bandung'
+          petugasPengawas: 'Pembimbing Kemasyarakatan Bapas Samarinda Test-1',
+          instansiPengawas: 'Bapas Kelas I Samarinda'
         },
         {
           id: 'jrn-068-3',
@@ -1237,7 +1237,7 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
           statusKehadiran: 'Hadir',
           catatanPerkembangan: 'Terapi kelompok remaja sebaya: latihan asertif menolak tawaran obat terlarang.',
           petugasPengawas: 'Konselor Adiksi Pratama Test-1, S.Psi',
-          instansiPengawas: 'Klinik Pratama BNN Kota Bandung'
+          instansiPengawas: 'Klinik Pratama BNN Kota Samarinda'
         },
         {
           id: 'jrn-068-4',
@@ -1246,7 +1246,7 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
           statusKehadiran: 'Hadir',
           catatanPerkembangan: 'Laporan mingguan teratur. Hubungan dengan keluarga membaik signifikan.',
           petugasPengawas: 'Penyidik Pembantu Test-4',
-          instansiPengawas: 'Sat Resnarkoba Polresta Bandung'
+          instansiPengawas: 'Sat Resnarkoba Polresta Samarinda'
         },
         {
           id: 'jrn-068-5',
@@ -1254,8 +1254,8 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
           jenisKegiatan: 'Home Visit (Kunjungan Rumah)',
           statusKehadiran: 'Hadir',
           catatanPerkembangan: 'Kunjungan rumah oleh PK Bapas dan konselor. Lingkungan keluarga kondusif dan mendukung.',
-          petugasPengawas: 'Pembimbing Kemasyarakatan Bapas Bandung Test-1',
-          instansiPengawas: 'Bapas Kelas I Bandung'
+          petugasPengawas: 'Pembimbing Kemasyarakatan Bapas Samarinda Test-1',
+          instansiPengawas: 'Bapas Kelas I Samarinda'
         }
       ],
       rekomendasiTindakLanjutHukum: 'Diusulkan Surat Keterangan Selesai'
@@ -1272,7 +1272,7 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
         actorNama: 'Petugas Sekretariat Test-1',
         actorPeran: 'sekretariat',
         aksi: 'Konfirmasi Masuk Layanan Rehab',
-        rincian: 'Klien anak Terperiksa Test-6 mulai menjalani sesi perdana konseling rawat jalan di Klinik BNN Bandung.'
+        rincian: 'Klien anak Terperiksa Test-6 mulai menjalani sesi perdana konseling rawat jalan di Klinik BNN Samarinda.'
       }
     ]
   },
@@ -1292,7 +1292,7 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
     statusTindakLanjut: 'terlaksana',
     pengajuId: 'user-pengaju',
     pengajuNama: 'Penyidik Pengaju Test-1',
-    instansiPengaju: 'Sat Resnarkoba Polresta Bandung',
+    instansiPengaju: 'Sat Resnarkoba Polresta Samarinda',
     penanggungJawabBerikutnya: 'Konselor Klinik BNN & Penyidik Pengawas',
     tindakanBerikutnyaLabel: 'Pengawasan Klien: Dalam status Peringatan SP-1 akibat mangkir 1x sesi wajib lapor',
     terperiksa: {
@@ -1301,13 +1301,13 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
       alias: 'Subjek Uji 7',
       nik: '3273011508930005',
       isNikVerified: true,
-      tempatLahir: 'Bandung',
+      tempatLahir: 'Samarinda',
       tanggalLahir: '1993-08-15',
       usia: 33,
       jenisKelamin: 'Laki-laki',
       pekerjaan: 'Wiraswasta Kuliner',
-      alamatKtp: 'Kec. Lengkong, Kota Bandung',
-      alamatDomisili: 'Kec. Lengkong, Kota Bandung',
+      alamatKtp: 'Kec. Lengkong, Kota Samarinda',
+      alamatDomisili: 'Kec. Lengkong, Kota Samarinda',
       namaWaliPendamping: 'Keluarga Terperiksa Test-7',
       kontakWali: '0812-7788-9900'
     },
@@ -1315,11 +1315,11 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
       id: 'perk-055',
       nomorLaporanPolisi: 'LP/A/92/VIII/2026/SPKT.SATRESNARKOBA/POLRESTA BANDUNG',
       tanggalLp: '2026-07-31',
-      instansiPenyidik: 'Sat Resnarkoba Polresta Bandung',
+      instansiPenyidik: 'Sat Resnarkoba Polresta Samarinda',
       namaPenyidik: 'Penyidik Pengaju Test-1',
       nomorHpPenyidik: '0813-8899-1122',
       pasalDipersangkakan: 'Pasal 127 ayat (1) huruf a UU No. 35/2009',
-      tempatKejadianPerkara: 'Kec. Lengkong, Kota Bandung',
+      tempatKejadianPerkara: 'Kec. Lengkong, Kota Samarinda',
       tanggalWaktuPenangkapan: '2026-07-31 21:00 WIB',
       kronologiSingkat: 'Diamankan saat mengonsumsi ganja di tempat tinggal. BB di bawah ambang SEMA No. 04/2010 (0.8 gr).',
       barangBuktiList: [
@@ -1337,29 +1337,29 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
       asesorMedisNama: 'Dokter Asesor Medis Test-1',
       asesorHukumNama: 'Asesor Hukum Test-1',
       jadwalPleno: '2026-08-05 10:00 WIB',
-      lokasiPemeriksaan: 'Ruang TAT BNN Kota Bandung'
+      lokasiPemeriksaan: 'Ruang TAT BNN Kota Samarinda'
     },
     dokumenList: [],
     rekomendasiResmi: {
-      nomorSurat: 'REK-TAT/055/VIII/2026/BNNP-JABAR',
+      nomorSurat: 'REK-TAT/055/VIII/2026/BNNP-KALTIM',
       tanggalTerbit: '2026-08-05',
-      dibuatOleh: 'Sekretariat TAT BNNP Jawa Barat',
+      dibuatOleh: 'Sekretariat TAT BNNP Kalimantan Timur',
       ringkasanMedis: 'Penyalahgunaan zat kanabis derajat sedang. Direkomendasikan rawat jalan 3 bulan.',
       ringkasanHukum: 'Penyalahguna murni, memenuhi syarat Restorative Justice Polri sesuai Perpol No. 08/2021.',
-      rekomendasiFinalText: 'Rekomendasi Restorative Justice dengan kewajiban menjalani Rehabilitasi Rawat Jalan 3 bulan di Klinik Pratama BNN Kota Bandung.',
+      rekomendasiFinalText: 'Rekomendasi Restorative Justice dengan kewajiban menjalani Rehabilitasi Rawat Jalan 3 bulan di Klinik Pratama BNN Kota Samarinda.',
       isLengkapPengesahan: true,
       qrVerificationCode: 'ETAT-VERIF-2026-055-RJ88',
       filePdfSimulasiUrl: '#',
       daftarPengesah: [
-        { id: 's-55-1', nama: 'Dokter Asesor Medis Test-1', jabatan: 'Asesor Medis', instansi: 'RSUD Bandung', status: 'disahkan', tanggalPengesahan: '2026-08-05 11:00' },
-        { id: 's-55-2', nama: 'Asesor Hukum Test-1', jabatan: 'Asesor Hukum', instansi: 'Kejari Bandung', status: 'disahkan', tanggalPengesahan: '2026-08-05 11:30' },
-        { id: 's-55-3', nama: 'Koordinator TAT Test-1', jabatan: 'Ketua TAT', instansi: 'BNNP Jabar', status: 'disahkan', tanggalPengesahan: '2026-08-05 14:00' }
+        { id: 's-55-1', nama: 'Dokter Asesor Medis Test-1', jabatan: 'Asesor Medis', instansi: 'RSUD Samarinda', status: 'disahkan', tanggalPengesahan: '2026-08-05 11:00' },
+        { id: 's-55-2', nama: 'Asesor Hukum Test-1', jabatan: 'Asesor Hukum', instansi: 'Kejari Samarinda', status: 'disahkan', tanggalPengesahan: '2026-08-05 11:30' },
+        { id: 's-55-3', nama: 'Koordinator TAT Test-1', jabatan: 'Ketua TAT', instansi: 'BNNP Kaltim', status: 'disahkan', tanggalPengesahan: '2026-08-05 14:00' }
       ]
     },
     tindakLanjut: {
       id: 'tl-055',
       jenisTindakLanjut: 'Diversi / Restorative Justice',
-      namaFasilitasTujuan: 'Klinik Pratama BNN Kota Bandung (IPWL)',
+      namaFasilitasTujuan: 'Klinik Pratama BNN Kota Samarinda (IPWL)',
       kontakFasilitas: '(022) 2503201',
       statusRujukan: 'klien_mulai_layanan',
       tanggalRujukanDikirim: '2026-08-06',
@@ -1376,7 +1376,7 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
       durasiBulan: 3,
       tanggalMulai: '2026-08-10',
       tanggalTargetSelesai: '2026-11-10',
-      instansiPelaksanaRehab: 'Klinik Pratama BNN Kota Bandung (IPWL)',
+      instansiPelaksanaRehab: 'Klinik Pratama BNN Kota Samarinda (IPWL)',
       konselorPendamping: 'Konselor Adiksi Pratama Test-1, S.Psi',
       penyidikPengawas: 'Penyidik Pengaju Test-1 (Sat Resnarkoba Polresta)',
       totalSesiWajib: 16,
@@ -1431,7 +1431,7 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
           statusKehadiran: 'Hadir',
           catatanPerkembangan: 'Sesi intake & penetapan jadwal wajib lapor tiap hari Jumat.',
           petugasPengawas: 'Konselor Adiksi Pratama Test-1, S.Psi',
-          instansiPengawas: 'Klinik Pratama BNN Kota Bandung'
+          instansiPengawas: 'Klinik Pratama BNN Kota Samarinda'
         },
         {
           id: 'jrn-055-2',
@@ -1440,7 +1440,7 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
           statusKehadiran: 'Hadir',
           catatanPerkembangan: 'Sesi evaluasi pemicu stres kerja dan manajemen waktu.',
           petugasPengawas: 'Konselor Adiksi Pratama Test-1, S.Psi',
-          instansiPengawas: 'Klinik Pratama BNN Kota Bandung'
+          instansiPengawas: 'Klinik Pratama BNN Kota Samarinda'
         },
         {
           id: 'jrn-055-3',
@@ -1449,7 +1449,7 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
           statusKehadiran: 'Hadir',
           catatanPerkembangan: 'Mengikuti diskusi kelompok pemulihan adiksi.',
           petugasPengawas: 'Konselor Adiksi Pratama Test-1, S.Psi',
-          instansiPengawas: 'Klinik Pratama BNN Kota Bandung'
+          instansiPengawas: 'Klinik Pratama BNN Kota Samarinda'
         },
         {
           id: 'jrn-055-4',
@@ -1458,7 +1458,7 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
           statusKehadiran: 'Hadir',
           catatanPerkembangan: 'Tes urin bulan ke-1 hasil negatif.',
           petugasPengawas: 'Analis Lab Klinik BNN Test-1',
-          instansiPengawas: 'Klinik Pratama BNN Kota Bandung'
+          instansiPengawas: 'Klinik Pratama BNN Kota Samarinda'
         },
         {
           id: 'jrn-055-5',
@@ -1467,7 +1467,7 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
           statusKehadiran: 'Mangkir / Tanpa Kabar',
           catatanPerkembangan: 'Klien tidak hadir dan nomor ponsel tidak merespons saat dihubungi petugas. Petugas menerbitkan SP-1.',
           petugasPengawas: 'Konselor Adiksi Pratama Test-1, S.Psi',
-          instansiPengawas: 'Klinik Pratama BNN Kota Bandung'
+          instansiPengawas: 'Klinik Pratama BNN Kota Samarinda'
         },
         {
           id: 'jrn-055-6',
@@ -1476,7 +1476,7 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
           statusKehadiran: 'Hadir',
           catatanPerkembangan: 'Klien hadir memenuhi panggilan SP-1 didampingi wali. Mengakui lalai karena urusan pekerjaan. Berjanji patuh pada jadwal sisa.',
           petugasPengawas: 'Konselor Adiksi Pratama Test-1, S.Psi',
-          instansiPengawas: 'Klinik Pratama BNN Kota Bandung'
+          instansiPengawas: 'Klinik Pratama BNN Kota Samarinda'
         }
       ],
       rekomendasiTindakLanjutHukum: 'Lanjut Rehabilitasi'

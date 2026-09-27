@@ -73,6 +73,8 @@ export const VerifikasiBerkasView: React.FC<VerifikasiBerkasViewProps> = ({
             const invalidCount = item.dokumenList.filter(d => d.statusVerifikasi === 'perlu_perbaikan').length;
             const totalDocs = item.dokumenList.length;
 
+            const percentComplete = totalDocs > 0 ? Math.round((validCount / totalDocs) * 100) : 0;
+
             return (
               <div
                 key={item.id}
@@ -84,11 +86,11 @@ export const VerifikasiBerkasView: React.FC<VerifikasiBerkasViewProps> = ({
                     <div className="flex items-center space-x-2">
                       <span className="font-bold text-sm text-white group-hover:text-[#38bdf8] font-mono transition-colors">{item.nomorPermohonan}</span>
                       {item.statusProsesUtama === 'perlu_perbaikan' ? (
-                        <span className="text-[10px] bg-[#081224] text-slate-200 font-mono font-medium px-2 py-0.5 rounded border border-[#1b3459]">
+                        <span className="text-[10px] bg-rose-500/20 text-rose-300 font-mono font-medium px-2 py-0.5 rounded border border-rose-500/30">
                           Perlu Perbaikan Pengaju
                         </span>
                       ) : (
-                        <span className="text-[10px] bg-[#081224] text-slate-200 font-mono font-medium px-2 py-0.5 rounded border border-[#1b3459]">
+                        <span className="text-[10px] bg-sky-500/20 text-sky-300 font-mono font-medium px-2 py-0.5 rounded border border-sky-500/30">
                           Menunggu Pemeriksaan Berkas
                         </span>
                       )}
@@ -103,9 +105,18 @@ export const VerifikasiBerkasView: React.FC<VerifikasiBerkasViewProps> = ({
 
                   <div className="flex items-center space-x-6 shrink-0">
                     <div className="text-right text-xs">
-                      <span className="text-slate-400 block text-[11px]">Progres Dokumen:</span>
-                      <span className="font-bold text-slate-200">
-                        <span>{validCount} Sesuai</span> • <span>{invalidCount} Perlu Koreksi</span> / {totalDocs} Total
+                      <div className="flex items-center justify-end space-x-1.5">
+                        <span className="text-slate-400 text-[11px]">Kelengkapan:</span>
+                        <span className="font-bold font-mono text-emerald-400">{percentComplete}%</span>
+                      </div>
+                      <div className="w-32 bg-[#081224] h-1.5 rounded-full overflow-hidden border border-[#1b3459] mt-1 ml-auto">
+                        <div
+                          className={`h-full transition-all duration-300 ${percentComplete === 100 ? 'bg-emerald-400' : percentComplete >= 50 ? 'bg-amber-400' : 'bg-rose-400'}`}
+                          style={{ width: `${percentComplete}%` }}
+                        />
+                      </div>
+                      <span className="font-medium text-[11px] text-slate-400 block mt-1">
+                        {validCount} dari {totalDocs} berkas valid
                       </span>
                     </div>
 

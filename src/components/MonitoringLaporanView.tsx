@@ -23,26 +23,71 @@ export const MonitoringLaporanView: React.FC<MonitoringLaporanViewProps> = ({
   permohonanList,
   currentUser
 }) => {
+  const [downloadSuccess, setDownloadSuccess] = React.useState(false);
+
+  const handleExportCSV = () => {
+    const headers = [
+      'No Registrasi',
+      'NIK',
+      'Nama Terperiksa',
+      'Instansi Pengaju',
+      'Status Proses Utama',
+      'Status Medis/Hukum',
+      'Status Dokumen',
+      'Status Tindak Lanjut',
+      'Jenis Rekomendasi Final'
+    ];
+    const rows = permohonanList.map(p => [
+      p.nomorPermohonan,
+      p.terperiksa.nik,
+      `"${p.terperiksa.namaLengkap}"`,
+      `"${p.instansiPengaju}"`,
+      p.statusProsesUtama,
+      p.statusMedisHukum,
+      p.statusDokumen,
+      p.statusTindakLanjut,
+      `"${p.rekomendasiResmi?.jenisRekomendasiFinal || '-'}"`
+    ]);
+    const csvContent = 'data:text/csv;charset=utf-8,\uFEFF' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `Laporan_Kinerja_ETAT_SIAP_PULIH_BNNP_KALTIM_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    setDownloadSuccess(true);
+    setTimeout(() => setDownloadSuccess(false), 3000);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-xl font-bold text-white flex items-center space-x-2 font-['Cinzel',serif]">
             <BarChart3 className="w-5 h-5 text-slate-300" />
-            <span>Monitoring Kinerja & 8 Indikator Keberhasilan Layanan e-TAT</span>
+            <span>Monitoring Kinerja & 8 Indikator Keberhasilan Layanan e-TAT SIAP PULIH</span>
           </h1>
           <p className="text-xs text-slate-400 mt-1">
-            Pengukuran kepatuhan SLA, kualitas verifikasi berkas, soliditas musyawarah pleno, dan keterlaksanaan rujukan rehabilitasi.
+            Pengukuran kepatuhan SLA BNNP Kalimantan Timur, kualitas verifikasi berkas, musyawarah pleno, dan keterlaksanaan rujukan rehabilitasi.
           </p>
         </div>
 
-        <button
-          onClick={() => alert('Laporan Kinerja e-TAT Periode September 2026 diekspor ke format PDF/Excel.')}
-          className="bg-[#133863] hover:bg-[#1a4a82] text-white text-xs font-bold px-4 py-2 rounded-xl flex items-center space-x-2 border border-[#235594] shadow-md cursor-pointer transition-all"
-        >
-          <Download className="w-4 h-4 text-white" />
-          <span>Unduh Laporan Kinerja (PDF/XLS)</span>
-        </button>
+        <div className="flex items-center space-x-2">
+          {downloadSuccess && (
+            <span className="text-xs text-emerald-400 font-semibold animate-pulse">
+              CSV berhasil diunduh!
+            </span>
+          )}
+          <button
+            onClick={handleExportCSV}
+            className="bg-[#133863] hover:bg-[#1a4a82] text-white text-xs font-bold px-4 py-2 rounded-xl flex items-center space-x-2 border border-[#235594] shadow-md cursor-pointer transition-all"
+          >
+            <Download className="w-4 h-4 text-white" />
+            <span>Unduh Laporan Data (CSV)</span>
+          </button>
+        </div>
       </div>
 
       {/* Real-time Command Center Live Analytics Board */}
@@ -148,7 +193,7 @@ export const MonitoringLaporanView: React.FC<MonitoringLaporanViewProps> = ({
           </div>
           <span className="text-xs font-bold text-slate-200 block">Kasus Tertahan (Bottleneck)</span>
           <div className="text-2xl font-extrabold text-white mt-2 font-mono">1 Kasus</div>
-          <p className="text-[11px] text-slate-400 mt-1">Penyebab: Kuota Balai Lido penuh</p>
+          <p className="text-[11px] text-slate-400 mt-1">Penyebab: Kuota Balai Tanah Merah penuh</p>
         </div>
       </div>
 
@@ -200,26 +245,26 @@ export const MonitoringLaporanView: React.FC<MonitoringLaporanViewProps> = ({
           <div className="space-y-2.5 pt-2 text-xs">
             <div className="p-2.5 bg-[#081224] border border-[#1b3459] rounded-lg flex items-center justify-between">
               <div>
-                <span className="font-bold text-slate-200 block">Balai Besar Rehabilitasi BNN Lido</span>
-                <span className="text-[11px] text-slate-400">Bogor, Jawa Barat (Rawat Inap Medis)</span>
+                <span className="font-bold text-slate-200 block">Balai Rehabilitasi BNN Tanah Merah</span>
+                <span className="text-[11px] text-slate-400">Samarinda Utara, Kaltim (Rawat Inap Medis & Sosial)</span>
+              </div>
+              <span className="font-mono font-bold bg-[#0b172a] text-slate-200 px-2.5 py-1 rounded border border-[#1b3459]">24 Klien</span>
+            </div>
+
+            <div className="p-2.5 bg-[#081224] border border-[#1b3459] rounded-lg flex items-center justify-between">
+              <div>
+                <span className="font-bold text-slate-200 block">Klinik Pratama BNNP Kalimantan Timur</span>
+                <span className="text-[11px] text-slate-400">Samarinda (Rawat Jalan Intensif & Bimbingan)</span>
               </div>
               <span className="font-mono font-bold bg-[#0b172a] text-slate-200 px-2.5 py-1 rounded border border-[#1b3459]">18 Klien</span>
             </div>
 
             <div className="p-2.5 bg-[#081224] border border-[#1b3459] rounded-lg flex items-center justify-between">
               <div>
-                <span className="font-bold text-slate-200 block">Klinik Pratama BNNP Jawa Barat</span>
-                <span className="text-[11px] text-slate-400">Bandung (Rawat Jalan Intensif)</span>
+                <span className="font-bold text-slate-200 block">RSUD Abdul Wahab Sjahranie (AWS)</span>
+                <span className="text-[11px] text-slate-400">Samarinda (Detoksifikasi Medis & Rawat Khusus)</span>
               </div>
-              <span className="font-mono font-bold bg-[#0b172a] text-slate-200 px-2.5 py-1 rounded border border-[#1b3459]">14 Klien</span>
-            </div>
-
-            <div className="p-2.5 bg-[#081224] border border-[#1b3459] rounded-lg flex items-center justify-between">
-              <div>
-                <span className="font-bold text-slate-200 block">RSKO Cibubur</span>
-                <span className="text-[11px] text-slate-400">Jakarta Timur (Detoksifikasi & Psikiatri)</span>
-              </div>
-              <span className="font-mono font-bold bg-[#0b172a] text-slate-200 px-2.5 py-1 rounded border border-[#1b3459]">8 Klien</span>
+              <span className="font-mono font-bold bg-[#0b172a] text-slate-200 px-2.5 py-1 rounded border border-[#1b3459]">11 Klien</span>
             </div>
           </div>
         </div>

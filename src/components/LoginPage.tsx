@@ -86,7 +86,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
         <div className="flex items-center space-x-2.5">
           <PoliceEmblem size="sm" />
           <span className="font-extrabold text-xs sm:text-sm tracking-wide text-white font-['Cinzel',serif]">
-            E-TAT <span className="text-[#D4AF37]">PRESISI</span>
+            E-TAT <span className="text-[#D4AF37]">SIAP PULIH</span>
           </span>
         </div>
       </header>
@@ -209,7 +209,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
 
       {/* Subtle Copyright Bottom */}
       <footer className="py-4 text-center border-t border-[#1b3459] text-[11px] text-slate-400 font-mono">
-        Sistem e-TAT Presisi &copy; 2026 Inisiatif SEKORNA
+        Sistem e-TAT SIAP PULIH &copy; 2026 BNNP Kalimantan Timur
       </footer>
     </div>
   );
