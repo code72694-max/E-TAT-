@@ -328,7 +328,7 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
       {/* HERO SLIDER SECTION - SIAP SESPIM STYLE WITH AUTO SLIDE, FULL-PAGE HEIGHT & CLEAN POLICE/REHAB IMAGERY */}
       <section
         id="hero-carousel"
-        className="relative overflow-hidden h-[calc(100vh-4rem)] min-h-[580px] flex items-center bg-[#071326] border-b border-[#1b3459] select-none"
+        className="relative overflow-hidden h-[calc(100vh-4rem)] min-h-[520px] sm:min-h-[580px] flex items-center bg-[#071326] border-b border-[#1b3459] select-none"
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
         onTouchStart={handleTouchStart}
@@ -362,55 +362,55 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
           );
         })}
 
-        {/* Content Container - Shifted higher up for clean balance */}
-        <div className="relative z-20 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 -translate-y-6 sm:-translate-y-10 lg:-translate-y-12">
+        {/* Content Container - Higher position and larger font size on mobile */}
+        <div className="relative z-20 max-w-7xl w-full mx-auto px-6 sm:px-6 lg:px-8 -translate-y-12 sm:-translate-y-10 lg:-translate-y-12">
           <div className="max-w-2xl space-y-4">
-            {/* Animated Slide Content Box - Clean without label badges */}
-            <div key={currentSlide} className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
+            {/* Animated Slide Content Box */}
+            <div key={currentSlide} className="space-y-3.5 sm:space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
               {/* Clean Headline */}
-              <h1 className="text-xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-wide leading-snug font-['Cinzel',serif] drop-shadow-md">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-wide leading-snug font-['Cinzel',serif] drop-shadow-md">
                 <span className="block text-slate-100">
                   {heroSlides[currentSlide].titlePart1}
                 </span>
                 <span className="block text-[#D4AF37] my-1">
                   {heroSlides[currentSlide].titleHighlight}
                 </span>
-                <span className="block text-slate-200 text-lg sm:text-2xl lg:text-3xl font-bold">
+                <span className="block text-slate-200 text-lg sm:text-2xl lg:text-3xl font-bold mt-1">
                   {heroSlides[currentSlide].titlePart2}
                 </span>
               </h1>
 
               {/* Clean Description */}
-              <p className="text-slate-300 text-xs sm:text-sm md:text-base leading-relaxed max-w-xl font-normal drop-shadow-sm">
+              <p className="text-slate-300 text-xs sm:text-sm md:text-base leading-relaxed max-w-xl font-normal drop-shadow-sm mt-3">
                 {heroSlides[currentSlide].description}
               </p>
             </div>
           </div>
         </div>
 
-        {/* Carousel Prev & Next Navigation Buttons (Like siapsespimpolri.id carousel-control-prev/next) */}
+        {/* Carousel Prev & Next Navigation Buttons */}
         <button
           type="button"
           onClick={goToPrevSlide}
           aria-label="Slide sebelumnya"
-          className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 z-30 p-2.5 sm:p-3 rounded-full bg-[#071326]/70 hover:bg-[#0d1f38] text-white/80 hover:text-white border border-[#1b3459] hover:border-[#D4AF37]/60 backdrop-blur-md shadow-xl transition-all cursor-pointer group"
+          className="absolute left-2.5 sm:left-6 top-1/2 -translate-y-1/2 z-30 p-2 sm:p-3 rounded-full bg-[#071326]/75 hover:bg-[#0d1f38] text-white/80 hover:text-white border border-[#1b3459] hover:border-[#D4AF37]/60 backdrop-blur-md shadow-xl transition-all cursor-pointer group"
         >
-          <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 transition-transform group-hover:-translate-x-0.5" />
+          <ChevronLeft className="w-4 h-4 sm:w-6 sm:h-6 transition-transform group-hover:-translate-x-0.5" />
         </button>
 
         <button
           type="button"
           onClick={goToNextSlide}
           aria-label="Slide berikutnya"
-          className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 z-30 p-2.5 sm:p-3 rounded-full bg-[#071326]/70 hover:bg-[#0d1f38] text-white/80 hover:text-white border border-[#1b3459] hover:border-[#D4AF37]/60 backdrop-blur-md shadow-xl transition-all cursor-pointer group"
+          className="absolute right-2.5 sm:right-6 top-1/2 -translate-y-1/2 z-30 p-2 sm:p-3 rounded-full bg-[#071326]/75 hover:bg-[#0d1f38] text-white/80 hover:text-white border border-[#1b3459] hover:border-[#D4AF37]/60 backdrop-blur-md shadow-xl transition-all cursor-pointer group"
         >
-          <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 transition-transform group-hover:translate-x-0.5" />
+          <ChevronRight className="w-4 h-4 sm:w-6 sm:h-6 transition-transform group-hover:translate-x-0.5" />
         </button>
 
         {/* Bottom Carousel Indicators */}
-        <div className="absolute bottom-8 sm:bottom-10 inset-x-0 z-30 flex justify-center pointer-events-auto">
+        <div className="absolute bottom-4 sm:bottom-10 inset-x-0 z-30 flex justify-center pointer-events-auto">
           {/* Slide Indicator Pills */}
-          <div className="flex items-center space-x-2 bg-[#071326]/80 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-[#1b3459]">
+          <div className="flex items-center space-x-1.5 sm:space-x-2 bg-[#071326]/80 backdrop-blur-md px-2.5 py-1 sm:px-3.5 sm:py-1.5 rounded-full border border-[#1b3459]">
             {heroSlides.map((slide, idx) => {
               const isActive = idx === currentSlide;
               return (
@@ -421,8 +421,8 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
                   aria-label={`Pindah ke slide ${idx + 1}`}
                   className={`transition-all duration-300 rounded-full cursor-pointer ${
                     isActive
-                      ? 'w-7 sm:w-8 h-2.5 bg-[#D4AF37] shadow-lg shadow-[#D4AF37]/40'
-                      : 'w-2.5 h-2.5 bg-slate-500/60 hover:bg-slate-300'
+                      ? 'w-5 sm:w-8 h-1.5 sm:h-2.5 bg-[#D4AF37] shadow-md shadow-[#D4AF37]/40'
+                      : 'w-1.5 h-1.5 sm:w-2.5 sm:h-2.5 bg-slate-500/60 hover:bg-slate-300'
                   }`}
                 />
               );
