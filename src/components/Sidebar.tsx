@@ -87,13 +87,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
           items: [
             {
               id: 'beranda',
-              label: 'Beranda',
+              label: 'Dashboard',
               icon: <LayoutDashboard className="w-4 h-4" />,
               category: 'utama'
             },
             {
               id: 'permohonan',
-              label: 'Daftar Berkas',
+              label: 'Permohonan',
               icon: <FileSpreadsheet className="w-4 h-4" />,
               badge: badgeCounts.perluPerbaikan > 0 ? badgeCounts.perluPerbaikan : undefined,
               badgeColor: 'bg-[#1E2D4A] text-slate-200 border-[#2A3F6D]',
@@ -101,7 +101,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             },
             {
               id: 'verifikasi',
-              label: 'Perbaikan Berkas',
+              label: 'Verifikasi',
               icon: <FileCheck2 className="w-4 h-4" />,
               badge: badgeCounts.perluPerbaikan > 0 ? badgeCounts.perluPerbaikan : undefined,
               badgeColor: 'bg-[#1E2D4A] text-slate-200 border-[#2A3F6D]',
@@ -109,19 +109,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
             },
             {
               id: 'penugasan',
-              label: 'Jadwal Pemeriksaan',
+              label: 'Penugasan & Jadwal',
               icon: <CalendarCheck className="w-4 h-4" />,
               category: 'utama'
             },
             {
               id: 'dokumen',
-              label: 'Rekomendasi Resmi',
+              label: 'Rekomendasi',
               icon: <FileSignature className="w-4 h-4" />,
               category: 'utama'
             },
             {
               id: 'about',
-              label: 'Tentang & Panduan Alur',
+              label: 'Bantuan',
               icon: <Info className="w-4 h-4" />,
               category: 'utama'
             }
@@ -141,13 +141,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
           items: [
             {
               id: 'beranda',
-              label: 'Beranda',
+              label: 'Dashboard',
               icon: <LayoutDashboard className="w-4 h-4" />,
               category: 'utama'
             },
             {
               id: 'permohonan',
-              label: 'Daftar Berkas',
+              label: 'Permohonan',
               icon: <FileSpreadsheet className="w-4 h-4" />,
               badge: badgeCounts.siapVerifikasi > 0 ? badgeCounts.siapVerifikasi : undefined,
               badgeColor: 'bg-[#1E2D4A] text-slate-200 border-[#2A3F6D]',
@@ -155,7 +155,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             },
             {
               id: 'verifikasi',
-              label: 'Verifikasi Berkas',
+              label: 'Verifikasi',
               icon: <FileCheck2 className="w-4 h-4" />,
               badge: badgeCounts.siapVerifikasi > 0 ? badgeCounts.siapVerifikasi : undefined,
               badgeColor: 'bg-[#1E2D4A] text-slate-200 border-[#2A3F6D]',
@@ -169,7 +169,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             },
             {
               id: 'pleno',
-              label: 'Sidang Pleno',
+              label: 'Sidang TAT',
               icon: <Users className="w-4 h-4" />,
               badge: badgeCounts.siapPleno > 0 ? badgeCounts.siapPleno : undefined,
               badgeColor: 'bg-[#1E2D4A] text-slate-200 border-[#2A3F6D]',
@@ -177,7 +177,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             },
             {
               id: 'dokumen',
-              label: 'Pengesahan Dokumen',
+              label: 'Rekomendasi',
               icon: <FileSignature className="w-4 h-4" />,
               badge: badgeCounts.menungguPengesahan > 0 ? badgeCounts.menungguPengesahan : undefined,
               badgeColor: 'bg-[#1E2D4A] text-slate-200 border-[#2A3F6D]',
@@ -185,7 +185,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             },
             {
               id: 'tindak_lanjut',
-              label: 'Rujukan & Fasilitas',
+              label: 'Monitoring Pengawasan Pasca Rehabilitasi',
               icon: <Share2 className="w-4 h-4" />,
               badge: badgeCounts.tindakLanjutTerhambat > 0 ? badgeCounts.tindakLanjutTerhambat : undefined,
               badgeColor: 'bg-[#1E2D4A] text-slate-200 border-[#2A3F6D]',
@@ -193,7 +193,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             },
             {
               id: 'about',
-              label: 'Tentang & Panduan Alur',
+              label: 'Bantuan',
               icon: <Info className="w-4 h-4" />,
               category: 'output'
             }
@@ -210,7 +210,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           items: [
             {
               id: 'beranda',
-              label: 'Beranda',
+              label: 'Dashboard',
               icon: <LayoutDashboard className="w-4 h-4" />,
               category: 'asesor'
             },
@@ -222,13 +222,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
             },
             {
               id: 'penugasan',
-              label: 'Jadwal Pemeriksaan',
+              label: 'Penugasan & Jadwal',
               icon: <CalendarCheck className="w-4 h-4" />,
               category: 'asesor'
             },
             {
               id: 'pleno',
-              label: 'Sidang Pleno',
+              label: 'Sidang TAT',
               icon: <Users className="w-4 h-4" />,
               badge: badgeCounts.siapPleno > 0 ? badgeCounts.siapPleno : undefined,
               badgeColor: 'bg-[#1E2D4A] text-slate-200 border-[#2A3F6D]',
@@ -236,7 +236,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             },
             {
               id: 'about',
-              label: 'Tentang & Panduan Alur',
+              label: 'Bantuan',
               icon: <Info className="w-4 h-4" />,
               category: 'asesor'
             }
@@ -253,7 +253,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           items: [
             {
               id: 'beranda',
-              label: 'Beranda',
+              label: 'Dashboard',
               icon: <LayoutDashboard className="w-4 h-4" />,
               category: 'asesor'
             },
@@ -265,16 +265,22 @@ export const Sidebar: React.FC<SidebarProps> = ({
             },
             {
               id: 'penugasan',
-              label: 'Jadwal Pemeriksaan',
+              label: 'Penugasan & Jadwal',
               icon: <CalendarCheck className="w-4 h-4" />,
               category: 'asesor'
             },
             {
               id: 'pleno',
-              label: 'Sidang Pleno',
+              label: 'Sidang TAT',
               icon: <Users className="w-4 h-4" />,
               badge: badgeCounts.siapPleno > 0 ? badgeCounts.siapPleno : undefined,
               badgeColor: 'bg-[#1E2D4A] text-slate-200 border-[#2A3F6D]',
+              category: 'asesor'
+            },
+            {
+              id: 'about',
+              label: 'Bantuan',
+              icon: <Info className="w-4 h-4" />,
               category: 'asesor'
             }
           ],
@@ -292,19 +298,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
           items: [
             {
               id: 'beranda',
-              label: 'Beranda',
+              label: 'Dashboard',
               icon: <LayoutDashboard className="w-4 h-4" />,
               category: 'utama'
             },
             {
               id: 'permohonan',
-              label: 'Daftar Berkas',
+              label: 'Permohonan',
               icon: <FileSpreadsheet className="w-4 h-4" />,
               category: 'utama'
             },
             {
               id: 'pleno',
-              label: 'Sidang Pleno',
+              label: 'Sidang TAT',
               icon: <Users className="w-4 h-4" />,
               badge: badgeCounts.siapPleno > 0 ? badgeCounts.siapPleno : undefined,
               badgeColor: 'bg-[#1E2D4A] text-slate-200 border-[#2A3F6D]',
@@ -312,7 +318,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             },
             {
               id: 'dokumen',
-              label: 'Pengesahan Rekomendasi',
+              label: 'Rekomendasi',
               icon: <FileSignature className="w-4 h-4" />,
               badge: badgeCounts.menungguPengesahan > 0 ? badgeCounts.menungguPengesahan : undefined,
               badgeColor: 'bg-[#1E2D4A] text-slate-200 border-[#2A3F6D]',
@@ -320,7 +326,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             },
             {
               id: 'tindak_lanjut',
-              label: 'Rujukan & Fasilitas',
+              label: 'Monitoring Pengawasan Pasca Rehabilitasi',
               icon: <Share2 className="w-4 h-4" />,
               badge: badgeCounts.tindakLanjutTerhambat > 0 ? badgeCounts.tindakLanjutTerhambat : undefined,
               badgeColor: 'bg-[#1E2D4A] text-slate-200 border-[#2A3F6D]',
@@ -328,7 +334,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             },
             {
               id: 'about',
-              label: 'Tentang & Panduan Alur',
+              label: 'Bantuan',
               icon: <Info className="w-4 h-4" />,
               category: 'utama'
             }
@@ -345,25 +351,25 @@ export const Sidebar: React.FC<SidebarProps> = ({
           items: [
             {
               id: 'beranda',
-              label: 'Beranda',
+              label: 'Dashboard',
               icon: <LayoutDashboard className="w-4 h-4" />,
               category: 'kelola'
             },
             {
               id: 'monitoring',
-              label: 'Monitoring & SLA',
+              label: 'Laporan dan Statistik',
               icon: <BarChart3 className="w-4 h-4" />,
               category: 'kelola'
             },
             {
               id: 'permohonan',
-              label: 'Daftar Berkas',
+              label: 'Permohonan',
               icon: <FileSpreadsheet className="w-4 h-4" />,
               category: 'kelola'
             },
             {
               id: 'tindak_lanjut',
-              label: 'Rujukan & Fasilitas',
+              label: 'Monitoring Pengawasan Pasca Rehabilitasi',
               icon: <Share2 className="w-4 h-4" />,
               badge: badgeCounts.tindakLanjutTerhambat > 0 ? badgeCounts.tindakLanjutTerhambat : undefined,
               badgeColor: 'bg-[#1E2D4A] text-slate-200 border-[#2A3F6D]',
@@ -371,7 +377,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             },
             {
               id: 'about',
-              label: 'Tentang & Panduan Alur',
+              label: 'Bantuan',
               icon: <Info className="w-4 h-4" />,
               category: 'kelola'
             }
@@ -388,13 +394,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
           items: [
             {
               id: 'beranda',
-              label: 'Beranda',
+              label: 'Dashboard',
               icon: <LayoutDashboard className="w-4 h-4" />,
               category: 'output'
             },
             {
               id: 'tindak_lanjut',
-              label: 'Rujukan Klien',
+              label: 'Monitoring Pengawasan Pasca Rehabilitasi',
               icon: <Share2 className="w-4 h-4" />,
               badge: badgeCounts.tindakLanjutTerhambat > 0 ? badgeCounts.tindakLanjutTerhambat : undefined,
               badgeColor: 'bg-[#1E2D4A] text-slate-200 border-[#2A3F6D]',
@@ -402,13 +408,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
             },
             {
               id: 'dokumen',
-              label: 'Rekomendasi Resmi',
+              label: 'Rekomendasi',
               icon: <FileSignature className="w-4 h-4" />,
               category: 'output'
             },
             {
               id: 'about',
-              label: 'Tentang & Panduan Alur',
+              label: 'Bantuan',
               icon: <Info className="w-4 h-4" />,
               category: 'output'
             }
@@ -425,25 +431,25 @@ export const Sidebar: React.FC<SidebarProps> = ({
           items: [
             {
               id: 'beranda',
-              label: 'Beranda',
+              label: 'Dashboard',
               icon: <LayoutDashboard className="w-4 h-4" />,
               category: 'kelola'
             },
             {
               id: 'administrasi',
-              label: 'Pengguna & Regulasi',
+              label: 'Pengaturan',
               icon: <Settings className="w-4 h-4" />,
               category: 'kelola'
             },
             {
               id: 'monitoring',
-              label: 'Audit & Keamanan',
+              label: 'Laporan dan Statistik',
               icon: <BarChart3 className="w-4 h-4" />,
               category: 'kelola'
             },
             {
               id: 'about',
-              label: 'Tentang & Panduan Alur',
+              label: 'Bantuan',
               icon: <Info className="w-4 h-4" />,
               category: 'kelola'
             }
@@ -460,13 +466,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
           items: [
             {
               id: 'beranda',
-              label: 'Beranda',
+              label: 'Dashboard',
               icon: <LayoutDashboard className="w-4 h-4" />,
               category: 'utama'
             },
             {
               id: 'about',
-              label: 'Tentang & Panduan Alur',
+              label: 'Bantuan',
               icon: <Info className="w-4 h-4" />,
               category: 'utama'
             }
