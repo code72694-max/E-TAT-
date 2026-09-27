@@ -1282,17 +1282,17 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
           </div>
         )}
 
-        {/* TAB 7: REKOMENDASI & PENGESAHAN DOKUMEN RESMI */}
+        {/* TAB 7: REKOMENDASI & PENGESAHAN DOKUMEN RESMI (ACUAN VISUAL 8 - 3 PANEL) */}
         {activeTab === 'dokumen' && (
           <div className="space-y-6">
             <div className="flex items-center justify-between pb-3 border-b border-[#1b3459]">
               <div>
                 <h3 className="text-sm font-bold text-white flex items-center space-x-2">
                   <FileSignature className="w-4 h-4 text-[#D4AF37]" />
-                  <span>Surat Rekomendasi Resmi & Pengesahan Multi-Pihak</span>
+                  <span>Hasil Asesmen Terpadu & Pengesahan Dokumen (Acuan Visual 8)</span>
                 </h3>
                 <p className="text-xs text-slate-400">
-                  Dokumen resmi produk layanan TAT yang ditandatangani secara elektronik berjenjang.
+                  Ringkasan keputusan rekomendasi, preview PDF hasil asesmen resmi, dan jaminan keamanan audit trail.
                 </p>
               </div>
               {permohonan.rekomendasiResmi && (
@@ -1307,85 +1307,383 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
             </div>
 
             {!permohonan.rekomendasiResmi ? (
-              <div className="text-center py-12 text-slate-400">
+              <div className="text-center py-12 text-slate-400 bg-[#0b172a] border border-[#1b3459] rounded-xl">
                 <FileSignature className="w-8 h-8 text-slate-500 mx-auto mb-2" />
-                <p className="text-sm font-semibold">Surat rekomendasi belum diterbitkan.</p>
+                <p className="text-sm font-semibold text-slate-200">Surat rekomendasi belum diterbitkan.</p>
                 <p className="text-xs text-slate-500 mt-1">Dokumen resmi disusun setelah kesepakatan Sidang Pleno tercapai.</p>
               </div>
             ) : (
-              <div className="space-y-5">
-                {/* Official Letter Preview Card */}
-                <div className="border border-[#234b7d] rounded-xl p-6 bg-[#081224] font-serif">
-                  <div className="text-center pb-4 border-b-2 border-[#234b7d] space-y-0.5 font-sans">
-                    <p className="text-xs uppercase font-bold tracking-wider text-slate-400">
-                      TIM ASESMEN TERPADU (TAT) KORBAN PENYALAHGUNAAN NARKOTIKA
-                    </p>
-                    <p className="text-sm font-extrabold uppercase text-white">
-                      PROVINSI KALIMANTAN TIMUR
-                    </p>
-                    <p className="text-[10px] text-slate-400">
-                      Sekretariat: Kantor BNNP Kalimantan Timur, Jl. Rapak Indah No. 17, Karang Asam Ilir, Samarinda
-                    </p>
-                  </div>
+              <div className="space-y-6">
+                {/* 3-PANEL LAYOUT (EXACT MATCH FOR ACUAN VISUAL 8) */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
+                  
+                  {/* PANEL 1 (LEFT): REKOMENDASI TIM ASESMEN TERPADU */}
+                  <div className="lg:col-span-4 bg-[#0b172a] border border-[#1b3459] rounded-xl p-5 flex flex-col justify-between space-y-4 shadow-xl">
+                    <div className="space-y-4">
+                      {/* Header */}
+                      <div className="flex items-center space-x-2 pb-2 border-b border-[#1b3459]">
+                        <FileSignature className="w-4 h-4 text-[#D4AF37]" />
+                        <h4 className="text-xs font-bold text-white uppercase tracking-wider">
+                          REKOMENDASI TIM ASESMEN TERPADU
+                        </h4>
+                      </div>
 
-                  <div className="text-center my-4 font-sans">
-                    <h3 className="font-bold text-sm uppercase underline text-white">
-                      SURAT REKOMENDASI ASESMEN TERPADU
-                    </h3>
-                    <p className="text-xs font-mono text-[#D4AF37] mt-0.5">
-                      Nomor: {permohonan.rekomendasiResmi.nomorSurat}
-                    </p>
-                  </div>
+                      {/* Nomor Rekomendasi */}
+                      <div>
+                        <span className="text-[10px] uppercase tracking-wider font-semibold text-slate-400 block">
+                          Nomor Rekomendasi
+                        </span>
+                        <span className="text-xs font-mono font-bold text-slate-200 block mt-0.5">
+                          {permohonan.rekomendasiResmi.nomorSurat}
+                        </span>
+                      </div>
 
-                  <div className="space-y-3 text-xs leading-relaxed text-slate-300 font-sans">
-                    <p>
-                      Berdasarkan hasil asesmen medis dan asesmen hukum terhadap Terperiksa <strong className="text-white">{permohonan.terperiksa.namaLengkap}</strong> terkait perkara dugaan tindak pidana narkotika Nomor: <strong className="text-white">{permohonan.perkara.nomorLaporanPolisi}</strong>, bersama ini Tim Asesmen Terpadu menyampaikan simpulan pertimbangan sebagai berikut:
-                    </p>
-
-                    <div className="p-3 bg-[#0b172a] border border-[#1b3459] rounded space-y-2 text-slate-300">
-                      <p><strong className="text-white">1. Ringkasan Medis:</strong> {permohonan.rekomendasiResmi.ringkasanMedis}</p>
-                      <p><strong className="text-white">2. Ringkasan Hukum:</strong> {permohonan.rekomendasiResmi.ringkasanHukum}</p>
-                      <p className="pt-2 border-t border-[#1b3459] text-[#D4AF37] font-bold">
-                        <strong className="text-white">3. Rekomendasi Akhir:</strong> {permohonan.rekomendasiResmi.rekomendasiFinalText}
-                      </p>
-                    </div>
-
-                    <p className="text-[11px] text-slate-400 italic">
-                      Surat rekomendasi ini diterbitkan untuk digunakan sebagai pertimbangan penyidik, penuntut umum, dan hakim sesuai ketentuan perundang-undangan.
-                    </p>
-                  </div>
-
-                  {/* Signatures Matrix */}
-                  <div className="mt-6 pt-4 border-t border-[#1b3459] font-sans">
-                    <p className="text-xs font-bold text-white mb-3 text-center">
-                      DAFTAR PENGESAHAN DOKUMEN (TANDA TANGAN ELEKTRONIK TERSERTIFIKASI)
-                    </p>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                      {permohonan.rekomendasiResmi.daftarPengesah.map((p) => (
-                        <div key={p.id} className="border border-[#1b3459] rounded-lg p-3 bg-[#0b172a] text-center flex flex-col justify-between">
-                          <div>
-                            <p className="text-[10px] text-slate-400 font-semibold">{p.jabatan}</p>
-                            <p className="text-xs font-bold text-white mt-1">{p.nama}</p>
-                            <p className="text-[10px] text-slate-400">{p.instansi}</p>
+                      {/* Keputusan Card */}
+                      <div>
+                        <span className="text-[10px] uppercase tracking-wider font-semibold text-slate-400 block mb-1">
+                          Keputusan
+                        </span>
+                        <div className="p-3 bg-emerald-950/60 border border-emerald-500/50 rounded-xl flex items-center space-x-3 text-emerald-200">
+                          <div className="w-8 h-8 rounded-full bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center shrink-0">
+                            <CheckCircle2 className="w-5 h-5 text-slate-200" />
                           </div>
-
-                          <div className="mt-3 pt-2 border-t border-[#1b3459]">
-                            {p.status === 'disahkan' ? (
-                              <div className="text-slate-200 space-y-0.5">
-                                <span className="text-[10px] bg-[#0d1f38] text-slate-200 font-bold px-2 py-0.5 rounded block border border-[#1b3459]">
-                                  Telah Disahkan
-                                </span>
-                                <span className="text-[9px] text-[#D4AF37] block font-mono truncate">{p.tandaTanganDigitalHash}</span>
-                              </div>
-                            ) : (
-                              <span className="text-[10px] bg-[#0d1f38] text-[#D4AF37] font-semibold px-2 py-0.5 rounded block border border-[#1b3459]">
-                                Menunggu Pengesahan
-                              </span>
-                            )}
+                          <div>
+                            <span className="text-xs font-extrabold text-white block uppercase tracking-wider">
+                              DISETUJUI
+                            </span>
+                            <span className="text-[11px] font-semibold text-slate-200 block">
+                              Rekomendasi Positif
+                            </span>
                           </div>
                         </div>
-                      ))}
+                      </div>
+
+                      {/* Opsi Rekomendasi */}
+                      <div className="space-y-2">
+                        <span className="text-[10px] uppercase tracking-wider font-semibold text-slate-400 block">
+                          Opsi Rekomendasi
+                        </span>
+
+                        {/* Option 1: Positif (Selected) */}
+                        <div className="p-2.5 bg-[#071326] border border-[#2d5289] rounded-lg flex items-start space-x-2.5">
+                          <div className="w-4 h-4 rounded-full bg-emerald-500 flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
+                            <CheckCircle2 className="w-3 h-3 text-white" />
+                          </div>
+                          <div>
+                            <span className="text-xs font-bold text-white block">Rekomendasi Positif</span>
+                            <span className="text-[10px] text-slate-400 block">Disetujui untuk diproses sesuai ketentuan.</span>
+                          </div>
+                        </div>
+
+                        {/* Option 2: Positif dengan Catatan */}
+                        <div className="p-2.5 bg-[#071326]/50 border border-[#1b3459] rounded-lg flex items-start space-x-2.5 opacity-60">
+                          <div className="w-4 h-4 rounded-full border border-slate-500 shrink-0 mt-0.5" />
+                          <div>
+                            <span className="text-xs font-semibold text-slate-300 block">Rekomendasi Positif dengan Catatan</span>
+                            <span className="text-[10px] text-slate-400 block">Disetujui dengan pemenuhan catatan rekomendasi.</span>
+                          </div>
+                        </div>
+
+                        {/* Option 3: Negatif */}
+                        <div className="p-2.5 bg-[#071326]/50 border border-[#1b3459] rounded-lg flex items-start space-x-2.5 opacity-60">
+                          <div className="w-4 h-4 rounded-full border border-slate-500 shrink-0 mt-0.5" />
+                          <div>
+                            <span className="text-xs font-semibold text-slate-300 block">Rekomendasi Negatif</span>
+                            <span className="text-[10px] text-slate-400 block">Tidak disetujui untuk diproses lebih lanjut.</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Tanda Tangan Ketua Tim */}
+                      <div className="pt-2 border-t border-[#1b3459] space-y-1.5">
+                        <div className="flex justify-between items-baseline text-[10px]">
+                          <span className="text-slate-400 font-semibold">Tanda Tangan Ketua Tim</span>
+                          <span className="text-slate-400 font-mono">Tanggal: {permohonan.rekomendasiResmi.tanggalTerbit}</span>
+                        </div>
+
+                        <div className="p-3 bg-[#071326] border border-[#1b3459] rounded-lg text-center font-sans space-y-1">
+                          <div className="py-1">
+                            <span className="font-serif italic text-lg text-[#D4AF37] tracking-widest block font-bold" style={{ fontFamily: 'Dancing Script, cursive, serif' }}>
+                              Andi Pratama
+                            </span>
+                          </div>
+                          <span className="text-xs font-bold text-white block">
+                            KOMBES POL. ANDI PRATAMA, S.I.K., M.H.
+                          </span>
+                          <span className="text-[10px] text-slate-400 block">
+                            Ketua Tim Asesmen Terpadu
+                          </span>
+                        </div>
+
+                        <div className="flex justify-between text-[10px] text-slate-400 pt-0.5">
+                          <span>Tempat: Samarinda / Jakarta</span>
+                        </div>
+                      </div>
                     </div>
+
+                    {/* Action Button: Proses TTE & Finalisasi */}
+                    <button
+                      onClick={() => onOpenQrModal(permohonan)}
+                      className="w-full bg-gradient-to-r from-[#144782] via-[#17549c] to-[#1c64b8] hover:from-[#175194] hover:via-[#1c60b0] hover:to-[#2274d4] text-white font-bold text-xs py-2.5 px-4 rounded-xl border border-[#2d7ad6]/70 shadow-lg shadow-sky-950/40 flex items-center justify-center space-x-2 cursor-pointer transition-all mt-2"
+                    >
+                      <FileSignature className="w-4 h-4 text-[#D4AF37]" />
+                      <span>Proses TTE & Finalisasi</span>
+                    </button>
+                  </div>
+
+                  {/* PANEL 2 (CENTER): PREVIEW DOKUMEN HASIL ASESMEN (PDF PAPER VIEW) */}
+                  <div className="lg:col-span-5 bg-[#0b172a] border border-[#1b3459] rounded-xl p-4 flex flex-col justify-between space-y-3 shadow-xl">
+                    {/* Header bar */}
+                    <div className="flex items-center justify-between pb-2 border-b border-[#1b3459]">
+                      <span className="text-xs font-bold text-white uppercase tracking-wider flex items-center space-x-1.5">
+                        <FileText className="w-4 h-4 text-sky-400" />
+                        <span>PREVIEW DOKUMEN HASIL ASESMEN (PDF)</span>
+                      </span>
+                      <div className="flex items-center space-x-1.5">
+                        <button
+                          onClick={() => onOpenQrModal(permohonan)}
+                          className="p-1.5 hover:bg-[#163a69] text-slate-300 rounded border border-[#234b7d] transition-colors"
+                          title="Unduh PDF Hasil Asesmen"
+                        >
+                          <Download className="w-3.5 h-3.5 text-[#D4AF37]" />
+                        </button>
+                        <button
+                          onClick={() => onOpenQrModal(permohonan)}
+                          className="p-1.5 hover:bg-[#163a69] text-slate-300 rounded border border-[#234b7d] transition-colors"
+                          title="Buka Lembar Verifikasi Barcode"
+                        >
+                          <ExternalLink className="w-3.5 h-3.5 text-slate-300" />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* PDF Document Paper Container */}
+                    <div className="bg-white text-slate-900 rounded-lg p-5 shadow-2xl space-y-4 font-serif text-[11px] leading-relaxed flex-1 flex flex-col justify-between border border-slate-300">
+                      <div>
+                        {/* Kop Surat Header */}
+                        <div className="text-center pb-3 border-b-2 border-slate-900 space-y-0.5 font-sans">
+                          <p className="text-[10px] font-extrabold uppercase tracking-wider text-slate-900">
+                            KEPOLISIAN NEGARA REPUBLIK INDONESIA
+                          </p>
+                          <p className="text-xs font-black uppercase text-slate-900 mt-1">
+                            HASIL ASESMEN TERPADU
+                          </p>
+                          <p className="text-[10px] font-mono font-bold text-slate-700">
+                            Nomor: {permohonan.rekomendasiResmi.nomorSurat}
+                          </p>
+                        </div>
+
+                        {/* Document Section Outline (EXACT MATCH FOR ACUAN VISUAL 8) */}
+                        <div className="mt-4 space-y-1.5 font-sans text-[10px] text-slate-800 font-bold uppercase tracking-wide">
+                          <div className="flex justify-between border-b border-slate-200 pb-0.5">
+                            <span>I. IDENTITAS PEMOHON</span>
+                          </div>
+                          <div className="flex justify-between border-b border-slate-200 pb-0.5">
+                            <span>II. DASAR ASESMEN</span>
+                          </div>
+                          <div className="flex justify-between border-b border-slate-200 pb-0.5">
+                            <span>III. RUANG LINGKUP ASESMEN</span>
+                          </div>
+                          <div className="flex justify-between border-b border-slate-200 pb-0.5">
+                            <span>IV. METODOLOGI ASESMEN</span>
+                          </div>
+                          <div className="flex justify-between border-b border-slate-200 pb-0.5">
+                            <span>V. HASIL ASESMEN PER BIDANG</span>
+                          </div>
+                          <div className="flex justify-between border-b border-slate-200 pb-0.5">
+                            <span>VI. TEMUAN & CATATAN</span>
+                          </div>
+                          <div className="flex justify-between border-b border-slate-200 pb-0.5 text-slate-900 font-black">
+                            <span>VII. REKOMENDASI TIM ASESMEN TERPADU</span>
+                          </div>
+                          <div className="flex justify-between border-b border-slate-200 pb-0.5">
+                            <span>VIII. KEPUTUSAN</span>
+                          </div>
+                          <div className="flex justify-between border-b border-slate-200 pb-0.5">
+                            <span>IX. PENUTUP</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* PDF Bottom Signature & QR Verification Section */}
+                      <div className="pt-4 border-t border-slate-300 font-sans grid grid-cols-12 gap-3 items-end">
+                        {/* QR Code Verification Box (Left) */}
+                        <div className="col-span-5 bg-slate-50 border border-slate-300 rounded p-2 text-center space-y-1">
+                          <div className="w-14 h-14 bg-white border border-slate-900 mx-auto flex items-center justify-center p-1 rounded">
+                            <QrCode className="w-12 h-12 text-slate-900" />
+                          </div>
+                          <span className="text-[8px] font-black uppercase text-slate-900 block leading-tight">
+                            SCAN UNTUK VERIFIKASI DOKUMEN
+                          </span>
+                          <p className="text-[7px] text-slate-600 leading-tight">
+                            Pastikan dokumen asli dengan memindai QR Code atau kunjungi{' '}
+                            <span className="text-slate-900 font-mono font-bold underline">https://e-tat.polri.go.id/verify</span>
+                          </p>
+                        </div>
+
+                        {/* Ketua Tim Signature (Right) */}
+                        <div className="col-span-7 text-center font-sans space-y-1">
+                          <p className="text-[9px] text-slate-700">Samarinda, {permohonan.rekomendasiResmi.tanggalTerbit}</p>
+                          <p className="text-[9px] font-bold text-slate-900 uppercase">Ketua Tim Asesmen Terpadu</p>
+                          <div className="py-1">
+                            <span className="font-serif italic text-base text-slate-900 block font-bold" style={{ fontFamily: 'Dancing Script, cursive, serif' }}>
+                              Andi Pratama
+                            </span>
+                          </div>
+                          <p className="text-[9px] font-extrabold text-slate-900 underline">
+                            KOMBES POL. ANDI PRATAMA, S.I.K., M.H.
+                          </p>
+                          <p className="text-[8px] font-mono text-slate-700">NRP 73060660</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* PANEL 3 (RIGHT): KEAMANAN & AUDIT TRAIL */}
+                  <div className="lg:col-span-3 bg-[#0b172a] border border-[#1b3459] rounded-xl p-5 flex flex-col justify-between space-y-3 shadow-xl">
+                    <div className="space-y-3">
+                      {/* Header */}
+                      <div className="flex items-center space-x-2 pb-2 border-b border-[#1b3459]">
+                        <Shield className="w-4 h-4 text-[#D4AF37]" />
+                        <h4 className="text-xs font-bold text-white uppercase tracking-wider">
+                          KEAMANAN & AUDIT TRAIL
+                        </h4>
+                      </div>
+
+                      {/* Security Features List */}
+                      <div className="space-y-2.5">
+                        {/* 1. Login 2FA */}
+                        <div className="p-2.5 bg-[#071326] border border-[#1b3459] rounded-lg flex items-start space-x-2.5">
+                          <div className="w-6 h-6 rounded-full bg-[#132d54] flex items-center justify-center shrink-0 mt-0.5 border border-[#2d5289]">
+                            <User className="w-3.5 h-3.5 text-[#D4AF37]" />
+                          </div>
+                          <div>
+                            <span className="text-xs font-bold text-white block">Login 2FA/MFA</span>
+                            <span className="text-[10px] text-slate-400 block leading-tight mt-0.5">
+                              Autentikasi dua faktor untuk perlindungan akses pengguna.
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* 2. RBAC */}
+                        <div className="p-2.5 bg-[#071326] border border-[#1b3459] rounded-lg flex items-start space-x-2.5">
+                          <div className="w-6 h-6 rounded-full bg-[#132d54] flex items-center justify-center shrink-0 mt-0.5 border border-[#2d5289]">
+                            <Users className="w-3.5 h-3.5 text-[#D4AF37]" />
+                          </div>
+                          <div>
+                            <span className="text-xs font-bold text-white block">Role Based Access Control</span>
+                            <span className="text-[10px] text-slate-400 block leading-tight mt-0.5">
+                              Akses disesuaikan peran dan tanggung jawab.
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* 3. Encrypted Data */}
+                        <div className="p-2.5 bg-[#071326] border border-[#1b3459] rounded-lg flex items-start space-x-2.5">
+                          <div className="w-6 h-6 rounded-full bg-[#132d54] flex items-center justify-center shrink-0 mt-0.5 border border-[#2d5289]">
+                            <Shield className="w-3.5 h-3.5 text-[#D4AF37]" />
+                          </div>
+                          <div>
+                            <span className="text-xs font-bold text-white block">Enkripsi Data & Dokumen</span>
+                            <span className="text-[10px] text-slate-400 block leading-tight mt-0.5">
+                              Data dan dokumen dienkripsi end-to-end untuk keamanan.
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* 4. Immutable Audit Trail */}
+                        <div className="p-2.5 bg-[#071326] border border-[#1b3459] rounded-lg flex items-start space-x-2.5">
+                          <div className="w-6 h-6 rounded-full bg-[#132d54] flex items-center justify-center shrink-0 mt-0.5 border border-[#2d5289]">
+                            <History className="w-3.5 h-3.5 text-[#D4AF37]" />
+                          </div>
+                          <div>
+                            <span className="text-xs font-bold text-white block">Audit Trail Tidak Dapat Dihapus</span>
+                            <span className="text-[10px] text-slate-400 block leading-tight mt-0.5">
+                              Seluruh aktivitas tercatat dan tidak dapat diubah atau dihapus.
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* 5. Backup & Recovery */}
+                        <div className="p-2.5 bg-[#071326] border border-[#1b3459] rounded-lg flex items-start space-x-2.5">
+                          <div className="w-6 h-6 rounded-full bg-[#132d54] flex items-center justify-center shrink-0 mt-0.5 border border-[#2d5289]">
+                            <Activity className="w-3.5 h-3.5 text-[#D4AF37]" />
+                          </div>
+                          <div>
+                            <span className="text-xs font-bold text-white block">Backup & Disaster Recovery</span>
+                            <span className="text-[10px] text-slate-400 block leading-tight mt-0.5">
+                              Pencadangan rutin dan rencana pemulihan bencana tersedia.
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* 6. QR Code Verification */}
+                        <div className="p-2.5 bg-[#071326] border border-[#1b3459] rounded-lg flex items-start space-x-2.5">
+                          <div className="w-6 h-6 rounded-full bg-[#132d54] flex items-center justify-center shrink-0 mt-0.5 border border-[#2d5289]">
+                            <QrCode className="w-3.5 h-3.5 text-[#D4AF37]" />
+                          </div>
+                          <div>
+                            <span className="text-xs font-bold text-white block">QR Code Verifikasi</span>
+                            <span className="text-[10px] text-slate-400 block leading-tight mt-0.5">
+                              Verifikasi keaslian dokumen secara cepat dan aman.
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* 7. Electronic Signature */}
+                        <div className="p-2.5 bg-[#071326] border border-[#1b3459] rounded-lg flex items-start space-x-2.5">
+                          <div className="w-6 h-6 rounded-full bg-[#132d54] flex items-center justify-center shrink-0 mt-0.5 border border-[#2d5289]">
+                            <FileSignature className="w-3.5 h-3.5 text-[#D4AF37]" />
+                          </div>
+                          <div>
+                            <span className="text-xs font-bold text-white block">Tanda Tangan Elektronik</span>
+                            <span className="text-[10px] text-slate-400 block leading-tight mt-0.5">
+                              Dokumen ditandatangani secara elektronik yang sah dan tersertifikasi.
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Signatures Matrix & Confirmation Section Below 3-Panel Grid */}
+                <div className="border border-[#234b7d] rounded-xl p-5 bg-[#081224] space-y-4">
+                  <div className="flex items-center justify-between pb-3 border-b border-[#1b3459]">
+                    <span className="text-xs font-bold text-white uppercase tracking-wider flex items-center space-x-2">
+                      <FileSignature className="w-4 h-4 text-[#D4AF37]" />
+                      <span>Matriks Tanda Tangan Elektronik Multi-Pihak</span>
+                    </span>
+                    <span className="text-xs font-semibold text-[#D4AF37]">
+                      {permohonan.rekomendasiResmi.daftarPengesah.filter(p => p.status === 'disahkan').length} / {permohonan.rekomendasiResmi.daftarPengesah.length} Pengesahan
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                    {permohonan.rekomendasiResmi.daftarPengesah.map((p) => (
+                      <div key={p.id} className="border border-[#1b3459] rounded-lg p-3 bg-[#0b172a] text-center flex flex-col justify-between shadow-sm">
+                        <div>
+                          <p className="text-[10px] text-slate-400 font-semibold">{p.jabatan}</p>
+                          <p className="text-xs font-bold text-white mt-1">{p.nama}</p>
+                          <p className="text-[10px] text-slate-400">{p.instansi}</p>
+                        </div>
+
+                        <div className="mt-3 pt-2 border-t border-[#1b3459]">
+                          {p.status === 'disahkan' ? (
+                            <div className="text-slate-200 space-y-0.5">
+                              <span className="text-[10px] bg-[#0d1f38] text-slate-200 font-bold px-2 py-0.5 rounded block border border-[#1b3459]">
+                                ✓ Telah Disahkan
+                              </span>
+                              <span className="text-[9px] text-[#D4AF37] block font-mono truncate">{p.tandaTanganDigitalHash}</span>
+                            </div>
+                          ) : (
+                            <span className="text-[10px] bg-[#0d1f38] text-[#D4AF37] font-semibold px-2 py-0.5 rounded block border border-[#1b3459]">
+                              Menunggu Pengesahan
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
 

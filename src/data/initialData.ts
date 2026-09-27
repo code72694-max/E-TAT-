@@ -2,15 +2,6 @@ import { PermohonanAsesmen, UserProfile, DokumenPersyaratan } from '../types';
 
 export const MOCK_USERS: UserProfile[] = [
   {
-    id: 'user-sekretariat',
-    name: 'Petugas Sekretariat Test-1',
-    nip: '198403152006041002',
-    role: 'sekretariat',
-    agency: 'Sekretariat TAT - BNN Kota Samarinda',
-    email: 'sekretariat.test1@bnn.go.id',
-    phone: '0812-3456-7890'
-  },
-  {
     id: 'user-pengaju',
     name: 'Penyidik Pengaju Test-1',
     nip: '198907122010121003',
@@ -38,6 +29,24 @@ export const MOCK_USERS: UserProfile[] = [
     phone: '0815-7766-5544'
   },
   {
+    id: 'user-sekretariat',
+    name: 'Petugas Sekretariat Test-1',
+    nip: '198403152006041002',
+    role: 'sekretariat',
+    agency: 'Sekretariat TAT - BNN Kota Samarinda',
+    email: 'sekretariat.test1@bnn.go.id',
+    phone: '0812-3456-7890'
+  },
+  {
+    id: 'user-admin',
+    name: 'Administrator Sistem Test-1',
+    nip: '199501202020121004',
+    role: 'admin',
+    agency: 'Pusdatin BNN RI',
+    email: 'admin.test1@bnn.go.id',
+    phone: '0812-9900-1122'
+  },
+  {
     id: 'user-koordinator',
     name: 'Koordinator TAT Test-1',
     nip: '197705142001121001',
@@ -63,15 +72,6 @@ export const MOCK_USERS: UserProfile[] = [
     agency: 'Balai Besar Rehabilitasi BNN Tanah Merah Bogor',
     email: 'rehab.test1@lido.bnn.go.id',
     phone: '0813-4455-6677'
-  },
-  {
-    id: 'user-admin',
-    name: 'Administrator Sistem Test-1',
-    nip: '199501202020121004',
-    role: 'admin',
-    agency: 'Pusdatin BNN RI',
-    email: 'admin.test1@bnn.go.id',
-    phone: '0812-9900-1122'
   }
 ];
 

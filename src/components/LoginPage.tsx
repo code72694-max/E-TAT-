@@ -23,30 +23,33 @@ export const LoginPage: React.FC<LoginPageProps> = ({
   onLogin,
   onBackToLanding
 }) => {
-  const [selectedUserId, setSelectedUserId] = useState<string>(MOCK_USERS[1].id);
-  const [emailInput, setEmailInput] = useState(MOCK_USERS[1].email);
+  const FIVE_MAIN_ROLES = ['pengaju', 'medis', 'hukum', 'sekretariat', 'admin'];
+  const mainUsers = MOCK_USERS.filter(u => FIVE_MAIN_ROLES.includes(u.role));
+
+  const [selectedUserId, setSelectedUserId] = useState<string>(mainUsers[0]?.id || MOCK_USERS[1].id);
+  const [emailInput, setEmailInput] = useState(mainUsers[0]?.email || MOCK_USERS[1].email);
   const [passwordInput, setPasswordInput] = useState('••••••••••••');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
 
   const getRoleLabel = (role: UserRole) => {
     switch (role) {
+      case 'pengaju':
+        return 'Pemohon / Penyidik (Polri/BNN)';
+      case 'medis':
+        return 'Petugas Medis / Dokter Asesor';
+      case 'hukum':
+        return 'Petugas Hukum / Asesor Hukum';
+      case 'sekretariat':
+        return 'Sekretariat Tata Usaha TAT';
+      case 'admin':
+        return 'Administrator Sistem';
       case 'pimpinan':
         return 'Pimpinan / Kepala BNNP';
       case 'koordinator':
         return 'Koordinator Tim Asesmen (TAT)';
-      case 'hukum':
-        return 'Asesor Hukum (Kejaksaan/Polri)';
-      case 'pengaju':
-        return 'Penyidik Pengaju (Polri/BNN)';
-      case 'medis':
-        return 'Dokter Asesor Medis / Psikiater';
-      case 'sekretariat':
-        return 'Sekretariat Tata Usaha TAT';
       case 'rehabilitasi':
         return 'Petugas Balai Rehabilitasi';
-      case 'admin':
-        return 'Pusdatin / Administrator Sistem';
       default:
         return 'Petugas Resmi';
     }
@@ -97,20 +100,21 @@ export const LoginPage: React.FC<LoginPageProps> = ({
           {/* Card Header & Branding */}
           <div className="text-center space-y-1">
             <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight font-['Cinzel',serif]">
-              LOGIN
+              LOGIN SISTEM
             </h1>
+            <p className="text-xs text-slate-400">Portal Otentikasi Petugas Tim Asesmen Terpadu</p>
           </div>
 
           {/* Clean Card Surface */}
           <div className="bg-[#09172e] rounded-2xl border border-[#1b3459] p-6 sm:p-7 shadow-2xl shadow-black/40 space-y-5">
-            {/* Quick Role Preset Picker */}
+            {/* Quick Role Preset Picker - 5 Main Roles */}
             <div className="space-y-1.5 pb-4 border-b border-[#1b3459]">
               <label className="flex items-center justify-between text-[11px] font-semibold text-slate-300">
                 <span className="flex items-center space-x-1.5">
                   <UserCheck className="w-3.5 h-3.5 text-[#D4AF37]" />
-                  <span>Pilih Profil Akun Kedinasan (Simulasi):</span>
+                  <span>Pilih Profil Akun Peran (5 Utama):</span>
                 </span>
-                <span className="text-[10px] text-slate-400 font-mono">8 Otoritas</span>
+                <span className="text-[10px] text-[#D4AF37] font-mono">5 Peran Kedinasan</span>
               </label>
 
               <select
@@ -118,7 +122,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                 onChange={e => handleDropdownChange(e.target.value)}
                 className="w-full bg-[#061021] text-white border border-[#1b3459] focus:border-[#D4AF37] rounded-xl px-3 py-2.5 text-xs font-medium focus:outline-none transition-colors cursor-pointer truncate"
               >
-                {MOCK_USERS.map(user => (
+                {mainUsers.map(user => (
                   <option key={user.id} value={user.id}>
                     {user.name} — {getRoleLabel(user.role)}
                   </option>
@@ -203,6 +207,19 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                 <span>Masuk ke Dashboard</span>
               </button>
             </form>
+
+            {/* Public Access Link for General Public (Tanpa Login) */}
+            <div className="pt-4 border-t border-[#1b3459] text-center space-y-2">
+              <span className="text-[11px] text-slate-400 block">Layanan Akses Umum / Masyarakat (Tanpa Login):</span>
+              <button
+                type="button"
+                onClick={onBackToLanding}
+                className="w-full bg-[#061021] hover:bg-[#0e213d] text-slate-200 hover:text-white text-xs font-semibold py-2.5 px-3 rounded-xl border border-[#1b3459] hover:border-[#D4AF37]/50 flex items-center justify-center space-x-2 transition-all cursor-pointer"
+              >
+                <Shield className="w-3.5 h-3.5 text-[#D4AF37]" />
+                <span>Portal Publik Umum (Lacak Berkas & SOP TAT)</span>
+              </button>
+            </div>
           </div>
         </div>
       </main>
