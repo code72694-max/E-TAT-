@@ -494,14 +494,14 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
           </button>
           <div>
             <div className="flex items-center space-x-2">
-              <span className="text-xs uppercase font-semibold text-[#38bdf8] bg-[#142642] px-2 py-0.5 rounded border border-[#1e3c66]">
+              <span className="text-xs uppercase font-semibold text-[#D4AF37] bg-[#142642] px-2 py-0.5 rounded border border-[#1e3c66]">
                 Berkas Asesmen Terpadu
               </span>
               <span className="text-xs text-slate-500">•</span>
               <span className="text-xs text-slate-400">Diajukan: {permohonan.tanggalPengajuan}</span>
             </div>
             <h1 className="text-xl font-bold text-white flex items-center space-x-2 mt-0.5">
-              <span className="font-mono text-[#F1C40F]">{permohonan.nomorPermohonan}</span>
+              <span className="font-mono text-[#D4AF37]">{permohonan.nomorPermohonan}</span>
               <span className="text-slate-600 font-normal">|</span>
               <span className="text-white">{permohonan.terperiksa.namaLengkap}</span>
             </h1>
@@ -512,9 +512,9 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
         {permohonan.rekomendasiResmi && (
           <button
             onClick={() => onOpenQrModal(permohonan)}
-            className="bg-gradient-to-r from-[#144782] via-[#17549c] to-[#1c64b8] hover:from-[#175194] hover:via-[#1c60b0] hover:to-[#2274d4] text-white text-xs font-bold px-3.5 py-2 rounded-xl flex items-center space-x-2 border border-[#2d7ad6]/70 shadow-[0_2px_10px_rgba(20,83,154,0.35)] cursor-pointer transition-all shrink-0"
+            className="bg-gradient-to-r from-[#0d1f38] via-[#132644] to-[#1b3459] hover:from-[#175194] hover:via-[#1c60b0] hover:to-[#2274d4] text-white text-xs font-bold px-3.5 py-2 rounded-xl flex items-center space-x-2 border border-[#2d7ad6]/70 shadow-[0_2px_10px_rgba(20,83,154,0.35)] cursor-pointer transition-all shrink-0"
           >
-            <QrCode className="w-4 h-4 text-[#F1C40F]" />
+            <QrCode className="w-4 h-4 text-[#D4AF37]" />
             <span>Verifikasi Keabsahan (QR)</span>
           </button>
         )}
@@ -526,7 +526,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
           <div className="bg-[#081224] border border-[#1b3459] rounded-lg px-3 py-2">
             <span className="text-[10px] uppercase font-semibold text-slate-400 block">Proses Utama</span>
-            <span className="text-xs font-bold text-[#38bdf8] mt-0.5 block truncate">
+            <span className="text-xs font-bold text-[#D4AF37] mt-0.5 block truncate">
               {formatStatus(permohonan.statusProsesUtama)}
             </span>
           </div>
@@ -534,9 +534,9 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
           <div className="bg-[#081224] border border-[#1b3459] rounded-lg px-3 py-2">
             <span className="text-[10px] uppercase font-semibold text-slate-400 block">Telaah Medis & Hukum</span>
             <div className="text-xs font-semibold text-slate-200 mt-0.5 flex items-center space-x-1.5 truncate">
-              <span className="text-emerald-400">M: {formatStatus(permohonan.statusMedis)}</span>
+              <span className="text-[#D4AF37]">M: {formatStatus(permohonan.statusMedis)}</span>
               <span className="text-slate-600">|</span>
-              <span className="text-purple-300">H: {formatStatus(permohonan.statusHukum)}</span>
+              <span className="text-slate-200">H: {formatStatus(permohonan.statusHukum)}</span>
             </div>
           </div>
 
@@ -549,7 +549,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
 
           <div className="bg-[#081224] border border-[#1b3459] rounded-lg px-3 py-2">
             <span className="text-[10px] uppercase font-semibold text-slate-400 block">Tindak Lanjut</span>
-            <span className={`text-xs font-bold mt-0.5 block truncate ${permohonan.statusTindakLanjut === 'terhambat' ? 'text-rose-400' : 'text-slate-200'}`}>
+            <span className={`text-xs font-bold mt-0.5 block truncate ${permohonan.statusTindakLanjut === 'terhambat' ? 'text-slate-300' : 'text-slate-200'}`}>
               {formatStatus(permohonan.statusTindakLanjut)}
             </span>
           </div>
@@ -563,7 +563,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
             <span className="text-slate-600">•</span>
             <span className="text-slate-400">PJ: <strong className="text-slate-200">{permohonan.penanggungJawabBerikutnya}</strong></span>
             <span className="text-slate-600">•</span>
-            <span className="text-slate-400">SLA: <strong className="text-[#F1C40F]">{permohonan.tenggatSlaTanggal}</strong></span>
+            <span className="text-slate-400">SLA: <strong className="text-[#D4AF37]">{permohonan.tenggatSlaTanggal}</strong></span>
           </div>
 
           {/* Action Buttons */}
@@ -571,7 +571,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
             {permohonan.statusProsesUtama === 'perlu_perbaikan' && currentUser.role === 'pengaju' && (
               <button
                 onClick={() => setActiveTab('administrasi')}
-                className="bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center space-x-1.5 transition-all cursor-pointer"
+                className="bg-[#133863] hover:bg-[#1a4a82] text-white text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center space-x-1.5 transition-all cursor-pointer"
               >
                 <Upload className="w-3.5 h-3.5" />
                 <span>Unggah Perbaikan</span>
@@ -581,7 +581,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
             {permohonan.statusProsesUtama === 'verifikasi_berkas' && currentUser.role === 'sekretariat' && (
               <button
                 onClick={() => setActiveTab('administrasi')}
-                className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center space-x-1.5 transition-all cursor-pointer"
+                className="bg-[#133863] hover:bg-[#1a4a82] text-white text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center space-x-1.5 transition-all cursor-pointer"
               >
                 <CheckCircle2 className="w-3.5 h-3.5" />
                 <span>Verifikasi Dokumen</span>
@@ -591,7 +591,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
             {permohonan.statusProsesUtama === 'pengesahan_rekomendasi' && userCanSignNow && (
               <button
                 onClick={handleDigitalSign}
-                className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center space-x-1.5 transition-all cursor-pointer"
+                className="bg-[#133863] hover:bg-[#1a4a82] text-white text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center space-x-1.5 transition-all cursor-pointer"
               >
                 <FileSignature className="w-3.5 h-3.5" />
                 <span>Tandatangani Rekomendasi</span>
@@ -601,7 +601,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
             {currentUser.role === 'rehabilitasi' && permohonan.tindakLanjut && (
               <button
                 onClick={() => setActiveTab('tindak_lanjut')}
-                className="bg-teal-600 hover:bg-teal-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center space-x-1.5 transition-all cursor-pointer"
+                className="bg-[#133863] hover:bg-[#1a4a82] text-white text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center space-x-1.5 transition-all cursor-pointer"
               >
                 <Share2 className="w-3.5 h-3.5" />
                 <span>Konfirmasi Rujukan</span>
@@ -611,7 +611,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
             {currentUser.role === 'pengaju' && permohonan.rekomendasiResmi && (permohonan.statusProsesUtama === 'rekomendasi_terbit' || permohonan.statusProsesUtama === 'selesai_tindak_lanjut') && (
               <button
                 onClick={() => setActiveTab('dokumen')}
-                className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center space-x-1.5 transition-all cursor-pointer"
+                className="bg-[#133863] hover:bg-[#1a4a82] text-white text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center space-x-1.5 transition-all cursor-pointer"
               >
                 <Download className="w-3.5 h-3.5" />
                 <span>Rekomendasi Resmi</span>
@@ -623,7 +623,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
                 onClick={() => setActiveTab('klarifikasi')}
                 className="bg-[#1b3459] hover:bg-[#25487a] text-slate-200 text-xs font-medium px-3 py-1.5 rounded-lg flex items-center space-x-1.5 transition-all cursor-pointer border border-[#2d5289]"
               >
-                <MessageSquare className="w-3.5 h-3.5 text-[#38bdf8]" />
+                <MessageSquare className="w-3.5 h-3.5 text-[#D4AF37]" />
                 <span>Klarifikasi ({permohonan.klarifikasiList.length})</span>
               </button>
             )}
@@ -642,7 +642,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center space-x-2 px-3.5 py-2.5 font-semibold rounded-t-lg transition-colors whitespace-nowrap cursor-pointer ${
                   isActive
-                    ? 'border-b-2 border-[#38bdf8] text-[#38bdf8] bg-[#0b172a]'
+                    ? 'border-b-2 border-[#D4AF37] text-[#D4AF37] bg-[#0b172a]'
                     : 'text-slate-400 hover:text-white hover:bg-[#0b172a]/60'
                 }`}
               >
@@ -664,15 +664,15 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
               <div className="border border-[#1b3459] rounded-xl p-4 bg-[#081224]">
                 <div className="flex items-center justify-between pb-2 border-b border-[#1b3459] mb-3">
                   <div className="flex items-center space-x-2">
-                    <User className="w-4 h-4 text-[#38bdf8]" />
+                    <User className="w-4 h-4 text-[#D4AF37]" />
                     <h3 className="text-sm font-bold text-white">Data Terperiksa</h3>
                   </div>
                   {permohonan.terperiksa.isNikVerified ? (
-                    <span className="text-[10px] bg-emerald-900/60 text-emerald-300 font-bold px-2 py-0.5 rounded border border-emerald-700/60">
+                    <span className="text-[10px] bg-[#0d1f38] text-slate-200 font-bold px-2 py-0.5 rounded border border-[#1b3459]">
                       NIK Terverifikasi
                     </span>
                   ) : (
-                    <span className="text-[10px] bg-amber-900/60 text-amber-300 font-bold px-2 py-0.5 rounded border border-amber-700/60">
+                    <span className="text-[10px] bg-[#0d1f38] text-[#D4AF37] font-bold px-2 py-0.5 rounded border border-[#1b3459]">
                       NIK Perlu Verifikasi
                     </span>
                   )}
@@ -689,7 +689,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
                   </div>
                   <div className="grid grid-cols-3">
                     <span className="text-slate-400">NIK / Identitas</span>
-                    <span className="col-span-2 font-mono text-[#F1C40F]">{permohonan.terperiksa.nik || 'Tidak ada (Dibuatkan ID Khusus)'}</span>
+                    <span className="col-span-2 font-mono text-[#D4AF37]">{permohonan.terperiksa.nik || 'Tidak ada (Dibuatkan ID Khusus)'}</span>
                   </div>
                   <div className="grid grid-cols-3">
                     <span className="text-slate-400">Tempat, Tgl Lahir</span>
@@ -718,10 +718,10 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
               <div className="border border-[#1b3459] rounded-xl p-4 bg-[#081224]">
                 <div className="flex items-center justify-between pb-2 border-b border-[#1b3459] mb-3">
                   <div className="flex items-center space-x-2">
-                    <Scale className="w-4 h-4 text-purple-400" />
+                    <Scale className="w-4 h-4 text-[#D4AF37]" />
                     <h3 className="text-sm font-bold text-white">Data Perkara</h3>
                   </div>
-                  <span className="text-[10px] bg-purple-900/60 text-purple-300 font-semibold px-2 py-0.5 rounded border border-purple-700/60">
+                  <span className="text-[10px] bg-[#0d1f38] text-slate-200 font-semibold px-2 py-0.5 rounded border border-[#1b3459]">
                     Penyidikan Aktif
                   </span>
                 </div>
@@ -745,7 +745,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
                   </div>
                   <div className="grid grid-cols-3">
                     <span className="text-slate-400">Pasal Sangkaan</span>
-                    <span className="col-span-2 font-bold text-amber-300 bg-amber-950/40 p-1.5 rounded border border-amber-500/40 font-mono">
+                    <span className="col-span-2 font-bold text-[#D4AF37] bg-[#081224] p-1.5 rounded border border-[#1b3459] font-mono">
                       {permohonan.perkara.pasalDipersangkakan}
                     </span>
                   </div>
@@ -768,7 +768,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
             {/* Barang Bukti Sub-Section */}
             <div className="border border-[#1b3459] rounded-xl p-4 bg-[#081224]">
               <h3 className="text-xs font-bold uppercase tracking-wider text-slate-300 mb-3 flex items-center space-x-2">
-                <Shield className="w-4 h-4 text-[#38bdf8]" />
+                <Shield className="w-4 h-4 text-[#D4AF37]" />
                 <span>Barang Bukti & Uji Lab</span>
               </h3>
               <div className="overflow-x-auto">
@@ -789,11 +789,11 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
                         <td className="p-2.5 font-semibold text-slate-200">{bb.beratBersihGram} Gram</td>
                         <td className="p-2.5">
                           {bb.statusUjiLab === 'positif' ? (
-                            <span className="bg-emerald-900/60 text-emerald-300 text-[10px] font-bold px-2 py-0.5 rounded border border-emerald-700/60">
+                            <span className="bg-[#0d1f38] text-slate-200 text-[10px] font-bold px-2 py-0.5 rounded border border-[#1b3459]">
                               Positif Lab
                             </span>
                           ) : bb.statusUjiLab === 'proses_lab' ? (
-                            <span className="bg-amber-900/60 text-amber-300 text-[10px] font-bold px-2 py-0.5 rounded border border-amber-700/60">
+                            <span className="bg-[#0d1f38] text-[#D4AF37] text-[10px] font-bold px-2 py-0.5 rounded border border-[#1b3459]">
                               Sedang Diuji Lab
                             </span>
                           ) : (
@@ -838,7 +838,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
 
                 <div className="flex items-center space-x-4">
                   <div className="text-right">
-                    <span className="font-mono text-xl font-extrabold text-emerald-400 block">{percentComplete}%</span>
+                    <span className="font-mono text-xl font-extrabold text-[#D4AF37] block">{percentComplete}%</span>
                     <span className="text-[10px] text-slate-400">
                       {validDocsCount} Sesuai &bull; {invalidDocsCount} Koreksi
                     </span>
@@ -854,7 +854,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
 
               <div className="flex items-center justify-between pb-3 border-b border-[#1b3459]">
                 <h3 className="text-sm font-bold text-white">Daftar Dokumen Persyaratan Resmi</h3>
-                <span className="text-xs text-slate-400">Role Anda: <strong className="text-[#38bdf8] capitalize">{currentUser.role}</strong></span>
+                <span className="text-xs text-slate-400">Role Anda: <strong className="text-[#D4AF37] capitalize">{currentUser.role}</strong></span>
               </div>
 
               <div className="space-y-3">
@@ -863,7 +863,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
                   key={doc.id}
                   className={`border rounded-xl p-4 transition-all ${
                     doc.statusVerifikasi === 'perlu_perbaikan'
-                      ? 'border-amber-500/50 bg-amber-950/20'
+                      ? 'border-[#1b3459] bg-amber-950/20'
                       : doc.statusVerifikasi === 'sesuai'
                       ? 'border-emerald-500/40 bg-emerald-950/20'
                       : 'border-[#1b3459] bg-[#081224]'
@@ -884,7 +884,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
 
                       {doc.fileName && (
                         <div className="flex items-center space-x-3 text-xs text-slate-400 pt-0.5">
-                          <span className="font-mono text-[#38bdf8] underline cursor-pointer">{doc.fileName}</span>
+                          <span className="font-mono text-[#D4AF37] underline cursor-pointer">{doc.fileName}</span>
                           <span className="text-slate-500">• {doc.fileSize}</span>
                           <span className="text-slate-500">• Diunggah: {doc.uploadedAt}</span>
                         </div>
@@ -892,9 +892,9 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
 
                       {/* Targeted Correction Note from Secretariat */}
                       {doc.catatanKoreksi && (
-                        <div className="mt-2 p-2.5 bg-amber-950/50 border border-amber-500/40 rounded-lg text-xs text-amber-200">
-                          <div className="font-semibold flex items-center space-x-1.5 text-amber-300 mb-0.5">
-                            <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
+                        <div className="mt-2 p-2.5 bg-[#081224] border border-[#1b3459] rounded-lg text-xs text-amber-200">
+                          <div className="font-semibold flex items-center space-x-1.5 text-[#D4AF37] mb-0.5">
+                            <AlertTriangle className="w-3.5 h-3.5 text-[#D4AF37]" />
                             <span>Catatan Koreksi dari Sekretariat TAT:</span>
                           </div>
                           <p>{doc.catatanKoreksi}</p>
@@ -905,13 +905,13 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
                     {/* Status Badge & Actions */}
                     <div className="flex flex-col sm:flex-row items-end md:items-center space-y-2 sm:space-y-0 sm:space-x-2 shrink-0">
                       {doc.statusVerifikasi === 'sesuai' ? (
-                        <span className="bg-emerald-900/60 text-emerald-300 text-xs font-semibold px-3 py-1 rounded-lg border border-emerald-700/60 flex items-center space-x-1">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                        <span className="bg-[#0d1f38] text-slate-200 text-xs font-semibold px-3 py-1 rounded-lg border border-[#1b3459] flex items-center space-x-1">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-[#D4AF37]" />
                           <span>Sesuai</span>
                         </span>
                       ) : doc.statusVerifikasi === 'perlu_perbaikan' ? (
-                        <span className="bg-amber-900/60 text-amber-300 text-xs font-bold px-3 py-1 rounded-lg border border-amber-700/60 flex items-center space-x-1">
-                          <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
+                        <span className="bg-[#0d1f38] text-[#D4AF37] text-xs font-bold px-3 py-1 rounded-lg border border-[#1b3459] flex items-center space-x-1">
+                          <AlertTriangle className="w-3.5 h-3.5 text-[#D4AF37]" />
                           <span>Perlu Perbaikan</span>
                         </span>
                       ) : (
@@ -924,7 +924,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
                       {currentUser.role === 'pengaju' && doc.statusVerifikasi === 'perlu_perbaikan' && (
                         <button
                           onClick={() => handleFixDocument(doc.id)}
-                          className="bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center space-x-1.5 border border-amber-500 cursor-pointer transition-all"
+                          className="bg-[#133863] hover:bg-[#1a4a82] text-white text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center space-x-1.5 border border-amber-500 cursor-pointer transition-all"
                         >
                           <Upload className="w-3.5 h-3.5" />
                           <span>Unggah File Perbaikan</span>
@@ -936,7 +936,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
                         <div className="flex items-center space-x-1">
                           <button
                             onClick={() => handleVerifyDocumentItem(doc.id, 'sesuai')}
-                            className="bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-semibold px-2.5 py-1 rounded transition-colors cursor-pointer"
+                            className="bg-[#133863] hover:bg-[#1a4a82] text-white text-[11px] font-semibold px-2.5 py-1 rounded transition-colors cursor-pointer"
                           >
                             Setujui
                           </button>
@@ -945,7 +945,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
                               const note = prompt('Tuliskan catatan koreksi spesifik untuk dokumen ini:');
                               if (note) handleVerifyDocumentItem(doc.id, 'perlu_perbaikan', note);
                             }}
-                            className="bg-amber-600 hover:bg-amber-700 text-white text-[11px] font-semibold px-2.5 py-1 rounded transition-colors cursor-pointer"
+                            className="bg-[#133863] hover:bg-[#1a4a82] text-white text-[11px] font-semibold px-2.5 py-1 rounded transition-colors cursor-pointer"
                           >
                             Minta Koreksi
                           </button>
@@ -993,12 +993,12 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
             <div className="border border-[#234b7d] bg-[#0d213d] rounded-xl p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <span className="text-[10px] font-bold uppercase text-[#38bdf8]">Agenda Sidang Pleno Bersama</span>
+                  <span className="text-[10px] font-bold uppercase text-[#D4AF37]">Agenda Sidang Pleno Bersama</span>
                   <p className="text-sm font-bold text-white mt-1">
                     {permohonan.timAsesmen?.jadwalPleno || 'Belum dijadwalkan (Menunggu kedua asesmen selesai)'}
                   </p>
                 </div>
-                <span className="text-xs bg-[#17375e] text-[#38bdf8] px-2.5 py-1 rounded-full font-semibold border border-[#234b7d]">
+                <span className="text-xs bg-[#17375e] text-[#D4AF37] px-2.5 py-1 rounded-full font-semibold border border-[#234b7d]">
                   {permohonan.sidangPleno?.statusPleno ? formatStatus(permohonan.sidangPleno.statusPleno) : 'Menunggu Kesiapan'}
                 </span>
               </div>
@@ -1012,7 +1012,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
             <div className="flex items-center justify-between pb-3 border-b border-[#1b3459]">
               <div>
                 <h3 className="text-sm font-bold text-white flex items-center space-x-2">
-                  <Stethoscope className="w-4 h-4 text-emerald-400" />
+                  <Stethoscope className="w-4 h-4 text-[#D4AF37]" />
                   <span>Hasil Pemeriksaan Medis & Psikologis Terstruktur</span>
                 </h3>
                 <p className="text-xs text-slate-400">
@@ -1020,7 +1020,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
                 </p>
               </div>
               {permohonan.asesmenMedis && (
-                <span className="text-xs bg-emerald-900/60 text-emerald-300 font-semibold px-2.5 py-1 rounded-lg border border-emerald-700/60">
+                <span className="text-xs bg-[#0d1f38] text-slate-200 font-semibold px-2.5 py-1 rounded-lg border border-[#1b3459]">
                   Asesor: {permohonan.asesmenMedis.asesorNama}
                 </span>
               )}
@@ -1031,7 +1031,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
                 <Stethoscope className="w-8 h-8 text-slate-500 mx-auto mb-2" />
                 <p className="text-sm font-semibold">Asesmen medis belum diisi atau sedang berlangsung.</p>
                 {currentUser.role === 'medis' && (
-                  <p className="text-xs text-emerald-400 mt-1">Anda dapat memulai wawancara klinis dan pengisian formulir.</p>
+                  <p className="text-xs text-[#D4AF37] mt-1">Anda dapat memulai wawancara klinis dan pengisian formulir.</p>
                 )}
               </div>
             ) : (
@@ -1039,17 +1039,17 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
                 {/* Instrumen ASSIST & Diagnosis Banner */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                   <div className="bg-emerald-950/30 border border-emerald-500/30 rounded-lg p-3">
-                    <span className="text-[10px] font-bold uppercase text-emerald-400">Skor Instrumen ASSIST</span>
+                    <span className="text-[10px] font-bold uppercase text-[#D4AF37]">Skor Instrumen ASSIST</span>
                     <div className="text-xl font-extrabold text-white mt-1">
                       {permohonan.asesmenMedis.skorInstrumen} Poin
                     </div>
-                    <span className="text-[11px] font-semibold text-emerald-300">
+                    <span className="text-[11px] font-semibold text-slate-200">
                       Tingkat Risiko: {permohonan.asesmenMedis.tingkatRisikoInstrumen}
                     </span>
                   </div>
 
                   <div className="bg-blue-950/30 border border-blue-500/30 rounded-lg p-3">
-                    <span className="text-[10px] font-bold uppercase text-[#38bdf8]">Diagnosis Klinis ICD-10</span>
+                    <span className="text-[10px] font-bold uppercase text-[#D4AF37]">Diagnosis Klinis ICD-10</span>
                     <div className="text-xs font-bold text-white mt-1">
                       {permohonan.asesmenMedis.diagnosisKlinisIcd}
                     </div>
@@ -1057,11 +1057,11 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
                   </div>
 
                   <div className="bg-purple-950/30 border border-purple-500/30 rounded-lg p-3">
-                    <span className="text-[10px] font-bold uppercase text-purple-300">Usulan Intervensi Medis</span>
+                    <span className="text-[10px] font-bold uppercase text-slate-200">Usulan Intervensi Medis</span>
                     <div className="text-sm font-extrabold text-white mt-1">
                       {permohonan.asesmenMedis.kebutuhanRawat} ({permohonan.asesmenMedis.durasiUsulanBulan} Bulan)
                     </div>
-                    <span className="text-[11px] text-purple-300">Sesuai standar klinis BNN & Kemenkes</span>
+                    <span className="text-[11px] text-slate-200">Sesuai standar klinis BNN & Kemenkes</span>
                   </div>
                 </div>
 
@@ -1084,7 +1084,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
                       {permohonan.asesmenMedis.hasilUrin.map((u, i) => (
                         <div key={i} className="flex items-center justify-between p-1.5 bg-[#0b172a] rounded border border-[#1b3459]">
                           <span className="font-mono text-slate-300">{u.parameter}</span>
-                          <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${u.hasil === 'Positif' ? 'bg-red-900/60 text-red-300 border border-red-700/60' : 'bg-emerald-900/60 text-emerald-300 border border-emerald-700/60'}`}>
+                          <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${u.hasil === 'Positif' ? 'bg-red-900/60 text-red-300 border border-red-700/60' : 'bg-[#0d1f38] text-slate-200 border border-[#1b3459]'}`}>
                             {u.hasil}
                           </span>
                         </div>
@@ -1114,7 +1114,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
             <div className="flex items-center justify-between pb-3 border-b border-[#1b3459]">
               <div>
                 <h3 className="text-sm font-bold text-white flex items-center space-x-2">
-                  <Scale className="w-4 h-4 text-purple-400" />
+                  <Scale className="w-4 h-4 text-[#D4AF37]" />
                   <span>Telaah Yuridis & Analisis Peran Terperiksa</span>
                 </h3>
                 <p className="text-xs text-slate-400">
@@ -1122,7 +1122,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
                 </p>
               </div>
               {permohonan.asesmenHukum && (
-                <span className="text-xs bg-purple-900/60 text-purple-300 font-semibold px-2.5 py-1 rounded-lg border border-purple-700/60">
+                <span className="text-xs bg-[#0d1f38] text-slate-200 font-semibold px-2.5 py-1 rounded-lg border border-[#1b3459]">
                   Asesor: {permohonan.asesmenHukum.asesorNama}
                 </span>
               )}
@@ -1138,7 +1138,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
                 {/* Status Peran & Rekomendasi Hukum */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="bg-purple-950/30 border border-purple-500/30 rounded-xl p-4">
-                    <span className="text-[10px] font-bold uppercase text-purple-300">Hasil Analisis Peran Terperiksa</span>
+                    <span className="text-[10px] font-bold uppercase text-slate-200">Hasil Analisis Peran Terperiksa</span>
                     <div className="text-base font-extrabold text-white mt-1">
                       {permohonan.asesmenHukum.analisisPeran}
                     </div>
@@ -1148,7 +1148,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
                   </div>
 
                   <div className="bg-blue-950/30 border border-blue-500/30 rounded-xl p-4">
-                    <span className="text-[10px] font-bold uppercase text-[#38bdf8]">Rekomendasi Aspek Hukum</span>
+                    <span className="text-[10px] font-bold uppercase text-[#D4AF37]">Rekomendasi Aspek Hukum</span>
                     <div className="text-base font-extrabold text-white mt-1">
                       {permohonan.asesmenHukum.rekomendasiHukum}
                     </div>
@@ -1161,8 +1161,8 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
                 {/* Fakta Terverifikasi vs Belum Terverifikasi (Dokumen 1 Section 4.5) */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
                   <div className="border border-emerald-500/30 rounded-xl p-3.5 bg-emerald-950/20">
-                    <h4 className="font-bold text-emerald-300 mb-2 flex items-center space-x-1.5">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                    <h4 className="font-bold text-slate-200 mb-2 flex items-center space-x-1.5">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-[#D4AF37]" />
                       <span>Fakta Pendukung yang Terverifikasi:</span>
                     </h4>
                     <ul className="list-disc list-inside space-y-1 text-slate-300">
@@ -1176,8 +1176,8 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
                   </div>
 
                   <div className="border border-amber-500/30 rounded-xl p-3.5 bg-amber-950/20">
-                    <h4 className="font-bold text-amber-300 mb-2 flex items-center space-x-1.5">
-                      <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
+                    <h4 className="font-bold text-[#D4AF37] mb-2 flex items-center space-x-1.5">
+                      <AlertTriangle className="w-3.5 h-3.5 text-[#D4AF37]" />
                       <span>Catatan Informasi yang Belum Terverifikasi / Perlu Pendalaman:</span>
                     </h4>
                     <p className="text-slate-300 leading-relaxed">
@@ -1199,7 +1199,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
             <div className="flex items-center justify-between pb-3 border-b border-[#1b3459]">
               <div>
                 <h3 className="text-sm font-bold text-white flex items-center space-x-2">
-                  <Users className="w-4 h-4 text-[#38bdf8]" />
+                  <Users className="w-4 h-4 text-[#D4AF37]" />
                   <span>Musyawarah Sidang Pleno Tim Asesmen Terpadu</span>
                 </h3>
                 <p className="text-xs text-slate-400">
@@ -1207,7 +1207,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
                 </p>
               </div>
               {permohonan.sidangPleno && (
-                <span className="text-xs bg-[#17375e] text-[#38bdf8] font-semibold px-2.5 py-1 rounded-lg border border-[#234b7d]">
+                <span className="text-xs bg-[#17375e] text-[#D4AF37] font-semibold px-2.5 py-1 rounded-lg border border-[#234b7d]">
                   No. BA: {permohonan.sidangPleno.nomorBeritaAcara}
                 </span>
               )}
@@ -1225,7 +1225,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
                 <div className="bg-[#081224] border border-[#1b3459] rounded-xl p-4 text-xs space-y-2">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <span className="font-bold text-white text-sm">{permohonan.sidangPleno.pimpinanPleno}</span>
-                    <span className="bg-[#17375e] text-[#38bdf8] px-2.5 py-0.5 rounded font-bold border border-[#234b7d]">
+                    <span className="bg-[#17375e] text-[#D4AF37] px-2.5 py-0.5 rounded font-bold border border-[#234b7d]">
                       {formatStatus(permohonan.sidangPleno.statusPleno)}
                     </span>
                   </div>
@@ -1241,7 +1241,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
 
                   <div className="p-3 bg-[#0d213d] border border-[#234b7d] rounded-lg">
                     <h4 className="font-bold text-white mb-1">Kesepakatan Rekomendasi Final:</h4>
-                    <p className="text-[#38bdf8] font-medium">{permohonan.sidangPleno.kesepakatanRekomendasi}</p>
+                    <p className="text-[#D4AF37] font-medium">{permohonan.sidangPleno.kesepakatanRekomendasi}</p>
                     <div className="flex items-center space-x-3 mt-2 text-[11px] text-slate-300">
                       <span>Jenis: <strong className="text-white">{permohonan.sidangPleno.jenisRekomendasiFinal}</strong></span>
                       {permohonan.sidangPleno.durasiRehabBulan && (
@@ -1254,7 +1254,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
                   </div>
 
                   {permohonan.sidangPleno.catatanPerbedaanPendapat && (
-                    <div className="p-3 bg-amber-950/40 border border-amber-500/40 rounded-lg text-amber-200">
+                    <div className="p-3 bg-[#081224] border border-[#1b3459] rounded-lg text-amber-200">
                       <strong>Catatan Perbedaan Pendapat (Dissenting Opinions):</strong> {permohonan.sidangPleno.catatanPerbedaanPendapat}
                     </div>
                   )}
@@ -1270,7 +1270,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
                           <p className="font-bold text-white">{p.nama}</p>
                           <p className="text-[10px] text-slate-400">{p.peran} • {p.instansi}</p>
                         </div>
-                        <span className="text-[10px] bg-emerald-900/60 text-emerald-300 font-bold px-2 py-0.5 rounded border border-emerald-700/60">
+                        <span className="text-[10px] bg-[#0d1f38] text-slate-200 font-bold px-2 py-0.5 rounded border border-[#1b3459]">
                           Hadir
                         </span>
                       </div>
@@ -1288,7 +1288,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
             <div className="flex items-center justify-between pb-3 border-b border-[#1b3459]">
               <div>
                 <h3 className="text-sm font-bold text-white flex items-center space-x-2">
-                  <FileSignature className="w-4 h-4 text-[#38bdf8]" />
+                  <FileSignature className="w-4 h-4 text-[#D4AF37]" />
                   <span>Surat Rekomendasi Resmi & Pengesahan Multi-Pihak</span>
                 </h3>
                 <p className="text-xs text-slate-400">
@@ -1300,7 +1300,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
                   onClick={() => onOpenQrModal(permohonan)}
                   className="bg-[#0f274a] hover:bg-[#163a69] text-white text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center space-x-1.5 border border-[#234b7d] cursor-pointer transition-colors"
                 >
-                  <QrCode className="w-3.5 h-3.5 text-[#38bdf8]" />
+                  <QrCode className="w-3.5 h-3.5 text-[#D4AF37]" />
                   <span>Cek QR Verifikasi</span>
                 </button>
               )}
@@ -1332,7 +1332,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
                     <h3 className="font-bold text-sm uppercase underline text-white">
                       SURAT REKOMENDASI ASESMEN TERPADU
                     </h3>
-                    <p className="text-xs font-mono text-[#38bdf8] mt-0.5">
+                    <p className="text-xs font-mono text-[#D4AF37] mt-0.5">
                       Nomor: {permohonan.rekomendasiResmi.nomorSurat}
                     </p>
                   </div>
@@ -1345,7 +1345,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
                     <div className="p-3 bg-[#0b172a] border border-[#1b3459] rounded space-y-2 text-slate-300">
                       <p><strong className="text-white">1. Ringkasan Medis:</strong> {permohonan.rekomendasiResmi.ringkasanMedis}</p>
                       <p><strong className="text-white">2. Ringkasan Hukum:</strong> {permohonan.rekomendasiResmi.ringkasanHukum}</p>
-                      <p className="pt-2 border-t border-[#1b3459] text-[#38bdf8] font-bold">
+                      <p className="pt-2 border-t border-[#1b3459] text-[#D4AF37] font-bold">
                         <strong className="text-white">3. Rekomendasi Akhir:</strong> {permohonan.rekomendasiResmi.rekomendasiFinalText}
                       </p>
                     </div>
@@ -1371,14 +1371,14 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
 
                           <div className="mt-3 pt-2 border-t border-[#1b3459]">
                             {p.status === 'disahkan' ? (
-                              <div className="text-emerald-300 space-y-0.5">
-                                <span className="text-[10px] bg-emerald-900/60 text-emerald-300 font-bold px-2 py-0.5 rounded block border border-emerald-700/60">
+                              <div className="text-slate-200 space-y-0.5">
+                                <span className="text-[10px] bg-[#0d1f38] text-slate-200 font-bold px-2 py-0.5 rounded block border border-[#1b3459]">
                                   Telah Disahkan
                                 </span>
-                                <span className="text-[9px] text-[#38bdf8] block font-mono truncate">{p.tandaTanganDigitalHash}</span>
+                                <span className="text-[9px] text-[#D4AF37] block font-mono truncate">{p.tandaTanganDigitalHash}</span>
                               </div>
                             ) : (
-                              <span className="text-[10px] bg-amber-900/60 text-amber-300 font-semibold px-2 py-0.5 rounded block border border-amber-700/60">
+                              <span className="text-[10px] bg-[#0d1f38] text-[#D4AF37] font-semibold px-2 py-0.5 rounded block border border-[#1b3459]">
                                 Menunggu Pengesahan
                               </span>
                             )}
@@ -1393,10 +1393,10 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
                 {permohonan.rekomendasiResmi.buktiPenerimaanPengaju ? (
                   <div className="p-3 bg-emerald-950/30 border border-emerald-500/40 rounded-xl text-xs text-emerald-200 flex items-center justify-between">
                     <div>
-                      <span className="font-bold block text-emerald-300">Konfirmasi Tanda Terima Pengaju:</span>
+                      <span className="font-bold block text-slate-200">Konfirmasi Tanda Terima Pengaju:</span>
                       <span>Diterima oleh {permohonan.rekomendasiResmi.buktiPenerimaanPengaju.diterimaOleh} pada {permohonan.rekomendasiResmi.buktiPenerimaanPengaju.tanggalDiterima}</span>
                     </div>
-                    <span className="font-mono font-bold bg-[#0b172a] text-emerald-300 px-2 py-1 rounded border border-emerald-500/40">
+                    <span className="font-mono font-bold bg-[#0b172a] text-slate-200 px-2 py-1 rounded border border-emerald-500/40">
                       {permohonan.rekomendasiResmi.buktiPenerimaanPengaju.nomorTandaTerima}
                     </span>
                   </div>
@@ -1410,9 +1410,9 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
                     </div>
                     <button
                       onClick={handlePengajuSignReceipt}
-                      className="bg-gradient-to-r from-[#144782] via-[#17549c] to-[#1c64b8] hover:from-[#175194] hover:via-[#1c60b0] hover:to-[#2274d4] text-white font-bold text-xs px-4 py-2 rounded-xl border border-[#2d7ad6]/70 shadow-[0_2px_10px_rgba(20,83,154,0.35)] flex items-center space-x-1.5 shrink-0 cursor-pointer transition-all"
+                      className="bg-gradient-to-r from-[#0d1f38] via-[#132644] to-[#1b3459] hover:from-[#175194] hover:via-[#1c60b0] hover:to-[#2274d4] text-white font-bold text-xs px-4 py-2 rounded-xl border border-[#2d7ad6]/70 shadow-[0_2px_10px_rgba(20,83,154,0.35)] flex items-center space-x-1.5 shrink-0 cursor-pointer transition-all"
                     >
-                      <CheckCircle2 className="w-3.5 h-3.5 text-[#F1C40F]" />
+                      <CheckCircle2 className="w-3.5 h-3.5 text-[#D4AF37]" />
                       <span>Tandatangani Tanda Terima</span>
                     </button>
                   </div>
@@ -1458,7 +1458,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
                         {formatStatus(permohonan.tindakLanjut.statusRujukan)}
                       </span>
                     </div>
-                    <span className="text-xs bg-[#0b172a] px-3 py-1 rounded-full font-semibold border border-[#234b7d] text-[#38bdf8]">
+                    <span className="text-xs bg-[#0b172a] px-3 py-1 rounded-full font-semibold border border-[#234b7d] text-[#D4AF37]">
                       Fasilitas: {permohonan.tindakLanjut.namaFasilitasTujuan || 'Belum Ditentukan'}
                     </span>
                   </div>
@@ -1487,7 +1487,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
                       {permohonan.tindakLanjut.statusRujukan !== 'diterima_fasilitas' && permohonan.tindakLanjut.statusRujukan !== 'klien_mulai_layanan' && (
                         <button
                           onClick={() => handleRehabAction('terima')}
-                          className="bg-teal-600 hover:bg-teal-700 text-white text-xs font-semibold px-3 py-2 rounded-lg flex items-center space-x-1.5 border border-teal-500 cursor-pointer transition-all shadow-none"
+                          className="bg-[#133863] hover:bg-[#1a4a82] text-white text-xs font-semibold px-3 py-2 rounded-lg flex items-center space-x-1.5 border border-teal-500 cursor-pointer transition-all shadow-none"
                         >
                           <CheckCircle2 className="w-3.5 h-3.5" />
                           <span>Konfirmasi Ketersediaan Kuota & Jadwal Terima</span>
@@ -1497,7 +1497,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
                       {permohonan.tindakLanjut.statusRujukan !== 'klien_mulai_layanan' && (
                         <button
                           onClick={() => handleRehabAction('admisi')}
-                          className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-3 py-2 rounded-lg flex items-center space-x-1.5 border border-emerald-500 cursor-pointer transition-all shadow-none"
+                          className="bg-[#133863] hover:bg-[#1a4a82] text-white text-xs font-semibold px-3 py-2 rounded-lg flex items-center space-x-1.5 border border-emerald-500 cursor-pointer transition-all shadow-none"
                         >
                           <CheckCircle2 className="w-3.5 h-3.5" />
                           <span>Konfirmasi Klien Masuk Layanan (Admisi Selesai)</span>
@@ -1512,7 +1512,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
                           }}
                           className="bg-rose-900/60 hover:bg-rose-900/80 text-rose-200 text-xs font-semibold px-3 py-2 rounded-lg flex items-center space-x-1.5 border border-rose-500/50 cursor-pointer transition-all shadow-none"
                         >
-                          <AlertTriangle className="w-3.5 h-3.5 text-rose-400" />
+                          <AlertTriangle className="w-3.5 h-3.5 text-slate-300" />
                           <span>Laporkan Kuota Penuh / Kendala</span>
                         </button>
                       )}
@@ -1560,7 +1560,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
           <div className="space-y-6">
             <div className="pb-3 border-b border-[#1b3459]">
               <h3 className="text-sm font-bold text-white flex items-center space-x-2">
-                <MessageSquare className="w-4 h-4 text-[#38bdf8]" />
+                <MessageSquare className="w-4 h-4 text-[#D4AF37]" />
                 <span>Klarifikasi Terarah Melekat pada Berkas</span>
               </h3>
               <p className="text-xs text-slate-400">
@@ -1577,7 +1577,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
                   <select
                     value={tujuanPeran}
                     onChange={(e) => setTujuanPeran(e.target.value as UserRole)}
-                    className="border border-[#1b3459] rounded px-2 py-1 bg-[#0b172a] font-medium text-white focus:outline-none focus:border-[#38bdf8]"
+                    className="border border-[#1b3459] rounded px-2 py-1 bg-[#0b172a] font-medium text-white focus:outline-none focus:border-[#D4AF37]"
                   >
                     <option value="pengaju">Penyidik Pengaju</option>
                     <option value="sekretariat">Sekretariat TAT</option>
@@ -1594,16 +1594,16 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
                 onChange={(e) => setPertanyaanInput(e.target.value)}
                 placeholder="Tuliskan permintaan klarifikasi substantif atau administrasi secara spesifik..."
                 rows={2}
-                className="w-full text-xs p-2.5 border border-[#1b3459] rounded-lg focus:outline-none focus:border-[#38bdf8] bg-[#0b172a] text-white placeholder-slate-500"
+                className="w-full text-xs p-2.5 border border-[#1b3459] rounded-lg focus:outline-none focus:border-[#D4AF37] bg-[#0b172a] text-white placeholder-slate-500"
               />
 
               <div className="flex justify-end">
                 <button
                   type="submit"
                   disabled={!pertanyaanInput.trim()}
-                  className="bg-gradient-to-r from-[#144782] via-[#17549c] to-[#1c64b8] hover:from-[#175194] hover:via-[#1c60b0] hover:to-[#2274d4] disabled:opacity-50 text-white text-xs font-bold px-4 py-2 rounded-xl flex items-center space-x-1.5 border border-[#2d7ad6]/70 shadow-[0_2px_10px_rgba(20,83,154,0.35)] cursor-pointer transition-all"
+                  className="bg-gradient-to-r from-[#0d1f38] via-[#132644] to-[#1b3459] hover:from-[#175194] hover:via-[#1c60b0] hover:to-[#2274d4] disabled:opacity-50 text-white text-xs font-bold px-4 py-2 rounded-xl flex items-center space-x-1.5 border border-[#2d7ad6]/70 shadow-[0_2px_10px_rgba(20,83,154,0.35)] cursor-pointer transition-all"
                 >
-                  <Send className="w-3.5 h-3.5 text-[#F1C40F]" />
+                  <Send className="w-3.5 h-3.5 text-[#D4AF37]" />
                   <span>Kirim Klarifikasi</span>
                 </button>
               </div>
@@ -1619,7 +1619,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
                     <div className="flex items-center justify-between text-[11px] text-slate-400">
                       <div className="flex items-center space-x-2">
                         <span className="font-bold text-white">{item.dariNama}</span>
-                        <span className="bg-[#0b172a] text-[#38bdf8] px-1.5 py-0.5 rounded font-medium capitalize border border-[#1b3459]">
+                        <span className="bg-[#0b172a] text-[#D4AF37] px-1.5 py-0.5 rounded font-medium capitalize border border-[#1b3459]">
                           {item.dariPeran}
                         </span>
                         <span>→ Kepada: <strong className="capitalize text-white">{item.kepadaPeran}</strong></span>
@@ -1632,15 +1632,15 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
                     </p>
 
                     {item.jawaban ? (
-                      <div className="mt-2 pl-4 border-l-2 border-[#38bdf8] bg-[#0d213d] p-2.5 rounded-r">
-                        <div className="flex items-center justify-between text-[10px] text-[#38bdf8] font-semibold mb-1">
+                      <div className="mt-2 pl-4 border-l-2 border-[#D4AF37] bg-[#0d213d] p-2.5 rounded-r">
+                        <div className="flex items-center justify-between text-[10px] text-[#D4AF37] font-semibold mb-1">
                           <span>Jawaban oleh {item.dijawabOleh}</span>
                           <span className="text-slate-400">{item.tanggalJawab}</span>
                         </div>
                         <p className="text-slate-200">{item.jawaban}</p>
                       </div>
                     ) : (
-                      <div className="flex items-center justify-between text-[11px] text-amber-300 font-medium pt-1">
+                      <div className="flex items-center justify-between text-[11px] text-[#D4AF37] font-medium pt-1">
                         <span>Menunggu tanggapan dari {item.kepadaPeran}...</span>
                         {currentUser.role === item.kepadaPeran && (
                           <button
@@ -1684,7 +1684,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
           <div className="space-y-4">
             <div className="pb-3 border-b border-[#1b3459]">
               <h3 className="text-sm font-bold text-white flex items-center space-x-2">
-                <History className="w-4 h-4 text-[#38bdf8]" />
+                <History className="w-4 h-4 text-[#D4AF37]" />
                 <span>Catatan Riwayat Aktivitas & Jejak Audit (Audit Trail)</span>
               </h3>
               <p className="text-xs text-slate-400">
@@ -1695,14 +1695,14 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
             <div className="space-y-3">
               {permohonan.auditLogs.map((log) => (
                 <div key={log.id} className="p-3 bg-[#081224] border border-[#1b3459] rounded-lg text-xs flex items-start space-x-3">
-                  <div className="w-2 h-2 rounded-full bg-[#38bdf8] mt-1.5 shrink-0" />
+                  <div className="w-2 h-2 rounded-full bg-[#D4AF37] mt-1.5 shrink-0" />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
                       <span className="font-bold text-white">{log.aksi}</span>
                       <span className="text-[10px] text-slate-400">{log.timestamp}</span>
                     </div>
                     <p className="text-slate-300 mt-0.5">{log.rincian}</p>
-                    <span className="text-[10px] text-[#38bdf8] font-semibold mt-1 inline-block">
+                    <span className="text-[10px] text-[#D4AF37] font-semibold mt-1 inline-block">
                       Oleh: {log.actorNama} ({log.actorPeran})
                     </span>
                   </div>

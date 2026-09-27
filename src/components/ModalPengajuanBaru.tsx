@@ -224,18 +224,18 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
               key={s.num}
               className={`flex items-center space-x-2 ${
                 step === s.num
-                  ? 'text-[#38bdf8] font-bold'
+                  ? 'text-[#D4AF37] font-bold'
                   : step > s.num
-                  ? 'text-emerald-400'
+                  ? 'text-[#D4AF37]'
                   : 'text-slate-500'
               }`}
             >
               <div
                 className={`w-6 h-6 rounded-full flex items-center justify-center text-xs border ${
                   step === s.num
-                    ? 'bg-[#1b3459] text-[#38bdf8] border-[#38bdf8]'
+                    ? 'bg-[#1b3459] text-[#D4AF37] border-[#D4AF37]'
                     : step > s.num
-                    ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                    ? 'bg-emerald-500/20 text-slate-200 border-emerald-500/40'
                     : 'bg-[#0b172a] text-slate-400 border-[#1b3459]'
                 }`}
               >
@@ -263,7 +263,7 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
                     value={namaLengkap}
                     onChange={(e) => setNamaLengkap(e.target.value)}
                     placeholder="Contoh: Terperiksa Test-1 / Subjek Uji"
-                    className="w-full p-2 border border-[#1b3459] bg-[#081224] text-white rounded-lg focus:ring-2 focus:ring-[#38bdf8] focus:border-[#38bdf8] outline-none"
+                    className="w-full p-2 border border-[#1b3459] bg-[#081224] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-[#D4AF37] outline-none"
                     required
                   />
                 </div>
@@ -275,7 +275,7 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
                     value={alias}
                     onChange={(e) => setAlias(e.target.value)}
                     placeholder="Contoh: Subjek-01 / Test-A"
-                    className="w-full p-2 border border-[#1b3459] bg-[#081224] text-white rounded-lg focus:ring-2 focus:ring-[#38bdf8] focus:border-[#38bdf8] outline-none"
+                    className="w-full p-2 border border-[#1b3459] bg-[#081224] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-[#D4AF37] outline-none"
                   />
                 </div>
 
@@ -286,7 +286,7 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
                     value={nik}
                     onChange={(e) => setNik(e.target.value)}
                     placeholder="16 Digit NIK"
-                    className="w-full p-2 border border-[#1b3459] bg-[#081224] text-white rounded-lg font-mono focus:ring-2 focus:ring-[#38bdf8] focus:border-[#38bdf8] outline-none"
+                    className="w-full p-2 border border-[#1b3459] bg-[#081224] text-white rounded-lg font-mono focus:ring-2 focus:ring-[#D4AF37] focus:border-[#D4AF37] outline-none"
                   />
                 </div>
 
@@ -295,7 +295,7 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
                   <select
                     value={statusKhusus}
                     onChange={(e) => setStatusKhusus(e.target.value as any)}
-                    className="w-full p-2 border border-[#1b3459] bg-[#081224] text-white rounded-lg focus:ring-2 focus:ring-[#38bdf8] focus:border-[#38bdf8] outline-none"
+                    className="w-full p-2 border border-[#1b3459] bg-[#081224] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-[#D4AF37] outline-none"
                   >
                     <option value="dewasa">Dewasa Umum</option>
                     <option value="anak_berhadapan_hukum">Anak Berhadapan Hukum (ABH - Di bawah 18 th)</option>
@@ -311,13 +311,13 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
                       value={tempatLahir}
                       onChange={(e) => setTempatLahir(e.target.value)}
                       placeholder="Tempat Lahir"
-                      className="p-2 border border-[#1b3459] bg-[#081224] text-white rounded-lg focus:ring-2 focus:ring-[#38bdf8] outline-none"
+                      className="p-2 border border-[#1b3459] bg-[#081224] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none"
                     />
                     <input
                       type="date"
                       value={tanggalLahir}
                       onChange={(e) => setTanggalLahir(e.target.value)}
-                      className="p-2 border border-[#1b3459] bg-[#081224] text-white rounded-lg focus:ring-2 focus:ring-[#38bdf8] outline-none"
+                      className="p-2 border border-[#1b3459] bg-[#081224] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none"
                     />
                   </div>
                 </div>
@@ -330,12 +330,12 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
                       value={usia}
                       onChange={(e) => setUsia(Number(e.target.value))}
                       placeholder="Usia (Tahun)"
-                      className="p-2 border border-[#1b3459] bg-[#081224] text-white rounded-lg focus:ring-2 focus:ring-[#38bdf8] outline-none"
+                      className="p-2 border border-[#1b3459] bg-[#081224] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none"
                     />
                     <select
                       value={jenisKelamin}
                       onChange={(e) => setJenisKelamin(e.target.value as any)}
-                      className="p-2 border border-[#1b3459] bg-[#081224] text-white rounded-lg focus:ring-2 focus:ring-[#38bdf8] outline-none"
+                      className="p-2 border border-[#1b3459] bg-[#081224] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none"
                     >
                       <option value="Laki-laki">Laki-laki</option>
                       <option value="Perempuan">Perempuan</option>
@@ -350,7 +350,7 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
                     value={alamatKtp}
                     onChange={(e) => setAlamatKtp(e.target.value)}
                     placeholder="Alamat lengkap terperiksa"
-                    className="w-full p-2 border border-[#1b3459] bg-[#081224] text-white rounded-lg focus:ring-2 focus:ring-[#38bdf8] outline-none"
+                    className="w-full p-2 border border-[#1b3459] bg-[#081224] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none"
                   />
                 </div>
 
@@ -361,7 +361,7 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
                     value={namaWali}
                     onChange={(e) => setNamaWali(e.target.value)}
                     placeholder="Nama Orang Tua / Pasangan / Pengacara"
-                    className="w-full p-2 border border-[#1b3459] bg-[#081224] text-white rounded-lg focus:ring-2 focus:ring-[#38bdf8] outline-none"
+                    className="w-full p-2 border border-[#1b3459] bg-[#081224] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none"
                   />
                 </div>
 
@@ -372,7 +372,7 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
                     value={kontakWali}
                     onChange={(e) => setKontakWali(e.target.value)}
                     placeholder="0812-XXXX-XXXX"
-                    className="w-full p-2 border border-[#1b3459] bg-[#081224] text-white rounded-lg focus:ring-2 focus:ring-[#38bdf8] outline-none"
+                    className="w-full p-2 border border-[#1b3459] bg-[#081224] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none"
                   />
                 </div>
               </div>
@@ -389,7 +389,7 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
                     type="text"
                     value={nomorLp}
                     onChange={(e) => setNomorLp(e.target.value)}
-                    className="w-full p-2 border border-[#1b3459] bg-[#081224] text-white rounded-lg font-mono focus:ring-2 focus:ring-[#38bdf8] outline-none"
+                    className="w-full p-2 border border-[#1b3459] bg-[#081224] text-white rounded-lg font-mono focus:ring-2 focus:ring-[#D4AF37] outline-none"
                   />
                 </div>
 
@@ -399,7 +399,7 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
                     type="date"
                     value={tanggalLp}
                     onChange={(e) => setTanggalLp(e.target.value)}
-                    className="w-full p-2 border border-[#1b3459] bg-[#081224] text-white rounded-lg focus:ring-2 focus:ring-[#38bdf8] outline-none"
+                    className="w-full p-2 border border-[#1b3459] bg-[#081224] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none"
                   />
                 </div>
 
@@ -410,7 +410,7 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
                     value={pasal}
                     onChange={(e) => setPasal(e.target.value)}
                     placeholder="Contoh: Pasal 127 ayat (1) huruf a UU No. 35 Tahun 2009"
-                    className="w-full p-2 border border-[#1b3459] bg-[#081224] font-semibold text-[#F1C40F] rounded-lg focus:ring-2 focus:ring-[#38bdf8] outline-none"
+                    className="w-full p-2 border border-[#1b3459] bg-[#081224] font-semibold text-[#D4AF37] rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none"
                   />
                 </div>
 
@@ -420,7 +420,7 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
                     type="text"
                     value={tkp}
                     onChange={(e) => setTkp(e.target.value)}
-                    className="w-full p-2 border border-[#1b3459] bg-[#081224] text-white rounded-lg focus:ring-2 focus:ring-[#38bdf8] outline-none"
+                    className="w-full p-2 border border-[#1b3459] bg-[#081224] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none"
                   />
                 </div>
 
@@ -430,7 +430,7 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
                     value={kronologi}
                     onChange={(e) => setKronologi(e.target.value)}
                     rows={2}
-                    className="w-full p-2 border border-[#1b3459] bg-[#081224] text-white rounded-lg focus:ring-2 focus:ring-[#38bdf8] outline-none"
+                    className="w-full p-2 border border-[#1b3459] bg-[#081224] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none"
                   />
                 </div>
               </div>
@@ -443,7 +443,7 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
                   <select
                     value={newJenisZat}
                     onChange={(e) => setNewJenisZat(e.target.value)}
-                    className="flex-1 p-2 border border-[#1b3459] rounded-lg bg-[#0b172a] text-white focus:ring-2 focus:ring-[#38bdf8] outline-none"
+                    className="flex-1 p-2 border border-[#1b3459] rounded-lg bg-[#0b172a] text-white focus:ring-2 focus:ring-[#D4AF37] outline-none"
                   >
                     <option value="Metamfetamina (Sabu)">Metamfetamina (Sabu)</option>
                     <option value="Ganja Kering">Ganja Kering</option>
@@ -458,13 +458,13 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
                     placeholder="Berat Bersih (gram)"
                     value={newBerat}
                     onChange={(e) => setNewBerat(e.target.value)}
-                    className="w-40 p-2 border border-[#1b3459] bg-[#0b172a] text-white rounded-lg focus:ring-2 focus:ring-[#38bdf8] outline-none"
+                    className="w-40 p-2 border border-[#1b3459] bg-[#0b172a] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none"
                   />
 
                   <button
                     type="button"
                     onClick={handleAddBb}
-                    className="bg-[#1b3459] hover:bg-[#284c80] text-[#38bdf8] border border-[#2d5289] font-semibold px-3 py-2 rounded-lg flex items-center space-x-1 shrink-0 cursor-pointer"
+                    className="bg-[#1b3459] hover:bg-[#284c80] text-[#D4AF37] border border-[#2d5289] font-semibold px-3 py-2 rounded-lg flex items-center space-x-1 shrink-0 cursor-pointer"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     <span>Tambah BB</span>
@@ -477,12 +477,12 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
                     <div key={bb.id} className="flex items-center justify-between p-2 bg-[#0b172a] rounded border border-[#1b3459]">
                       <div>
                         <span className="font-bold text-white">{bb.jenisZat}</span>
-                        <span className="text-[#38bdf8] ml-2 font-semibold">({bb.beratBersihGram} gram netto)</span>
+                        <span className="text-[#D4AF37] ml-2 font-semibold">({bb.beratBersihGram} gram netto)</span>
                       </div>
                       <button
                         type="button"
                         onClick={() => handleRemoveBb(bb.id)}
-                        className="text-rose-400 hover:text-rose-300 p-1 cursor-pointer"
+                        className="text-slate-300 hover:text-rose-300 p-1 cursor-pointer"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -509,7 +509,7 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
                       onClick={() => toggleDocUpload(doc.id)}
                       className={`p-3 rounded-lg border cursor-pointer flex items-center justify-between transition-all ${
                         isChecked
-                          ? 'border-[#38bdf8] bg-[#081224]'
+                          ? 'border-[#D4AF37] bg-[#081224]'
                           : 'border-[#1b3459] bg-[#0b172a] hover:bg-[#081224]'
                       }`}
                     >
@@ -518,7 +518,7 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
                           type="checkbox"
                           checked={isChecked}
                           onChange={() => {}}
-                          className="rounded text-[#38bdf8] accent-[#38bdf8]"
+                          className="rounded text-[#D4AF37] accent-[#D4AF37]"
                         />
                         <div>
                           <div className="flex items-center space-x-2">
@@ -533,7 +533,7 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
                         </div>
                       </div>
 
-                      <span className={`text-[11px] font-semibold ${isChecked ? 'text-[#38bdf8]' : 'text-slate-500'}`}>
+                      <span className={`text-[11px] font-semibold ${isChecked ? 'text-[#D4AF37]' : 'text-slate-500'}`}>
                         {isChecked ? 'Terlampir' : 'Belum Dilampirkan'}
                       </span>
                     </div>
@@ -547,8 +547,8 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
           {step === 4 && (
             <div className="space-y-4 text-xs">
               <div className="bg-emerald-950/30 border border-emerald-500/40 rounded-xl p-4">
-                <h4 className="font-bold text-emerald-300 text-sm mb-1 font-['Cinzel',serif]">Konfirmasi Ringkasan Pengajuan</h4>
-                <p className="text-emerald-400/90">
+                <h4 className="font-bold text-slate-200 text-sm mb-1 font-['Cinzel',serif]">Konfirmasi Ringkasan Pengajuan</h4>
+                <p className="text-[#D4AF37]/90">
                   Pastikan seluruh data di bawah ini telah sesuai sebelum dikirim ke Sekretariat TAT.
                 </p>
               </div>
@@ -564,7 +564,7 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
                 </div>
                 <div className="flex justify-between py-1 border-b border-[#1b3459]">
                   <span className="text-slate-400">Pasal Sangkaan</span>
-                  <span className="font-semibold text-[#F1C40F]">{pasal}</span>
+                  <span className="font-semibold text-[#D4AF37]">{pasal}</span>
                 </div>
                 <div className="flex justify-between py-1 border-b border-[#1b3459]">
                   <span className="text-slate-400">Jumlah Barang Bukti</span>
@@ -572,7 +572,7 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
                 </div>
                 <div className="flex justify-between py-1 border-b border-[#1b3459]">
                   <span className="text-slate-400">Dokumen Dilampirkan</span>
-                  <span className="font-bold text-[#38bdf8]">{uploadedDocIds.length} dari {DOC_TEMPLATES.length} Dokumen</span>
+                  <span className="font-bold text-[#D4AF37]">{uploadedDocIds.length} dari {DOC_TEMPLATES.length} Dokumen</span>
                 </div>
                 <div className="flex justify-between py-1">
                   <span className="text-slate-400">Instansi Pengaju</span>
@@ -603,12 +603,12 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
               className="bg-gradient-to-r from-[#144782] via-[#17549c] to-[#1c64b8] hover:from-[#175194] hover:via-[#1c60b0] hover:to-[#2274d4] text-white px-5 py-2 rounded-xl text-xs font-bold flex items-center space-x-1.5 border border-[#2d7ad6]/70 shadow-[0_2px_10px_rgba(20,83,154,0.35)] cursor-pointer transition-all"
             >
               <span>Lanjutkan</span>
-              <ArrowRight className="w-3.5 h-3.5 text-[#F1C40F]" />
+              <ArrowRight className="w-3.5 h-3.5 text-[#D4AF37]" />
             </button>
           ) : (
             <button
               onClick={handleSubmitAll}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-lg text-xs font-bold flex items-center space-x-1.5 border border-emerald-500 cursor-pointer shadow-lg shadow-emerald-900/30"
+              className="bg-[#133863] hover:bg-[#1a4a82] text-white px-5 py-2 rounded-lg text-xs font-bold flex items-center space-x-1.5 border border-emerald-500 cursor-pointer shadow-lg shadow-emerald-900/30"
             >
               <CheckCircle2 className="w-4 h-4" />
               <span>Kirim Permohonan ke Sekretariat</span>

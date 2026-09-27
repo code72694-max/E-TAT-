@@ -34,7 +34,7 @@ export const DokumenPengesahanView: React.FC<DokumenPengesahanViewProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-xl font-bold text-white flex items-center space-x-2 font-['Cinzel',serif]">
-            <FileSignature className="w-5 h-5 text-[#38bdf8]" />
+            <FileSignature className="w-5 h-5 text-[#D4AF37]" />
             <span>Dokumen Rekomendasi Terpadu & TTE QR SIAP PULIH</span>
           </h1>
           <p className="text-xs text-slate-400 mt-1">
@@ -59,13 +59,13 @@ export const DokumenPengesahanView: React.FC<DokumenPengesahanViewProps> = ({
             return (
               <div
                 key={item.id}
-                className="bg-[#0b172a] border border-[#1b3459] hover:border-[#38bdf8] rounded-xl p-5 transition-all space-y-4 shadow-lg shadow-black/20 group"
+                className="bg-[#0b172a] border border-[#1b3459] hover:border-[#D4AF37] rounded-xl p-5 transition-all space-y-4 shadow-lg shadow-black/20 group"
               >
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
                   <div>
                     <div className="flex items-center space-x-2">
-                      <span className="font-bold text-sm text-white group-hover:text-[#38bdf8] font-mono transition-colors">{rek.nomorSurat}</span>
-                      <span className="text-xs text-slate-400">• Kasus: <span className="text-[#38bdf8]">{item.nomorPermohonan}</span></span>
+                      <span className="font-bold text-sm text-white group-hover:text-[#D4AF37] font-mono transition-colors">{rek.nomorSurat}</span>
+                      <span className="text-xs text-slate-400">• Kasus: <span className="text-[#D4AF37]">{item.nomorPermohonan}</span></span>
                     </div>
                     <p className="text-xs font-semibold text-slate-200 mt-0.5">
                       Terperiksa: {item.terperiksa.namaLengkap} • Tanggal Terbit: <span className="font-mono text-slate-300">{rek.tanggalTerbit}</span>
@@ -75,8 +75,8 @@ export const DokumenPengesahanView: React.FC<DokumenPengesahanViewProps> = ({
                   <div className="flex items-center space-x-2">
                     <span className={`text-xs font-bold px-3 py-1 rounded-full border ${
                       rek.isLengkapPengesahan
-                        ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
-                        : 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+                        ? 'bg-emerald-500/20 text-slate-200 border-emerald-500/40'
+                        : 'bg-amber-500/20 text-[#D4AF37] border-[#1b3459]'
                     }`}>
                       {rek.isLengkapPengesahan ? '✓ Sah & Resmi Terbit' : `${signedCount} dari ${totalSigners} Pengesahan`}
                     </span>
@@ -92,7 +92,7 @@ export const DokumenPengesahanView: React.FC<DokumenPengesahanViewProps> = ({
                       className="p-2 border border-[#1b3459] bg-[#081224] rounded-lg hover:bg-[#112340] text-slate-200 cursor-pointer transition-colors"
                       title="Buka QR Verifikasi"
                     >
-                      <QrCode className="w-4 h-4 text-[#38bdf8]" />
+                      <QrCode className="w-4 h-4 text-[#D4AF37]" />
                     </button>
                   </div>
                 </div>
@@ -109,7 +109,7 @@ export const DokumenPengesahanView: React.FC<DokumenPengesahanViewProps> = ({
                   <div key={s.id} className="p-2 bg-[#081224] rounded-lg border border-[#1b3459] text-center">
                     <span className="text-[10px] text-slate-400 block truncate">{s.jabatan}</span>
                     <span className="font-bold text-slate-200 block truncate text-[11px] mt-0.5">{s.nama}</span>
-                    <span className={`text-[10px] font-bold block mt-1 ${s.status === 'disahkan' ? 'text-emerald-400' : 'text-amber-400'}`}>
+                    <span className={`text-[10px] font-bold block mt-1 ${s.status === 'disahkan' ? 'text-[#D4AF37]' : 'text-[#D4AF37]'}`}>
                       {s.status === 'disahkan' ? '✓ Disahkan' : 'Menunggu TTD'}
                     </span>
                   </div>
@@ -123,7 +123,7 @@ export const DokumenPengesahanView: React.FC<DokumenPengesahanViewProps> = ({
                   className="bg-gradient-to-r from-[#144782] via-[#17549c] to-[#1c64b8] hover:from-[#175194] hover:via-[#1c60b0] hover:to-[#2274d4] text-white text-xs font-semibold px-4 py-2 rounded-xl flex items-center space-x-1.5 border border-[#2d7ad6]/70 shadow-sm cursor-pointer transition-all"
                 >
                   <span>Lihat Lembar Dokumen & Riwayat</span>
-                  <ArrowRight className="w-3.5 h-3.5 text-[#F1C40F]" />
+                  <ArrowRight className="w-3.5 h-3.5 text-[#D4AF37]" />
                 </button>
               </div>
             </div>

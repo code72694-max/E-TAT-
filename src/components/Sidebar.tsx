@@ -554,7 +554,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 onClick={() => handleItemClick(item.id)}
                 className={`w-full group flex items-center justify-between px-3 py-2 text-xs font-semibold rounded-xl transition-all duration-150 text-left cursor-pointer ${
                   isActive
-                    ? 'bg-[#14213D] text-white font-bold border-l-3 border-[#38bdf8] shadow-sm'
+                    ? 'bg-[#14213D] text-white font-bold border-l-3 border-[#D4AF37] shadow-sm'
                     : 'text-slate-300 hover:text-white hover:bg-[#14213D]/60'
                 }`}
               >
@@ -562,7 +562,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <span
                     className={`shrink-0 transition-colors ${
                       isActive
-                        ? 'text-[#38bdf8]'
+                        ? 'text-[#D4AF37]'
                         : 'text-slate-400 group-hover:text-slate-200'
                     }`}
                   >

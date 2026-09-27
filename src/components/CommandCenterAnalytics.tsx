@@ -152,7 +152,7 @@ export const CommandCenterAnalytics: React.FC = () => {
               <path
                 d={makePath(pointsBlue)}
                 fill="none"
-                stroke="#38bdf8"
+                stroke="#D4AF37"
                 strokeWidth="2.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -164,7 +164,7 @@ export const CommandCenterAnalytics: React.FC = () => {
                   cy={p.y}
                   r="3.5"
                   fill="#0d1f38"
-                  stroke="#38bdf8"
+                  stroke="#D4AF37"
                   strokeWidth="2"
                 />
               ))}
@@ -241,7 +241,7 @@ export const CommandCenterAnalytics: React.FC = () => {
           {/* Legend */}
           <div className="flex flex-wrap items-center justify-start gap-4 sm:gap-6 pt-2 border-t border-[#1b3459]/60 text-xs">
             <div className="flex items-center space-x-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#38bdf8] ring-2 ring-[#38bdf8]/30" />
+              <span className="w-2.5 h-2.5 rounded-full bg-[#D4AF37] ring-2 ring-[#D4AF37]/30" />
               <span className="text-slate-300 font-medium">Peserta Aktif</span>
             </div>
             <div className="flex items-center space-x-2">
@@ -279,7 +279,7 @@ export const CommandCenterAnalytics: React.FC = () => {
                     cy="50"
                     r="36"
                     fill="transparent"
-                    stroke="#38bdf8"
+                    stroke="#D4AF37"
                     strokeWidth="14"
                     strokeDasharray="54.9 238.76"
                     strokeDashoffset="0"
@@ -346,7 +346,7 @@ export const CommandCenterAnalytics: React.FC = () => {
             <div className="sm:col-span-7 space-y-2 text-xs">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#38bdf8]" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#D4AF37]" />
                   <span className="text-slate-300">Pemulihan Berjalan</span>
                 </div>
                 <span className="font-bold text-white font-mono">289 <span className="text-slate-400 font-normal">(23%)</span></span>
@@ -411,19 +411,19 @@ export const CommandCenterAnalytics: React.FC = () => {
                 time: '12:24',
                 desc: 'Hasil asesmen medis selesai diverifikasi',
                 caseId: 'A.n. RAH - 00123',
-                dotColor: 'bg-[#38bdf8]'
+                dotColor: 'bg-[#D4AF37]'
               },
               {
                 time: '11:15',
                 desc: 'Rencana pemulihan telah disusun',
                 caseId: 'A.n. DDN - 00789',
-                dotColor: 'bg-[#38bdf8]'
+                dotColor: 'bg-[#D4AF37]'
               },
               {
                 time: '10:42',
                 desc: 'Peserta memulai program rehabilitasi',
                 caseId: 'A.n. BGS - 00567',
-                dotColor: 'bg-[#38bdf8]'
+                dotColor: 'bg-[#D4AF37]'
               },
               {
                 time: '09:18',

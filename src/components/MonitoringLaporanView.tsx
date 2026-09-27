@@ -76,7 +76,7 @@ export const MonitoringLaporanView: React.FC<MonitoringLaporanViewProps> = ({
 
         <div className="flex items-center space-x-2">
           {downloadSuccess && (
-            <span className="text-xs text-emerald-400 font-semibold animate-pulse">
+            <span className="text-xs text-[#D4AF37] font-semibold animate-pulse">
               CSV berhasil diunduh!
             </span>
           )}
@@ -94,7 +94,7 @@ export const MonitoringLaporanView: React.FC<MonitoringLaporanViewProps> = ({
       <div className="bg-[#0b172a] p-4 sm:p-6 rounded-2xl border border-[#1b3459] shadow-xl">
         <div className="mb-4 pb-2 border-b border-[#1b3459] flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <span className="w-2 h-2 rounded-full bg-[#38bdf8]" />
+            <span className="w-2 h-2 rounded-full bg-[#D4AF37]" />
             <h2 className="text-sm font-bold text-white uppercase tracking-wider font-['Cinzel',serif]">
               PUSAT KENDALI OPERASIONAL TERPADU (LIVE COMMAND CENTER)
             </h2>
@@ -211,7 +211,7 @@ export const MonitoringLaporanView: React.FC<MonitoringLaporanViewProps> = ({
                 <span className="text-slate-300 font-mono">4 Kasus (66.7%)</span>
               </div>
               <div className="w-full h-2 bg-[#081224] rounded-full overflow-hidden border border-[#1b3459]">
-                <div className="bg-[#38bdf8] h-full rounded-full w-[66.7%]" />
+                <div className="bg-[#D4AF37] h-full rounded-full w-[66.7%]" />
               </div>
             </div>
 

@@ -28,7 +28,7 @@ export const VerifikasiBerkasView: React.FC<VerifikasiBerkasViewProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-xl font-bold text-white flex items-center space-x-2 font-['Cinzel',serif]">
-            <FileCheck className="w-5 h-5 text-[#38bdf8]" />
+            <FileCheck className="w-5 h-5 text-[#D4AF37]" />
             <span>{isPengaju ? 'Daftar Perbaikan & Status Verifikasi Berkas' : 'Meja Verifikasi Kelengkapan Berkas Administrasi'}</span>
           </h1>
           <p className="text-xs text-slate-400 mt-1">
@@ -63,7 +63,7 @@ export const VerifikasiBerkasView: React.FC<VerifikasiBerkasViewProps> = ({
       <div className="grid grid-cols-1 gap-4">
         {pendingList.length === 0 ? (
           <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl p-12 text-center text-slate-400 shadow-lg shadow-black/20">
-            <CheckCircle2 className="w-10 h-10 text-[#38bdf8] mx-auto mb-2" />
+            <CheckCircle2 className="w-10 h-10 text-[#D4AF37] mx-auto mb-2" />
             <p className="text-sm font-semibold text-slate-200">Tidak ada berkas yang menunggu verifikasi.</p>
             <p className="text-xs text-slate-400 mt-0.5">Semua berkas yang diajukan telah selesai diperiksa atau dijadwalkan.</p>
           </div>
@@ -79,12 +79,12 @@ export const VerifikasiBerkasView: React.FC<VerifikasiBerkasViewProps> = ({
               <div
                 key={item.id}
                 onClick={() => onSelectPermohonan(item.id)}
-                className="bg-[#0b172a] border border-[#1b3459] hover:border-[#38bdf8] rounded-xl p-4 transition-all cursor-pointer shadow-md shadow-black/20 hover:shadow-cyan-950/20 group"
+                className="bg-[#0b172a] border border-[#1b3459] hover:border-[#D4AF37] rounded-xl p-4 transition-all cursor-pointer shadow-md shadow-black/20 hover:shadow-cyan-950/20 group"
               >
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                   <div className="space-y-1.5">
                     <div className="flex items-center space-x-2">
-                      <span className="font-bold text-sm text-white group-hover:text-[#38bdf8] font-mono transition-colors">{item.nomorPermohonan}</span>
+                      <span className="font-bold text-sm text-white group-hover:text-[#D4AF37] font-mono transition-colors">{item.nomorPermohonan}</span>
                       {item.statusProsesUtama === 'perlu_perbaikan' ? (
                         <span className="text-[10px] bg-rose-500/20 text-rose-300 font-mono font-medium px-2 py-0.5 rounded border border-rose-500/30">
                           Perlu Perbaikan Pengaju
@@ -107,7 +107,7 @@ export const VerifikasiBerkasView: React.FC<VerifikasiBerkasViewProps> = ({
                     <div className="text-right text-xs">
                       <div className="flex items-center justify-end space-x-1.5">
                         <span className="text-slate-400 text-[11px]">Kelengkapan:</span>
-                        <span className="font-bold font-mono text-emerald-400">{percentComplete}%</span>
+                        <span className="font-bold font-mono text-[#D4AF37]">{percentComplete}%</span>
                       </div>
                       <div className="w-32 bg-[#081224] h-1.5 rounded-full overflow-hidden border border-[#1b3459] mt-1 ml-auto">
                         <div

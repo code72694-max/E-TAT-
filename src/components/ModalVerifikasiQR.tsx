@@ -21,7 +21,7 @@ export const ModalVerifikasiQR: React.FC<ModalVerifikasiQRProps> = ({
         {/* Header */}
         <div className="bg-[#081224] border-b border-[#1b3459] text-white p-5 flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="w-9 h-9 rounded-lg bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-400">
+            <div className="w-9 h-9 rounded-lg bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-[#D4AF37]">
               <ShieldCheck className="w-5 h-5" />
             </div>
             <div>
@@ -40,10 +40,10 @@ export const ModalVerifikasiQR: React.FC<ModalVerifikasiQRProps> = ({
         {/* Verification Body */}
         <div className="p-6 space-y-4">
           <div className="bg-emerald-950/30 border border-emerald-500/40 rounded-xl p-4 flex items-center space-x-3">
-            <CheckCircle2 className="w-7 h-7 text-emerald-400 shrink-0" />
+            <CheckCircle2 className="w-7 h-7 text-[#D4AF37] shrink-0" />
             <div>
-              <h4 className="text-xs font-bold text-emerald-300">DOKUMEN DINYATAKAN ASLI & VALID</h4>
-              <p className="text-[11px] text-emerald-400/90 mt-0.5">
+              <h4 className="text-xs font-bold text-slate-200">DOKUMEN DINYATAKAN ASLI & VALID</h4>
+              <p className="text-[11px] text-[#D4AF37]/90 mt-0.5">
                 Tercatat resmi dalam pangkalan data Tim Asesmen Terpadu BNNP Kalimantan Timur.
               </p>
             </div>
@@ -52,7 +52,7 @@ export const ModalVerifikasiQR: React.FC<ModalVerifikasiQRProps> = ({
           <div className="space-y-2.5 text-xs">
             <div className="flex justify-between py-1.5 border-b border-[#1b3459]">
               <span className="text-slate-400">Nomor Surat Rekomendasi</span>
-              <span className="font-mono font-bold text-[#F1C40F]">{rek.nomorSurat}</span>
+              <span className="font-mono font-bold text-[#D4AF37]">{rek.nomorSurat}</span>
             </div>
             <div className="flex justify-between py-1.5 border-b border-[#1b3459]">
               <span className="text-slate-400">Nomor Permohonan</span>
@@ -72,7 +72,7 @@ export const ModalVerifikasiQR: React.FC<ModalVerifikasiQRProps> = ({
             </div>
             <div className="flex justify-between py-1.5 border-b border-[#1b3459]">
               <span className="text-slate-400">Simpulan Rekomendasi</span>
-              <span className="font-bold text-[#38bdf8] text-right max-w-[240px]">
+              <span className="font-bold text-[#D4AF37] text-right max-w-[240px]">
                 {rek.rekomendasiFinalText}
               </span>
             </div>
@@ -94,7 +94,7 @@ export const ModalVerifikasiQR: React.FC<ModalVerifikasiQRProps> = ({
                 <div key={idx} className="p-2 bg-[#081224] rounded-lg border border-[#1b3459]">
                   <span className="font-semibold block text-white truncate">{s.nama}</span>
                   <span className="text-slate-400 block truncate">{s.jabatan}</span>
-                  <span className="text-emerald-400 font-bold block mt-0.5">✓ TTD Sah Terverifikasi</span>
+                  <span className="text-[#D4AF37] font-bold block mt-0.5">✓ TTD Sah Terverifikasi</span>
                 </div>
               ))}
             </div>

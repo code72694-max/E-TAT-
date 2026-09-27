@@ -186,11 +186,11 @@ export const Header: React.FC<HeaderProps> = ({
                       }}
                       className="p-3 hover:bg-[#14213D] transition-colors cursor-pointer flex items-start space-x-2.5"
                     >
-                      <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                      <AlertTriangle className="w-4 h-4 text-[#D4AF37] shrink-0 mt-0.5" />
                       <div className="text-xs">
                         <div className="flex items-center space-x-1.5">
                           <span className="font-bold text-white">TAT-089 (Rian Hidayat)</span>
-                          <span className="text-[9px] bg-amber-500/20 text-amber-300 px-1 rounded">Perlu Perbaikan</span>
+                          <span className="text-[9px] bg-amber-500/20 text-[#D4AF37] px-1 rounded">Perlu Perbaikan</span>
                         </div>
                         <p className="text-[11px] text-slate-300 mt-0.5">
                           Hasil lab urin dan BA Penggeledahan belum diunggah oleh penyidik.
@@ -319,7 +319,7 @@ export const Header: React.FC<HeaderProps> = ({
                         }}
                         className="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold text-rose-300 hover:bg-rose-950/40 flex items-center space-x-2 transition-colors cursor-pointer"
                       >
-                        <LogOut className="w-4 h-4 text-rose-400" />
+                        <LogOut className="w-4 h-4 text-slate-300" />
                         <span>Keluar / Logout</span>
                       </button>
                     )}

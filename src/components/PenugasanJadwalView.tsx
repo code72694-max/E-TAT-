@@ -33,7 +33,7 @@ export const PenugasanJadwalView: React.FC<PenugasanJadwalViewProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-xl font-bold text-white flex items-center space-x-2 font-['Cinzel',serif]">
-            <CalendarCheck className="w-5 h-5 text-[#38bdf8]" />
+            <CalendarCheck className="w-5 h-5 text-[#D4AF37]" />
             <span>
               {isPengaju
                 ? 'Jadwal Pemeriksaan'
@@ -65,11 +65,11 @@ export const PenugasanJadwalView: React.FC<PenugasanJadwalViewProps> = ({
             <div
               key={item.id}
               onClick={() => onSelectPermohonan(item.id)}
-              className="bg-[#0b172a] border border-[#1b3459] hover:border-[#38bdf8] rounded-xl p-5 transition-all cursor-pointer space-y-4 shadow-lg shadow-black/20 group"
+              className="bg-[#0b172a] border border-[#1b3459] hover:border-[#D4AF37] rounded-xl p-5 transition-all cursor-pointer space-y-4 shadow-lg shadow-black/20 group"
             >
               <div className="flex items-start justify-between">
                 <div>
-                  <span className="font-bold text-sm text-white group-hover:text-[#38bdf8] font-mono transition-colors">{item.nomorPermohonan}</span>
+                  <span className="font-bold text-sm text-white group-hover:text-[#D4AF37] font-mono transition-colors">{item.nomorPermohonan}</span>
                   <p className="text-xs font-semibold text-slate-200 mt-0.5">Terperiksa: {item.terperiksa.namaLengkap}</p>
                   <p className="text-[11px] text-slate-400">Pengaju: {item.instansiPengaju}</p>
                 </div>
@@ -107,7 +107,7 @@ export const PenugasanJadwalView: React.FC<PenugasanJadwalViewProps> = ({
 
                 <div className="flex items-center justify-between p-2.5 rounded-lg bg-[#0a1b33] border border-[#1c3c66]">
                   <div className="flex items-center space-x-2">
-                    <Users className="w-3.5 h-3.5 text-[#38bdf8]" />
+                    <Users className="w-3.5 h-3.5 text-[#D4AF37]" />
                     <div>
                       <span className="font-bold text-white">Sidang Pleno Terpadu</span>
                       <p className="text-[10px] text-slate-300">{tim.jadwalPleno || 'Belum Dijadwalkan'}</p>
@@ -123,7 +123,7 @@ export const PenugasanJadwalView: React.FC<PenugasanJadwalViewProps> = ({
                 <span>Lokasi: {tim.lokasiPemeriksaan}</span>
                 <span className="text-slate-300 group-hover:text-white font-semibold flex items-center space-x-1 group-hover:translate-x-0.5 transition-transform">
                   <span>Buka Berkas</span>
-                  <ArrowRight className="w-3 h-3 text-[#38bdf8]" />
+                  <ArrowRight className="w-3 h-3 text-[#D4AF37]" />
                 </span>
               </div>
             </div>

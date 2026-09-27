@@ -215,7 +215,7 @@ export const AboutView: React.FC<AboutViewProps> = ({
       name: 'Penyidik Pengaju',
       agency: 'Satresnarkoba Polri / BNN Kabupaten/Kota',
       badgeColor: 'bg-[#142847] text-slate-200 border-[#1e3c6a]',
-      icon: <FileSpreadsheet className="w-5 h-5 text-[#38bdf8]" />,
+      icon: <FileSpreadsheet className="w-5 h-5 text-[#D4AF37]" />,
       overview:
         'Penyidik yang menangani perkara tindak pidana narkotika dan mengajukan permohonan asesmen terpadu guna mendapatkan rekomendasi resmi bagi tersangka penyalahguna.',
       keyResponsibilities: [
@@ -472,7 +472,7 @@ export const AboutView: React.FC<AboutViewProps> = ({
       id: 'out-2',
       title: 'QR Code Kriptografis Verifikasi Keabsahan Dokumen',
       category: 'Keamanan & Autentikasi',
-      icon: <QrCode className="w-6 h-6 text-[#38bdf8]" />,
+      icon: <QrCode className="w-6 h-6 text-[#D4AF37]" />,
       badge: 'Anti Pemalsuan',
       description:
         'Kode QR kriptografis dinamis yang dicetak pada setiap lembar rekomendasi resmi, memungkinkan verifikasi keaslian instan di pengadilan.',
@@ -566,8 +566,8 @@ export const AboutView: React.FC<AboutViewProps> = ({
         <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-5">
           <div className="space-y-2 max-w-3xl">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#0d213d] text-[#38bdf8] border border-[#1b3459]">
-                <Sparkles className="w-3 h-3 text-[#38bdf8]" />
+              <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#0d213d] text-[#D4AF37] border border-[#1b3459]">
+                <Sparkles className="w-3 h-3 text-[#D4AF37]" />
                 <span>e-TAT Platform v1.2</span>
               </span>
               <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[#081224] text-slate-300 border border-[#1b3459]">
@@ -595,7 +595,7 @@ export const AboutView: React.FC<AboutViewProps> = ({
             <div className="bg-[#081224] border border-[#1b3459] rounded-xl px-3.5 py-2.5 text-left md:text-right">
               <span className="text-[10px] uppercase font-semibold text-slate-400 block">Peran Aktif Anda</span>
               <span className="font-bold text-white block mt-0.5 capitalize">{currentUser.name}</span>
-              <span className="text-[#38bdf8] font-semibold block text-[11px]">{rolesDetails[currentUser.role]?.name}</span>
+              <span className="text-[#D4AF37] font-semibold block text-[11px]">{rolesDetails[currentUser.role]?.name}</span>
             </div>
           </div>
         </div>
@@ -618,7 +618,7 @@ export const AboutView: React.FC<AboutViewProps> = ({
             <span className="text-[10px] text-slate-400 block mt-0.5">Dokumen, SP & SKSP</span>
           </div>
           <div className="bg-[#081224] rounded-xl p-3 border border-[#1b3459]">
-            <span className="text-2xl font-bold text-[#38bdf8] block">6 Hari</span>
+            <span className="text-2xl font-bold text-[#D4AF37] block">6 Hari</span>
             <span className="text-xs font-semibold text-slate-200">Batas Waktu SLA</span>
             <span className="text-[10px] text-slate-400 block mt-0.5">Kepatuhan Berkas Perkara</span>
           </div>
@@ -636,7 +636,7 @@ export const AboutView: React.FC<AboutViewProps> = ({
               : 'text-slate-400 hover:text-white hover:bg-[#0f274a] border border-transparent'
           }`}
         >
-          <GitCommit className="w-4 h-4 text-[#38bdf8]" />
+          <GitCommit className="w-4 h-4 text-[#D4AF37]" />
           <span>Roadmap Alur Layanan (Flow)</span>
         </button>
 
@@ -649,7 +649,7 @@ export const AboutView: React.FC<AboutViewProps> = ({
               : 'text-slate-400 hover:text-white hover:bg-[#0f274a] border border-transparent'
           }`}
         >
-          <Users className="w-4 h-4 text-[#38bdf8]" />
+          <Users className="w-4 h-4 text-[#D4AF37]" />
           <span>8 Peran Pengguna & Tanggung Jawab</span>
         </button>
 
@@ -662,7 +662,7 @@ export const AboutView: React.FC<AboutViewProps> = ({
               : 'text-slate-400 hover:text-white hover:bg-[#0f274a] border border-transparent'
           }`}
         >
-          <Award className="w-4 h-4 text-[#38bdf8]" />
+          <Award className="w-4 h-4 text-[#D4AF37]" />
           <span>Daftar Output & Dokumen Resmi</span>
         </button>
 
@@ -675,7 +675,7 @@ export const AboutView: React.FC<AboutViewProps> = ({
               : 'text-slate-400 hover:text-white hover:bg-[#0f274a] border border-transparent'
           }`}
         >
-          <Activity className="w-4 h-4 text-[#38bdf8]" />
+          <Activity className="w-4 h-4 text-[#D4AF37]" />
           <span>Mekanisme Pengawasan Klien Pasca TAT</span>
         </button>
 
@@ -688,7 +688,7 @@ export const AboutView: React.FC<AboutViewProps> = ({
               : 'text-slate-400 hover:text-white hover:bg-[#0f274a] border border-transparent'
           }`}
         >
-          <BookOpen className="w-4 h-4 text-[#38bdf8]" />
+          <BookOpen className="w-4 h-4 text-[#D4AF37]" />
           <span>Dasar Hukum & Batasan Sistem</span>
         </button>
       </div>
@@ -700,14 +700,14 @@ export const AboutView: React.FC<AboutViewProps> = ({
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
               <div>
                 <h2 className="text-base font-bold text-white flex items-center space-x-2">
-                  <GitCommit className="w-5 h-5 text-[#38bdf8]" />
+                  <GitCommit className="w-5 h-5 text-[#D4AF37]" />
                   <span>Roadmap Alur End-to-End Layanan e-TAT</span>
                 </h2>
                 <p className="text-xs text-slate-400 mt-0.5">
                   Dari pengajuan perkara oleh penyidik hingga realisasi admisi rehabilitasi dan pemenuhan berkas peradilan (SLA 6 Hari Kerja).
                 </p>
               </div>
-              <span className="text-[11px] bg-[#0d213d] text-[#38bdf8] font-bold px-3 py-1 rounded-full border border-[#234b7d] self-start">
+              <span className="text-[11px] bg-[#0d213d] text-[#D4AF37] font-bold px-3 py-1 rounded-full border border-[#234b7d] self-start">
                 Pilih Tahap untuk Rincian
               </span>
             </div>
@@ -723,14 +723,14 @@ export const AboutView: React.FC<AboutViewProps> = ({
                     onClick={() => setSelectedStage(stage.step)}
                     className={`text-left p-3 rounded-xl border transition-all cursor-pointer ${
                       isSelected
-                        ? 'bg-[#0d2342] border-[#38bdf8] shadow-[0_0_12px_rgba(56,189,248,0.25)] ring-1 ring-[#38bdf8]/40'
+                        ? 'bg-[#0d2342] border-[#D4AF37] shadow-[0_0_12px_rgba(56,189,248,0.25)] ring-1 ring-[#D4AF37]/40'
                         : 'bg-[#081224] border-[#1b3459] hover:bg-[#0f274a] hover:border-[#234b7d]'
                     }`}
                   >
                     <div className="flex items-center justify-between">
                       <span
                         className={`w-6 h-6 rounded-lg text-xs font-bold flex items-center justify-center ${
-                          isSelected ? 'bg-[#38bdf8] text-[#071326]' : 'bg-[#0b172a] text-slate-300 border border-[#1b3459]'
+                          isSelected ? 'bg-[#D4AF37] text-[#071326]' : 'bg-[#0b172a] text-slate-300 border border-[#1b3459]'
                         }`}
                       >
                         {stage.step}
@@ -741,7 +741,7 @@ export const AboutView: React.FC<AboutViewProps> = ({
                     </div>
                     <span
                       className={`text-xs font-bold block mt-2 line-clamp-2 leading-snug ${
-                        isSelected ? 'text-[#38bdf8]' : 'text-white'
+                        isSelected ? 'text-[#D4AF37]' : 'text-white'
                       }`}
                     >
                       {stage.title}
@@ -784,7 +784,7 @@ export const AboutView: React.FC<AboutViewProps> = ({
                     {/* Input Dokumen */}
                     <div className="bg-[#0b172a] border border-[#1b3459] rounded-lg p-3.5 space-y-2">
                       <div className="flex items-center space-x-1.5 font-bold text-white pb-1 border-b border-[#1b3459]">
-                        <FileSpreadsheet className="w-4 h-4 text-[#38bdf8]" />
+                        <FileSpreadsheet className="w-4 h-4 text-[#D4AF37]" />
                         <span>Dokumen Input & Persyaratan</span>
                       </div>
                       <ul className="space-y-1.5 text-slate-300">
@@ -816,7 +816,7 @@ export const AboutView: React.FC<AboutViewProps> = ({
                     {/* Output & Status */}
                     <div className="bg-[#0b172a] border border-[#1b3459] rounded-lg p-3.5 space-y-2">
                       <div className="flex items-center space-x-1.5 font-bold text-white pb-1 border-b border-[#1b3459]">
-                        <Award className="w-4 h-4 text-[#38bdf8]" />
+                        <Award className="w-4 h-4 text-[#D4AF37]" />
                         <span>Hasil Output & Perubahan Status</span>
                       </div>
                       <div className="space-y-2 text-slate-300">
@@ -860,7 +860,7 @@ export const AboutView: React.FC<AboutViewProps> = ({
           {/* 4 Status Tiers Architecture Card */}
           <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl p-5 space-y-3">
             <h3 className="text-sm font-bold text-white flex items-center space-x-2">
-              <ShieldCheck className="w-4 h-4 text-[#38bdf8]" />
+              <ShieldCheck className="w-4 h-4 text-[#D4AF37]" />
               <span>Arsitektur 4 Kelompok Status Terpisah (Multi-Tier Status Model)</span>
             </h3>
             <p className="text-xs text-slate-400">
@@ -869,7 +869,7 @@ export const AboutView: React.FC<AboutViewProps> = ({
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs pt-1">
               <div className="bg-[#081224] border border-[#1b3459] rounded-lg p-3 space-y-1">
-                <span className="text-[10px] uppercase font-bold text-[#38bdf8] block">1. Status Proses Utama</span>
+                <span className="text-[10px] uppercase font-bold text-[#D4AF37] block">1. Status Proses Utama</span>
                 <p className="text-slate-300 text-[11px]">
                   Mengendalikan tahapan berkas dari <em>diajukan</em>, <em>verifikasi_berkas</em>, <em>penugasan_jadwal</em>, <em>asesmen_berlangsung</em>, <em>siap_pleno</em>, hingga <em>rekomendasi_terbit</em>.
                 </p>
@@ -906,7 +906,7 @@ export const AboutView: React.FC<AboutViewProps> = ({
           {/* Role Selection Grid */}
           <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl p-5">
             <h2 className="text-base font-bold text-white flex items-center space-x-2 mb-1">
-              <Users className="w-5 h-5 text-[#38bdf8]" />
+              <Users className="w-5 h-5 text-[#D4AF37]" />
               <span>Matriks 8 Peran Pengguna Lintas Instansi</span>
             </h2>
             <p className="text-xs text-slate-400 mb-4">
@@ -925,7 +925,7 @@ export const AboutView: React.FC<AboutViewProps> = ({
                     onClick={() => setSelectedRoleDetail(rKey)}
                     className={`text-left p-3 rounded-xl border transition-all cursor-pointer ${
                       isSelected
-                        ? 'bg-[#0d2342] border-[#38bdf8] ring-1 ring-[#38bdf8]/40 shadow-[0_0_12px_rgba(56,189,248,0.25)]'
+                        ? 'bg-[#0d2342] border-[#D4AF37] ring-1 ring-[#D4AF37]/40 shadow-[0_0_12px_rgba(56,189,248,0.25)]'
                         : 'bg-[#081224] border-[#1b3459] hover:bg-[#0f274a] hover:border-[#234b7d]'
                     }`}
                   >
@@ -934,7 +934,7 @@ export const AboutView: React.FC<AboutViewProps> = ({
                         {r.icon}
                       </div>
                       {isCurrent && (
-                        <span className="text-[9px] font-bold bg-emerald-900/60 text-emerald-300 border border-emerald-700/60 px-1.5 py-0.5 rounded">
+                        <span className="text-[9px] font-bold bg-[#0d1f38] text-slate-200 border border-[#1b3459] px-1.5 py-0.5 rounded">
                           Role Anda
                         </span>
                       )}
@@ -1008,7 +1008,7 @@ export const AboutView: React.FC<AboutViewProps> = ({
                     {/* Cakupan Akses Modul */}
                     <div className="bg-[#0b172a] border border-[#1b3459] rounded-lg p-4 space-y-2">
                       <h4 className="font-bold text-white flex items-center space-x-1.5 text-xs pb-1 border-b border-[#1b3459]">
-                        <ShieldCheck className="w-4 h-4 text-[#38bdf8]" />
+                        <ShieldCheck className="w-4 h-4 text-[#D4AF37]" />
                         <span>Hak Akses Menu & Data</span>
                       </h4>
                       <ul className="space-y-1.5 text-slate-300">
@@ -1024,7 +1024,7 @@ export const AboutView: React.FC<AboutViewProps> = ({
                     {/* Output yang Dihasilkan */}
                     <div className="bg-[#0b172a] border border-[#1b3459] rounded-lg p-4 space-y-2">
                       <h4 className="font-bold text-white flex items-center space-x-1.5 text-xs pb-1 border-b border-[#1b3459]">
-                        <Award className="w-4 h-4 text-[#38bdf8]" />
+                        <Award className="w-4 h-4 text-[#D4AF37]" />
                         <span>Output & Dokumen yang Diproduksi</span>
                       </h4>
                       <ul className="space-y-1.5 text-slate-300">
@@ -1049,7 +1049,7 @@ export const AboutView: React.FC<AboutViewProps> = ({
         <div className="space-y-6">
           <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl p-5">
             <h2 className="text-base font-bold text-white flex items-center space-x-2 mb-1">
-              <Award className="w-5 h-5 text-[#38bdf8]" />
+              <Award className="w-5 h-5 text-[#D4AF37]" />
               <span>Daftar Output Resmi yang Diproduksi Sistem e-TAT</span>
             </h2>
             <p className="text-xs text-slate-400 mb-5">
@@ -1075,7 +1075,7 @@ export const AboutView: React.FC<AboutViewProps> = ({
                           <h3 className="text-sm font-bold text-white">{out.title}</h3>
                         </div>
                       </div>
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-[#0d213d] text-[#38bdf8] border border-[#1b3459] shrink-0">
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-[#0d213d] text-[#D4AF37] border border-[#1b3459] shrink-0">
                         {out.badge}
                       </span>
                     </div>
@@ -1089,7 +1089,7 @@ export const AboutView: React.FC<AboutViewProps> = ({
                       <ul className="space-y-1 text-xs text-slate-300">
                         {out.components.map((c, i) => (
                           <li key={i} className="flex items-start space-x-1.5">
-                            <span className="text-[#38bdf8] font-bold">•</span>
+                            <span className="text-[#D4AF37] font-bold">•</span>
                             <span className="text-[11px]">{c}</span>
                           </li>
                         ))}
@@ -1098,7 +1098,7 @@ export const AboutView: React.FC<AboutViewProps> = ({
                   </div>
 
                   <div className="pt-3 border-t border-[#1b3459] text-xs bg-[#0b172a] rounded-lg p-2.5 border border-[#1b3459]">
-                    <span className="text-[10px] uppercase font-bold text-[#38bdf8] block">Kegunaan Hukum:</span>
+                    <span className="text-[10px] uppercase font-bold text-[#D4AF37] block">Kegunaan Hukum:</span>
                     <p className="text-[11px] text-slate-300 mt-0.5">{out.usage}</p>
                   </div>
                 </div>
@@ -1116,7 +1116,7 @@ export const AboutView: React.FC<AboutViewProps> = ({
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#1b3459]">
               <div>
                 <h2 className="text-base sm:text-lg font-bold text-white flex items-center space-x-2">
-                  <Activity className="w-5 h-5 text-[#38bdf8]" />
+                  <Activity className="w-5 h-5 text-[#D4AF37]" />
                   <span>Mekanisme Pengawasan Klien Pasca TAT (Aftercare & Kepatuhan Hukum)</span>
                 </h2>
                 <p className="text-xs text-slate-400 mt-1">
@@ -1132,7 +1132,7 @@ export const AboutView: React.FC<AboutViewProps> = ({
             {/* Konsep Filosofis */}
             <div className="bg-[#081224] border border-[#1b3459] rounded-xl p-4 text-xs space-y-2 text-slate-200">
               <span className="font-bold flex items-center space-x-1.5 text-white">
-                <Info className="w-4 h-4 text-[#38bdf8]" />
+                <Info className="w-4 h-4 text-[#D4AF37]" />
                 <span>Prinsip Kunci: Rekomendasi TAT Adalah Titik Awal Komitmen Pemulihan, Bukan Pembebasan Murni</span>
               </span>
               <p className="leading-relaxed text-slate-300">
@@ -1295,7 +1295,7 @@ export const AboutView: React.FC<AboutViewProps> = ({
           {/* MEKANISME KELULUSAN & PENGHENTIAN PERKARA TETAP */}
           <div className="bg-[#081224] border border-[#1b3459] rounded-xl p-6 space-y-4">
             <h3 className="text-sm font-bold text-white flex items-center space-x-2">
-              <Award className="w-5 h-5 text-[#38bdf8]" />
+              <Award className="w-5 h-5 text-[#D4AF37]" />
               <span>Mekanisme Kelulusan Program & Penghentian Penuntutan Tetap (SKSP)</span>
             </h3>
             <p className="text-xs text-slate-300 leading-relaxed">
@@ -1329,7 +1329,7 @@ export const AboutView: React.FC<AboutViewProps> = ({
           {/* MATRIKS KOORDINASI LINTAS PERAN DALAM PENGAWASAN */}
           <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl p-6 space-y-4">
             <h3 className="text-sm font-bold text-white flex items-center space-x-2">
-              <Scale className="w-4 h-4 text-[#38bdf8]" />
+              <Scale className="w-4 h-4 text-[#D4AF37]" />
               <span>Matriks Pembagian Peran Pengawasan di Aplikasi e-TAT</span>
             </h3>
             <div className="overflow-x-auto text-xs">
@@ -1374,7 +1374,7 @@ export const AboutView: React.FC<AboutViewProps> = ({
         <div className="space-y-6">
           <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl p-5 space-y-4">
             <h2 className="text-base font-bold text-white flex items-center space-x-2">
-              <BookOpen className="w-5 h-5 text-[#38bdf8]" />
+              <BookOpen className="w-5 h-5 text-[#D4AF37]" />
               <span>Landasan Hukum & Regulasi Pelayanan Tim Asesmen Terpadu</span>
             </h2>
             <p className="text-xs text-slate-400">
@@ -1442,7 +1442,7 @@ export const AboutView: React.FC<AboutViewProps> = ({
             {/* SLA Table Summary */}
             <div className="pt-4 border-t border-[#1b3459]">
               <h3 className="text-xs font-bold uppercase tracking-wider text-slate-300 mb-2 flex items-center space-x-1.5">
-                <Clock className="w-4 h-4 text-[#38bdf8]" />
+                <Clock className="w-4 h-4 text-[#D4AF37]" />
                 <span>Rincian Standar Waktu Layanan (SLA 6 Hari Kerja)</span>
               </h3>
               <div className="overflow-x-auto">
@@ -1459,49 +1459,49 @@ export const AboutView: React.FC<AboutViewProps> = ({
                     <tr>
                       <td className="p-2.5 font-medium text-white">1. Registrasi Permohonan</td>
                       <td className="p-2.5 text-slate-300">Penyidik Pengaju</td>
-                      <td className="p-2.5 text-[#38bdf8] font-semibold">1x24 Jam pasca tangkap</td>
+                      <td className="p-2.5 text-[#D4AF37] font-semibold">1x24 Jam pasca tangkap</td>
                       <td className="p-2.5 text-slate-300">Berkas perkara terdaftar</td>
                     </tr>
                     <tr>
                       <td className="p-2.5 font-medium text-white">2. Verifikasi Berkas Persyaratan</td>
                       <td className="p-2.5 text-slate-300">Sekretariat TAT</td>
-                      <td className="p-2.5 text-[#38bdf8] font-semibold">Hari ke-1 s/d Hari ke-2</td>
+                      <td className="p-2.5 text-[#D4AF37] font-semibold">Hari ke-1 s/d Hari ke-2</td>
                       <td className="p-2.5 text-slate-300">Disposisi kelengkapan formil</td>
                     </tr>
                     <tr>
                       <td className="p-2.5 font-medium text-white">3. Penugasan & Penjadwalan</td>
                       <td className="p-2.5 text-slate-300">Sekretariat & Koordinator</td>
-                      <td className="p-2.5 text-[#38bdf8] font-semibold">Hari ke-2</td>
+                      <td className="p-2.5 text-[#D4AF37] font-semibold">Hari ke-2</td>
                       <td className="p-2.5 text-slate-300">Surat tugas & jadwal asesmen</td>
                     </tr>
                     <tr>
                       <td className="p-2.5 font-medium text-white">4. Asesmen Medis & Telaah Hukum</td>
                       <td className="p-2.5 text-slate-300">Tim Medis & Tim Hukum</td>
-                      <td className="p-2.5 text-[#38bdf8] font-semibold">Hari ke-2 s/d Hari ke-4</td>
+                      <td className="p-2.5 text-[#D4AF37] font-semibold">Hari ke-2 s/d Hari ke-4</td>
                       <td className="p-2.5 text-slate-300">Catatan klinis & analisis peran</td>
                     </tr>
                     <tr>
                       <td className="p-2.5 font-medium text-white">5. Sidang Pleno Musyawarah</td>
                       <td className="p-2.5 text-slate-300">Koordinator TAT & Tim</td>
-                      <td className="p-2.5 text-[#38bdf8] font-semibold">Hari ke-4 s/d Hari ke-5</td>
+                      <td className="p-2.5 text-[#D4AF37] font-semibold">Hari ke-4 s/d Hari ke-5</td>
                       <td className="p-2.5 text-slate-300">Risalah kesepakatan pleno</td>
                     </tr>
                     <tr>
                       <td className="p-2.5 font-medium text-white">6. Pengesahan 3 Pihak & QR Code</td>
                       <td className="p-2.5 text-slate-300">Koordinator, Medis, Hukum</td>
-                      <td className="p-2.5 text-[#38bdf8] font-semibold">Hari ke-5 s/d Hari ke-6</td>
+                      <td className="p-2.5 text-[#D4AF37] font-semibold">Hari ke-5 s/d Hari ke-6</td>
                       <td className="p-2.5 text-slate-200 font-bold">Surat Rekomendasi Resmi</td>
                     </tr>
                     <tr>
                       <td className="p-2.5 font-medium text-white">7. Koordinasi Rujukan & Admisi</td>
                       <td className="p-2.5 text-slate-300">Fasilitas Rehab & Penyidik</td>
-                      <td className="p-2.5 text-[#38bdf8] font-semibold">Maks. Hari ke-14</td>
+                      <td className="p-2.5 text-[#D4AF37] font-semibold">Maks. Hari ke-14</td>
                       <td className="p-2.5 text-slate-300">Tiket rujukan & tanggal masuk rawat</td>
                     </tr>
                     <tr>
                       <td className="p-2.5 font-medium text-white">8. Pengawasan Pasca TAT (Aftercare)</td>
                       <td className="p-2.5 text-slate-300">Konselor, Penyidik & Bapas</td>
-                      <td className="p-2.5 text-[#38bdf8] font-semibold">1 s/d 12 Bulan</td>
+                      <td className="p-2.5 text-[#D4AF37] font-semibold">1 s/d 12 Bulan</td>
                       <td className="p-2.5 text-slate-200 font-bold">Jurnal lapor, tes urin & SKSP tuntas</td>
                     </tr>
                   </tbody>

@@ -482,7 +482,7 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({
             </div>
             <div className="bg-[#081224] border border-[#1b3459] px-4 py-2.5 rounded-xl text-center">
               <span className="text-[10px] text-slate-400 uppercase block font-medium">Atensi Khusus</span>
-              <span className="text-lg font-bold text-rose-400 font-mono">{perluPerbaikanList.length + terhambatList.length}</span>
+              <span className="text-lg font-bold text-slate-300 font-mono">{perluPerbaikanList.length + terhambatList.length}</span>
             </div>
           </div>
         </div>
@@ -490,7 +490,7 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({
         {/* Interactive Filter Bar according to Proposal Bab 07 */}
         <div className="mt-5 pt-4 border-t border-[#1b3459] flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center space-x-1.5 text-xs text-slate-400">
-            <Clock className="w-3.5 h-3.5 text-[#38bdf8]" />
+            <Clock className="w-3.5 h-3.5 text-[#D4AF37]" />
             <span className="font-semibold text-slate-300">Filter Periode:</span>
             <div className="inline-flex rounded-lg bg-[#081224] p-0.5 border border-[#1b3459]">
               <button

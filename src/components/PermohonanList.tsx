@@ -169,7 +169,7 @@ export const PermohonanList: React.FC<PermohonanListProps> = ({
         <div>
           <h1 className="text-xl font-bold text-white flex items-center space-x-2 font-['Cinzel',serif]">
             <span>{headerInfo.title}</span>
-            <span className="text-xs bg-[#0b172a] text-[#38bdf8] border border-[#1b3459] font-semibold px-2 py-0.5 rounded-full font-mono">
+            <span className="text-xs bg-[#0b172a] text-[#D4AF37] border border-[#1b3459] font-semibold px-2 py-0.5 rounded-full font-mono">
               {filteredList.length} Berkas
             </span>
           </h1>
@@ -200,7 +200,7 @@ export const PermohonanList: React.FC<PermohonanListProps> = ({
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
               placeholder="Cari nomor permohonan (misal: TAT/2026/09/089), nama terperiksa, atau no LP..."
-              className="w-full pl-9 pr-4 py-2 text-xs bg-[#081224] border border-[#1b3459] text-white placeholder-slate-400 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#38bdf8] focus:border-[#38bdf8]"
+              className="w-full pl-9 pr-4 py-2 text-xs bg-[#081224] border border-[#1b3459] text-white placeholder-slate-400 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#D4AF37] focus:border-[#D4AF37]"
             />
           </div>
 
@@ -212,7 +212,7 @@ export const PermohonanList: React.FC<PermohonanListProps> = ({
             <select
               value={selectedStage}
               onChange={(e) => setSelectedStage(e.target.value)}
-              className="text-xs border border-[#1b3459] rounded-lg px-2.5 py-1.5 bg-[#081224] text-slate-200 focus:outline-none focus:ring-1 focus:ring-[#38bdf8]"
+              className="text-xs border border-[#1b3459] rounded-lg px-2.5 py-1.5 bg-[#081224] text-slate-200 focus:outline-none focus:ring-1 focus:ring-[#D4AF37]"
             >
               <option value="all">Semua Tahap</option>
               <option value="verifikasi_berkas">Verifikasi Berkas</option>
@@ -228,7 +228,7 @@ export const PermohonanList: React.FC<PermohonanListProps> = ({
             <select
               value={selectedSla}
               onChange={(e) => setSelectedSla(e.target.value)}
-              className="text-xs border border-[#1b3459] rounded-lg px-2.5 py-1.5 bg-[#081224] text-slate-200 focus:outline-none focus:ring-1 focus:ring-[#38bdf8]"
+              className="text-xs border border-[#1b3459] rounded-lg px-2.5 py-1.5 bg-[#081224] text-slate-200 focus:outline-none focus:ring-1 focus:ring-[#D4AF37]"
             >
               <option value="all">Semua Waktu SLA</option>
               <option value="mendekati">Mendekati Batas Waktu</option>
@@ -251,13 +251,13 @@ export const PermohonanList: React.FC<PermohonanListProps> = ({
             <div
               key={item.id}
               onClick={() => onSelectPermohonan(item.id)}
-              className="bg-[#0b172a] border border-[#1b3459] hover:border-[#38bdf8] rounded-xl p-4 transition-all cursor-pointer group shadow-md shadow-black/10 hover:shadow-cyan-950/20"
+              className="bg-[#0b172a] border border-[#1b3459] hover:border-[#D4AF37] rounded-xl p-4 transition-all cursor-pointer group shadow-md shadow-black/10 hover:shadow-cyan-950/20"
             >
               <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
                 {/* Left: Identification & Stages */}
                 <div className="space-y-1.5 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="font-bold text-sm text-white group-hover:text-[#38bdf8] transition-colors font-mono">
+                    <span className="font-bold text-sm text-white group-hover:text-[#D4AF37] transition-colors font-mono">
                       {item.nomorPermohonan}
                     </span>
                     {getStageBadge(item.statusProsesUtama)}
@@ -312,7 +312,7 @@ export const PermohonanList: React.FC<PermohonanListProps> = ({
                 </div>
 
                 <div className="hidden lg:flex items-center justify-center pl-2">
-                  <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-[#38bdf8] group-hover:translate-x-0.5 transition-all" />
+                  <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-[#D4AF37] group-hover:translate-x-0.5 transition-all" />
                 </div>
               </div>
             </div>

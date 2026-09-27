@@ -72,7 +72,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
   const selectedUser = MOCK_USERS.find(u => u.id === selectedUserId) || MOCK_USERS[1];
 
   return (
-    <div className="min-h-screen bg-[#071326] text-slate-100 flex flex-col justify-between antialiased selection:bg-[#38bdf8] selection:text-slate-950 font-sans">
+    <div className="min-h-screen bg-[#071326] text-slate-100 flex flex-col justify-between antialiased selection:bg-[#D4AF37] selection:text-slate-950 font-sans">
       {/* Top Header Bar */}
       <header className="bg-[#071325]/95 border-b border-[#1b3459] px-4 sm:px-8 py-3 flex items-center justify-between sticky top-0 z-20 backdrop-blur-sm">
         <button
@@ -107,7 +107,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
             <div className="space-y-1.5 pb-4 border-b border-[#1b3459]">
               <label className="flex items-center justify-between text-[11px] font-semibold text-slate-300">
                 <span className="flex items-center space-x-1.5">
-                  <UserCheck className="w-3.5 h-3.5 text-[#38bdf8]" />
+                  <UserCheck className="w-3.5 h-3.5 text-[#D4AF37]" />
                   <span>Pilih Profil Akun Kedinasan (Simulasi):</span>
                 </span>
                 <span className="text-[10px] text-slate-400 font-mono">8 Otoritas</span>
@@ -116,7 +116,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
               <select
                 value={selectedUserId}
                 onChange={e => handleDropdownChange(e.target.value)}
-                className="w-full bg-[#061021] text-white border border-[#1b3459] focus:border-[#38bdf8] rounded-xl px-3 py-2.5 text-xs font-medium focus:outline-none transition-colors cursor-pointer truncate"
+                className="w-full bg-[#061021] text-white border border-[#1b3459] focus:border-[#D4AF37] rounded-xl px-3 py-2.5 text-xs font-medium focus:outline-none transition-colors cursor-pointer truncate"
               >
                 {MOCK_USERS.map(user => (
                   <option key={user.id} value={user.id}>
@@ -145,7 +145,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                     value={emailInput}
                     onChange={e => setEmailInput(e.target.value)}
                     placeholder="nama.nrp@polri.go.id"
-                    className="w-full bg-[#061021] text-white pl-10 pr-3.5 py-2.5 rounded-xl border border-[#1b3459] text-xs focus:outline-none focus:border-[#38bdf8] placeholder-slate-500 transition-colors"
+                    className="w-full bg-[#061021] text-white pl-10 pr-3.5 py-2.5 rounded-xl border border-[#1b3459] text-xs focus:outline-none focus:border-[#D4AF37] placeholder-slate-500 transition-colors"
                   />
                 </div>
               </div>
@@ -162,7 +162,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                     value={passwordInput}
                     onChange={e => setPasswordInput(e.target.value)}
                     placeholder="Masukkan sandi..."
-                    className="w-full bg-[#061021] text-white pl-10 pr-10 py-2.5 rounded-xl border border-[#1b3459] text-xs focus:outline-none focus:border-[#38bdf8] placeholder-slate-500 transition-colors"
+                    className="w-full bg-[#061021] text-white pl-10 pr-10 py-2.5 rounded-xl border border-[#1b3459] text-xs focus:outline-none focus:border-[#D4AF37] placeholder-slate-500 transition-colors"
                   />
                   <button
                     type="button"
@@ -181,14 +181,14 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                     type="checkbox"
                     checked={rememberMe}
                     onChange={e => setRememberMe(e.target.checked)}
-                    className="w-3.5 h-3.5 rounded border-[#1b3459] bg-[#061021] text-[#38bdf8] focus:ring-0 focus:ring-offset-0 cursor-pointer"
+                    className="w-3.5 h-3.5 rounded border-[#1b3459] bg-[#061021] text-[#D4AF37] focus:ring-0 focus:ring-offset-0 cursor-pointer"
                   />
                   <span>Ingat di perangkat ini</span>
                 </label>
                 <button
                   type="button"
                   onClick={() => alert("Silakan hubungi Administrator PUSDATIN SIBER untuk reset kata sandi dinas.")}
-                  className="text-slate-400 hover:text-[#38bdf8] transition-colors cursor-pointer text-xs"
+                  className="text-slate-400 hover:text-[#D4AF37] transition-colors cursor-pointer text-xs"
                 >
                   Bantuan Sandi
                 </button>

@@ -34,7 +34,7 @@ export const AdministrasiView: React.FC<AdministrasiViewProps> = ({ currentUser 
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-xl font-bold text-white flex items-center space-x-2 font-['Cinzel',serif]">
-            <Settings className="w-5 h-5 text-[#38bdf8]" />
+            <Settings className="w-5 h-5 text-[#D4AF37]" />
             <span>Pengaturan & Administrasi Sistem e-TAT SIAP PULIH</span>
           </h1>
           <p className="text-xs text-slate-400 mt-1">
@@ -95,7 +95,7 @@ export const AdministrasiView: React.FC<AdministrasiViewProps> = ({ currentUser 
       {activeSubTab === 'regulasi' && (
         <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl p-5 space-y-4 shadow-lg shadow-black/20">
           <h3 className="text-sm font-bold text-white flex items-center space-x-2 font-['Cinzel',serif]">
-            <BookOpen className="w-4 h-4 text-[#38bdf8]" />
+            <BookOpen className="w-4 h-4 text-[#D4AF37]" />
             <span>Landasan Yuridis Pelaksanaan Tim Asesmen Terpadu</span>
           </h3>
 
@@ -150,7 +150,7 @@ export const AdministrasiView: React.FC<AdministrasiViewProps> = ({ currentUser 
         <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl p-5 space-y-5 shadow-lg shadow-black/20">
           <div>
             <h3 className="text-sm font-bold text-white flex items-center space-x-2 font-['Cinzel',serif]">
-              <Hash className="w-4 h-4 text-[#38bdf8]" />
+              <Hash className="w-4 h-4 text-[#D4AF37]" />
               <span>Konfigurasi Pola Penomoran & Template Rekomendasi</span>
             </h3>
             <p className="text-xs text-slate-400 mt-1">
@@ -165,7 +165,7 @@ export const AdministrasiView: React.FC<AdministrasiViewProps> = ({ currentUser 
                 type="text"
                 value={polaNomorPermohonan}
                 onChange={e => setPolaNomorPermohonan(e.target.value)}
-                className="w-full bg-[#0b172a] border border-[#1b3459] rounded-lg px-3 py-2 text-white font-mono text-xs focus:outline-none focus:border-[#38bdf8]"
+                className="w-full bg-[#0b172a] border border-[#1b3459] rounded-lg px-3 py-2 text-white font-mono text-xs focus:outline-none focus:border-[#D4AF37]"
               />
               <span className="text-[11px] text-slate-400 block">
                 Contoh hasil: <strong className="text-[#D4AF37] font-mono">TAT/2026/09/082</strong>
@@ -178,7 +178,7 @@ export const AdministrasiView: React.FC<AdministrasiViewProps> = ({ currentUser 
                 type="text"
                 value={polaNomorRekomendasi}
                 onChange={e => setPolaNomorRekomendasi(e.target.value)}
-                className="w-full bg-[#0b172a] border border-[#1b3459] rounded-lg px-3 py-2 text-white font-mono text-xs focus:outline-none focus:border-[#38bdf8]"
+                className="w-full bg-[#0b172a] border border-[#1b3459] rounded-lg px-3 py-2 text-white font-mono text-xs focus:outline-none focus:border-[#D4AF37]"
               />
               <span className="text-[11px] text-slate-400 block">
                 Contoh hasil: <strong className="text-[#D4AF37] font-mono">REK-TAT/082/IX/2026/BNNP-KALTIM</strong>
@@ -195,7 +195,7 @@ export const AdministrasiView: React.FC<AdministrasiViewProps> = ({ currentUser 
 
           <div className="flex items-center justify-end space-x-3 pt-2">
             {isSaved && (
-              <span className="text-xs text-emerald-400 flex items-center space-x-1">
+              <span className="text-xs text-[#D4AF37] flex items-center space-x-1">
                 <CheckCircle2 className="w-4 h-4" />
                 <span>Pola berhasil disimpan ke sistem!</span>
               </span>
@@ -216,7 +216,7 @@ export const AdministrasiView: React.FC<AdministrasiViewProps> = ({ currentUser 
         <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl p-5 space-y-4 shadow-lg shadow-black/20">
           <div>
             <h3 className="text-sm font-bold text-white flex items-center space-x-2 font-['Cinzel',serif]">
-              <Users className="w-4 h-4 text-[#38bdf8]" />
+              <Users className="w-4 h-4 text-[#D4AF37]" />
               <span>Matriks Kewenangan & Peran Pengguna (Role Permission)</span>
             </h3>
             <p className="text-xs text-slate-400 mt-1">
@@ -245,19 +245,19 @@ export const AdministrasiView: React.FC<AdministrasiViewProps> = ({ currentUser 
                   <td className="py-3 px-3 font-bold text-white">Tim Asesor Medis</td>
                   <td className="py-3 px-3 text-slate-300">Dokter BNNP / RSUD / Sp.KJ</td>
                   <td className="py-3 px-3 text-slate-300">Pemeriksaan fisik, laboratorium toksikologi urin, pengisian WHO ASSIST, diagnosis klinis ICD</td>
-                  <td className="py-3 px-3 text-center"><span className="bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded text-[10px]">Aktif</span></td>
+                  <td className="py-3 px-3 text-center"><span className="bg-emerald-500/20 text-slate-200 px-2 py-0.5 rounded text-[10px]">Aktif</span></td>
                 </tr>
                 <tr>
                   <td className="py-3 px-3 font-bold text-white">Tim Asesor Hukum</td>
                   <td className="py-3 px-3 text-slate-300">Kejati Kaltim / Polda Kaltim</td>
                   <td className="py-3 px-3 text-slate-300">Verifikasi kronologi, analisis peran tersangka, uji gramatur SEMA 04/2010, simpulan hukum</td>
-                  <td className="py-3 px-3 text-center"><span className="bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded text-[10px]">Aktif</span></td>
+                  <td className="py-3 px-3 text-center"><span className="bg-purple-500/20 text-slate-200 px-2 py-0.5 rounded text-[10px]">Aktif</span></td>
                 </tr>
                 <tr>
                   <td className="py-3 px-3 font-bold text-white">Petugas Pemantauan / Rehab</td>
                   <td className="py-3 px-3 text-slate-300">Bidang Rehabilitasi BNNP Kaltim</td>
                   <td className="py-3 px-3 text-slate-300">Distribusi rujukan ke faskes, pemantauan berkala, jurnal bimbingan, uji urin acak & SP</td>
-                  <td className="py-3 px-3 text-center"><span className="bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded text-[10px]">Aktif</span></td>
+                  <td className="py-3 px-3 text-center"><span className="bg-amber-500/20 text-[#D4AF37] px-2 py-0.5 rounded text-[10px]">Aktif</span></td>
                 </tr>
                 <tr>
                   <td className="py-3 px-3 font-bold text-white">Penyidik Pengaju</td>
@@ -282,7 +282,7 @@ export const AdministrasiView: React.FC<AdministrasiViewProps> = ({ currentUser 
         <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl p-5 space-y-4 shadow-lg shadow-black/20">
           <div>
             <h3 className="text-sm font-bold text-white flex items-center space-x-2 font-['Cinzel',serif]">
-              <Building2 className="w-4 h-4 text-[#38bdf8]" />
+              <Building2 className="w-4 h-4 text-[#D4AF37]" />
               <span>Struktur Lembaga Mitra Tim Asesmen Terpadu BNNP Kalimantan Timur</span>
             </h3>
             <p className="text-xs text-slate-400 mt-1">
@@ -301,7 +301,7 @@ export const AdministrasiView: React.FC<AdministrasiViewProps> = ({ currentUser 
             </div>
 
             <div className="p-3.5 bg-[#081224] border border-[#1b3459] rounded-xl space-y-1.5">
-              <span className="font-bold text-purple-300 block">Penuntut Umum Terpadu</span>
+              <span className="font-bold text-slate-200 block">Penuntut Umum Terpadu</span>
               <p className="text-slate-300 font-semibold">Kejaksaan Tinggi Kalimantan Timur & Kejari Samarinda</p>
               <p className="text-[11px] text-slate-400">Jl. Bung Tomo, Samarinda Seberang</p>
               <span className="text-[10px] text-slate-400 block font-mono border-t border-[#1b3459] pt-1 mt-2">
@@ -310,7 +310,7 @@ export const AdministrasiView: React.FC<AdministrasiViewProps> = ({ currentUser 
             </div>
 
             <div className="p-3.5 bg-[#081224] border border-[#1b3459] rounded-xl space-y-1.5">
-              <span className="font-bold text-emerald-300 block">Fasilitas Rujukan Pemulihan</span>
+              <span className="font-bold text-slate-200 block">Fasilitas Rujukan Pemulihan</span>
               <p className="text-slate-300 font-semibold">Balai Rehabilitasi BNN Tanah Merah & Klinik Pratama BNNP Kaltim</p>
               <p className="text-[11px] text-slate-400">Samarinda Utara & RSUD AW Sjahranie Samarinda</p>
               <span className="text-[10px] text-slate-400 block font-mono border-t border-[#1b3459] pt-1 mt-2">
