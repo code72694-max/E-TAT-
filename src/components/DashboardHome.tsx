@@ -1,6 +1,5 @@
 import React from 'react';
 import { UserProfile, PermohonanAsesmen } from '../types';
-import { PoliceEmblem } from './PoliceEmblem';
 import {
   AlertTriangle,
   Clock,
@@ -13,7 +12,8 @@ import {
   ArrowRight,
   ShieldCheck,
   Users,
-  Activity
+  Activity,
+  Plus
 } from 'lucide-react';
 
 interface DashboardHomeProps {
@@ -21,13 +21,15 @@ interface DashboardHomeProps {
   permohonanList: PermohonanAsesmen[];
   onSelectPermohonan: (id: string) => void;
   onNavigateToTab: (tab: any) => void;
+  onOpenNewModal?: () => void;
 }
 
 export const DashboardHome: React.FC<DashboardHomeProps> = ({
   currentUser,
   permohonanList,
   onSelectPermohonan,
-  onNavigateToTab
+  onNavigateToTab,
+  onOpenNewModal
 }) => {
   const role = currentUser.role;
   const [selectedPeriod, setSelectedPeriod] = React.useState<'semua' | 'bulan_ini' | 'triwulan' | 'tahun'>('semua');
@@ -68,20 +70,20 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({
                     <div
                       key={item.id}
                       onClick={() => onSelectPermohonan(item.id)}
-                      className="bg-[#081224] hover:bg-[#112340] border border-[#1b3459] rounded-xl p-3.5 transition-all flex items-center justify-between cursor-pointer"
+                      className="bg-[#081224] hover:bg-[#112340] border border-[#1b3459] rounded-xl p-3.5 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 cursor-pointer"
                     >
-                      <div>
-                        <div className="flex items-center space-x-2">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center space-x-2 flex-wrap gap-y-1">
                           <span className="font-mono font-bold text-xs text-white">{item.nomorPermohonan}</span>
                           <span className="text-xs text-slate-300">&bull; Terperiksa: <strong className="text-white">{item.terperiksa.namaLengkap}</strong></span>
                         </div>
-                        <p className="text-xs text-slate-300 mt-0.5">
+                        <p className="text-xs text-slate-300 mt-0.5 leading-snug">
                           {item.tindakanBerikutnyaLabel}
                         </p>
                       </div>
-                      <button className="text-xs bg-[#133863] hover:bg-[#1a4a82] text-white font-semibold px-3.5 py-1.5 rounded-xl flex items-center space-x-1 shrink-0 transition-all border border-[#235594] cursor-pointer">
+                      <button className="text-xs bg-[#142642] hover:bg-[#1b3459] text-slate-200 font-semibold px-3 py-2 rounded-xl flex items-center justify-center space-x-1 shrink-0 transition-colors border border-[#234475] cursor-pointer w-full sm:w-auto">
                         <span>Unggah Perbaikan</span>
-                        <ArrowRight className="w-3.5 h-3.5 text-white" />
+                        <ArrowRight className="w-3.5 h-3.5 text-slate-200" />
                       </button>
                     </div>
                   ))}
@@ -194,18 +196,18 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({
                   <div
                     key={item.id}
                     onClick={() => onSelectPermohonan(item.id)}
-                    className="p-3 border border-[#1b3459] bg-[#081224] rounded-xl hover:bg-[#112340] cursor-pointer flex items-center justify-between text-xs transition-colors"
+                    className="p-3.5 border border-[#1b3459] bg-[#081224] rounded-xl hover:bg-[#112340] cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs transition-colors"
                   >
-                    <div className="flex items-center space-x-2.5 truncate">
-                      <span className="font-mono font-bold text-white">{item.nomorPermohonan}</span>
+                    <div className="flex items-center space-x-2 truncate min-w-0">
+                      <span className="font-mono font-bold text-white shrink-0">{item.nomorPermohonan}</span>
                       <span className="text-slate-300 truncate">&bull; {item.terperiksa.namaLengkap}</span>
                     </div>
-                    <div className="flex items-center space-x-3 shrink-0">
+                    <div className="flex items-center justify-between sm:justify-end space-x-3 shrink-0 pt-1 sm:pt-0 border-t sm:border-t-0 border-[#1b3459]/40">
                       <span className="text-slate-400">Tenggat: <strong className="text-white font-mono">{item.tenggatSlaTanggal}</strong></span>
-                      <span className="px-2.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border bg-[#0a182f] text-slate-300 border-[#1b3459]">
+                      <span className="px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider border bg-[#0a182f] text-slate-300 border-[#1b3459]">
                         {item.isMendekatiTenggat ? 'Mendekati Batas' : 'Terkendali'}
                       </span>
-                      <ArrowRight className="w-3 h-3 text-slate-400" />
+                      <ArrowRight className="w-3.5 h-3.5 text-slate-400" />
                     </div>
                   </div>
                 ))}
@@ -218,7 +220,7 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({
         return (
           <div className="space-y-5">
             <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl p-5 shadow-lg shadow-black/20">
-              <div className="flex items-center justify-between mb-4 pb-2 border-b border-[#1b3459]">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 pb-2 border-b border-[#1b3459]">
                 <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center space-x-2">
                   <Stethoscope className="w-4 h-4 text-slate-400" />
                   <span>Kasus Penugasan Asesmen Medis & Psikiatri</span>
@@ -228,20 +230,20 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({
               <div className="space-y-2">
                 <div 
                   onClick={() => onSelectPermohonan('tat-085')}
-                  className="bg-[#081224] hover:bg-[#112340] border border-[#1b3459] rounded-xl p-4 cursor-pointer flex items-center justify-between transition-all"
+                  className="bg-[#081224] hover:bg-[#112340] border border-[#1b3459] rounded-xl p-3.5 sm:p-4 cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-all"
                 >
-                  <div>
-                    <div className="flex items-center space-x-2">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center space-x-2 flex-wrap gap-y-1">
                       <span className="font-mono font-bold text-xs text-white">TAT/2026/09/085 - Test-2</span>
-                      <span className="text-[10px] bg-[#0a182f] text-slate-300 border border-[#1b3459] px-2 py-0.5 rounded font-bold uppercase">
+                      <span className="text-[10px] bg-[#142642] text-slate-200 border border-[#234475] px-2 py-0.5 rounded font-bold uppercase">
                         Selesai Diperiksa
                       </span>
                     </div>
-                    <p className="text-xs text-slate-300 mt-1">Diagnosis: F15.1 Sabu (ASSIST Skor 21) &bull; Usulan Rawat Jalan 3 Bulan</p>
+                    <p className="text-xs text-slate-300 mt-1 leading-snug">Diagnosis: F15.1 Sabu (ASSIST Skor 21) &bull; Usulan Rawat Jalan 3 Bulan</p>
                   </div>
-                  <button className="text-xs bg-[#133863] hover:bg-[#1a4a82] text-white font-semibold px-3.5 py-2 rounded-xl flex items-center space-x-1 shrink-0 transition-colors border border-[#235594]">
+                  <button className="text-xs bg-[#142642] hover:bg-[#1b3459] text-slate-200 font-semibold px-3.5 py-2 rounded-xl flex items-center justify-center space-x-1 shrink-0 transition-colors border border-[#234475] w-full sm:w-auto">
                     <span>Lihat Rekam Medis</span>
-                    <ArrowRight className="w-3.5 h-3.5 text-white" />
+                    <ArrowRight className="w-3.5 h-3.5 text-slate-200" />
                   </button>
                 </div>
               </div>
@@ -253,7 +255,7 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({
         return (
           <div className="space-y-5">
             <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl p-5 shadow-lg shadow-black/20">
-              <div className="flex items-center justify-between mb-4 pb-2 border-b border-[#1b3459]">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 pb-2 border-b border-[#1b3459]">
                 <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center space-x-2">
                   <Scale className="w-4 h-4 text-slate-400" />
                   <span>Kasus Penelaahan Yuridis Hukum</span>
@@ -263,20 +265,20 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({
               <div className="space-y-2">
                 <div 
                   onClick={() => onSelectPermohonan('tat-085')}
-                  className="bg-[#081224] hover:bg-[#112340] border border-[#1b3459] rounded-xl p-4 cursor-pointer flex items-center justify-between transition-all"
+                  className="bg-[#081224] hover:bg-[#112340] border border-[#1b3459] rounded-xl p-3.5 sm:p-4 cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-all"
                 >
-                  <div>
-                    <div className="flex items-center space-x-2">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center space-x-2 flex-wrap gap-y-1">
                       <span className="font-mono font-bold text-xs text-white">TAT/2026/09/085 - Test-2</span>
-                      <span className="text-[10px] bg-[#0a182f] text-slate-300 border border-[#1b3459] px-2 py-0.5 rounded font-bold uppercase">
+                      <span className="text-[10px] bg-[#142642] text-slate-200 border border-[#234475] px-2 py-0.5 rounded font-bold uppercase">
                         Perlu Klarifikasi
                       </span>
                     </div>
-                    <p className="text-xs text-slate-300 mt-1">Klasifikasi: Penyalahguna (0.22g Sabu) &bull; Menunggu verifikasi BAP saksi penangkap</p>
+                    <p className="text-xs text-slate-300 mt-1 leading-snug">Klasifikasi: Penyalahguna (0.22g Sabu) &bull; Menunggu verifikasi BAP saksi penangkap</p>
                   </div>
-                  <button className="text-xs bg-[#133863] hover:bg-[#1a4a82] text-white font-semibold px-3.5 py-2 rounded-xl flex items-center space-x-1 shrink-0 transition-colors border border-[#235594]">
+                  <button className="text-xs bg-[#142642] hover:bg-[#1b3459] text-slate-200 font-semibold px-3.5 py-2 rounded-xl flex items-center justify-center space-x-1 shrink-0 transition-colors border border-[#234475] w-full sm:w-auto">
                     <span>Lengkapi Analisis</span>
-                    <ArrowRight className="w-3.5 h-3.5 text-white" />
+                    <ArrowRight className="w-3.5 h-3.5 text-slate-200" />
                   </button>
                 </div>
               </div>
@@ -288,7 +290,7 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({
         return (
           <div className="space-y-5">
             <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl p-5 shadow-lg shadow-black/20">
-              <div className="flex items-center justify-between mb-4 pb-2 border-b border-[#1b3459]">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 pb-2 border-b border-[#1b3459]">
                 <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center space-x-2">
                   <FileSignature className="w-4 h-4 text-slate-400" />
                   <span>Menunggu Pengesahan Rekomendasi Terpadu ({menungguPengesahanList.length})</span>
@@ -300,21 +302,21 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({
                   <div
                     key={item.id}
                     onClick={() => onSelectPermohonan(item.id)}
-                    className="bg-[#081224] hover:bg-[#112340] border border-[#1b3459] rounded-xl p-4 cursor-pointer flex items-center justify-between transition-all"
+                    className="bg-[#081224] hover:bg-[#112340] border border-[#1b3459] rounded-xl p-3.5 sm:p-4 cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-all"
                   >
-                    <div>
-                      <div className="flex items-center space-x-2">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center space-x-2 flex-wrap gap-y-1">
                         <span className="font-mono font-bold text-xs text-white">{item.nomorPermohonan}</span>
                         <span className="text-xs text-slate-300">&bull; {item.terperiksa.namaLengkap}</span>
-                        <span className="text-[10px] bg-[#0a182f] text-slate-200 px-2 py-0.5 rounded font-bold uppercase border border-[#1b3459]">
+                        <span className="text-[10px] bg-[#142642] text-slate-200 px-2 py-0.5 rounded font-bold uppercase border border-[#234475]">
                           3/4 TTD Sah
                         </span>
                       </div>
-                      <p className="text-xs text-slate-300 mt-1">Kesepakatan: {item.sidangPleno?.kesepakatanRekomendasi || 'Rehabilitasi Rawat Inap RSKO'}</p>
+                      <p className="text-xs text-slate-300 mt-1 leading-snug">Kesepakatan: {item.sidangPleno?.kesepakatanRekomendasi || 'Rehabilitasi Rawat Inap RSKO'}</p>
                     </div>
-                    <button className="text-xs bg-[#133863] hover:bg-[#1a4a82] text-white font-semibold px-3.5 py-2 rounded-xl flex items-center space-x-1 shrink-0 transition-colors border border-[#235594]">
+                    <button className="text-xs bg-[#142642] hover:bg-[#1b3459] text-slate-200 font-semibold px-3.5 py-2 rounded-xl flex items-center justify-center space-x-1 shrink-0 transition-colors border border-[#234475] w-full sm:w-auto">
                       <span>Sahkan Rekomendasi</span>
-                      <ArrowRight className="w-3.5 h-3.5 text-white" />
+                      <ArrowRight className="w-3.5 h-3.5 text-slate-200" />
                     </button>
                   </div>
                 ))}
@@ -327,7 +329,7 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({
         return (
           <div className="space-y-5">
             <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl p-5 shadow-lg shadow-black/20">
-              <div className="flex items-center justify-between mb-4 pb-2 border-b border-[#1b3459]">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 pb-2 border-b border-[#1b3459]">
                 <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center space-x-2">
                   <Share2 className="w-4 h-4 text-slate-400" />
                   <span>Daftar Rujukan Masuk Klien Rehabilitasi</span>
@@ -336,20 +338,20 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({
               </div>
               <div 
                 onClick={() => onSelectPermohonan('tat-074')}
-                className="bg-[#081224] hover:bg-[#112340] border border-[#1b3459] rounded-xl p-4 cursor-pointer flex items-center justify-between transition-all"
+                className="bg-[#081224] hover:bg-[#112340] border border-[#1b3459] rounded-xl p-3.5 sm:p-4 cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-all"
               >
-                <div>
-                  <div className="flex items-center space-x-2">
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center space-x-2 flex-wrap gap-y-1">
                     <span className="font-mono font-bold text-xs text-white">Rujukan: Dimas Ardiansyah (TAT-074)</span>
-                    <span className="text-[10px] bg-[#0a182f] text-slate-300 border border-[#1b3459] px-2 py-0.5 rounded font-bold uppercase">
+                    <span className="text-[10px] bg-[#142642] text-slate-200 border border-[#234475] px-2 py-0.5 rounded font-bold uppercase">
                       Kapasitas Penuh
                     </span>
                   </div>
-                  <p className="text-xs text-slate-300 mt-1">Usulan: Rawat Inap 6 Bulan di Balai Tanah Merah Samarinda &bull; Ketersediaan Kuota Kamar: 0 slot (Perlu Relokasi)</p>
+                  <p className="text-xs text-slate-300 mt-1 leading-snug">Usulan: Rawat Inap 6 Bulan di Balai Tanah Merah Samarinda &bull; Ketersediaan Kuota Kamar: 0 slot (Perlu Relokasi)</p>
                 </div>
-                <button className="text-xs bg-[#133863] hover:bg-[#1a4a82] text-white font-semibold px-3.5 py-2 rounded-xl flex items-center space-x-1 shrink-0 transition-colors border border-[#235594]">
+                <button className="text-xs bg-[#142642] hover:bg-[#1b3459] text-slate-200 font-semibold px-3.5 py-2 rounded-xl flex items-center justify-center space-x-1 shrink-0 transition-colors border border-[#234475] w-full sm:w-auto">
                   <span>Kelola Slot</span>
-                  <ArrowRight className="w-3.5 h-3.5 text-white" />
+                  <ArrowRight className="w-3.5 h-3.5 text-slate-200" />
                 </button>
               </div>
             </div>
@@ -451,97 +453,49 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({
   };
 
   return (
-    <div className="space-y-6">
-      {/* Top Banner: Clean, Harmonious Executive Command Desk */}
-      <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl p-6 shadow-xl shadow-black/30">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5">
-          <div className="flex items-center space-x-4">
-            <PoliceEmblem size="md" />
-            <div>
-              <div className="flex items-center space-x-2">
-                <span className="text-[10px] uppercase font-bold tracking-wider text-slate-300 bg-[#081224] px-2.5 py-0.5 rounded border border-[#1b3459] font-mono">
-                  SENTRA KOMANDO E-TAT SIAP PULIH
-                </span>
-                <span className="text-[10px] text-slate-400 font-mono">
-                  SLA 6 HARI KERJA
-                </span>
-              </div>
-              <h1 className="text-xl sm:text-2xl font-extrabold text-white mt-1.5 tracking-tight font-['Cinzel',serif]">
-                Selamat Bertugas, {currentUser.name}
-              </h1>
-              <p className="text-xs text-slate-300 mt-0.5">
-                {currentUser.agency} &bull; <span className="font-bold text-slate-200">{currentUser.role.toUpperCase()}</span>
-              </p>
+    <div className="space-y-4 sm:space-y-6">
+      {/* Top Banner: Proportional Executive Command Desk without redundant logo */}
+      <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl p-4 sm:p-6 shadow-xl shadow-black/30 space-y-4">
+        {/* Main Header Row */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          {/* Identity & Welcome */}
+          <div className="space-y-1 min-w-0">
+            <div className="flex items-center space-x-2 flex-wrap gap-y-1">
+              <span className="text-[10px] uppercase font-bold tracking-wider text-[#d4af37] bg-[#142642] px-2.5 py-0.5 rounded-md border border-[#d4af37]/30">
+                SENTRA KOMANDO E-TAT
+              </span>
+              <span className="text-[10px] text-slate-400 font-medium">
+                SLA 6 HARI KERJA
+              </span>
             </div>
+            <h1 className="text-lg sm:text-xl font-bold text-white tracking-tight leading-snug">
+              Selamat Bertugas, <span className="text-[#d4af37]">{currentUser.name}</span>
+            </h1>
+            <p className="text-xs text-slate-300">
+              {currentUser.agency} &bull; <span className="font-semibold text-slate-200">{currentUser.role.toUpperCase()}</span>
+            </p>
           </div>
 
-          <div className="flex items-center space-x-3 shrink-0">
-            <div className="bg-[#081224] border border-[#1b3459] px-4 py-2.5 rounded-xl text-center">
-              <span className="text-[10px] text-slate-400 uppercase block font-medium">Kasus Aktif</span>
-              <span className="text-lg font-bold text-white font-mono">{filteredByPeriod.length}</span>
+          {/* Quick Actions & Stats Badge Row */}
+          <div className="flex items-center space-x-2.5 sm:space-x-3 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-[#1b3459]/60">
+            {(role === 'pengaju' || role === 'sekretariat') && onOpenNewModal && (
+              <button
+                type="button"
+                onClick={onOpenNewModal}
+                className="flex-1 sm:flex-initial bg-gradient-to-r from-[#D4AF37] via-[#C59B27] to-[#AA7C11] text-slate-950 font-extrabold text-xs sm:text-sm px-3.5 py-2.5 rounded-xl shadow-lg shadow-[#D4AF37]/20 hover:brightness-110 active:scale-95 transition-all flex items-center justify-center space-x-1.5 cursor-pointer border border-[#FFF2B2]/30"
+              >
+                <Plus className="w-4 h-4 stroke-[3] text-slate-950 shrink-0" />
+                <span className="whitespace-nowrap">Pengajuan Baru</span>
+              </button>
+            )}
+            <div className="bg-[#081224] border border-[#1b3459] px-3.5 py-2 sm:py-2.5 rounded-xl text-center min-w-[64px]">
+              <span className="text-[9px] sm:text-[10px] text-slate-400 uppercase block font-medium">Aktif</span>
+              <span className="text-base sm:text-lg font-bold text-white font-mono">{permohonanList.length}</span>
             </div>
-            <div className="bg-[#081224] border border-[#1b3459] px-4 py-2.5 rounded-xl text-center">
-              <span className="text-[10px] text-slate-400 uppercase block font-medium">Atensi Khusus</span>
-              <span className="text-lg font-bold text-slate-300 font-mono">{perluPerbaikanList.length + terhambatList.length}</span>
+            <div className="bg-[#081224] border border-[#1b3459] px-3.5 py-2 sm:py-2.5 rounded-xl text-center min-w-[64px]">
+              <span className="text-[9px] sm:text-[10px] text-slate-400 uppercase block font-medium">Atensi</span>
+              <span className="text-base sm:text-lg font-bold text-rose-400 font-mono">{perluPerbaikanList.length + terhambatList.length}</span>
             </div>
-          </div>
-        </div>
-
-        {/* Interactive Filter Bar according to Proposal Bab 07 */}
-        <div className="mt-5 pt-4 border-t border-[#1b3459] flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center space-x-1.5 text-xs text-slate-400">
-            <Clock className="w-3.5 h-3.5 text-[#D4AF37]" />
-            <span className="font-semibold text-slate-300">Filter Periode:</span>
-            <div className="inline-flex rounded-lg bg-[#081224] p-0.5 border border-[#1b3459]">
-              <button
-                type="button"
-                onClick={() => setSelectedPeriod('semua')}
-                className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition-all cursor-pointer ${
-                  selectedPeriod === 'semua'
-                    ? 'bg-[#133863] text-white shadow-xs'
-                    : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                Semua Data
-              </button>
-              <button
-                type="button"
-                onClick={() => setSelectedPeriod('bulan_ini')}
-                className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition-all cursor-pointer ${
-                  selectedPeriod === 'bulan_ini'
-                    ? 'bg-[#133863] text-white shadow-xs'
-                    : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                Bulan Ini (Sep 2026)
-              </button>
-              <button
-                type="button"
-                onClick={() => setSelectedPeriod('triwulan')}
-                className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition-all cursor-pointer ${
-                  selectedPeriod === 'triwulan'
-                    ? 'bg-[#133863] text-white shadow-xs'
-                    : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                Triwulan III
-              </button>
-              <button
-                type="button"
-                onClick={() => setSelectedPeriod('tahun')}
-                className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition-all cursor-pointer ${
-                  selectedPeriod === 'tahun'
-                    ? 'bg-[#133863] text-white shadow-xs'
-                    : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                Tahun 2026
-              </button>
-            </div>
-          </div>
-
-          <div className="text-[11px] text-slate-400 flex items-center space-x-2">
-            <span>Menampilkan <strong className="text-white font-mono">{filteredByPeriod.length}</strong> dari <strong className="text-white font-mono">{permohonanList.length}</strong> total perkara</span>
           </div>
         </div>
       </div>

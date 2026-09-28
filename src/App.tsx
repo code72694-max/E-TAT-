@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { UserProfile, PermohonanAsesmen, UserRole } from './types';
 import { MOCK_USERS, INITIAL_PERMOHONAN } from './data/initialData';
 import { Header } from './components/Header';
@@ -23,11 +24,16 @@ import { AdministrasiView } from './components/AdministrasiView';
 import { ModalPengajuanBaru } from './components/ModalPengajuanBaru';
 import { ModalVerifikasiQR } from './components/ModalVerifikasiQR';
 import { AboutView } from './components/AboutView';
+import { ProfileView } from './components/ProfileView';
 import { LandingPageView } from './components/LandingPageView';
 import { LoginPage } from './components/LoginPage';
 import { LacakBerkasPage } from './components/LacakBerkasPage';
+import { MobileBottomNav } from './components/MobileBottomNav';
 
 export default function App() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
   // Navigation / Auth mode: 'landing' (public), 'lacak' (public tracking), 'login' (role selection), or 'dashboard' (authenticated)
   const [appViewMode, setAppViewMode] = useState<'landing' | 'lacak' | 'login' | 'dashboard'>('landing');
 
@@ -42,6 +48,38 @@ export default function App() {
   const [isNewModalOpen, setIsNewModalOpen] = useState(false);
   const [qrModalPermohonan, setQrModalPermohonan] = useState<PermohonanAsesmen | null>(null);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
+
+  // Sync state from URL path
+  useEffect(() => {
+    const path = location.pathname;
+    if (path === '/lacak') {
+      setAppViewMode('lacak');
+    } else if (path === '/login') {
+      setAppViewMode('login');
+    } else if (path.startsWith('/dashboard')) {
+      setAppViewMode('dashboard');
+      const parts = path.split('/').filter(Boolean);
+      if (parts[1] === 'detail' && parts[2]) {
+        setSelectedPermohonanId(parts[2]);
+      } else if (parts[1]) {
+        setCurrentTab(parts[1] as ActiveTab);
+        setSelectedPermohonanId(null);
+      } else {
+        setCurrentTab('beranda');
+        setSelectedPermohonanId(null);
+      }
+    } else {
+      setAppViewMode('landing');
+    }
+  }, [location.pathname]);
+
+  const changeAppViewMode = (mode: 'landing' | 'lacak' | 'login' | 'dashboard') => {
+    setAppViewMode(mode);
+    if (mode === 'landing') navigate('/');
+    else if (mode === 'lacak') navigate('/lacak');
+    else if (mode === 'login') navigate('/login');
+    else if (mode === 'dashboard') navigate(`/dashboard/${currentTab}`);
+  };
 
   // Selected permohonan object
   const selectedPermohonan = useMemo(() => {
@@ -73,12 +111,14 @@ export default function App() {
   // Open a specific application from anywhere
   const handleOpenPermohonan = (id: string) => {
     setSelectedPermohonanId(id);
+    navigate(`/dashboard/detail/${id}`);
   };
 
   // Switch tab and clear active detail view if user clicks navigation
   const handleSelectTab = (tab: ActiveTab) => {
     setCurrentTab(tab);
     setSelectedPermohonanId(null);
+    navigate(`/dashboard/${tab}`);
   };
 
   // Switch role / user with strict tab and detail view validation
@@ -86,14 +126,14 @@ export default function App() {
     setCurrentUser(user);
     setSelectedPermohonanId(null);
     const roleAllowedTabs: Record<UserRole, ActiveTab[]> = {
-      pengaju: ['beranda', 'permohonan', 'verifikasi', 'penugasan', 'dokumen', 'about'],
-      sekretariat: ['beranda', 'permohonan', 'verifikasi', 'penugasan', 'pleno', 'dokumen', 'tindak_lanjut', 'about'],
-      medis: ['beranda', 'medis', 'penugasan', 'pleno', 'about'],
-      hukum: ['beranda', 'hukum', 'penugasan', 'pleno', 'about'],
-      koordinator: ['beranda', 'permohonan', 'pleno', 'dokumen', 'tindak_lanjut', 'about'],
-      pimpinan: ['beranda', 'monitoring', 'permohonan', 'tindak_lanjut', 'about'],
-      rehabilitasi: ['beranda', 'tindak_lanjut', 'dokumen', 'about'],
-      admin: ['beranda', 'administrasi', 'monitoring', 'about']
+      pengaju: ['beranda', 'permohonan', 'verifikasi', 'penugasan', 'dokumen', 'about', 'profile'],
+      sekretariat: ['beranda', 'permohonan', 'verifikasi', 'penugasan', 'pleno', 'dokumen', 'tindak_lanjut', 'about', 'profile'],
+      medis: ['beranda', 'medis', 'penugasan', 'pleno', 'about', 'profile'],
+      hukum: ['beranda', 'hukum', 'penugasan', 'pleno', 'about', 'profile'],
+      koordinator: ['beranda', 'permohonan', 'pleno', 'dokumen', 'tindak_lanjut', 'about', 'profile'],
+      pimpinan: ['beranda', 'monitoring', 'permohonan', 'tindak_lanjut', 'about', 'profile'],
+      rehabilitasi: ['beranda', 'tindak_lanjut', 'dokumen', 'about', 'profile'],
+      admin: ['beranda', 'administrasi', 'monitoring', 'about', 'profile']
     };
     if (!roleAllowedTabs[user.role]?.includes(currentTab)) {
       setCurrentTab('beranda');
@@ -224,6 +264,16 @@ export default function App() {
           />
         );
 
+      case 'profile':
+        return (
+          <ProfileView
+            currentUser={currentUser}
+            onSelectUser={handleSelectUser}
+            onGoToLogin={() => changeAppViewMode('login')}
+            onGoToLanding={() => changeAppViewMode('landing')}
+          />
+        );
+
       default:
         return (
           <DashboardHome
@@ -231,6 +281,7 @@ export default function App() {
             permohonanList={permohonanList}
             onSelectPermohonan={handleOpenPermohonan}
             onNavigateToTab={(tab) => handleSelectTab(tab)}
+            onOpenNewModal={() => setIsNewModalOpen(true)}
           />
         );
     }
@@ -240,12 +291,12 @@ export default function App() {
   if (appViewMode === 'landing') {
     return (
       <LandingPageView
-        onGoToLogin={() => setAppViewMode('login')}
-        onGoToLacak={() => setAppViewMode('lacak')}
+        onGoToLogin={() => changeAppViewMode('login')}
+        onGoToLacak={() => changeAppViewMode('lacak')}
         permohonanList={permohonanList}
         onOpenPermohonanDetail={(id) => {
           setSelectedPermohonanId(id);
-          setAppViewMode('dashboard');
+          changeAppViewMode('dashboard');
         }}
       />
     );
@@ -257,7 +308,7 @@ export default function App() {
       <LacakBerkasPage
         permohonanList={permohonanList}
         onGoToLanding={(sectionId) => {
-          setAppViewMode('landing');
+          changeAppViewMode('landing');
           if (sectionId) {
             setTimeout(() => {
               const el = document.getElementById(sectionId);
@@ -265,10 +316,10 @@ export default function App() {
             }, 100);
           }
         }}
-        onGoToLogin={() => setAppViewMode('login')}
+        onGoToLogin={() => changeAppViewMode('login')}
         onOpenPermohonanDetail={(id) => {
           setSelectedPermohonanId(id);
-          setAppViewMode('dashboard');
+          changeAppViewMode('dashboard');
         }}
       />
     );
@@ -280,9 +331,9 @@ export default function App() {
       <LoginPage
         onLogin={(user) => {
           handleSelectUser(user);
-          setAppViewMode('dashboard');
+          changeAppViewMode('dashboard');
         }}
-        onBackToLanding={() => setAppViewMode('landing')}
+        onBackToLanding={() => changeAppViewMode('landing')}
       />
     );
   }
@@ -290,7 +341,7 @@ export default function App() {
   // 3. AUTHENTICATED ROLE WORKSPACE DASHBOARD
   return (
     <div className="min-h-screen bg-[#071326] flex flex-col text-slate-100 antialiased font-sans selection:bg-[#38bdf8]/30 selection:text-white">
-      {/* Top Application Header */}
+      {/* Top Application Header - Sticky Bar (Adapts content when viewing detail page) */}
       <Header
         currentUser={currentUser}
         onSelectUser={handleSelectUser}
@@ -300,9 +351,12 @@ export default function App() {
         pendingAlertsCount={badgeCounts.perluPerbaikan + (badgeCounts.tindakLanjutTerhambat > 0 ? 1 : 0) + (badgeCounts.menungguPengesahan > 0 ? 1 : 0)}
         onToggleMobileNav={() => setIsMobileNavOpen(!isMobileNavOpen)}
         isMobileNavOpen={isMobileNavOpen}
-        onLogout={() => setAppViewMode('login')}
-        onGoToLanding={() => setAppViewMode('landing')}
-        onGoToLogin={() => setAppViewMode('login')}
+        onLogout={() => changeAppViewMode('login')}
+        onGoToLanding={() => changeAppViewMode('landing')}
+        onGoToLogin={() => changeAppViewMode('login')}
+        selectedPermohonan={selectedPermohonan}
+        onBackFromDetail={() => setSelectedPermohonanId(null)}
+        onOpenQrModal={(item) => setQrModalPermohonan(item)}
       />
 
       {/* Main Workspace Layout - Desktop: Clean sidebar docked at the far left */}
@@ -312,21 +366,35 @@ export default function App() {
           currentTab={currentTab}
           onSelectTab={handleSelectTab}
           userRole={currentUser.role}
+          currentUser={currentUser}
+          onSelectUser={handleSelectUser}
           onOpenNewModal={() => setIsNewModalOpen(true)}
           badgeCounts={badgeCounts}
           isMobileOpen={isMobileNavOpen}
           onCloseMobile={() => setIsMobileNavOpen(false)}
           onLogout={() => setAppViewMode('login')}
           onGoToLanding={() => setAppViewMode('landing')}
+          hasTopHeader={true}
         />
 
         {/* Content Viewport */}
-        <main className="flex-1 min-w-0 p-4 sm:p-6 lg:p-8 overflow-x-hidden bg-[#071326]">
+        <main className={`flex-1 min-w-0 p-3 sm:p-6 lg:p-8 ${selectedPermohonan ? 'pb-6 md:pb-8' : 'pb-20 md:pb-8'} overflow-x-hidden bg-[#071326]`}>
           <div className="max-w-7xl mx-auto w-full">
             {renderCurrentView()}
           </div>
         </main>
       </div>
+
+      {/* Mobile Native App Bottom Navigation Bar - Hidden on Detail View */}
+      {!selectedPermohonan && (
+        <MobileBottomNav
+          userRole={currentUser.role}
+          currentTab={currentTab}
+          onSelectTab={handleSelectTab}
+          onOpenNewModal={() => setIsNewModalOpen(true)}
+          badgeCounts={badgeCounts}
+        />
+      )}
 
       {/* Modal: Pengajuan Permohonan Asesmen Baru */}
       <ModalPengajuanBaru

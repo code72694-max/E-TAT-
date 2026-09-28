@@ -16,9 +16,10 @@ import {
   LogOut,
   Globe,
   ArrowLeftRight,
-  Shield,
-  Star
+  ArrowLeft,
+  QrCode
 } from 'lucide-react';
+import { PermohonanAsesmen } from '../types';
 
 interface HeaderProps {
   currentUser: UserProfile;
@@ -32,6 +33,9 @@ interface HeaderProps {
   onLogout?: () => void;
   onGoToLanding?: () => void;
   onGoToLogin?: () => void;
+  selectedPermohonan?: PermohonanAsesmen | null;
+  onBackFromDetail?: () => void;
+  onOpenQrModal?: (permohonan: PermohonanAsesmen) => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -45,7 +49,10 @@ export const Header: React.FC<HeaderProps> = ({
   isMobileNavOpen,
   onLogout,
   onGoToLanding,
-  onGoToLogin
+  onGoToLogin,
+  selectedPermohonan,
+  onBackFromDetail,
+  onOpenQrModal
 }) => {
   const [showRoleDropdown, setShowRoleDropdown] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -95,40 +102,97 @@ export const Header: React.FC<HeaderProps> = ({
     }
   };
 
-  return (
-    <header className="bg-[#0B132B] text-slate-100 border-b border-[#1E2D4A] sticky top-0 z-30 shadow-md">
-      <div className="w-full px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Left: Mobile Toggle & Brand Identifier */}
-          <div className="flex items-center space-x-3">
-            {onToggleMobileNav && (
+  // Dedicated Sticky Detail View Header Bar
+  if (selectedPermohonan && onBackFromDetail) {
+    return (
+      <header className="bg-[#0b172a] text-slate-100 border-b border-[#1b3459] sticky top-0 z-30 shadow-md">
+        <div className="w-full px-3 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-14 sm:h-16 gap-3">
+            {/* Left: Back Button & Case Title */}
+            <div className="flex items-center space-x-2.5 sm:space-x-3 min-w-0 flex-1">
               <button
                 type="button"
-                onClick={onToggleMobileNav}
-                className="md:hidden p-2 -ml-1.5 text-slate-300 hover:text-white hover:bg-[#14213D] rounded-lg transition-colors border border-transparent hover:border-[#2A3F6D]"
-                aria-label="Buka menu navigasi"
+                onClick={onBackFromDetail}
+                className="p-2 sm:px-3 sm:py-2 bg-[#081224] border border-[#1b3459] hover:bg-[#142642] rounded-xl text-slate-200 transition-colors cursor-pointer shrink-0 flex items-center space-x-1.5"
+                title="Kembali ke Daftar Permohonan"
               >
-                {isMobileNavOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+                <ArrowLeft className="w-4 h-4 text-[#d4af37]" />
+                <span className="text-xs font-semibold hidden sm:inline text-slate-200">Kembali</span>
               </button>
-            )}
-
-            {/* BNN & E-TAT Logos */}
-            <div className="flex items-center space-x-3">
-              <div className="flex items-center space-x-2 shrink-0">
-                <img src="/bnn.png" alt="Logo BNN" className="h-9 w-auto object-contain drop-shadow-[0_2px_8px_rgba(212,175,55,0.25)]" />
-                <img src="/logo_etat.png" alt="Logo E-TAT" className="h-9 w-auto object-contain drop-shadow-[0_2px_8px_rgba(212,175,55,0.25)]" />
-              </div>
-              <div>
+              <div className="min-w-0 flex-1">
                 <div className="flex items-center space-x-2">
-                  <span className="font-extrabold text-base tracking-wider text-white font-['Cinzel',serif] block leading-tight">
+                  <span className="font-mono font-bold text-xs sm:text-sm text-[#d4af37] truncate">
+                    {selectedPermohonan.nomorPermohonan}
+                  </span>
+                  <span className="hidden sm:inline-block text-[10px] text-slate-300 font-mono bg-[#142642] px-2 py-0.5 rounded border border-[#234475] shrink-0">
+                    {selectedPermohonan.statusProsesUtama.replace(/_/g, ' ').toUpperCase()}
+                  </span>
+                </div>
+                <p className="text-xs text-white font-semibold truncate leading-tight mt-0.5">
+                  {selectedPermohonan.terperiksa.namaLengkap}
+                </p>
+              </div>
+            </div>
+
+            {/* Right: Quick QR Button & Notification Bell */}
+            <div className="flex items-center space-x-2 sm:space-x-3 shrink-0">
+              {selectedPermohonan.rekomendasiResmi && onOpenQrModal && (
+                <button
+                  type="button"
+                  onClick={() => onOpenQrModal(selectedPermohonan)}
+                  className="bg-[#142642] hover:bg-[#1b3459] text-white text-xs font-semibold px-3 py-1.5 rounded-xl flex items-center space-x-1.5 border border-[#234475] transition-colors cursor-pointer"
+                >
+                  <QrCode className="w-3.5 h-3.5 text-[#d4af37]" />
+                  <span className="hidden sm:inline">QR Verifikasi</span>
+                </button>
+              )}
+
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setShowNotifications(!showNotifications)}
+                  className="p-2 text-slate-300 hover:text-white hover:bg-[#142642] rounded-xl border border-[#1b3459] relative transition-colors cursor-pointer"
+                  title="Pemberitahuan"
+                >
+                  <Bell className="w-4 h-4" />
+                  {pendingAlertsCount > 0 && (
+                    <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-rose-600 text-white text-[9px] font-bold flex items-center justify-center">
+                      {pendingAlertsCount}
+                    </span>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+    );
+  }
+
+  return (
+    <header className="bg-[#0B132B] text-slate-100 border-b border-[#1E2D4A] sticky top-0 z-30 shadow-md">
+      <div className="w-full px-3 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-14 sm:h-16">
+          {/* Left: Brand Identifier */}
+          <div className="flex items-center space-x-2 sm:space-x-3 min-w-0">
+            {/* E-TAT Logo & Brand */}
+            <div className="flex items-center space-x-2 sm:space-x-3 min-w-0">
+              <img
+                src="/logo_etat.png"
+                alt="Logo E-TAT"
+                className="h-10 sm:h-12 w-auto object-contain shrink-0 drop-shadow-[0_2px_8px_rgba(212,175,55,0.30)]"
+              />
+              <div className="min-w-0">
+                <div className="flex items-center space-x-2">
+                  <span className="font-extrabold text-sm sm:text-base tracking-wider text-white font-['Cinzel',serif] block leading-tight truncate">
                     E-TAT <span className="text-[#D4AF37]">SIAP PULIH</span>
                   </span>
-                  <span className="hidden sm:inline-block text-[9px] uppercase font-mono font-bold bg-[#D4AF37]/15 text-[#F3E5AB] px-1.5 py-0.2 rounded border border-[#D4AF37]/30">
+                  <span className="hidden sm:inline-block text-[9px] uppercase font-mono font-bold bg-[#D4AF37]/15 text-[#F3E5AB] px-1.5 rounded border border-[#D4AF37]/30 shrink-0">
                     BNNP KALTIM
                   </span>
                 </div>
-                <p className="text-[10px] text-slate-400 hidden sm:block leading-tight mt-0.5">
-                  Sistem Integrasi Asesmen & Pantauan Pemulihan
+                <p className="text-[10px] text-slate-400 hidden sm:block leading-tight mt-0.5 truncate">
+                  Sistem Integrasi Asesmen &amp; Pantauan Pemulihan
                 </p>
               </div>
             </div>
@@ -148,9 +212,9 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           </div>
 
-          {/* Right: Actions & User Switcher */}
-          <div className="flex items-center space-x-2 sm:space-x-3">
-            {/* Notification Bell */}
+          {/* Right: Actions & User Switcher & Mobile Nav Toggle */}
+          <div className="flex items-center space-x-1.5 sm:space-x-3">
+            {/* Notification Bell (Left of Hamburger) */}
             <div className="relative">
               <button
                 id="btn-notifications"
@@ -224,6 +288,19 @@ export const Header: React.FC<HeaderProps> = ({
               )}
             </div>
 
+            {/* Mobile Navigation Toggle (Far Right Corner) */}
+            {onToggleMobileNav && (
+              <button
+                type="button"
+                onClick={onToggleMobileNav}
+                className="md:hidden p-2 text-slate-300 hover:text-white hover:bg-[#14213D] rounded-xl border border-[#23355A] transition-colors cursor-pointer"
+                aria-label="Buka menu navigasi"
+                title="Menu Navigasi"
+              >
+                {isMobileNavOpen ? <X className="w-5 h-5 text-white" /> : <Menu className="w-5 h-5 text-[#D4AF37]" />}
+              </button>
+            )}
+
             {/* Quick Landing Page Link */}
             {onGoToLanding && (
               <button
@@ -237,8 +314,8 @@ export const Header: React.FC<HeaderProps> = ({
               </button>
             )}
 
-            {/* Role / User Profile Menu Button */}
-            <div className="relative">
+            {/* Role / User Profile Menu Button (Desktop Only) */}
+            <div className="relative hidden md:block">
               <button
                 id="btn-role-switcher"
                 onClick={() => setShowRoleDropdown(!showRoleDropdown)}

@@ -35,13 +35,13 @@ interface AboutViewProps {
   onNavigateToTab?: (tab: ActiveTab) => void;
 }
 
-type SectionTab = 'roadmap' | 'roles' | 'outputs' | 'pengawasan' | 'regulasi';
+type SectionTab = 'profil' | 'roadmap' | 'roles' | 'outputs' | 'pengawasan' | 'regulasi';
 
 export const AboutView: React.FC<AboutViewProps> = ({
   currentUser,
   onNavigateToTab
 }) => {
-  const [activeSection, setActiveSection] = useState<SectionTab>('roadmap');
+  const [activeSection, setActiveSection] = useState<SectionTab>('profil');
   const [selectedRoleDetail, setSelectedRoleDetail] = useState<UserRole>(currentUser.role);
   const [selectedStage, setSelectedStage] = useState<number>(1);
 
@@ -628,6 +628,19 @@ export const AboutView: React.FC<AboutViewProps> = ({
       {/* Navigation Tabs for About Page */}
       <div className="flex items-center space-x-2 border-b border-[#1b3459] pb-1 overflow-x-auto scrollbar-none">
         <button
+          id="tab-about-profil"
+          onClick={() => setActiveSection('profil')}
+          className={`flex items-center space-x-2 px-4 py-2.5 text-xs font-semibold rounded-lg transition-all shrink-0 cursor-pointer ${
+            activeSection === 'profil'
+              ? 'bg-gradient-to-r from-[#144782] via-[#17549c] to-[#1c64b8] text-white border border-[#2d7ad6]/70 shadow-[0_2px_10px_rgba(20,83,154,0.35)]'
+              : 'text-slate-400 hover:text-white hover:bg-[#0f274a] border border-transparent'
+          }`}
+        >
+          <UserCheck className="w-4 h-4 text-[#D4AF37]" />
+          <span>Profil Pengguna &amp; Akun Otoritas</span>
+        </button>
+
+        <button
           id="tab-about-roadmap"
           onClick={() => setActiveSection('roadmap')}
           className={`flex items-center space-x-2 px-4 py-2.5 text-xs font-semibold rounded-lg transition-all shrink-0 cursor-pointer ${
@@ -692,6 +705,106 @@ export const AboutView: React.FC<AboutViewProps> = ({
           <span>Dasar Hukum & Batasan Sistem</span>
         </button>
       </div>
+
+      {/* SECTION 0: USER PROFILE & OTORITAS AKUN */}
+      {activeSection === 'profil' && (
+        <div className="space-y-6">
+          {/* Main User Card */}
+          <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl p-6 shadow-xl space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5 pb-6 border-b border-[#1b3459]">
+              <div className="flex items-center space-x-4">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-[#142847] to-[#071120] border-2 border-[#D4AF37]/50 flex items-center justify-center shrink-0 shadow-lg shadow-black/40">
+                  <UserCheck className="w-9 h-9 text-[#D4AF37]" />
+                </div>
+                <div>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-[10px] font-extrabold uppercase font-mono tracking-wider text-[#F3E5AB] bg-[#D4AF37]/15 px-2.5 py-0.5 rounded border border-[#D4AF37]/30">
+                      AKUN OTORITAS AKTIF
+                    </span>
+                    <span className="text-[10px] text-emerald-400 font-mono font-bold bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                      TERVERIFIKASI PUSDATIN
+                    </span>
+                  </div>
+                  <h2 className="text-xl sm:text-2xl font-extrabold text-white mt-1 tracking-tight">
+                    {currentUser.name}
+                  </h2>
+                  <p className="text-xs text-slate-300 font-medium mt-0.5">
+                    {currentUser.agency}
+                  </p>
+                </div>
+              </div>
+
+              <div className="bg-[#081224] border border-[#1b3459] rounded-xl p-3.5 space-y-1.5 min-w-[200px]">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-slate-400">Pangkat / Otoritas:</span>
+                  <strong className="text-[#F3E5AB] uppercase font-mono">{currentUser.role}</strong>
+                </div>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-slate-400">NIP / NRP:</span>
+                  <strong className="text-white font-mono">{currentUser.nip}</strong>
+                </div>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-slate-400">Keamanan Sesi:</span>
+                  <strong className="text-emerald-400 font-mono">AES-256 Bit</strong>
+                </div>
+              </div>
+            </div>
+
+            {/* Profile Detail Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-[#081224] border border-[#1b3459] rounded-xl p-4 space-y-3">
+                <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center space-x-2 pb-2 border-b border-[#1b3459]">
+                  <FileText className="w-4 h-4 text-[#D4AF37]" />
+                  <span>Detail Informasi Kontak Otoritas</span>
+                </h3>
+                <div className="space-y-2 text-xs">
+                  <div className="flex items-center justify-between py-1 border-b border-[#1b3459]/50">
+                    <span className="text-slate-400">Nama Lengkap</span>
+                    <span className="font-bold text-white">{currentUser.name}</span>
+                  </div>
+                  <div className="flex items-center justify-between py-1 border-b border-[#1b3459]/50">
+                    <span className="text-slate-400">NIP / Nomor Anggota</span>
+                    <span className="font-mono font-bold text-white">{currentUser.nip}</span>
+                  </div>
+                  <div className="flex items-center justify-between py-1 border-b border-[#1b3459]/50">
+                    <span className="text-slate-400">Instansi / Unit Satuan</span>
+                    <span className="font-medium text-slate-200 text-right">{currentUser.agency}</span>
+                  </div>
+                  <div className="flex items-center justify-between py-1 border-b border-[#1b3459]/50">
+                    <span className="text-slate-400">Email Kedinasan</span>
+                    <span className="font-mono text-slate-200">{currentUser.email}</span>
+                  </div>
+                  <div className="flex items-center justify-between py-1">
+                    <span className="text-slate-400">Nomor Telepon / WA</span>
+                    <span className="font-mono text-slate-200">{currentUser.phone}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-[#081224] border border-[#1b3459] rounded-xl p-4 space-y-3">
+                <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center space-x-2 pb-2 border-b border-[#1b3459]">
+                  <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                  <span>Hak Akses &amp; Wewenang Sistem ({rolesDetails[currentUser.role]?.name})</span>
+                </h3>
+                <p className="text-xs text-slate-300 leading-relaxed">
+                  {rolesDetails[currentUser.role]?.overview}
+                </p>
+                <div className="pt-2">
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1.5">Tanggung Jawab Utama:</span>
+                  <ul className="space-y-1">
+                    {rolesDetails[currentUser.role]?.keyResponsibilities.slice(0, 3).map((resp, idx) => (
+                      <li key={idx} className="text-xs text-slate-300 flex items-start space-x-2">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-[#D4AF37] shrink-0 mt-0.5" />
+                        <span>{resp}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* SECTION 1: ROADMAP & ALUR ALIR LAYANAN (FLOW) */}
       {activeSection === 'roadmap' && (

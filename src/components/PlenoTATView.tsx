@@ -1,6 +1,6 @@
 import React from 'react';
 import { PermohonanAsesmen, UserProfile } from '../types';
-import { Users, CheckCircle2, Clock, ArrowRight, FileText, AlertTriangle } from 'lucide-react';
+import { Users, ArrowRight } from 'lucide-react';
 
 interface PlenoTATViewProps {
   permohonanList: PermohonanAsesmen[];
@@ -18,11 +18,11 @@ export const PlenoTATView: React.FC<PlenoTATViewProps> = ({
   );
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div className="space-y-5">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-xl font-bold text-white flex items-center space-x-2 font-['Cinzel',serif]">
-            <Users className="w-5 h-5 text-[#D4AF37]" />
+          <h1 className="text-lg sm:text-xl font-bold text-white flex items-center space-x-2">
+            <Users className="w-5 h-5 text-[#d4af37]" />
             <span>Sidang Pleno Musyawarah Tim Asesmen Terpadu</span>
           </h1>
           <p className="text-xs text-slate-400 mt-1">
@@ -38,22 +38,22 @@ export const PlenoTATView: React.FC<PlenoTATViewProps> = ({
             <div
               key={item.id}
               onClick={() => onSelectPermohonan(item.id)}
-              className="bg-[#0b172a] border border-[#1b3459] hover:border-[#D4AF37] rounded-xl p-5 transition-all cursor-pointer space-y-3 shadow-lg shadow-black/20 group"
+              className="bg-[#0b172a] border border-[#1b3459] hover:border-[#d4af37]/60 rounded-2xl p-4 sm:p-5 transition-all cursor-pointer space-y-3 shadow-md group"
             >
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-                <div>
-                  <div className="flex items-center space-x-2">
-                    <span className="font-bold text-sm text-white group-hover:text-[#D4AF37] font-mono transition-colors">{item.nomorPermohonan}</span>
-                    <span className="text-xs text-slate-300">• Terperiksa: <strong className="text-white">{item.terperiksa.namaLengkap}</strong></span>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center space-x-2 flex-wrap gap-y-1">
+                    <span className="font-mono font-bold text-xs text-[#d4af37] group-hover:underline">{item.nomorPermohonan}</span>
+                    <span className="text-xs text-slate-300">&bull; Terperiksa: <strong className="text-white">{item.terperiksa.namaLengkap}</strong></span>
                   </div>
                   <p className="text-xs text-slate-400 mt-0.5">
                     No. Berita Acara: <strong className="text-slate-200">{item.sidangPleno?.nomorBeritaAcara || 'Menunggu Penyusunan'}</strong>
                   </p>
                 </div>
 
-                <div className="flex items-center space-x-2">
-                  <span className={`text-xs font-bold px-2.5 py-1 rounded-full border ${
-                    isDone ? 'bg-emerald-500/20 text-slate-200 border-emerald-500/40' : 'bg-sky-500/20 text-sky-300 border-sky-500/40'
+                <div className="flex items-center space-x-2 shrink-0">
+                  <span className={`text-[10px] sm:text-xs font-semibold px-2.5 py-0.5 rounded-full border ${
+                    isDone ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-[#142642] text-slate-200 border-[#234475]'
                   }`}>
                     {isDone ? 'Pleno Selesai' : 'Siap Diperiksa / Berlangsung'}
                   </span>
@@ -61,30 +61,30 @@ export const PlenoTATView: React.FC<PlenoTATViewProps> = ({
               </div>
 
               {/* Side by side preview Medis vs Hukum */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 text-xs">
-                <div className="p-3 bg-[#081224] rounded-lg border border-[#1b3459]">
-                  <span className="text-[10px] uppercase font-bold text-[#D4AF37] block">Aspek Medis:</span>
-                  <p className="font-semibold text-white mt-0.5">{item.asesmenMedis?.diagnosisKlinisIcd || 'Dalam proses'}</p>
-                  <p className="text-slate-300 text-[11px] mt-1">Usulan: {item.asesmenMedis?.kebutuhanRawat} ({item.asesmenMedis?.durasiUsulanBulan} Bulan)</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1 text-xs">
+                <div className="p-3 bg-[#081224] rounded-xl border border-[#1b3459] space-y-0.5">
+                  <span className="text-[10px] uppercase font-bold text-[#d4af37] block">ASPEK MEDIS:</span>
+                  <p className="font-semibold text-white leading-snug">{item.asesmenMedis?.diagnosisKlinisIcd || 'Dalam proses'}</p>
+                  <p className="text-slate-400 text-[11px]">Usulan: {item.asesmenMedis?.kebutuhanRawat} ({item.asesmenMedis?.durasiUsulanBulan} Bulan)</p>
                 </div>
 
-                <div className="p-3 bg-[#081224] rounded-lg border border-[#1b3459]">
-                  <span className="text-[10px] uppercase font-bold text-[#D4AF37] block">Aspek Hukum:</span>
-                  <p className="font-semibold text-white mt-0.5">{item.asesmenHukum?.analisisPeran || 'Dalam proses'}</p>
-                  <p className="text-slate-300 text-[11px] mt-1">Rekomendasi: {item.asesmenHukum?.rekomendasiHukum}</p>
+                <div className="p-3 bg-[#081224] rounded-xl border border-[#1b3459] space-y-0.5">
+                  <span className="text-[10px] uppercase font-bold text-[#d4af37] block">ASPEK HUKUM:</span>
+                  <p className="font-semibold text-white leading-snug">{item.asesmenHukum?.analisisPeran || 'Dalam proses'}</p>
+                  <p className="text-slate-400 text-[11px]">Rekomendasi: {item.asesmenHukum?.rekomendasiHukum}</p>
                 </div>
               </div>
 
               {/* Kesepakatan Final */}
               {item.sidangPleno?.kesepakatanRekomendasi && (
-                <div className="p-3 bg-[#0d1f3d] rounded-lg border border-[#234577] text-xs flex items-center justify-between">
-                  <div>
-                    <span className="text-[10px] uppercase font-bold text-[#D4AF37] block">Kesepakatan Musyawarah Pleno:</span>
-                    <span className="font-bold text-white text-xs">{item.sidangPleno.kesepakatanRekomendasi}</span>
+                <div className="p-3 bg-[#081224] rounded-xl border border-[#1b3459] text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <span className="text-[10px] uppercase font-bold text-[#d4af37] block">KESEPAKATAN MUSYAWARAH PLENO:</span>
+                    <span className="font-semibold text-white text-xs leading-snug block">{item.sidangPleno.kesepakatanRekomendasi}</span>
                   </div>
-                  <button className="bg-gradient-to-r from-[#144782] via-[#17549c] to-[#1c64b8] hover:from-[#175194] hover:via-[#1c60b0] hover:to-[#2274d4] text-white text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center space-x-1 shrink-0 border border-[#2d7ad6]/70 shadow-sm transition-colors">
+                  <button className="bg-[#142642] hover:bg-[#1b3459] text-white text-xs font-semibold px-3.5 py-2 rounded-xl flex items-center justify-center space-x-1.5 shrink-0 border border-[#234475] transition-colors w-full sm:w-auto">
                     <span>Lihat Berita Acara</span>
-                    <ArrowRight className="w-3 h-3 text-[#D4AF37]" />
+                    <ArrowRight className="w-3.5 h-3.5 text-slate-200" />
                   </button>
                 </div>
               )}

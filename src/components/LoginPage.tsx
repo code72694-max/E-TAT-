@@ -75,38 +75,31 @@ export const LoginPage: React.FC<LoginPageProps> = ({
   const selectedUser = MOCK_USERS.find(u => u.id === selectedUserId) || MOCK_USERS[1];
 
   return (
-    <div className="min-h-screen bg-[#071326] text-slate-100 flex flex-col justify-between antialiased selection:bg-[#D4AF37] selection:text-slate-950 font-sans">
+    <div className="min-h-screen bg-[#071325] text-slate-100 flex flex-col antialiased selection:bg-[#D4AF37] selection:text-slate-950 font-sans">
       {/* Top Header Bar */}
-      <header className="bg-[#071325]/95 border-b border-[#1b3459] px-4 sm:px-8 py-3 flex items-center justify-between sticky top-0 z-20 backdrop-blur-sm">
+      <header className="bg-[#071325]/95 border-b border-[#1b3459] px-3.5 sm:px-8 py-3 flex items-center justify-between sticky top-0 z-20 backdrop-blur-sm">
         <button
           onClick={onBackToLanding}
-          className="inline-flex items-center space-x-2 text-xs font-semibold text-slate-300 hover:text-white px-2 py-1.5 rounded-lg transition-colors cursor-pointer hover:bg-white/5"
+          className="inline-flex items-center space-x-2 text-xs font-semibold text-slate-300 hover:text-white px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer hover:bg-white/5 border border-[#1b3459]/60 sm:border-transparent"
         >
-          <ArrowLeft className="w-4 h-4 text-slate-400 group-hover:text-white" />
-          <span>Kembali ke Beranda</span>
+          <ArrowLeft className="w-4 h-4 text-[#D4AF37]" />
+          <span className="text-xs">Kembali</span>
         </button>
-
-        <div className="flex items-center space-x-2.5">
-          <PoliceEmblem size="sm" />
-          <span className="font-extrabold text-xs sm:text-sm tracking-wide text-white font-['Cinzel',serif]">
-            E-TAT <span className="text-[#D4AF37]">SIAP PULIH</span>
-          </span>
-        </div>
       </header>
 
       {/* Main Content Area */}
-      <main className="flex-1 flex items-center justify-center px-4 sm:px-6 py-8 sm:py-12">
-        <div className="w-full max-w-md space-y-6">
+      <main className="flex-1 flex items-center justify-center px-4 sm:px-6 py-6 sm:py-10">
+        <div className="w-full max-w-md space-y-5">
           {/* Card Header & Branding */}
           <div className="text-center space-y-1">
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight font-['Cinzel',serif]">
+            <h1 className="text-xl sm:text-2xl font-bold text-white tracking-wide">
               LOGIN SISTEM
             </h1>
             <p className="text-xs text-slate-400">Portal Otentikasi Petugas Tim Asesmen Terpadu</p>
           </div>
 
           {/* Clean Card Surface */}
-          <div className="bg-[#09172e] rounded-2xl border border-[#1b3459] p-6 sm:p-7 shadow-2xl shadow-black/40 space-y-5">
+          <div className="bg-[#0b172a] rounded-2xl border border-[#1b3459] p-4 sm:p-7 shadow-2xl space-y-4">
             {/* Quick Role Preset Picker - 5 Main Roles */}
             <div className="space-y-1.5 pb-4 border-b border-[#1b3459]">
               <label className="flex items-center justify-between text-[11px] font-semibold text-slate-300">
@@ -120,7 +113,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
               <select
                 value={selectedUserId}
                 onChange={e => handleDropdownChange(e.target.value)}
-                className="w-full bg-[#061021] text-white border border-[#1b3459] focus:border-[#D4AF37] rounded-xl px-3 py-2.5 text-xs font-medium focus:outline-none transition-colors cursor-pointer truncate"
+                className="w-full bg-[#081224] text-white border border-[#1b3459] focus:border-[#D4AF37] rounded-xl px-3 py-2.5 text-xs font-medium focus:outline-none transition-colors cursor-pointer truncate"
               >
                 {mainUsers.map(user => (
                   <option key={user.id} value={user.id}>
@@ -149,7 +142,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                     value={emailInput}
                     onChange={e => setEmailInput(e.target.value)}
                     placeholder="nama.nrp@polri.go.id"
-                    className="w-full bg-[#061021] text-white pl-10 pr-3.5 py-2.5 rounded-xl border border-[#1b3459] text-xs focus:outline-none focus:border-[#D4AF37] placeholder-slate-500 transition-colors"
+                    className="w-full bg-[#081224] text-white pl-10 pr-3.5 py-2.5 rounded-xl border border-[#1b3459] text-xs focus:outline-none focus:border-[#D4AF37] placeholder-slate-500 transition-colors"
                   />
                 </div>
               </div>
@@ -166,7 +159,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                     value={passwordInput}
                     onChange={e => setPasswordInput(e.target.value)}
                     placeholder="Masukkan sandi..."
-                    className="w-full bg-[#061021] text-white pl-10 pr-10 py-2.5 rounded-xl border border-[#1b3459] text-xs focus:outline-none focus:border-[#D4AF37] placeholder-slate-500 transition-colors"
+                    className="w-full bg-[#081224] text-white pl-10 pr-10 py-2.5 rounded-xl border border-[#1b3459] text-xs focus:outline-none focus:border-[#D4AF37] placeholder-slate-500 transition-colors"
                   />
                   <button
                     type="button"
@@ -185,7 +178,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                     type="checkbox"
                     checked={rememberMe}
                     onChange={e => setRememberMe(e.target.checked)}
-                    className="w-3.5 h-3.5 rounded border-[#1b3459] bg-[#061021] text-[#D4AF37] focus:ring-0 focus:ring-offset-0 cursor-pointer"
+                    className="w-3.5 h-3.5 rounded border-[#1b3459] bg-[#081224] text-[#D4AF37] focus:ring-0 focus:ring-offset-0 cursor-pointer"
                   />
                   <span>Ingat di perangkat ini</span>
                 </label>
@@ -201,33 +194,15 @@ export const LoginPage: React.FC<LoginPageProps> = ({
               {/* Clean Primary Login Button */}
               <button
                 type="submit"
-                className="w-full bg-[#133863] hover:bg-[#1a4a82] text-white font-bold text-xs sm:text-sm py-2.5 rounded-xl flex items-center justify-center space-x-2 transition-all cursor-pointer border border-[#235594] shadow-md shadow-black/30 hover:border-[#3b82f6]"
+                className="w-full bg-[#142642] hover:bg-[#1b3459] text-white font-bold text-xs sm:text-sm py-2.5 rounded-xl flex items-center justify-center space-x-2 transition-all cursor-pointer border border-[#234475] shadow-md hover:border-[#D4AF37]/50"
               >
-                <LogIn className="w-4 h-4 text-white" />
+                <LogIn className="w-4 h-4 text-[#D4AF37]" />
                 <span>Masuk ke Dashboard</span>
               </button>
             </form>
-
-            {/* Public Access Link for General Public (Tanpa Login) */}
-            <div className="pt-4 border-t border-[#1b3459] text-center space-y-2">
-              <span className="text-[11px] text-slate-400 block">Layanan Akses Umum / Masyarakat (Tanpa Login):</span>
-              <button
-                type="button"
-                onClick={onBackToLanding}
-                className="w-full bg-[#061021] hover:bg-[#0e213d] text-slate-200 hover:text-white text-xs font-semibold py-2.5 px-3 rounded-xl border border-[#1b3459] hover:border-[#D4AF37]/50 flex items-center justify-center space-x-2 transition-all cursor-pointer"
-              >
-                <Shield className="w-3.5 h-3.5 text-[#D4AF37]" />
-                <span>Portal Publik Umum (Lacak Berkas & SOP TAT)</span>
-              </button>
-            </div>
           </div>
         </div>
       </main>
-
-      {/* Subtle Copyright Bottom */}
-      <footer className="py-4 text-center border-t border-[#1b3459] text-[11px] text-slate-400 font-mono">
-        Sistem e-TAT SIAP PULIH &copy; 2026 BNNP Kalimantan Timur
-      </footer>
     </div>
   );
 };

@@ -1,5 +1,6 @@
 import React from 'react';
-import { UserRole } from '../types';
+import { UserRole, UserProfile } from '../types';
+import { MOCK_USERS } from '../data/initialData';
 import {
   LayoutDashboard,
   FileSpreadsheet,
@@ -13,11 +14,12 @@ import {
   BarChart3,
   Settings,
   Plus,
-  AlertCircle,
   X,
   Info,
   LogOut,
-  Globe
+  Globe,
+  ChevronDown,
+  User
 } from 'lucide-react';
 
 export type ActiveTab =
@@ -32,12 +34,15 @@ export type ActiveTab =
   | 'tindak_lanjut'
   | 'monitoring'
   | 'administrasi'
-  | 'about';
+  | 'about'
+  | 'profile';
 
 interface SidebarProps {
   currentTab: ActiveTab;
   onSelectTab: (tab: ActiveTab) => void;
   userRole: UserRole;
+  currentUser?: UserProfile;
+  onSelectUser?: (user: UserProfile) => void;
   onOpenNewModal: () => void;
   badgeCounts: {
     perluPerbaikan: number;
@@ -57,430 +62,162 @@ interface MenuItem {
   label: string;
   icon: React.ReactNode;
   badge?: number;
-  badgeColor?: string;
-  category: 'utama' | 'asesor' | 'output' | 'kelola';
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
   currentTab,
   onSelectTab,
   userRole,
+  currentUser,
+  onSelectUser,
   onOpenNewModal,
   badgeCounts,
   isMobileOpen = false,
   onCloseMobile,
   onLogout,
-  onGoToLanding
+  onGoToLanding,
+  hasTopHeader = true
 }) => {
   const getRoleNav = (): {
-    categories: { key: string; title: string }[];
     items: MenuItem[];
     showCreateButton: boolean;
     buttonLabel: string;
     roleLabel: string;
-    roleDesc: string;
   } => {
     switch (userRole) {
       case 'pengaju':
         return {
-          categories: [{ key: 'pengaju', title: 'Menu' }],
           items: [
-            {
-              id: 'beranda',
-              label: 'Dashboard',
-              icon: <LayoutDashboard className="w-4 h-4" />,
-              category: 'utama'
-            },
-            {
-              id: 'permohonan',
-              label: 'Permohonan',
-              icon: <FileSpreadsheet className="w-4 h-4" />,
-              badge: badgeCounts.perluPerbaikan > 0 ? badgeCounts.perluPerbaikan : undefined,
-              badgeColor: 'bg-[#1E2D4A] text-slate-200 border-[#2A3F6D]',
-              category: 'utama'
-            },
-            {
-              id: 'verifikasi',
-              label: 'Verifikasi',
-              icon: <FileCheck2 className="w-4 h-4" />,
-              badge: badgeCounts.perluPerbaikan > 0 ? badgeCounts.perluPerbaikan : undefined,
-              badgeColor: 'bg-[#1E2D4A] text-slate-200 border-[#2A3F6D]',
-              category: 'utama'
-            },
-            {
-              id: 'penugasan',
-              label: 'Penugasan & Jadwal',
-              icon: <CalendarCheck className="w-4 h-4" />,
-              category: 'utama'
-            },
-            {
-              id: 'dokumen',
-              label: 'Rekomendasi',
-              icon: <FileSignature className="w-4 h-4" />,
-              category: 'utama'
-            },
-            {
-              id: 'about',
-              label: 'Bantuan',
-              icon: <Info className="w-4 h-4" />,
-              category: 'utama'
-            }
+            { id: 'beranda', label: 'Dashboard', icon: <LayoutDashboard className="w-4 h-4" /> },
+            { id: 'permohonan', label: 'Permohonan Asesmen', icon: <FileSpreadsheet className="w-4 h-4" />, badge: badgeCounts.perluPerbaikan || undefined },
+            { id: 'verifikasi', label: 'Verifikasi Berkas', icon: <FileCheck2 className="w-4 h-4" />, badge: badgeCounts.perluPerbaikan || undefined },
+            { id: 'penugasan', label: 'Penugasan & Jadwal', icon: <CalendarCheck className="w-4 h-4" /> },
+            { id: 'dokumen', label: 'Surat Rekomendasi', icon: <FileSignature className="w-4 h-4" /> },
+            { id: 'profile', label: 'Profil Saya', icon: <User className="w-4 h-4" /> },
+            { id: 'about', label: 'Bantuan & SOP', icon: <Info className="w-4 h-4" /> }
           ],
           showCreateButton: true,
           buttonLabel: 'Pengajuan Baru',
-          roleLabel: 'Penyidik Pengaju',
-          roleDesc: 'Penyidik Pengaju'
+          roleLabel: 'Penyidik Pengaju'
         };
 
       case 'sekretariat':
         return {
-          categories: [
-            { key: 'koordinasi', title: 'Alur Layanan' },
-            { key: 'distribusi', title: 'Rujukan & Output' }
-          ],
           items: [
-            {
-              id: 'beranda',
-              label: 'Dashboard',
-              icon: <LayoutDashboard className="w-4 h-4" />,
-              category: 'utama'
-            },
-            {
-              id: 'permohonan',
-              label: 'Permohonan',
-              icon: <FileSpreadsheet className="w-4 h-4" />,
-              badge: badgeCounts.siapVerifikasi > 0 ? badgeCounts.siapVerifikasi : undefined,
-              badgeColor: 'bg-[#1E2D4A] text-slate-200 border-[#2A3F6D]',
-              category: 'utama'
-            },
-            {
-              id: 'verifikasi',
-              label: 'Verifikasi',
-              icon: <FileCheck2 className="w-4 h-4" />,
-              badge: badgeCounts.siapVerifikasi > 0 ? badgeCounts.siapVerifikasi : undefined,
-              badgeColor: 'bg-[#1E2D4A] text-slate-200 border-[#2A3F6D]',
-              category: 'utama'
-            },
-            {
-              id: 'penugasan',
-              label: 'Penugasan & Jadwal',
-              icon: <CalendarCheck className="w-4 h-4" />,
-              category: 'utama'
-            },
-            {
-              id: 'pleno',
-              label: 'Sidang TAT',
-              icon: <Users className="w-4 h-4" />,
-              badge: badgeCounts.siapPleno > 0 ? badgeCounts.siapPleno : undefined,
-              badgeColor: 'bg-[#1E2D4A] text-slate-200 border-[#2A3F6D]',
-              category: 'utama'
-            },
-            {
-              id: 'dokumen',
-              label: 'Rekomendasi',
-              icon: <FileSignature className="w-4 h-4" />,
-              badge: badgeCounts.menungguPengesahan > 0 ? badgeCounts.menungguPengesahan : undefined,
-              badgeColor: 'bg-[#1E2D4A] text-slate-200 border-[#2A3F6D]',
-              category: 'output'
-            },
-            {
-              id: 'tindak_lanjut',
-              label: 'Monitoring Pengawasan Pasca Rehabilitasi',
-              icon: <Share2 className="w-4 h-4" />,
-              badge: badgeCounts.tindakLanjutTerhambat > 0 ? badgeCounts.tindakLanjutTerhambat : undefined,
-              badgeColor: 'bg-[#1E2D4A] text-slate-200 border-[#2A3F6D]',
-              category: 'output'
-            },
-            {
-              id: 'about',
-              label: 'Bantuan',
-              icon: <Info className="w-4 h-4" />,
-              category: 'output'
-            }
+            { id: 'beranda', label: 'Dashboard', icon: <LayoutDashboard className="w-4 h-4" /> },
+            { id: 'permohonan', label: 'Daftar Permohonan', icon: <FileSpreadsheet className="w-4 h-4" />, badge: badgeCounts.siapVerifikasi || undefined },
+            { id: 'verifikasi', label: 'Verifikasi Berkas', icon: <FileCheck2 className="w-4 h-4" />, badge: badgeCounts.siapVerifikasi || undefined },
+            { id: 'penugasan', label: 'Penugasan & Jadwal', icon: <CalendarCheck className="w-4 h-4" /> },
+            { id: 'pleno', label: 'Sidang Pleno TAT', icon: <Users className="w-4 h-4" />, badge: badgeCounts.siapPleno || undefined },
+            { id: 'dokumen', label: 'Surat Rekomendasi', icon: <FileSignature className="w-4 h-4" />, badge: badgeCounts.menungguPengesahan || undefined },
+            { id: 'tindak_lanjut', label: 'Pasca Rehabilitasi', icon: <Share2 className="w-4 h-4" />, badge: badgeCounts.tindakLanjutTerhambat || undefined },
+            { id: 'profile', label: 'Profil Saya', icon: <User className="w-4 h-4" /> },
+            { id: 'about', label: 'Bantuan & SOP', icon: <Info className="w-4 h-4" /> }
           ],
           showCreateButton: true,
           buttonLabel: 'Input Permohonan',
-          roleLabel: 'Sekretariat TAT',
-          roleDesc: 'Sekretariat'
+          roleLabel: 'Sekretariat TAT'
         };
 
       case 'medis':
         return {
-          categories: [{ key: 'medis_cat', title: 'Menu' }],
           items: [
-            {
-              id: 'beranda',
-              label: 'Dashboard',
-              icon: <LayoutDashboard className="w-4 h-4" />,
-              category: 'asesor'
-            },
-            {
-              id: 'medis',
-              label: 'Asesmen Medis',
-              icon: <Stethoscope className="w-4 h-4" />,
-              category: 'asesor'
-            },
-            {
-              id: 'penugasan',
-              label: 'Penugasan & Jadwal',
-              icon: <CalendarCheck className="w-4 h-4" />,
-              category: 'asesor'
-            },
-            {
-              id: 'pleno',
-              label: 'Sidang TAT',
-              icon: <Users className="w-4 h-4" />,
-              badge: badgeCounts.siapPleno > 0 ? badgeCounts.siapPleno : undefined,
-              badgeColor: 'bg-[#1E2D4A] text-slate-200 border-[#2A3F6D]',
-              category: 'asesor'
-            },
-            {
-              id: 'about',
-              label: 'Bantuan',
-              icon: <Info className="w-4 h-4" />,
-              category: 'asesor'
-            }
+            { id: 'beranda', label: 'Dashboard', icon: <LayoutDashboard className="w-4 h-4" /> },
+            { id: 'medis', label: 'Asesmen Medis', icon: <Stethoscope className="w-4 h-4" /> },
+            { id: 'penugasan', label: 'Penugasan & Jadwal', icon: <CalendarCheck className="w-4 h-4" /> },
+            { id: 'pleno', label: 'Sidang Pleno TAT', icon: <Users className="w-4 h-4" />, badge: badgeCounts.siapPleno || undefined },
+            { id: 'profile', label: 'Profil Saya', icon: <User className="w-4 h-4" /> },
+            { id: 'about', label: 'Bantuan & SOP', icon: <Info className="w-4 h-4" /> }
           ],
           showCreateButton: false,
           buttonLabel: '',
-          roleLabel: 'Asesor Medis',
-          roleDesc: 'Asesor Medis'
+          roleLabel: 'Asesor Medis'
         };
 
       case 'hukum':
         return {
-          categories: [{ key: 'hukum_cat', title: 'Menu' }],
           items: [
-            {
-              id: 'beranda',
-              label: 'Dashboard',
-              icon: <LayoutDashboard className="w-4 h-4" />,
-              category: 'asesor'
-            },
-            {
-              id: 'hukum',
-              label: 'Asesmen Hukum',
-              icon: <Scale className="w-4 h-4" />,
-              category: 'asesor'
-            },
-            {
-              id: 'penugasan',
-              label: 'Penugasan & Jadwal',
-              icon: <CalendarCheck className="w-4 h-4" />,
-              category: 'asesor'
-            },
-            {
-              id: 'pleno',
-              label: 'Sidang TAT',
-              icon: <Users className="w-4 h-4" />,
-              badge: badgeCounts.siapPleno > 0 ? badgeCounts.siapPleno : undefined,
-              badgeColor: 'bg-[#1E2D4A] text-slate-200 border-[#2A3F6D]',
-              category: 'asesor'
-            },
-            {
-              id: 'about',
-              label: 'Bantuan',
-              icon: <Info className="w-4 h-4" />,
-              category: 'asesor'
-            }
+            { id: 'beranda', label: 'Dashboard', icon: <LayoutDashboard className="w-4 h-4" /> },
+            { id: 'hukum', label: 'Asesmen Hukum', icon: <Scale className="w-4 h-4" /> },
+            { id: 'penugasan', label: 'Penugasan & Jadwal', icon: <CalendarCheck className="w-4 h-4" /> },
+            { id: 'pleno', label: 'Sidang Pleno TAT', icon: <Users className="w-4 h-4" />, badge: badgeCounts.siapPleno || undefined },
+            { id: 'profile', label: 'Profil Saya', icon: <User className="w-4 h-4" /> },
+            { id: 'about', label: 'Bantuan & SOP', icon: <Info className="w-4 h-4" /> }
           ],
           showCreateButton: false,
           buttonLabel: '',
-          roleLabel: 'Asesor Hukum',
-          roleDesc: 'Asesor Hukum'
+          roleLabel: 'Asesor Hukum'
         };
 
       case 'koordinator':
         return {
-          categories: [
-            { key: 'koor_cat', title: 'Menu' }
-          ],
           items: [
-            {
-              id: 'beranda',
-              label: 'Dashboard',
-              icon: <LayoutDashboard className="w-4 h-4" />,
-              category: 'utama'
-            },
-            {
-              id: 'permohonan',
-              label: 'Permohonan',
-              icon: <FileSpreadsheet className="w-4 h-4" />,
-              category: 'utama'
-            },
-            {
-              id: 'pleno',
-              label: 'Sidang TAT',
-              icon: <Users className="w-4 h-4" />,
-              badge: badgeCounts.siapPleno > 0 ? badgeCounts.siapPleno : undefined,
-              badgeColor: 'bg-[#1E2D4A] text-slate-200 border-[#2A3F6D]',
-              category: 'utama'
-            },
-            {
-              id: 'dokumen',
-              label: 'Rekomendasi',
-              icon: <FileSignature className="w-4 h-4" />,
-              badge: badgeCounts.menungguPengesahan > 0 ? badgeCounts.menungguPengesahan : undefined,
-              badgeColor: 'bg-[#1E2D4A] text-slate-200 border-[#2A3F6D]',
-              category: 'utama'
-            },
-            {
-              id: 'tindak_lanjut',
-              label: 'Monitoring Pengawasan Pasca Rehabilitasi',
-              icon: <Share2 className="w-4 h-4" />,
-              badge: badgeCounts.tindakLanjutTerhambat > 0 ? badgeCounts.tindakLanjutTerhambat : undefined,
-              badgeColor: 'bg-[#1E2D4A] text-slate-200 border-[#2A3F6D]',
-              category: 'utama'
-            },
-            {
-              id: 'about',
-              label: 'Bantuan',
-              icon: <Info className="w-4 h-4" />,
-              category: 'utama'
-            }
+            { id: 'beranda', label: 'Dashboard', icon: <LayoutDashboard className="w-4 h-4" /> },
+            { id: 'permohonan', label: 'Daftar Permohonan', icon: <FileSpreadsheet className="w-4 h-4" /> },
+            { id: 'pleno', label: 'Sidang Pleno TAT', icon: <Users className="w-4 h-4" />, badge: badgeCounts.siapPleno || undefined },
+            { id: 'dokumen', label: 'Pengesahan Rekomendasi', icon: <FileSignature className="w-4 h-4" />, badge: badgeCounts.menungguPengesahan || undefined },
+            { id: 'tindak_lanjut', label: 'Pasca Rehabilitasi', icon: <Share2 className="w-4 h-4" />, badge: badgeCounts.tindakLanjutTerhambat || undefined },
+            { id: 'profile', label: 'Profil Saya', icon: <User className="w-4 h-4" /> },
+            { id: 'about', label: 'Bantuan & SOP', icon: <Info className="w-4 h-4" /> }
           ],
           showCreateButton: false,
           buttonLabel: '',
-          roleLabel: 'Ketua / Koordinator TAT',
-          roleDesc: 'Koordinator TAT'
+          roleLabel: 'Koordinator TAT'
         };
 
       case 'pimpinan':
         return {
-          categories: [{ key: 'pimpinan_cat', title: 'Menu' }],
           items: [
-            {
-              id: 'beranda',
-              label: 'Dashboard',
-              icon: <LayoutDashboard className="w-4 h-4" />,
-              category: 'kelola'
-            },
-            {
-              id: 'monitoring',
-              label: 'Laporan dan Statistik',
-              icon: <BarChart3 className="w-4 h-4" />,
-              category: 'kelola'
-            },
-            {
-              id: 'permohonan',
-              label: 'Permohonan',
-              icon: <FileSpreadsheet className="w-4 h-4" />,
-              category: 'kelola'
-            },
-            {
-              id: 'tindak_lanjut',
-              label: 'Monitoring Pengawasan Pasca Rehabilitasi',
-              icon: <Share2 className="w-4 h-4" />,
-              badge: badgeCounts.tindakLanjutTerhambat > 0 ? badgeCounts.tindakLanjutTerhambat : undefined,
-              badgeColor: 'bg-[#1E2D4A] text-slate-200 border-[#2A3F6D]',
-              category: 'kelola'
-            },
-            {
-              id: 'about',
-              label: 'Bantuan',
-              icon: <Info className="w-4 h-4" />,
-              category: 'kelola'
-            }
+            { id: 'beranda', label: 'Dashboard', icon: <LayoutDashboard className="w-4 h-4" /> },
+            { id: 'monitoring', label: 'Laporan & Analytics', icon: <BarChart3 className="w-4 h-4" /> },
+            { id: 'permohonan', label: 'Pengawasan Perkara', icon: <FileSpreadsheet className="w-4 h-4" /> },
+            { id: 'tindak_lanjut', label: 'Pasca Rehabilitasi', icon: <Share2 className="w-4 h-4" />, badge: badgeCounts.tindakLanjutTerhambat || undefined },
+            { id: 'profile', label: 'Profil Saya', icon: <User className="w-4 h-4" /> },
+            { id: 'about', label: 'Bantuan & SOP', icon: <Info className="w-4 h-4" /> }
           ],
           showCreateButton: false,
           buttonLabel: '',
-          roleLabel: 'Pimpinan / Pengawas',
-          roleDesc: 'Pengawas Mutu'
+          roleLabel: 'Pimpinan & Pengawas'
         };
 
       case 'rehabilitasi':
         return {
-          categories: [{ key: 'rehab_cat', title: 'Menu' }],
           items: [
-            {
-              id: 'beranda',
-              label: 'Dashboard',
-              icon: <LayoutDashboard className="w-4 h-4" />,
-              category: 'output'
-            },
-            {
-              id: 'tindak_lanjut',
-              label: 'Monitoring Pengawasan Pasca Rehabilitasi',
-              icon: <Share2 className="w-4 h-4" />,
-              badge: badgeCounts.tindakLanjutTerhambat > 0 ? badgeCounts.tindakLanjutTerhambat : undefined,
-              badgeColor: 'bg-[#1E2D4A] text-slate-200 border-[#2A3F6D]',
-              category: 'output'
-            },
-            {
-              id: 'dokumen',
-              label: 'Rekomendasi',
-              icon: <FileSignature className="w-4 h-4" />,
-              category: 'output'
-            },
-            {
-              id: 'about',
-              label: 'Bantuan',
-              icon: <Info className="w-4 h-4" />,
-              category: 'output'
-            }
+            { id: 'beranda', label: 'Dashboard', icon: <LayoutDashboard className="w-4 h-4" /> },
+            { id: 'tindak_lanjut', label: 'Pasca Rehabilitasi', icon: <Share2 className="w-4 h-4" />, badge: badgeCounts.tindakLanjutTerhambat || undefined },
+            { id: 'dokumen', label: 'Surat Rekomendasi', icon: <FileSignature className="w-4 h-4" /> },
+            { id: 'profile', label: 'Profil Saya', icon: <User className="w-4 h-4" /> },
+            { id: 'about', label: 'Bantuan & SOP', icon: <Info className="w-4 h-4" /> }
           ],
           showCreateButton: false,
           buttonLabel: '',
-          roleLabel: 'Fasilitas Rehabilitasi',
-          roleDesc: 'Fasilitas Rehabilitasi'
+          roleLabel: 'Mitra Rehabilitasi'
         };
 
       case 'admin':
         return {
-          categories: [{ key: 'admin_cat', title: 'Menu' }],
           items: [
-            {
-              id: 'beranda',
-              label: 'Dashboard',
-              icon: <LayoutDashboard className="w-4 h-4" />,
-              category: 'kelola'
-            },
-            {
-              id: 'administrasi',
-              label: 'Pengaturan',
-              icon: <Settings className="w-4 h-4" />,
-              category: 'kelola'
-            },
-            {
-              id: 'monitoring',
-              label: 'Laporan dan Statistik',
-              icon: <BarChart3 className="w-4 h-4" />,
-              category: 'kelola'
-            },
-            {
-              id: 'about',
-              label: 'Bantuan',
-              icon: <Info className="w-4 h-4" />,
-              category: 'kelola'
-            }
+            { id: 'beranda', label: 'Dashboard', icon: <LayoutDashboard className="w-4 h-4" /> },
+            { id: 'administrasi', label: 'Pengaturan System', icon: <Settings className="w-4 h-4" /> },
+            { id: 'monitoring', label: 'Laporan & Audit Log', icon: <BarChart3 className="w-4 h-4" /> },
+            { id: 'profile', label: 'Profil Saya', icon: <User className="w-4 h-4" /> },
+            { id: 'about', label: 'Bantuan & SOP', icon: <Info className="w-4 h-4" /> }
           ],
           showCreateButton: false,
           buttonLabel: '',
-          roleLabel: 'Administrator',
-          roleDesc: 'Administrator'
+          roleLabel: 'Administrator'
         };
 
       default:
         return {
-          categories: [{ key: 'default', title: 'Menu Layanan' }],
           items: [
-            {
-              id: 'beranda',
-              label: 'Dashboard',
-              icon: <LayoutDashboard className="w-4 h-4" />,
-              category: 'utama'
-            },
-            {
-              id: 'about',
-              label: 'Bantuan',
-              icon: <Info className="w-4 h-4" />,
-              category: 'utama'
-            }
+            { id: 'beranda', label: 'Dashboard', icon: <LayoutDashboard className="w-4 h-4" /> },
+            { id: 'profile', label: 'Profil Saya', icon: <User className="w-4 h-4" /> },
+            { id: 'about', label: 'Bantuan & SOP', icon: <Info className="w-4 h-4" /> }
           ],
           showCreateButton: false,
           buttonLabel: '',
-          roleLabel: 'Pengguna',
-          roleDesc: 'Layanan Terpadu'
+          roleLabel: 'Pengguna'
         };
     }
   };
@@ -495,118 +232,140 @@ export const Sidebar: React.FC<SidebarProps> = ({
   };
 
   const sidebarContent = (
-    <aside className="w-64 lg:w-72 bg-[#0B132B] text-slate-200 flex flex-col shrink-0 border-r border-[#1E2D4A] select-none h-full shadow-lg">
-      {/* Mobile Header Bar inside Drawer */}
-      <div className="md:hidden flex items-center justify-between p-4 border-b border-[#1E2D4A] bg-[#0E172B]">
-        <div>
-          <span className="font-bold text-sm text-white block">{navConfig.roleLabel}</span>
-          <span className="text-[10px] text-slate-400">{navConfig.roleDesc}</span>
+    <aside className="w-full md:w-64 bg-[#091426] text-slate-200 flex flex-col shrink-0 border-r border-[#1a2e4c] select-none h-full shadow-md">
+      {/* Mobile Drawer Header */}
+      <div className="md:hidden p-4 border-b border-[#1a2e4c] bg-[#0c1a30] space-y-3">
+        <div className="flex items-center justify-between">
+          <span className="text-[10px] uppercase font-bold tracking-wider text-[#d4af37] bg-[#142642] px-2.5 py-1 rounded border border-[#d4af37]/30">
+            {navConfig.roleLabel}
+          </span>
+          <button
+            onClick={onCloseMobile}
+            className="p-1.5 text-slate-400 hover:text-white hover:bg-[#142642] rounded-lg transition-colors cursor-pointer"
+            aria-label="Tutup menu"
+          >
+            <X className="w-5 h-5" />
+          </button>
         </div>
-        <button
-          onClick={onCloseMobile}
-          className="p-1.5 text-slate-400 hover:text-white hover:bg-[#14213D] rounded-lg transition-colors cursor-pointer"
-        >
-          <X className="w-5 h-5" />
-        </button>
+
+        {currentUser && onSelectUser && (
+          <div className="space-y-1.5 pt-1">
+            <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block">
+              Otoritas Jabatan (Role):
+            </label>
+            <div className="relative">
+              <select
+                value={currentUser.id}
+                onChange={(e) => {
+                  const targetUser = MOCK_USERS.find(u => u.id === e.target.value);
+                  if (targetUser) {
+                    onSelectUser(targetUser);
+                  }
+                }}
+                className="w-full bg-[#142642] text-xs font-semibold text-white border border-[#234475] rounded-xl px-3 py-2 pr-8 appearance-none cursor-pointer focus:outline-none focus:border-[#d4af37]"
+              >
+                {MOCK_USERS.map((user) => (
+                  <option key={user.id} value={user.id} className="bg-[#0b172a] text-slate-200">
+                    {user.name.split(',')[0]} ({user.role.toUpperCase()})
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="w-4 h-4 text-[#d4af37] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Role Context Bar on Desktop */}
-      <div className="hidden md:block px-4 py-3.5 border-b border-[#1E2D4A] bg-[#0E172B]">
+      <div className="hidden md:block px-4 py-3.5 border-b border-[#1a2e4c] bg-[#0c1a30]">
         <div className="flex items-center justify-between">
-          <span className="text-[10px] uppercase font-extrabold tracking-wider text-[#F3E5AB] bg-[#D4AF37]/15 px-2.5 py-0.5 rounded border border-[#D4AF37]/30">
+          <span className="text-[10px] uppercase font-bold tracking-wider text-[#d4af37] bg-[#142642] px-2.5 py-0.5 rounded border border-[#d4af37]/30">
             {navConfig.roleLabel}
           </span>
         </div>
-        <p className="text-[11px] text-slate-400 mt-1 line-clamp-2 leading-relaxed">
-          {navConfig.roleDesc}
-        </p>
+        {currentUser && (
+          <p className="text-[11px] text-slate-400 mt-1 truncate">
+            {currentUser.name}
+          </p>
+        )}
       </div>
 
-      {/* Primary Action Button (If authorized for this role) */}
+      {/* Primary Action Button (if allowed) */}
       {navConfig.showCreateButton && (
-        <div className="p-3.5 border-b border-[#1E2D4A] bg-[#0B132B]">
+        <div className="p-3.5 border-b border-[#1a2e4c]">
           <button
             id="btn-buat-permohonan-sidebar"
             onClick={() => {
               onOpenNewModal();
               if (onCloseMobile) onCloseMobile();
             }}
-            className="w-full flex items-center justify-center space-x-2 bg-[#133863] hover:bg-[#1a4a82] text-white font-bold py-2.5 px-3.5 rounded-xl border border-[#235594] shadow-md transition-all text-xs cursor-pointer"
+            className="w-full flex items-center justify-center space-x-2 bg-[#142642] hover:bg-[#1b3459] text-white font-semibold py-2.5 px-3.5 rounded-xl border border-[#234475] transition-colors text-xs cursor-pointer shadow-sm"
           >
-            <Plus className="w-4 h-4 stroke-[2.5]" />
+            <Plus className="w-4 h-4 text-[#d4af37]" />
             <span>{navConfig.buttonLabel}</span>
           </button>
         </div>
       )}
 
-      {/* Navigation List grouped neatly per role */}
-      <nav className="flex-1 px-3 py-3 space-y-1 overflow-y-auto scrollbar-thin scrollbar-thumb-[#1E2D4A]">
-        <div className="space-y-1">
-          {navConfig.items.map((item) => {
-            const isActive = currentTab === item.id;
-            const isAbout = item.id === 'about';
-            return (
-              <React.Fragment key={item.id}>
-                {isAbout && <div className="my-2 border-t border-[#1E2D4A]" />}
-                <button
-                key={item.id}
+      {/* Main Clean Navigation List */}
+      <nav className="flex-1 px-3 py-3 space-y-1 overflow-y-auto scrollbar-thin scrollbar-thumb-[#1a2e4c]">
+        {navConfig.items.map((item) => {
+          const isActive = currentTab === item.id;
+          const isSeparatorBefore = item.id === 'profile' || item.id === 'about';
+          return (
+            <React.Fragment key={item.id}>
+              {isSeparatorBefore && item.id === 'profile' && <div className="my-2 border-t border-[#1a2e4c]/70" />}
+              <button
                 id={`nav-item-${item.id}`}
                 onClick={() => handleItemClick(item.id)}
                 className={`w-full group flex items-center justify-between px-3 py-2 text-xs font-semibold rounded-xl transition-all duration-150 text-left cursor-pointer ${
                   isActive
-                    ? 'bg-[#14213D] text-white font-bold border-l-3 border-[#D4AF37] shadow-sm'
-                    : 'text-slate-300 hover:text-white hover:bg-[#14213D]/60'
+                    ? 'bg-[#142642] text-white font-bold border-l-2 border-[#d4af37]'
+                    : 'text-slate-300 hover:text-white hover:bg-[#142642]/50'
                 }`}
               >
                 <div className="flex items-center space-x-2.5 truncate">
                   <span
                     className={`shrink-0 transition-colors ${
-                      isActive
-                        ? 'text-[#D4AF37]'
-                        : 'text-slate-400 group-hover:text-slate-200'
+                      isActive ? 'text-[#d4af37]' : 'text-slate-400 group-hover:text-slate-200'
                     }`}
                   >
                     {item.icon}
                   </span>
                   <span className="truncate">{item.label}</span>
                 </div>
-                {item.badge !== undefined && (
-                  <span
-                    className={`ml-2 shrink-0 px-2 py-0.5 text-[10px] font-bold rounded-full border ${
-                      item.badgeColor || 'bg-[#1E2D4A] text-slate-200 border-[#2A3F6D]'
-                    }`}
-                  >
+                {item.badge !== undefined && item.badge > 0 && (
+                  <span className="ml-2 shrink-0 px-2 py-0.5 text-[10px] font-semibold rounded-full bg-[#142642] text-slate-200 border border-[#234475]">
                     {item.badge}
                   </span>
                 )}
               </button>
-              </React.Fragment>
-            );
-          })}
-        </div>
+            </React.Fragment>
+          );
+        })}
       </nav>
 
-      {/* Footer Navigation: Portal Publik & Logout */}
+      {/* Footer Navigation */}
       {(onGoToLanding || onLogout) && (
-        <div className="p-3 border-t border-[#1E2D4A] space-y-1 bg-[#080D1A] shrink-0">
+        <div className="p-3 border-t border-[#1a2e4c] space-y-1 bg-[#071120] shrink-0">
           {onGoToLanding && (
             <button
               type="button"
               onClick={onGoToLanding}
-              className="w-full flex items-center space-x-2.5 px-3 py-2 text-xs font-semibold text-slate-300 hover:text-white hover:bg-[#14213D] rounded-xl transition-colors cursor-pointer border border-transparent hover:border-[#2A3F6D]"
+              className="w-full flex items-center space-x-2.5 px-3 py-2 text-xs font-semibold text-slate-300 hover:text-white hover:bg-[#142642] rounded-xl transition-colors cursor-pointer"
             >
               <Globe className="w-4 h-4 text-slate-400" />
-              <span>Portal Publik Utama</span>
+              <span>Portal Beranda Utama</span>
             </button>
           )}
           {onLogout && (
             <button
               type="button"
               onClick={onLogout}
-              className="w-full flex items-center space-x-2.5 px-3 py-2 text-xs font-semibold text-slate-400 hover:text-white hover:bg-[#14213D] rounded-xl transition-colors cursor-pointer border border-transparent hover:border-[#2A3F6D]"
+              className="w-full flex items-center space-x-2.5 px-3 py-2 text-xs font-semibold text-slate-400 hover:text-white hover:bg-[#142642] rounded-xl transition-colors cursor-pointer"
             >
               <LogOut className="w-4 h-4 text-slate-400" />
-              <span>Ganti Akun / Logout</span>
+              <span>Keluar / Ganti Akun</span>
             </button>
           )}
         </div>
@@ -616,19 +375,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <>
-      {/* Desktop View: Clean docked sidebar on far-left corner */}
-      <div className="hidden md:flex shrink-0 sticky top-16 h-[calc(100vh-4rem)] z-20">
+      {/* Desktop View: Clean docked sidebar */}
+      <div className={`hidden md:flex shrink-0 sticky ${hasTopHeader ? 'top-16 h-[calc(100vh-4rem)]' : 'top-0 h-screen'} z-20`}>
         {sidebarContent}
       </div>
 
-      {/* Mobile View: Slide-out drawer with backdrop */}
+      {/* Mobile View: Drawer with smooth slide-in animation */}
       {isMobileOpen && (
-        <div className="md:hidden fixed inset-0 z-50 flex">
+        <div className="md:hidden fixed inset-0 z-50 flex justify-end">
           <div
-            className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs transition-opacity"
+            className="fixed inset-0 bg-slate-950/75 backdrop-blur-sm transition-opacity duration-300"
             onClick={onCloseMobile}
           />
-          <div className="relative flex-1 flex flex-col max-w-xs w-full bg-white border-r border-slate-300 z-10">
+          <div className="relative flex-1 flex flex-col max-w-xs w-full bg-[#091426] border-l border-[#1a2e4c] z-10 shadow-2xl animate-drawer-in">
             {sidebarContent}
           </div>
         </div>

@@ -242,6 +242,24 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
     return () => clearInterval(interval);
   }, [isPaused, heroSlides.length]);
 
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+          }
+        });
+      },
+      { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
+    );
+
+    const elements = document.querySelectorAll('.reveal-on-scroll');
+    elements.forEach(el => observer.observe(el));
+
+    return () => observer.disconnect();
+  }, []);
+
   const goToNextSlide = () => {
     setCurrentSlide(prev => (prev + 1) % heroSlides.length);
   };
@@ -416,26 +434,26 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
       {/* ABOUT SECTION */}
       <section id="tentang-tat" className="py-20 sm:py-24 bg-[#081225] border-b border-[#1b3459]/60">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12 sm:mb-16">
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#D4AF37] block mb-3">Tentang Sistem</span>
-            <h2 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight font-['Cinzel',serif] mb-4">
-              E-TAT <span className="text-[#D4AF37]">SIAP PULIH</span>
+          <div className="text-center mb-12 sm:mb-16 reveal-on-scroll">
+            <span className="text-[11px] sm:text-xs font-semibold uppercase tracking-[0.2em] text-[#D4AF37] block mb-2.5">Tentang Sistem</span>
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-white tracking-wide mb-3">
+              E-TAT <span className="text-[#D4AF37] font-bold">SIAP PULIH</span>
             </h2>
-            <p className="text-sm text-slate-400 max-w-xl mx-auto leading-relaxed">
+            <p className="text-xs sm:text-sm text-slate-300 max-w-xl mx-auto leading-relaxed">
               Sarana digital terpadu BNNP Kalimantan Timur &amp; Polda Kaltim untuk asesmen, rekomendasi, dan pemantauan pemulihan narkotika.
             </p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 sm:gap-8 items-start">
             {/* Left: Core Mission */}
-            <div className="lg:col-span-2 bg-[#0b172a] border border-[#1b3459]/80 rounded-2xl p-6 sm:p-8 space-y-5 flex flex-col justify-between">
+            <div className="lg:col-span-2 bg-[#0b172a] border border-[#1b3459]/80 rounded-2xl p-6 sm:p-8 space-y-5 flex flex-col justify-between reveal-on-scroll reveal-delay-1 shadow-xl hover:border-[#D4AF37]/30 transition-all duration-300">
               <div className="space-y-4">
                 <Shield className="w-7 h-7 text-[#D4AF37]" />
-                <h3 className="text-lg font-bold text-white font-['Cinzel',serif] leading-snug">
+                <h3 className="text-base sm:text-lg font-semibold text-white leading-snug">
                   Satu Sistem,<br />Satu Data, Satu Keputusan
                 </h3>
                 <p className="text-xs text-slate-400 leading-relaxed">
-                  E-TAT menyatukan penyidik, tim medis, dan tim hukum dalam satu alur kerja digital â€” menghilangkan redundansi berkas, memastikan SLA 6 hari kerja, dan menjamin transparansi penuh sesuai UU No. 35/2009 &amp; Perpol 08/2021.
+                  E-TAT menyatukan penyidik, tim medis, dan tim hukum dalam satu alur kerja digital — menghilangkan redundansi berkas, memastikan SLA 6 hari kerja, dan menjamin transparansi penuh sesuai UU No. 35/2009 &amp; Perpol 08/2021.
                 </p>
               </div>
               <div className="pt-4 border-t border-[#1b3459]/60 space-y-2">
@@ -453,20 +471,20 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
             {/* Right: 4 Pillars */}
             <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               {[
-                { icon: <FileCheck className="w-4 h-4" />, title: 'Satu Data Berkas', sub: '7 berkas formil terpadu', desc: 'Eliminasi pencatatan ganda â€” LP, BAP, bukti lab, NIK, semua dalam satu perkara digital.' },
-                { icon: <Calendar className="w-4 h-4" />, title: 'SLA 6 Hari Kerja', sub: 'Registrasi s.d. rekomendasi', desc: 'Waktu layanan terukur dari 1Ã—24 jam registrasi hingga sidang pleno penetapan.' },
-                { icon: <Users className="w-4 h-4" />, title: 'Tim Multidisiplin', sub: '6 peran terpisah', desc: 'Penyidik, medis, hukum, sekretariat, pimpinan, &amp; pemantau â€” independen &amp; terstruktur.' },
+                { icon: <FileCheck className="w-4 h-4" />, title: 'Satu Data Berkas', sub: '7 berkas formil terpadu', desc: 'Eliminasi pencatatan ganda — LP, BAP, bukti lab, NIK, semua dalam satu perkara digital.' },
+                { icon: <Calendar className="w-4 h-4" />, title: 'SLA 6 Hari Kerja', sub: 'Registrasi s.d. rekomendasi', desc: 'Waktu layanan terukur dari 1×24 jam registrasi hingga sidang pleno penetapan.' },
+                { icon: <Users className="w-4 h-4" />, title: 'Tim Multidisiplin', sub: '6 peran terpisah', desc: 'Penyidik, medis, hukum, sekretariat, pimpinan, & pemantau — independen & terstruktur.' },
                 { icon: <HeartHandshake className="w-4 h-4" />, title: 'Monitoring Pasca Rehab', sub: 'Berkelanjutan', desc: 'Pantauan rujukan Balai BNN, uji urin berkala, dan rekam kepatuhan hingga SKSP terbit.' },
               ].map((p, i) => (
-                <div key={i} className={`fade-in-up fade-in-up-delay-${i + 1} bg-[#071326] border border-[#1b3459]/70 rounded-xl p-4 sm:p-5 space-y-2 hover:border-[#D4AF37]/30 transition-colors duration-300`}>
+                <div key={i} className={`reveal-on-scroll reveal-delay-${i + 1} bg-[#071326] border border-[#1b3459]/70 rounded-xl p-4 sm:p-5 space-y-2 hover:border-[#D4AF37]/40 hover:-translate-y-1 transition-all duration-300 shadow-md`}>
                   <div className="flex items-center justify-between">
-                    <div className="w-8 h-8 rounded-lg bg-[#0d1f38] border border-[#1b3459] flex items-center justify-center text-slate-400">
+                    <div className="w-8 h-8 rounded-lg bg-[#0d1f38] border border-[#1b3459] flex items-center justify-center text-[#D4AF37]">
                       {p.icon}
                     </div>
-                    <span className="text-[9px] font-mono text-slate-600 uppercase tracking-wider">{p.sub}</span>
+                    <span className="text-[9px] font-mono text-slate-500 uppercase tracking-wider">{p.sub}</span>
                   </div>
                   <h4 className="text-sm font-bold text-white">{p.title}</h4>
-                  <p className="text-[11px] text-slate-500 leading-relaxed">{p.desc}</p>
+                  <p className="text-[11px] text-slate-400 leading-relaxed">{p.desc}</p>
                 </div>
               ))}
             </div>
@@ -474,15 +492,15 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
         </div>
       </section>
 
-      {/* SIAP PULIH TEGAS â€” 3 Pilar */}
+      {/* SIAP PULIH TEGAS — 3 Pilar */}
       <section id="gerakan-sekorna" className="py-20 sm:py-24 bg-[#071326] border-b border-[#1b3459]/60">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#D4AF37] block mb-3">Doktrin Operasional</span>
-            <h2 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight font-['Cinzel',serif]">
+          <div className="text-center mb-12 reveal-on-scroll">
+            <span className="text-[11px] sm:text-xs font-semibold uppercase tracking-[0.2em] text-[#D4AF37] block mb-2.5">Komitmen Utama</span>
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-white tracking-wide">
               SIAP · PULIH · TEGAS
             </h2>
-            <p className="text-sm text-slate-400 mt-3 max-w-md mx-auto">Tiga komitmen Tim Asesmen Terpadu BNNP Kalimantan Timur.</p>
+            <p className="text-xs sm:text-sm text-slate-300 mt-2.5 max-w-md mx-auto">Tiga komitmen Tim Asesmen Terpadu BNNP Kalimantan Timur.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
@@ -491,15 +509,15 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
               { word: 'PULIH', pillar: 'II', title: 'Pantauan Pemulihan Klien', sub: 'Balai BNN · RSUD · Klinik Pratama', desc: 'Pemantauan ketat pasca-asesmen dengan tes urin berkala dan evaluasi kepatuhan program rehab.', icon: <Scale className="w-4 h-4" /> },
               { word: 'TEGAS', pillar: 'III', title: 'Penegakan Hukum Tanpa Kompromi', sub: 'SEMA 04/2010 · Kepastian Peradilan', desc: 'Penindakan maksimal sindikat pengedar, dipisah jelas dari penyelamatan korban penyalahguna.', icon: <ShieldCheck className="w-4 h-4" /> },
             ].map((p, i) => (
-              <div key={i} className={`fade-in-up fade-in-up-delay-${i + 1} group bg-[#0d1f38] border border-[#1b3459]/70 rounded-2xl p-6 sm:p-7 hover:border-[#D4AF37]/25 transition-colors duration-300`}>
+              <div key={i} className={`reveal-on-scroll reveal-delay-${i + 1} group bg-[#0d1f38] border border-[#1b3459]/70 rounded-2xl p-6 sm:p-7 hover:border-[#D4AF37]/40 hover:-translate-y-1.5 transition-all duration-300 shadow-xl`}>
                 <div className="flex items-start justify-between mb-5">
                   <span className="font-mono font-black text-2xl sm:text-3xl text-[#D4AF37] leading-none tracking-tight">{p.word}</span>
-                  <span className="text-[9px] font-mono text-slate-600 mt-1">PILAR {p.pillar}</span>
+                  <span className="text-[9px] font-mono text-slate-500 mt-1 bg-[#071326] px-2 py-0.5 rounded border border-[#1b3459]">PILAR {p.pillar}</span>
                 </div>
-                <h3 className="text-sm font-bold text-white mb-2">{p.title}</h3>
-                <p className="text-[11px] text-slate-500 leading-relaxed mb-5">{p.desc}</p>
-                <div className="flex items-center space-x-1.5 text-[10px] text-slate-600 border-t border-[#1b3459]/60 pt-4">
-                  <div className="shrink-0">{p.icon}</div>
+                <h3 className="text-sm font-bold text-white mb-2 group-hover:text-[#D4AF37] transition-colors">{p.title}</h3>
+                <p className="text-[11px] text-slate-400 leading-relaxed mb-5">{p.desc}</p>
+                <div className="flex items-center space-x-1.5 text-[10px] text-slate-500 border-t border-[#1b3459]/60 pt-4">
+                  <div className="shrink-0 text-[#D4AF37]">{p.icon}</div>
                   <span>{p.sub}</span>
                 </div>
               </div>
@@ -507,11 +525,11 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
           </div>
 
           {/* QUOTE / COMMITMENT MORAL */}
-          <div className="mt-8 sm:mt-10 border border-[#1b3459]/60 rounded-2xl p-6 sm:p-8 bg-[#0b172a] text-center">
+          <div className="mt-8 sm:mt-10 border border-[#1b3459]/80 rounded-2xl p-6 sm:p-8 bg-[#0b172a] text-center reveal-on-scroll reveal-delay-4 shadow-xl">
             <p className="text-sm sm:text-base font-semibold text-white italic leading-relaxed max-w-2xl mx-auto">
               "Satu Nyawa yang Kita Pulihkan adalah Satu Masa Depan Bangsa yang Kita Selamatkan."
             </p>
-            <span className="text-[10px] text-slate-500 mt-2 block uppercase tracking-widest font-mono">Komitmen Moral Penegak Hukum Indonesia</span>
+            <span className="text-[10px] text-[#D4AF37] mt-2 block uppercase tracking-widest font-mono font-bold">Komitmen Moral Penegak Hukum Indonesia</span>
           </div>
         </div>
       </section>
@@ -519,9 +537,9 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
       {/* ALUR SOP */}
       <section id="alur-layanan" className="py-20 sm:py-24 bg-[#071326] border-b border-[#1b3459]/60">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
-          <div className="text-center">
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#D4AF37] block mb-3">Alur Terpadu SIAP PULIH</span>
-            <h2 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight font-['Cinzel',serif]">8 Tahapan SOP Layanan</h2>
+          <div className="text-center reveal-on-scroll">
+            <span className="text-[11px] sm:text-xs font-semibold uppercase tracking-[0.2em] text-[#D4AF37] block mb-2.5">Alur Terpadu SIAP PULIH</span>
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-white tracking-wide">8 Tahapan SOP Layanan</h2>
             <p className="text-xs sm:text-sm text-slate-400 mt-2.5 max-w-md mx-auto leading-relaxed">
               Klik pada salah satu tahapan di bawah untuk melihat rincian alur kerja, pelaksana, dan batas waktu SLA operasional.
             </p>
@@ -533,14 +551,14 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
               <div
                 key={item.step}
                 onClick={() => setSelectedSopStep(item)}
-                className={`fade-in-up fade-in-up-delay-${Math.min(i + 1, 8)} group bg-[#0d1f38] border border-[#1b3459]/80 hover:border-[#D4AF37] rounded-xl p-4 sm:p-5 flex flex-col justify-between space-y-3 cursor-pointer transition-all duration-200 hover:-translate-y-1 shadow-lg hover:shadow-sky-950/40`}
+                className={`reveal-on-scroll reveal-delay-${Math.min(i + 1, 8)} group bg-[#0d1f38] border border-[#1b3459]/80 hover:border-[#D4AF37] rounded-xl p-4 sm:p-5 flex flex-col justify-between space-y-3 cursor-pointer transition-all duration-300 hover:-translate-y-1.5 shadow-lg hover:shadow-[#D4AF37]/10`}
               >
                 <div>
                   <div className="flex items-center justify-between mb-3">
                     <div className="w-8 h-8 rounded-xl bg-[#071326] border border-[#1b3459] flex items-center justify-center shrink-0 group-hover:border-[#D4AF37]/50 transition-colors">
                       {item.icon}
                     </div>
-                    <span className="font-mono text-sm sm:text-base font-black text-[#1b3459] group-hover:text-[#D4AF37] transition-colors">
+                    <span className="font-mono text-sm sm:text-base font-black text-slate-500 group-hover:text-[#D4AF37] transition-colors">
                       {item.step}
                     </span>
                   </div>
@@ -571,13 +589,13 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 sm:gap-16">
 
             {/* Aftercare */}
-            <div className="space-y-6">
+            <div className="space-y-6 reveal-on-scroll reveal-delay-1">
               <div>
-                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#D4AF37] block mb-3">Aftercare &amp; Integritas</span>
-                <h2 className="text-xl sm:text-3xl font-extrabold text-white tracking-tight font-['Cinzel',serif] leading-snug">
+                <span className="text-[11px] sm:text-xs font-semibold uppercase tracking-[0.2em] text-[#D4AF37] block mb-2.5">Aftercare &amp; Integritas</span>
+                <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold text-white tracking-wide leading-snug">
                   Pengawasan Kepatuhan Pasca TAT
                 </h2>
-                <p className="text-xs text-slate-400 mt-3 leading-relaxed">
+                <p className="text-xs sm:text-sm text-slate-400 mt-2.5 leading-relaxed">
                   Rekomendasi TAT bukan pembebasan tanpa syarat. Klien wajib menjalani program rehabilitasi dengan kepatuhan penuh di bawah pengawasan sistem.
                 </p>
               </div>
@@ -605,28 +623,28 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
             </div>
 
             {/* Regulasi */}
-            <div id="dasar-hukum" className="space-y-6">
+            <div id="dasar-hukum" className="space-y-6 reveal-on-scroll reveal-delay-2">
               <div>
-                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#D4AF37] block mb-3">Landasan Hukum</span>
-                <h2 className="text-xl sm:text-3xl font-extrabold text-white tracking-tight font-['Cinzel',serif] leading-snug">
+                <span className="text-[11px] sm:text-xs font-semibold uppercase tracking-[0.2em] text-[#D4AF37] block mb-2.5">Landasan Hukum</span>
+                <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold text-white tracking-wide leading-snug">
                   Dasar Regulasi Operasional
                 </h2>
-                <p className="text-xs text-slate-400 mt-3 leading-relaxed">
+                <p className="text-xs sm:text-sm text-slate-400 mt-2.5 leading-relaxed">
                   Dasar yuridis yang mengikat seluruh instansi dalam Tim Asesmen Terpadu RI.
                 </p>
               </div>
               <div className="space-y-2.5">
                 {[
-                  { ref: 'UU No. 35/2009', desc: 'Mandat rehabilitasi medis &amp; sosial bagi pecandu dan korban penyalahgunaan narkotika.' },
-                  { ref: 'SEMA No. 04/2010', desc: 'Batasan berat barang bukti pemakaian 1 hari â€” sabu maksimal 1 gram.' },
+                  { ref: 'UU No. 35/2009', desc: 'Mandat rehabilitasi medis & sosial bagi pecandu dan korban penyalahgunaan narkotika.' },
+                  { ref: 'SEMA No. 04/2010', desc: 'Batasan berat barang bukti pemakaian 1 hari — sabu maksimal 1 gram.' },
                   { ref: 'Perpol No. 08/2021', desc: 'Penerapan Keadilan Restoratif dalam penanganan tindak pidana di lingkungan Polri.' },
                   { ref: 'Perja No. 15/2020', desc: 'Penghentian penuntutan berdasarkan keadilan restoratif pada Kejaksaan RI.' },
                 ].map((reg, i) => (
-                  <div key={i} className="flex items-start gap-3 bg-[#071326] border border-[#1b3459]/60 rounded-xl p-3.5 sm:p-4">
-                    <BookOpen className="w-3.5 h-3.5 text-slate-600 shrink-0 mt-0.5" />
+                  <div key={i} className="flex items-start gap-3 bg-[#071326] border border-[#1b3459]/60 rounded-xl p-3.5 sm:p-4 hover:border-[#D4AF37]/30 transition-colors">
+                    <BookOpen className="w-3.5 h-3.5 text-[#D4AF37] shrink-0 mt-0.5" />
                     <div>
                       <span className="text-xs font-bold text-white block">{reg.ref}</span>
-                      <p className="text-[11px] text-slate-500 mt-0.5 leading-relaxed">{reg.desc}</p>
+                      <p className="text-[11px] text-slate-400 mt-0.5 leading-relaxed">{reg.desc}</p>
                     </div>
                   </div>
                 ))}
@@ -637,7 +655,7 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
       </section>
 
       {/* FOOTER */}
-      <footer className="bg-[#050e1c] border-t border-[#12233c]">
+      <footer className="bg-[#050e1c] border-t border-[#12233c] reveal-on-scroll">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
           <div className="flex items-center space-x-3">
             <PoliceEmblem size="sm" />

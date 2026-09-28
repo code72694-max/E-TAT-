@@ -482,72 +482,36 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Back Button & Case Header Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="flex items-center space-x-3">
-          <button
-            onClick={onBack}
-            className="p-2 bg-[#0b172a] border border-[#1b3459] hover:bg-[#142642] rounded-lg text-slate-300 transition-colors cursor-pointer"
-            title="Kembali ke Daftar Permohonan"
-          >
-            <ArrowLeft className="w-4 h-4" />
-          </button>
-          <div>
-            <div className="flex items-center space-x-2">
-              <span className="text-xs uppercase font-semibold text-[#D4AF37] bg-[#142642] px-2 py-0.5 rounded border border-[#1e3c66]">
-                Berkas Asesmen Terpadu
-              </span>
-              <span className="text-xs text-slate-500">•</span>
-              <span className="text-xs text-slate-400">Diajukan: {permohonan.tanggalPengajuan}</span>
-            </div>
-            <h1 className="text-xl font-bold text-white flex items-center space-x-2 mt-0.5">
-              <span className="font-mono text-[#D4AF37]">{permohonan.nomorPermohonan}</span>
-              <span className="text-slate-600 font-normal">|</span>
-              <span className="text-white">{permohonan.terperiksa.namaLengkap}</span>
-            </h1>
-          </div>
-        </div>
-
-        {/* Quick QR code button if recommendation is ready */}
-        {permohonan.rekomendasiResmi && (
-          <button
-            onClick={() => onOpenQrModal(permohonan)}
-            className="bg-gradient-to-r from-[#0d1f38] via-[#132644] to-[#1b3459] hover:from-[#175194] hover:via-[#1c60b0] hover:to-[#2274d4] text-white text-xs font-bold px-3.5 py-2 rounded-xl flex items-center space-x-2 border border-[#2d7ad6]/70 shadow-[0_2px_10px_rgba(20,83,154,0.35)] cursor-pointer transition-all shrink-0"
-          >
-            <QrCode className="w-4 h-4 text-[#D4AF37]" />
-            <span>Verifikasi Keabsahan (QR)</span>
-          </button>
-        )}
-      </div>
+      {/* Compact Status & Action Overview */}
 
       {/* Compact Status & Action Overview */}
-      <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl p-4 space-y-3">
+      <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl p-3.5 sm:p-4 space-y-3">
         {/* 4 Statuses in a clean, minimal row */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
-          <div className="bg-[#081224] border border-[#1b3459] rounded-lg px-3 py-2">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          <div className="bg-[#081224] border border-[#1b3459] rounded-xl px-3 py-2">
             <span className="text-[10px] uppercase font-semibold text-slate-400 block">Proses Utama</span>
-            <span className="text-xs font-bold text-[#D4AF37] mt-0.5 block truncate">
+            <span className="text-xs font-bold text-[#d4af37] mt-0.5 block truncate">
               {formatStatus(permohonan.statusProsesUtama)}
             </span>
           </div>
 
-          <div className="bg-[#081224] border border-[#1b3459] rounded-lg px-3 py-2">
-            <span className="text-[10px] uppercase font-semibold text-slate-400 block">Telaah Medis & Hukum</span>
+          <div className="bg-[#081224] border border-[#1b3459] rounded-xl px-3 py-2">
+            <span className="text-[10px] uppercase font-semibold text-slate-400 block">Telaah Medis &amp; Hukum</span>
             <div className="text-xs font-semibold text-slate-200 mt-0.5 flex items-center space-x-1.5 truncate">
-              <span className="text-[#D4AF37]">M: {formatStatus(permohonan.statusMedis)}</span>
+              <span className="text-[#d4af37]">M: {formatStatus(permohonan.statusMedis)}</span>
               <span className="text-slate-600">|</span>
               <span className="text-slate-200">H: {formatStatus(permohonan.statusHukum)}</span>
             </div>
           </div>
 
-          <div className="bg-[#081224] border border-[#1b3459] rounded-lg px-3 py-2">
+          <div className="bg-[#081224] border border-[#1b3459] rounded-xl px-3 py-2">
             <span className="text-[10px] uppercase font-semibold text-slate-400 block">Dokumen Rekomendasi</span>
             <span className="text-xs font-bold text-white mt-0.5 block truncate">
               {formatStatus(permohonan.statusDokumen)}
             </span>
           </div>
 
-          <div className="bg-[#081224] border border-[#1b3459] rounded-lg px-3 py-2">
+          <div className="bg-[#081224] border border-[#1b3459] rounded-xl px-3 py-2">
             <span className="text-[10px] uppercase font-semibold text-slate-400 block">Tindak Lanjut</span>
             <span className={`text-xs font-bold mt-0.5 block truncate ${permohonan.statusTindakLanjut === 'terhambat' ? 'text-slate-300' : 'text-slate-200'}`}>
               {formatStatus(permohonan.statusTindakLanjut)}
@@ -556,22 +520,20 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
         </div>
 
         {/* Clean Action Strip */}
-        <div className="pt-2 border-t border-[#1b3459] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <div className="flex items-center space-x-2 text-xs">
+        <div className="pt-2 border-t border-[#1b3459] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5">
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
             <span className="text-slate-400 font-medium">Langkah Selanjutnya:</span>
-            <span className="font-semibold text-white">{permohonan.tindakanBerikutnyaLabel}</span>
-            <span className="text-slate-600">•</span>
-            <span className="text-slate-400">PJ: <strong className="text-slate-200">{permohonan.penanggungJawabBerikutnya}</strong></span>
-            <span className="text-slate-600">•</span>
-            <span className="text-slate-400">SLA: <strong className="text-[#D4AF37]">{permohonan.tenggatSlaTanggal}</strong></span>
+            <span className="font-semibold text-white leading-snug">{permohonan.tindakanBerikutnyaLabel}</span>
+            <span className="text-slate-400">&bull; PJ: <strong className="text-slate-200">{permohonan.penanggungJawabBerikutnya}</strong></span>
+            <span className="text-slate-400">&bull; SLA: <strong className="text-[#d4af37]">{permohonan.tenggatSlaTanggal}</strong></span>
           </div>
 
           {/* Action Buttons */}
-          <div className="flex items-center space-x-2 shrink-0">
+          <div className="flex flex-wrap items-center gap-2 shrink-0">
             {permohonan.statusProsesUtama === 'perlu_perbaikan' && currentUser.role === 'pengaju' && (
               <button
                 onClick={() => setActiveTab('administrasi')}
-                className="bg-[#133863] hover:bg-[#1a4a82] text-white text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center space-x-1.5 transition-all cursor-pointer"
+                className="bg-[#142642] hover:bg-[#1b3459] text-white text-xs font-semibold px-3 py-1.5 rounded-xl flex items-center justify-center space-x-1.5 transition-all cursor-pointer border border-[#234475] w-full sm:w-auto"
               >
                 <Upload className="w-3.5 h-3.5" />
                 <span>Unggah Perbaikan</span>
@@ -581,7 +543,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
             {permohonan.statusProsesUtama === 'verifikasi_berkas' && currentUser.role === 'sekretariat' && (
               <button
                 onClick={() => setActiveTab('administrasi')}
-                className="bg-[#133863] hover:bg-[#1a4a82] text-white text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center space-x-1.5 transition-all cursor-pointer"
+                className="bg-[#142642] hover:bg-[#1b3459] text-white text-xs font-semibold px-3 py-1.5 rounded-xl flex items-center justify-center space-x-1.5 transition-all cursor-pointer border border-[#234475] w-full sm:w-auto"
               >
                 <CheckCircle2 className="w-3.5 h-3.5" />
                 <span>Verifikasi Dokumen</span>
@@ -591,7 +553,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
             {permohonan.statusProsesUtama === 'pengesahan_rekomendasi' && userCanSignNow && (
               <button
                 onClick={handleDigitalSign}
-                className="bg-[#133863] hover:bg-[#1a4a82] text-white text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center space-x-1.5 transition-all cursor-pointer"
+                className="bg-[#142642] hover:bg-[#1b3459] text-white text-xs font-semibold px-3 py-1.5 rounded-xl flex items-center justify-center space-x-1.5 transition-all cursor-pointer border border-[#234475] w-full sm:w-auto"
               >
                 <FileSignature className="w-3.5 h-3.5" />
                 <span>Tandatangani Rekomendasi</span>
@@ -601,7 +563,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
             {currentUser.role === 'rehabilitasi' && permohonan.tindakLanjut && (
               <button
                 onClick={() => setActiveTab('tindak_lanjut')}
-                className="bg-[#133863] hover:bg-[#1a4a82] text-white text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center space-x-1.5 transition-all cursor-pointer"
+                className="bg-[#142642] hover:bg-[#1b3459] text-white text-xs font-semibold px-3 py-1.5 rounded-xl flex items-center justify-center space-x-1.5 transition-all cursor-pointer border border-[#234475] w-full sm:w-auto"
               >
                 <Share2 className="w-3.5 h-3.5" />
                 <span>Konfirmasi Rujukan</span>
@@ -611,7 +573,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
             {currentUser.role === 'pengaju' && permohonan.rekomendasiResmi && (permohonan.statusProsesUtama === 'rekomendasi_terbit' || permohonan.statusProsesUtama === 'selesai_tindak_lanjut') && (
               <button
                 onClick={() => setActiveTab('dokumen')}
-                className="bg-[#133863] hover:bg-[#1a4a82] text-white text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center space-x-1.5 transition-all cursor-pointer"
+                className="bg-[#142642] hover:bg-[#1b3459] text-white text-xs font-semibold px-3 py-1.5 rounded-xl flex items-center justify-center space-x-1.5 transition-all cursor-pointer border border-[#234475] w-full sm:w-auto"
               >
                 <Download className="w-3.5 h-3.5" />
                 <span>Rekomendasi Resmi</span>
@@ -621,9 +583,9 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
             {availableTabs.some(t => t.id === 'klarifikasi') && (
               <button
                 onClick={() => setActiveTab('klarifikasi')}
-                className="bg-[#1b3459] hover:bg-[#25487a] text-slate-200 text-xs font-medium px-3 py-1.5 rounded-lg flex items-center space-x-1.5 transition-all cursor-pointer border border-[#2d5289]"
+                className="bg-[#081224] hover:bg-[#142642] text-slate-200 text-xs font-medium px-3 py-1.5 rounded-xl flex items-center justify-center space-x-1.5 transition-all cursor-pointer border border-[#1b3459] w-full sm:w-auto"
               >
-                <MessageSquare className="w-3.5 h-3.5 text-[#D4AF37]" />
+                <MessageSquare className="w-3.5 h-3.5 text-[#d4af37]" />
                 <span>Klarifikasi ({permohonan.klarifikasiList.length})</span>
               </button>
             )}
@@ -633,7 +595,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
 
       {/* Tab Navigation - Filtered dynamically per role */}
       <div className="border-b border-[#1b3459]">
-        <div className="flex space-x-1 overflow-x-auto pb-1 scrollbar-none text-xs">
+        <div className="flex space-x-1 overflow-x-auto pb-1 no-scrollbar text-xs">
           {availableTabs.map(tab => {
             const isActive = activeTab === tab.id;
             return (
@@ -655,13 +617,13 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
       </div>
 
       {/* TAB CONTENT AREA */}
-      <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl p-5 min-h-[420px]">
+      <div className="space-y-6 min-h-[420px] pt-3">
         {/* TAB 1: RINGKASAN & IDENTITAS (Separation of Person, Case, and Application) */}
         {activeTab === 'ringkasan' && (
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Kolom 1: Terperiksa (Data Orang) */}
-              <div className="border border-[#1b3459] rounded-xl p-4 bg-[#081224]">
+              <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl p-4 sm:p-5 space-y-3">
                 <div className="flex items-center justify-between pb-2 border-b border-[#1b3459] mb-3">
                   <div className="flex items-center space-x-2">
                     <User className="w-4 h-4 text-[#D4AF37]" />
@@ -679,131 +641,131 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
                 </div>
 
                 <div className="space-y-2 text-xs">
-                  <div className="grid grid-cols-3">
-                    <span className="text-slate-400">Nama Lengkap</span>
-                    <span className="col-span-2 font-bold text-white">{permohonan.terperiksa.namaLengkap}</span>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-0.5 sm:gap-1 py-1 border-b border-[#1b3459]/40">
+                    <span className="text-slate-400 font-medium">Nama Lengkap</span>
+                    <span className="sm:col-span-2 font-semibold text-white break-words">{permohonan.terperiksa.namaLengkap}</span>
                   </div>
-                  <div className="grid grid-cols-3">
-                    <span className="text-slate-400">Nama Panggilan/Alias</span>
-                    <span className="col-span-2 text-slate-300">{permohonan.terperiksa.alias || '-'}</span>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-0.5 sm:gap-1 py-1 border-b border-[#1b3459]/40">
+                    <span className="text-slate-400 font-medium">Nama Panggilan/Alias</span>
+                    <span className="sm:col-span-2 text-slate-300 break-words">{permohonan.terperiksa.alias || '-'}</span>
                   </div>
-                  <div className="grid grid-cols-3">
-                    <span className="text-slate-400">NIK / Identitas</span>
-                    <span className="col-span-2 font-mono text-[#D4AF37]">{permohonan.terperiksa.nik || 'Tidak ada (Dibuatkan ID Khusus)'}</span>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-0.5 sm:gap-1 py-1 border-b border-[#1b3459]/40">
+                    <span className="text-slate-400 font-medium">NIK / Identitas</span>
+                    <span className="sm:col-span-2 font-mono text-[#d4af37] break-all">{permohonan.terperiksa.nik || 'Tidak ada (Dibuatkan ID Khusus)'}</span>
                   </div>
-                  <div className="grid grid-cols-3">
-                    <span className="text-slate-400">Tempat, Tgl Lahir</span>
-                    <span className="col-span-2 text-slate-300">{permohonan.terperiksa.tempatLahir}, {permohonan.terperiksa.tanggalLahir} ({permohonan.terperiksa.usia} Tahun)</span>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-0.5 sm:gap-1 py-1 border-b border-[#1b3459]/40">
+                    <span className="text-slate-400 font-medium">Tempat, Tgl Lahir</span>
+                    <span className="sm:col-span-2 text-slate-300 break-words">{permohonan.terperiksa.tempatLahir}, {permohonan.terperiksa.tanggalLahir} ({permohonan.terperiksa.usia} Tahun)</span>
                   </div>
-                  <div className="grid grid-cols-3">
-                    <span className="text-slate-400">Jenis Kelamin</span>
-                    <span className="col-span-2 text-slate-300">{permohonan.terperiksa.jenisKelamin}</span>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-0.5 sm:gap-1 py-1 border-b border-[#1b3459]/40">
+                    <span className="text-slate-400 font-medium">Jenis Kelamin</span>
+                    <span className="sm:col-span-2 text-slate-300">{permohonan.terperiksa.jenisKelamin}</span>
                   </div>
-                  <div className="grid grid-cols-3">
-                    <span className="text-slate-400">Pekerjaan</span>
-                    <span className="col-span-2 text-slate-300">{permohonan.terperiksa.pekerjaan}</span>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-0.5 sm:gap-1 py-1 border-b border-[#1b3459]/40">
+                    <span className="text-slate-400 font-medium">Pekerjaan</span>
+                    <span className="sm:col-span-2 text-slate-300 break-words">{permohonan.terperiksa.pekerjaan}</span>
                   </div>
-                  <div className="grid grid-cols-3">
-                    <span className="text-slate-400">Alamat KTP</span>
-                    <span className="col-span-2 text-slate-300">{permohonan.terperiksa.alamatKtp}</span>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-0.5 sm:gap-1 py-1 border-b border-[#1b3459]/40">
+                    <span className="text-slate-400 font-medium">Alamat KTP</span>
+                    <span className="sm:col-span-2 text-slate-300 break-words leading-relaxed">{permohonan.terperiksa.alamatKtp}</span>
                   </div>
-                  <div className="grid grid-cols-3">
-                    <span className="text-slate-400">Wali / Pendamping</span>
-                    <span className="col-span-2 text-slate-300">{permohonan.terperiksa.namaWaliPendamping} ({permohonan.terperiksa.kontakWali})</span>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-0.5 sm:gap-1 py-1">
+                    <span className="text-slate-400 font-medium">Wali / Pendamping</span>
+                    <span className="sm:col-span-2 text-slate-300 break-words">{permohonan.terperiksa.namaWaliPendamping} ({permohonan.terperiksa.kontakWali})</span>
                   </div>
                 </div>
               </div>
 
               {/* Kolom 2: Perkara Hukum Terkait (Data Perkara) */}
-              <div className="border border-[#1b3459] rounded-xl p-4 bg-[#081224]">
-                <div className="flex items-center justify-between pb-2 border-b border-[#1b3459] mb-3">
+              <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl p-4 sm:p-5 space-y-3">
+                <div className="flex items-center justify-between pb-2 border-b border-[#1b3459]">
                   <div className="flex items-center space-x-2">
-                    <Scale className="w-4 h-4 text-[#D4AF37]" />
+                    <Scale className="w-4 h-4 text-[#d4af37]" />
                     <h3 className="text-sm font-bold text-white">Data Perkara</h3>
                   </div>
-                  <span className="text-[10px] bg-[#0d1f38] text-slate-200 font-semibold px-2 py-0.5 rounded border border-[#1b3459]">
+                  <span className="text-[10px] bg-[#142642] text-slate-200 font-semibold px-2 py-0.5 rounded border border-[#234475]">
                     Penyidikan Aktif
                   </span>
                 </div>
 
                 <div className="space-y-2 text-xs">
-                  <div className="grid grid-cols-3">
-                    <span className="text-slate-400">Nomor LP</span>
-                    <span className="col-span-2 font-mono font-bold text-white">{permohonan.perkara.nomorLaporanPolisi}</span>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-0.5 sm:gap-1 py-1 border-b border-[#1b3459]/40">
+                    <span className="text-slate-400 font-medium">Nomor LP</span>
+                    <span className="sm:col-span-2 font-mono font-bold text-white break-all leading-snug">{permohonan.perkara.nomorLaporanPolisi}</span>
                   </div>
-                  <div className="grid grid-cols-3">
-                    <span className="text-slate-400">Tanggal LP</span>
-                    <span className="col-span-2 text-slate-300">{permohonan.perkara.tanggalLp}</span>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-0.5 sm:gap-1 py-1 border-b border-[#1b3459]/40">
+                    <span className="text-slate-400 font-medium">Tanggal LP</span>
+                    <span className="sm:col-span-2 text-slate-300">{permohonan.perkara.tanggalLp}</span>
                   </div>
-                  <div className="grid grid-cols-3">
-                    <span className="text-slate-400">Instansi Penyidik</span>
-                    <span className="col-span-2 font-semibold text-white">{permohonan.perkara.instansiPenyidik}</span>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-0.5 sm:gap-1 py-1 border-b border-[#1b3459]/40">
+                    <span className="text-slate-400 font-medium">Instansi Penyidik</span>
+                    <span className="sm:col-span-2 font-semibold text-white break-words">{permohonan.perkara.instansiPenyidik}</span>
                   </div>
-                  <div className="grid grid-cols-3">
-                    <span className="text-slate-400">Nama Penyidik</span>
-                    <span className="col-span-2 text-slate-300">{permohonan.perkara.namaPenyidik} ({permohonan.perkara.nomorHpPenyidik})</span>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-0.5 sm:gap-1 py-1 border-b border-[#1b3459]/40">
+                    <span className="text-slate-400 font-medium">Nama Penyidik</span>
+                    <span className="sm:col-span-2 text-slate-300 break-words">{permohonan.perkara.namaPenyidik} ({permohonan.perkara.nomorHpPenyidik})</span>
                   </div>
-                  <div className="grid grid-cols-3">
-                    <span className="text-slate-400">Pasal Sangkaan</span>
-                    <span className="col-span-2 font-bold text-[#D4AF37] bg-[#081224] p-1.5 rounded border border-[#1b3459] font-mono">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-0.5 sm:gap-1 py-1 border-b border-[#1b3459]/40">
+                    <span className="text-slate-400 font-medium">Pasal Sangkaan</span>
+                    <div className="sm:col-span-2 font-bold text-[#d4af37] bg-[#081224] p-2 rounded-lg border border-[#1b3459] font-mono break-words leading-relaxed">
                       {permohonan.perkara.pasalDipersangkakan}
-                    </span>
+                    </div>
                   </div>
-                  <div className="grid grid-cols-3">
-                    <span className="text-slate-400">Waktu Penangkapan</span>
-                    <span className="col-span-2 text-slate-300">{permohonan.perkara.tanggalWaktuPenangkapan}</span>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-0.5 sm:gap-1 py-1 border-b border-[#1b3459]/40">
+                    <span className="text-slate-400 font-medium">Waktu Penangkapan</span>
+                    <span className="sm:col-span-2 text-slate-300">{permohonan.perkara.tanggalWaktuPenangkapan}</span>
                   </div>
-                  <div className="grid grid-cols-3">
-                    <span className="text-slate-400">TKP</span>
-                    <span className="col-span-2 text-slate-300">{permohonan.perkara.tempatKejadianPerkara}</span>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-0.5 sm:gap-1 py-1 border-b border-[#1b3459]/40">
+                    <span className="text-slate-400 font-medium">TKP</span>
+                    <span className="sm:col-span-2 text-slate-300 break-words leading-relaxed">{permohonan.perkara.tempatKejadianPerkara}</span>
                   </div>
-                  <div className="grid grid-cols-3">
-                    <span className="text-slate-400">Kronologi Singkat</span>
-                    <span className="col-span-2 text-slate-300 italic">{permohonan.perkara.kronologiSingkat}</span>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-0.5 sm:gap-1 py-1">
+                    <span className="text-slate-400 font-medium">Kronologi Singkat</span>
+                    <span className="sm:col-span-2 text-slate-300 italic break-words leading-relaxed">{permohonan.perkara.kronologiSingkat}</span>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Barang Bukti Sub-Section */}
-            <div className="border border-[#1b3459] rounded-xl p-4 bg-[#081224]">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-300 mb-3 flex items-center space-x-2">
-                <Shield className="w-4 h-4 text-[#D4AF37]" />
-                <span>Barang Bukti & Uji Lab</span>
+            <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl p-4 sm:p-5 space-y-3">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center space-x-2">
+                <Shield className="w-4 h-4 text-[#d4af37]" />
+                <span>Barang Bukti &amp; Uji Lab</span>
               </h3>
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs border border-[#1b3459] rounded-lg overflow-hidden">
+              <div className="overflow-x-auto no-scrollbar -mx-1 px-1">
+                <table className="w-full text-left text-xs border border-[#1b3459] rounded-lg overflow-hidden min-w-[600px]">
                   <thead className="bg-[#0b172a] text-slate-300 uppercase text-[10px] font-semibold border-b border-[#1b3459]">
                     <tr>
-                      <th className="p-2.5">Jenis Zat / Narkotika</th>
-                      <th className="p-2.5">Berat Bersih (Netto)</th>
-                      <th className="p-2.5">Status Uji Lab Toksikologi</th>
-                      <th className="p-2.5">Nomor Surat Hasil Lab</th>
-                      <th className="p-2.5">Evaluasi Ambang Batas (SEMA 04/2010)</th>
+                      <th className="p-2.5 whitespace-nowrap">Jenis Zat / Narkotika</th>
+                      <th className="p-2.5 whitespace-nowrap">Berat Bersih (Netto)</th>
+                      <th className="p-2.5 whitespace-nowrap">Status Uji Lab Toksikologi</th>
+                      <th className="p-2.5 whitespace-nowrap">Nomor Surat Hasil Lab</th>
+                      <th className="p-2.5 whitespace-nowrap">Evaluasi Ambang Batas (SEMA 04/2010)</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#1b3459]">
                     {permohonan.perkara.barangBuktiList.map(bb => (
                       <tr key={bb.id} className="hover:bg-[#0f213a]">
-                        <td className="p-2.5 font-bold text-white">{bb.jenisZat}</td>
-                        <td className="p-2.5 font-semibold text-slate-200">{bb.beratBersihGram} Gram</td>
-                        <td className="p-2.5">
+                        <td className="p-2.5 font-bold text-white whitespace-nowrap">{bb.jenisZat}</td>
+                        <td className="p-2.5 font-semibold text-slate-200 whitespace-nowrap">{bb.beratBersihGram} Gram</td>
+                        <td className="p-2.5 whitespace-nowrap">
                           {bb.statusUjiLab === 'positif' ? (
-                            <span className="bg-[#0d1f38] text-slate-200 text-[10px] font-bold px-2 py-0.5 rounded border border-[#1b3459]">
+                            <span className="bg-[#142642] text-slate-200 text-[10px] font-semibold px-2 py-0.5 rounded border border-[#234475]">
                               Positif Lab
                             </span>
                           ) : bb.statusUjiLab === 'proses_lab' ? (
-                            <span className="bg-[#0d1f38] text-[#D4AF37] text-[10px] font-bold px-2 py-0.5 rounded border border-[#1b3459]">
+                            <span className="bg-[#142642] text-[#d4af37] text-[10px] font-semibold px-2 py-0.5 rounded border border-[#d4af37]/30">
                               Sedang Diuji Lab
                             </span>
                           ) : (
-                            <span className="bg-slate-800 text-slate-400 text-[10px] font-semibold px-2 py-0.5 rounded border border-slate-700">
+                            <span className="bg-[#142642] text-slate-400 text-[10px] font-semibold px-2 py-0.5 rounded border border-[#234475]">
                               Belum Uji
                             </span>
                           )}
                         </td>
-                        <td className="p-2.5 font-mono text-slate-300">{bb.nomorSuratLab || 'Menunggu dari Puslabfor'}</td>
-                        <td className="p-2.5 text-slate-400">{bb.keterangan || '-'}</td>
+                        <td className="p-2.5 font-mono text-slate-300 whitespace-nowrap">{bb.nomorSuratLab || 'Menunggu dari Puslabfor'}</td>
+                        <td className="p-2.5 text-slate-300">{bb.keterangan || '-'}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -823,7 +785,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
           return (
             <div className="space-y-4">
               {/* Completeness Summary Banner */}
-              <div className="bg-[#081224] border border-[#1b3459] rounded-xl p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div className="space-y-1">
                   <div className="flex items-center space-x-2">
                     <span className="text-xs font-bold text-white uppercase font-['Cinzel',serif]">Status Kelengkapan Berkas Formil</span>

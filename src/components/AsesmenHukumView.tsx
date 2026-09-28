@@ -1,6 +1,6 @@
 import React from 'react';
 import { PermohonanAsesmen, UserProfile } from '../types';
-import { Scale, CheckCircle2, AlertTriangle, ArrowRight, Shield, FileCheck } from 'lucide-react';
+import { Scale, ArrowRight } from 'lucide-react';
 
 interface AsesmenHukumViewProps {
   permohonanList: PermohonanAsesmen[];
@@ -14,12 +14,12 @@ export const AsesmenHukumView: React.FC<AsesmenHukumViewProps> = ({
   onSelectPermohonan
 }) => {
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div className="space-y-5">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-xl font-bold text-white flex items-center space-x-2 font-['Cinzel',serif]">
-            <Scale className="w-5 h-5 text-[#D4AF37]" />
-            <span>Asesmen Hukum & Yuridis</span>
+          <h1 className="text-lg sm:text-xl font-bold text-white flex items-center space-x-2">
+            <Scale className="w-5 h-5 text-[#d4af37]" />
+            <span>Asesmen Hukum &amp; Yuridis</span>
           </h1>
           <p className="text-xs text-slate-400 mt-1">
             Penelaahan kualifikasi peran (SEMA 04/2010), batas gramatur barang bukti narkotika, dan jaringan sindikat.
@@ -34,38 +34,40 @@ export const AsesmenHukumView: React.FC<AsesmenHukumViewProps> = ({
             <div
               key={item.id}
               onClick={() => onSelectPermohonan(item.id)}
-              className="bg-[#0b172a] border border-[#1b3459] hover:border-[#D4AF37] rounded-xl p-5 transition-all cursor-pointer space-y-3 shadow-lg shadow-black/20 group"
+              className="bg-[#0b172a] border border-[#1b3459] hover:border-[#d4af37]/60 rounded-2xl p-4 sm:p-5 transition-all cursor-pointer space-y-3 shadow-md group flex flex-col justify-between"
             >
-              <div className="flex items-start justify-between">
-                <div>
-                  <span className="font-bold text-sm text-white group-hover:text-[#D4AF37] font-mono transition-colors">{item.nomorPermohonan}</span>
-                  <p className="text-xs font-semibold text-slate-200 mt-0.5">{item.terperiksa.namaLengkap} • LP: {item.perkara.nomorLaporanPolisi}</p>
-                  <p className="text-[11px] text-slate-400">Pasal: {item.perkara.pasalDipersangkakan}</p>
+              <div className="space-y-3">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0 flex-1">
+                    <span className="font-bold text-xs text-[#d4af37] font-mono group-hover:underline">{item.nomorPermohonan}</span>
+                    <p className="text-xs font-semibold text-white mt-0.5 truncate">{item.terperiksa.namaLengkap} &bull; LP: {item.perkara.nomorLaporanPolisi}</p>
+                    <p className="text-[11px] text-slate-400 truncate">Pasal: {item.perkara.pasalDipersangkakan}</p>
+                  </div>
+                  <span className={`text-[10px] font-semibold px-2 py-0.5 rounded border shrink-0 ${
+                    hasHukum ? 'bg-[#142642] text-slate-200 border-[#234475]' : 'bg-[#142642] text-[#d4af37] border-[#d4af37]/30'
+                  }`}>
+                    {hasHukum ? 'Telaah Lengkap' : 'Menunggu Telaah'}
+                  </span>
                 </div>
-                <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${
-                  hasHukum ? 'bg-purple-500/20 text-slate-200 border-purple-500/40' : 'bg-amber-500/20 text-[#D4AF37] border-[#1b3459]'
-                }`}>
-                  {hasHukum ? 'Telaah Lengkap' : 'Menunggu Telaah'}
-                </span>
+
+                {hasHukum ? (
+                  <div className="bg-[#081224] rounded-xl p-3 text-xs space-y-1 text-slate-300 border border-[#1b3459]">
+                    <p>Analisis Peran: <strong className="text-white">{item.asesmenHukum?.analisisPeran}</strong></p>
+                    <p>Evaluasi BB: {item.asesmenHukum?.analisisBarangBukti}</p>
+                    <p>Kesimpulan Hukum: <strong className="text-slate-200">{item.asesmenHukum?.rekomendasiHukum}</strong></p>
+                  </div>
+                ) : (
+                  <div className="bg-[#142642] rounded-xl p-3 text-xs text-slate-300 border border-[#234475]">
+                    Telaah yuridis belum diinput atau menunggu kelengkapan uji lab toksikologi. Klik untuk menelaah.
+                  </div>
+                )}
               </div>
 
-              {hasHukum ? (
-                <div className="bg-[#081224] rounded-lg p-3 text-xs space-y-1 text-slate-300 border border-[#1b3459]">
-                  <p>Analisis Peran: <strong className="text-white">{item.asesmenHukum?.analisisPeran}</strong></p>
-                  <p>Evaluasi BB: {item.asesmenHukum?.analisisBarangBukti}</p>
-                  <p>Kesimpulan Hukum: <strong className="text-slate-200">{item.asesmenHukum?.rekomendasiHukum}</strong></p>
-                </div>
-              ) : (
-                <div className="bg-amber-500/10 rounded-lg p-3 text-xs text-amber-200 border border-amber-500/30">
-                  Telaah yuridis belum diinput atau menunggu kelengkapan uji lab toksikologi. Klik untuk menelaah.
-                </div>
-              )}
-
-              <div className="flex items-center justify-between text-[11px] text-slate-400 pt-1 border-t border-[#1b3459]">
-                <span>Penelaah: {item.asesmenHukum?.asesorNama || 'Belum diisi'}</span>
-                <span className="text-[#D4AF37] font-semibold flex items-center space-x-1 group-hover:translate-x-0.5 transition-transform">
+              <div className="flex items-center justify-between text-[11px] text-slate-400 pt-2 border-t border-[#1b3459] mt-2">
+                <span className="truncate">Penelaah: {item.asesmenHukum?.asesorNama || 'Belum diisi'}</span>
+                <span className="text-[#d4af37] font-semibold flex items-center space-x-1 group-hover:translate-x-0.5 transition-transform shrink-0 ml-2">
                   <span>Buka Lembar Hukum</span>
-                  <ArrowRight className="w-3 h-3 text-[#D4AF37]" />
+                  <ArrowRight className="w-3.5 h-3.5 text-[#d4af37]" />
                 </span>
               </div>
             </div>
