@@ -25,10 +25,11 @@ import { ModalVerifikasiQR } from './components/ModalVerifikasiQR';
 import { AboutView } from './components/AboutView';
 import { LandingPageView } from './components/LandingPageView';
 import { LoginPage } from './components/LoginPage';
+import { LacakBerkasPage } from './components/LacakBerkasPage';
 
 export default function App() {
-  // Navigation / Auth mode: 'landing' (public), 'login' (role selection), or 'dashboard' (authenticated)
-  const [appViewMode, setAppViewMode] = useState<'landing' | 'login' | 'dashboard'>('landing');
+  // Navigation / Auth mode: 'landing' (public), 'lacak' (public tracking), 'login' (role selection), or 'dashboard' (authenticated)
+  const [appViewMode, setAppViewMode] = useState<'landing' | 'lacak' | 'login' | 'dashboard'>('landing');
 
   // Current logged in user (defaults to Sekretariat for comprehensive overview)
   const [currentUser, setCurrentUser] = useState<UserProfile>(MOCK_USERS[1]); // Rina Marlina, S.H. (Sekretariat)
@@ -240,7 +241,31 @@ export default function App() {
     return (
       <LandingPageView
         onGoToLogin={() => setAppViewMode('login')}
+        onGoToLacak={() => setAppViewMode('lacak')}
         permohonanList={permohonanList}
+        onOpenPermohonanDetail={(id) => {
+          setSelectedPermohonanId(id);
+          setAppViewMode('dashboard');
+        }}
+      />
+    );
+  }
+
+  // 1.5 STANDALONE LACAK BERKAS PAGE
+  if (appViewMode === 'lacak') {
+    return (
+      <LacakBerkasPage
+        permohonanList={permohonanList}
+        onGoToLanding={(sectionId) => {
+          setAppViewMode('landing');
+          if (sectionId) {
+            setTimeout(() => {
+              const el = document.getElementById(sectionId);
+              if (el) el.scrollIntoView({ behavior: 'smooth' });
+            }, 100);
+          }
+        }}
+        onGoToLogin={() => setAppViewMode('login')}
         onOpenPermohonanDetail={(id) => {
           setSelectedPermohonanId(id);
           setAppViewMode('dashboard');

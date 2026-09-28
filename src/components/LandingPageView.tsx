@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { PermohonanAsesmen } from '../types';
 import { PoliceEmblem } from './PoliceEmblem';
+import { PublicHeader } from './PublicHeader';
 import {
   ShieldCheck,
   ArrowRight,
@@ -24,22 +25,158 @@ import {
   LifeBuoy,
   HeartHandshake,
   Menu,
-  X
+  X,
+  Clock,
+  Info
 } from 'lucide-react';
 
 interface LandingPageViewProps {
   onGoToLogin: (presetRole?: string) => void;
   permohonanList: PermohonanAsesmen[];
   onOpenPermohonanDetail?: (id: string) => void;
+  onGoToLacak?: () => void;
 }
 
 export const LandingPageView: React.FC<LandingPageViewProps> = ({
   onGoToLogin,
-  permohonanList
+  permohonanList,
+  onGoToLacak
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [trackingNumber, setTrackingNumber] = useState('');
   const [trackedResult, setTrackedResult] = useState<PermohonanAsesmen | null | 'not_found'>(null);
+
+  interface SopStepItem {
+    step: string;
+    title: string;
+    actor: string;
+    sla: string;
+    icon: React.ReactNode;
+    summary: string;
+    details: string[];
+    legalBasis: string;
+  }
+
+  const [selectedSopStep, setSelectedSopStep] = useState<SopStepItem | null>(null);
+
+  const SOP_8_STEPS: SopStepItem[] = [
+    {
+      step: '01',
+      title: 'Registrasi & Pengajuan',
+      actor: 'Penyidik Polri / BNN',
+      sla: 'Maks. 1×24 Jam Penangkapan',
+      icon: <FileCheck className="w-5 h-5 text-[#D4AF37]" />,
+      summary: 'Pendaftaran perkara awal & upload 7 berkas formil persyaratan.',
+      details: [
+        'Penyidik menginput Identitas Terperiksa (NIK, Nama, Wali, Domisili).',
+        'Pengisian Data Perkara (Nomor LP, Tanggal LP, TKP, Kronologi).',
+        'Merinci data Barang Bukti (Jenis zat, berat netto/bruto, nomor lab Puslabfor).',
+        'Mengunggah 7 dokumen persyaratan formil (Surat Permohonan TAT, LP, BAP, SKHPN, Lab BB).'
+      ],
+      legalBasis: 'SOP bersama BNNP Kaltim & Ditresnarkoba Polda Kaltim'
+    },
+    {
+      step: '02',
+      title: 'Verifikasi Berkas',
+      actor: 'Sekretariat TAT BNNP',
+      sla: 'Maks. 1 Hari Kerja',
+      icon: <CheckCircle2 className="w-5 h-5 text-[#D4AF37]" />,
+      summary: 'Pemeriksaan keabsahan administrasi & penugasan tim pemeriksa.',
+      details: [
+        'Sekretariat memeriksa kelengkapan, keterbacaan, dan keabsahan formil berkas.',
+        'Jika berkas belum lengkap: dikembalikan ke Penyidik dengan catatan revisi.',
+        'Jika berkas lengkap: disetujui dan dilanjutkan ke penugasan tim spesialis.',
+        'Menunjuk Dokter Asesor Medis & Asesor Hukum yang bertanggung jawab.'
+      ],
+      legalBasis: 'Perpol No. 08 Tahun 2021 & Juknis TAT BNN'
+    },
+    {
+      step: '03',
+      title: 'Surat Perintah Penugasan',
+      actor: 'Sekretariat & Koordinator',
+      sla: 'Maks. 1 Hari Kerja',
+      icon: <Calendar className="w-5 h-5 text-[#D4AF37]" />,
+      summary: 'Penerbitan Sprint Tim Terpadu & penjadwalan pemeriksaan.',
+      details: [
+        'Penerbitan Surat Perintah Penugasan Tim Asesmen Terpadu.',
+        'Penetapan jadwal & lokasi pemeriksaan klinis medis dan analisis hukum.',
+        'Pengiriman pemberitahuan agenda resmi kepada penyidik & tim pemeriksa.'
+      ],
+      legalBasis: 'Peraturan Bersama 7 Lembaga/Kementerian'
+    },
+    {
+      step: '04',
+      title: 'Forensik & Yuridis',
+      actor: 'Tim Medis & Asesor Hukum',
+      sla: 'Maks. 2 Hari Kerja (Paralel)',
+      icon: <Stethoscope className="w-5 h-5 text-[#D4AF37]" />,
+      summary: 'Skrining klinis ASSIST & analisis kualifikasi perkara hukum.',
+      details: [
+        'Asesmen Medis: Tes klinis, skrining ASSIST (skor 0-39), diagnosis ketergantungan, usulan terapi.',
+        'Asesmen Hukum: Analisis BAP, legalitas penangkapan, kualifikasi pengedar vs korban.',
+        'Pengujian barang bukti di bawah ambang batas SEMA No. 04 Tahun 2010.'
+      ],
+      legalBasis: 'UU No. 35/2009 & SEMA No. 04/2010'
+    },
+    {
+      step: '05',
+      title: 'Sidang Pleno TAT',
+      actor: 'Koordinator & Asesor Terpadu',
+      sla: 'Maks. 1 Hari Kerja',
+      icon: <Users className="w-5 h-5 text-[#D4AF37]" />,
+      summary: 'Forum musyawarah pembahasan temuan medis & analisis hukum.',
+      details: [
+        'Tim Terpadu menelaah bersama hasil pemeriksaan medis dan analisis hukum.',
+        'Pencatatan notulensi sidang dan daftar hadir anggota pleno.',
+        'Penyusunan Draf Berita Acara Pleno untuk merumuskan simpulan rekomendasi final.'
+      ],
+      legalBasis: 'Pedoman Penanganan Perkara TAT BNNP Kaltim'
+    },
+    {
+      step: '06',
+      title: 'Pengesahan QR & TTE',
+      actor: '4 Penanda Tangan Resmi',
+      sla: 'Maks. 1 Hari Kerja (Total SLA 6 Hari)',
+      icon: <FileSignature className="w-5 h-5 text-[#D4AF37]" />,
+      summary: 'Penerbitan Surat Rekomendasi Resmi 3-Panel & TTE Multi-Pihak.',
+      details: [
+        'Penerbitan dokumen dalam format 3-Panel (Acuan Visual 8).',
+        'Tanda Tangan Elektronik (TTE) berjenjang oleh 4 Pengesah (Medis, Hukum, Penyidik, Ketua TAT).',
+        'Penerbitan Barcode QR Code Verifikasi keaslian dokumen resmi.',
+        'Penyidik menandatangani lembar konfirmasi tanda terima berkas resmi.'
+      ],
+      legalBasis: 'Sistem TTE Tersertifikasi & Barcode Verification'
+    },
+    {
+      step: '07',
+      title: 'Rujukan & Eksekusi',
+      actor: 'Balai Rehabilitasi & Penyidik',
+      sla: 'Sesuai Rencana Eksekusi',
+      icon: <Share2 className="w-5 h-5 text-[#D4AF37]" />,
+      summary: 'Penerbitan rujukan balai rehab & penyerahan lembar rekomendasi.',
+      details: [
+        'Penerbitan surat rujukan resmi ke Balai Besar BNN (Tanah Merah/Lido) atau Klinik Pratama.',
+        'Penyidik melampirkan rekomendasi resmi ke berkas perkara penyidikan (BAP / P-21).',
+        'Konfirmasi admisi penerimaan klien oleh fasilitas rehabilitasi.'
+      ],
+      legalBasis: 'Perja No. 15/2020 & Perpol No. 08/2021'
+    },
+    {
+      step: '08',
+      title: 'Pengawasan & SKSP',
+      actor: 'Konselor & Penyidik Pengawas',
+      sla: '3 s.d. 6 Bulan Pemantauan',
+      icon: <Activity className="w-5 h-5 text-[#D4AF37]" />,
+      summary: 'Pemantauan kepatuhan rehabilitasi, tes urin berkala & penerbitan SKSP.',
+      details: [
+        'Pencatatan Jurnal Kegiatan Konseling dan absensi kepatuhan.',
+        'Skrining Tes Urin Periodik (5 Parameter: AMP, MET, THC, BZO, MOP).',
+        'Penerbitan Surat Peringatan (SP-1/2/3) jika terdapat pelanggaran mangkir.',
+        'Penerbitan Surat Keterangan Selesai Program (SKSP) bagi klien yang lulus.'
+      ],
+      legalBasis: 'Modul Monitoring Pengawasan Pasca TAT BNNP Kaltim'
+    }
+  ];
 
   const handleTrack = (e: React.FormEvent) => {
     e.preventDefault();
@@ -131,6 +268,17 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
     setTouchStartX(null);
   };
 
+  const handleGoToLanding = (sectionId?: string) => {
+    if (sectionId) {
+      const el = document.getElementById(sectionId);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+      }
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#071326] text-slate-100 flex flex-col antialiased selection:bg-[#D4AF37]/30 selection:text-white font-sans">
       <style>{`
@@ -151,179 +299,13 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
         .fade-in-up-delay-7 { animation-delay: 0.56s; }
         .fade-in-up-delay-8 { animation-delay: 0.64s; }
       `}</style>
-      {/* Main Clean Header */}
-      <header className="sticky top-0 z-40 bg-[#071325]/95 backdrop-blur-md border-b border-[#1b3459]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          {/* Brand Lockup */}
-          <div className="flex items-center space-x-2.5 sm:space-x-3 min-w-0">
-            <PoliceEmblem size="sm" />
-            <div className="flex items-center space-x-2 min-w-0">
-              <span className="font-extrabold text-base sm:text-lg tracking-wider text-white font-['Cinzel',serif] truncate">
-                E-TAT <span className="text-[#D4AF37]">SIAP PULIH</span>
-              </span>
-              <span className="hidden sm:inline-block text-[#1b3459]">|</span>
-              <span className="hidden sm:inline-block text-xs text-slate-400 font-medium">
-                BNNP Kalimantan Timur
-              </span>
-            </div>
-          </div>
-
-          {/* Right Navigation & Action - Mepet Kanan & Clean */}
-          <div className="flex items-center space-x-2 sm:space-x-5 lg:space-x-6 shrink-0">
-            {/* Navigation Links (Desktop) */}
-            <nav className="hidden md:flex items-center space-x-5 lg:space-x-6 text-xs font-medium text-slate-300">
-              <a href="#tentang-tat" className="hover:text-white transition-colors duration-150">
-                Tentang E-TAT
-              </a>
-              <a href="#gerakan-sekorna" className="hover:text-white transition-colors duration-150">
-                Konsep SIAP PULIH
-              </a>
-              <a href="#alur-layanan" className="hover:text-white transition-colors duration-150">
-                Alur SOP
-              </a>
-              <a href="#lacak-berkas" className="hover:text-white transition-colors duration-150">
-                Lacak Berkas
-              </a>
-              <a href="#pengawasan" className="hover:text-white transition-colors duration-150">
-                Pengawasan
-              </a>
-              <a href="#dasar-hukum" className="hover:text-white transition-colors duration-150">
-                Dasar Regulasi
-              </a>
-            </nav>
-
-            {/* Subtle Divider before Action */}
-            <div className="hidden md:block h-4 w-px bg-[#1b3459]" />
-
-            {/* Primary Action Button (Desktop only on small screens) */}
-            <button
-              onClick={() => onGoToLogin()}
-              className="hidden md:flex bg-[#133863] hover:bg-[#1a4a82] text-white font-semibold text-xs px-3.5 py-2 sm:px-4 sm:py-2 rounded-lg shadow-md items-center space-x-1.5 transition-all cursor-pointer border border-[#235594]"
-            >
-              <LogIn className="w-3.5 h-3.5 text-white" />
-              <span>Masuk Portal</span>
-            </button>
-
-            {/* Hamburger Button (Mobile only) */}
-            <button
-              type="button"
-              onClick={() => setMobileMenuOpen(true)}
-              aria-label="Buka Menu Navigasi"
-              className="md:hidden p-2 rounded-lg bg-[#0d1f38] hover:bg-[#142d52] text-slate-300 hover:text-white border border-[#1b3459] transition-colors cursor-pointer"
-            >
-              <Menu className="w-5 h-5" />
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* Mobile Off-Canvas Sidebar Drawer */}
-      {mobileMenuOpen && (
-        <div className="fixed inset-0 z-50 md:hidden">
-          {/* Backdrop Overlay */}
-          <div
-            className="fixed inset-0 bg-black/70 backdrop-blur-sm transition-opacity"
-            onClick={() => setMobileMenuOpen(false)}
-            aria-hidden="true"
-          />
-
-          {/* Sidebar Drawer Sheet */}
-          <aside className="fixed inset-y-0 right-0 w-full max-w-[280px] bg-[#071325] border-l border-[#1b3459] shadow-2xl flex flex-col justify-between p-5 z-10 animate-in slide-in-from-right duration-200">
-            <div className="space-y-6">
-              {/* Drawer Header */}
-              <div className="flex items-center justify-between pb-4 border-b border-[#1b3459]">
-                <div className="flex items-center space-x-2.5">
-                  <PoliceEmblem size="sm" />
-                  <div>
-                    <span className="font-extrabold text-sm tracking-wider text-white font-['Cinzel',serif] block">
-                      E-TAT <span className="text-[#D4AF37]">SIAP PULIH</span>
-                    </span>
-                    <span className="text-[10px] text-slate-400 font-medium">BNNP Kalimantan Timur</span>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setMobileMenuOpen(false)}
-                  aria-label="Tutup Menu"
-                  className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-[#0d1f38] border border-transparent hover:border-[#1b3459] transition-colors cursor-pointer"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              {/* Navigation Links in Sidebar */}
-              <nav className="space-y-1.5">
-                <a
-                  href="#tentang-tat"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 hover:text-white hover:bg-[#0d1f38] border border-transparent hover:border-[#1b3459] transition-all"
-                >
-                  <ShieldCheck className="w-4 h-4 text-[#D4AF37]" />
-                  <span>Tentang E-TAT</span>
-                </a>
-                <a
-                  href="#gerakan-sekorna"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 hover:text-white hover:bg-[#0d1f38] border border-transparent hover:border-[#1b3459] transition-all"
-                >
-                  <LifeBuoy className="w-4 h-4 text-slate-400" />
-                  <span>Konsep SIAP PULIH</span>
-                </a>
-                <a
-                  href="#alur-layanan"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 hover:text-white hover:bg-[#0d1f38] border border-transparent hover:border-[#1b3459] transition-all"
-                >
-                  <FileCheck className="w-4 h-4 text-slate-400" />
-                  <span>Alur SOP Layanan</span>
-                </a>
-                <a
-                  href="#lacak-berkas"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 hover:text-white hover:bg-[#0d1f38] border border-transparent hover:border-[#1b3459] transition-all"
-                >
-                  <Search className="w-4 h-4 text-slate-400" />
-                  <span>Lacak Berkas</span>
-                </a>
-                <a
-                  href="#pengawasan"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 hover:text-white hover:bg-[#0d1f38] border border-transparent hover:border-[#1b3459] transition-all"
-                >
-                  <ShieldCheck className="w-4 h-4 text-slate-400" />
-                  <span>Pengawasan & SOP</span>
-                </a>
-                <a
-                  href="#dasar-hukum"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-200 hover:text-white hover:bg-[#0d1f38] border border-transparent hover:border-[#1b3459] transition-all"
-                >
-                  <BookOpen className="w-4 h-4 text-slate-400" />
-                  <span>Dasar Regulasi</span>
-                </a>
-              </nav>
-            </div>
-
-            {/* Bottom Action in Sidebar */}
-            <div className="pt-4 border-t border-[#1b3459] space-y-3">
-              <button
-                type="button"
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  onGoToLogin();
-                }}
-                className="w-full bg-[#133863] hover:bg-[#1a4a82] text-white font-semibold text-xs py-2.5 px-4 rounded-xl shadow-md flex items-center justify-center space-x-2 transition-all cursor-pointer border border-[#235594]"
-              >
-                <LogIn className="w-4 h-4 text-white" />
-                <span>Masuk Portal SIAP PULIH</span>
-              </button>
-              <div className="text-[10px] text-slate-400 text-center font-mono">
-                Sistem e-TAT SIAP PULIH &copy; 2026 BNNP Kaltim
-              </div>
-            </div>
-          </aside>
-        </div>
-      )}
+      {/* Shared Public Header */}
+      <PublicHeader
+        activePage="landing"
+        onGoToLanding={handleGoToLanding}
+        onGoToLacak={() => onGoToLacak && onGoToLacak()}
+        onGoToLogin={() => onGoToLogin()}
+      />
 
       {/* HERO SLIDER SECTION - SIAP SESPIM STYLE WITH AUTO SLIDE, FULL-PAGE HEIGHT & CLEAN POLICE/REHAB IMAGERY */}
       <section
@@ -524,7 +506,7 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
             ))}
           </div>
 
-          {/* Quote */}
+          {/* QUOTE / COMMITMENT MORAL */}
           <div className="mt-8 sm:mt-10 border border-[#1b3459]/60 rounded-2xl p-6 sm:p-8 bg-[#0b172a] text-center">
             <p className="text-sm sm:text-base font-semibold text-white italic leading-relaxed max-w-2xl mx-auto">
               "Satu Nyawa yang Kita Pulihkan adalah Satu Masa Depan Bangsa yang Kita Selamatkan."
@@ -534,118 +516,49 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
         </div>
       </section>
 
-      {/* LACAK BERKAS */}
-      <section id="lacak-berkas" className="py-20 sm:py-24 bg-[#081225] border-b border-[#1b3459]/60">
-        <div className="max-w-2xl mx-auto px-4 sm:px-6">
-          <div className="text-center mb-10">
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#D4AF37] block mb-3">Pelacakan Perkara</span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight font-['Cinzel',serif]">Cek Status Berkas</h2>
-            <p className="text-xs text-slate-400 mt-3 max-w-sm mx-auto">Akses transparan untuk Penyidik, Jaksa, dan penasihat hukum.</p>
-          </div>
-
-          <form onSubmit={handleTrack} className="space-y-3">
-            <div className="flex gap-2.5">
-              <div className="relative flex-1">
-                <Search className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  value={trackingNumber}
-                  onChange={e => setTrackingNumber(e.target.value)}
-                  placeholder="Nomor permohonan atau nama terperiksa..."
-                  className="w-full bg-[#071326] text-white pl-10 pr-4 py-3 rounded-xl border border-[#1b3459] text-sm focus:outline-none focus:border-[#D4AF37]/50 placeholder-slate-600 transition-colors"
-                />
-              </div>
-              <button
-                type="submit"
-                className="shrink-0 bg-[#D4AF37] hover:bg-[#c4a030] text-[#071326] font-bold text-xs px-5 py-3 rounded-xl flex items-center space-x-1.5 cursor-pointer transition-colors"
-              >
-                <Search className="w-3.5 h-3.5" />
-                <span>Cari</span>
-              </button>
-            </div>
-            <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
-              <span className="text-slate-600">Contoh:</span>
-              {sampleNumbers.map(num => (
-                <button
-                  key={num}
-                  type="button"
-                  onClick={() => { setTrackingNumber(num); const found = permohonanList.find(p => p.nomorPermohonan.includes(num)); setTrackedResult(found || 'not_found'); }}
-                  className="font-mono text-slate-400 hover:text-[#D4AF37] bg-[#0d1f38] border border-[#1b3459] px-2 py-0.5 rounded cursor-pointer transition-colors"
-                >
-                  {num}
-                </button>
-              ))}
-            </div>
-          </form>
-
-          {trackedResult && trackedResult !== 'not_found' && (
-            <div className="mt-5 bg-[#0d1f38] border border-[#1b3459] rounded-2xl p-5 space-y-4 animate-in fade-in duration-200">
-              <div className="flex items-start justify-between pb-3 border-b border-[#1b3459]/60 gap-3">
-                <div>
-                  <span className="font-mono font-bold text-white text-sm">{trackedResult.nomorPermohonan}</span>
-                  <p className="text-[11px] text-slate-400 mt-0.5">{trackedResult.terperiksa.namaLengkap} · {trackedResult.instansiPengaju}</p>
-                </div>
-                <span className="text-[9px] bg-[#071326] text-slate-400 font-bold px-2 py-1 rounded border border-[#1b3459] uppercase tracking-wider shrink-0">
-                  {trackedResult.statusProsesUtama.replace(/_/g, ' ')}
-                </span>
-              </div>
-              <div className="grid grid-cols-3 gap-2 text-center">
-                {[
-                  { label: 'Dokumen', val: `${trackedResult.dokumenList.filter(d => d.statusVerifikasi === 'sesuai').length}/7` },
-                  { label: 'Asesmen', val: trackedResult.asesmenMedis && trackedResult.asesmenHukum ? 'Selesai' : 'Proses' },
-                  { label: 'Rekomendasi', val: trackedResult.rekomendasiResmi ? 'Terbit' : 'Pending' },
-                ].map((s, i) => (
-                  <div key={i} className="bg-[#071326] rounded-lg p-2.5 border border-[#1b3459]/60">
-                    <span className="text-slate-500 block text-[10px] uppercase tracking-wider">{s.label}</span>
-                    <span className="font-bold text-white text-xs font-mono">{s.val}</span>
-                  </div>
-                ))}
-              </div>
-              <button onClick={() => onGoToLogin()} className="w-full text-xs font-semibold text-slate-400 hover:text-white py-2.5 flex items-center justify-center space-x-1.5 transition-colors cursor-pointer border border-[#1b3459] rounded-xl hover:border-[#1b3459]">
-                <span>Buka di Portal Petugas</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          )}
-
-          {trackedResult === 'not_found' && (
-            <div className="mt-4 p-4 bg-[#071326] border border-[#1b3459]/60 rounded-xl text-[11px] text-slate-500 flex items-center space-x-2">
-              <AlertCircle className="w-4 h-4 text-slate-600 shrink-0" />
-              <span>Nomor atau nama tersangka tidak ditemukan dalam basis data e-TAT.</span>
-            </div>
-          )}
-        </div>
-      </section>
-
       {/* ALUR SOP */}
       <section id="alur-layanan" className="py-20 sm:py-24 bg-[#071326] border-b border-[#1b3459]/60">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#D4AF37] block mb-3">Alur Terpadu</span>
-            <h2 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight font-['Cinzel',serif]">8 Tahapan SOP</h2>
-            <p className="text-sm text-slate-400 mt-3 max-w-sm mx-auto">Dari registrasi 1Ã—24 jam hingga kelulusan program pemulihan.</p>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+          <div className="text-center">
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#D4AF37] block mb-3">Alur Terpadu SIAP PULIH</span>
+            <h2 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight font-['Cinzel',serif]">8 Tahapan SOP Layanan</h2>
+            <p className="text-xs sm:text-sm text-slate-400 mt-2.5 max-w-md mx-auto leading-relaxed">
+              Klik pada salah satu tahapan di bawah untuk melihat rincian alur kerja, pelaksana, dan batas waktu SLA operasional.
+            </p>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-            {[
-              { step: '01', title: 'Registrasi', actor: 'Penyidik / BNN', icon: <FileCheck className="w-4 h-4" /> },
-              { step: '02', title: 'Verifikasi Berkas', actor: 'Sekretariat TAT', icon: <CheckCircle2 className="w-4 h-4" /> },
-              { step: '03', title: 'Surat Perintah', actor: 'Sek. & Koordinator', icon: <Calendar className="w-4 h-4" /> },
-              { step: '04', title: 'Forensik & Yuridis', actor: 'Tim Medis & Hukum', icon: <Stethoscope className="w-4 h-4" /> },
-              { step: '05', title: 'Sidang Pleno', actor: 'Koordinator & Asesor', icon: <Users className="w-4 h-4" /> },
-              { step: '06', title: 'Pengesahan QR', actor: '3 Pihak Resmi', icon: <FileSignature className="w-4 h-4" /> },
-              { step: '07', title: 'Rujukan & Eksekusi', actor: 'Balai Rehab & Penyidik', icon: <Share2 className="w-4 h-4" /> },
-              { step: '08', title: 'Pengawasan SKSP', actor: 'Konselor & Bapas', icon: <Activity className="w-4 h-4" /> },
-            ].map((item, i) => (
-              <div key={item.step} className={`fade-in-up fade-in-up-delay-${Math.min(i + 1, 8)} group bg-[#0d1f38] border border-[#1b3459]/70 rounded-xl p-4 sm:p-5 hover:border-[#D4AF37]/25 transition-colors duration-300`}>
-                <div className="flex items-center justify-between mb-3">
-                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[#071326] border border-[#1b3459]/60 flex items-center justify-center text-slate-500">
-                    {item.icon}
+          {/* SOP Cards Grid (Clean & Proportional on Mobile) */}
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4.5">
+            {SOP_8_STEPS.map((item, i) => (
+              <div
+                key={item.step}
+                onClick={() => setSelectedSopStep(item)}
+                className={`fade-in-up fade-in-up-delay-${Math.min(i + 1, 8)} group bg-[#0d1f38] border border-[#1b3459]/80 hover:border-[#D4AF37] rounded-xl p-4 sm:p-5 flex flex-col justify-between space-y-3 cursor-pointer transition-all duration-200 hover:-translate-y-1 shadow-lg hover:shadow-sky-950/40`}
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="w-8 h-8 rounded-xl bg-[#071326] border border-[#1b3459] flex items-center justify-center shrink-0 group-hover:border-[#D4AF37]/50 transition-colors">
+                      {item.icon}
+                    </div>
+                    <span className="font-mono text-sm sm:text-base font-black text-[#1b3459] group-hover:text-[#D4AF37] transition-colors">
+                      {item.step}
+                    </span>
                   </div>
-                  <span className="font-mono text-base font-black text-[#1b3459] group-hover:text-[#D4AF37]/40 transition-colors">{item.step}</span>
+                  <h3 className="text-xs sm:text-sm font-bold text-white group-hover:text-[#D4AF37] transition-colors leading-snug">
+                    {item.title}
+                  </h3>
+                  <p className="text-[10px] text-slate-400 mt-1 font-medium truncate">
+                    {item.actor}
+                  </p>
                 </div>
-                <h3 className="text-xs sm:text-sm font-bold text-white">{item.title}</h3>
-                <p className="text-[10px] text-slate-600 mt-0.5">{item.actor}</p>
+
+                <div className="pt-2 border-t border-[#1b3459]/60 flex items-center justify-between text-[10px]">
+                  <span className="text-slate-400 font-mono font-semibold">{item.sla}</span>
+                  <span className="text-[#D4AF37] font-bold flex items-center space-x-0.5 group-hover:translate-x-0.5 transition-transform">
+                    <span>Detail</span>
+                    <ChevronRight className="w-3 h-3" />
+                  </span>
+                </div>
               </div>
             ))}
           </div>
@@ -739,6 +652,87 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
           </div>
         </div>
       </footer>
+      {/* MODAL POPUP FOR SOP 8 STEPS DETAIL */}
+      {selectedSopStep && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
+          <div
+            className="fixed inset-0"
+            onClick={() => setSelectedSopStep(null)}
+          />
+          <div className="relative z-10 max-w-lg w-full bg-[#0b172a] border border-[#234b7d] rounded-2xl p-6 sm:p-7 shadow-2xl space-y-5 text-slate-200">
+            {/* Modal Header */}
+            <div className="flex items-start justify-between pb-3 border-b border-[#1b3459] gap-3">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 rounded-xl bg-[#071326] border border-[#234b7d] flex items-center justify-center shrink-0 shadow-inner">
+                  {selectedSopStep.icon}
+                </div>
+                <div>
+                  <div className="flex items-center space-x-2">
+                    <span className="font-mono text-xs font-bold text-[#D4AF37] bg-[#071326] px-2 py-0.5 rounded border border-[#1b3459]">
+                      TAHAP {selectedSopStep.step}
+                    </span>
+                    <span className="text-[10px] text-slate-400 font-semibold">{selectedSopStep.actor}</span>
+                  </div>
+                  <h3 className="text-base sm:text-lg font-bold text-white mt-1">{selectedSopStep.title}</h3>
+                </div>
+              </div>
+              <button
+                onClick={() => setSelectedSopStep(null)}
+                className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-[#132d54] transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* SLA Badge */}
+            <div className="p-3 bg-[#071326] border border-[#1b3459] rounded-xl flex items-center justify-between text-xs">
+              <span className="text-slate-400 font-semibold flex items-center space-x-1.5">
+                <Clock className="w-4 h-4 text-[#D4AF37]" />
+                <span>Estimasi SLA Operasional:</span>
+              </span>
+              <span className="font-mono font-bold text-[#D4AF37] bg-[#0d1f38] px-2.5 py-1 rounded border border-[#1b3459]">
+                {selectedSopStep.sla}
+              </span>
+            </div>
+
+            {/* Summary */}
+            <p className="text-xs text-slate-300 italic bg-[#0d1f38]/60 p-3 rounded-lg border-l-2 border-[#D4AF37]">
+              "{selectedSopStep.summary}"
+            </p>
+
+            {/* Rincian Langkah SOP */}
+            <div className="space-y-2">
+              <span className="text-xs font-bold text-white uppercase tracking-wider block">
+                Rincian Prosedur Operasional (SOP):
+              </span>
+              <ul className="space-y-2 text-xs text-slate-300">
+                {selectedSopStep.details.map((detail, idx) => (
+                  <li key={idx} className="flex items-start space-x-2.5">
+                    <span className="w-4 h-4 rounded-full bg-[#132d54] text-[#D4AF37] font-mono font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5 border border-[#2d5289]">
+                      {idx + 1}
+                    </span>
+                    <span className="leading-relaxed">{detail}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Legal Basis */}
+            <div className="pt-3 border-t border-[#1b3459] flex items-center justify-between text-[11px] text-slate-400">
+              <span>Landasan Regulasi:</span>
+              <span className="font-semibold text-slate-200">{selectedSopStep.legalBasis}</span>
+            </div>
+
+            {/* Close Button */}
+            <button
+              onClick={() => setSelectedSopStep(null)}
+              className="w-full bg-[#133863] hover:bg-[#1a4a82] text-white font-bold text-xs py-2.5 rounded-xl border border-[#235594] transition-colors cursor-pointer"
+            >
+              Tutup Penjelasan SOP
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
