@@ -551,28 +551,28 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
               <div
                 key={item.step}
                 onClick={() => setSelectedSopStep(item)}
-                className={`reveal-on-scroll reveal-delay-${Math.min(i + 1, 8)} group bg-[#0d1f38] border border-[#1b3459]/80 hover:border-[#D4AF37] rounded-xl p-4 sm:p-5 flex flex-col justify-between space-y-3 cursor-pointer transition-all duration-300 hover:-translate-y-1.5 shadow-lg hover:shadow-[#D4AF37]/10`}
+                className={`reveal-on-scroll reveal-delay-${Math.min(i + 1, 8)} group bg-[#0d1f38] border border-[#1b3459]/80 hover:border-[#D4AF37] rounded-xl p-4 sm:p-4.5 flex flex-col justify-between space-y-3 cursor-pointer transition-all duration-300 hover:-translate-y-1.5 shadow-lg hover:shadow-[#D4AF37]/10 min-h-[175px]`}
               >
-                <div>
-                  <div className="flex items-center justify-between mb-3">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between mb-2">
                     <div className="w-8 h-8 rounded-xl bg-[#071326] border border-[#1b3459] flex items-center justify-center shrink-0 group-hover:border-[#D4AF37]/50 transition-colors">
                       {item.icon}
                     </div>
-                    <span className="font-mono text-sm sm:text-base font-black text-slate-500 group-hover:text-[#D4AF37] transition-colors">
+                    <span className="font-mono text-xs sm:text-sm font-bold text-slate-400 group-hover:text-[#D4AF37] transition-colors">
                       {item.step}
                     </span>
                   </div>
-                  <h3 className="text-xs sm:text-sm font-bold text-white group-hover:text-[#D4AF37] transition-colors leading-snug">
+                  <h3 className="text-xs sm:text-sm font-bold text-white group-hover:text-[#D4AF37] transition-colors leading-snug min-h-[36px] flex items-center">
                     {item.title}
                   </h3>
-                  <p className="text-[10px] text-slate-400 mt-1 font-medium truncate">
+                  <p className="text-[11px] text-slate-400 font-medium truncate pt-0.5">
                     {item.actor}
                   </p>
                 </div>
 
                 <div className="pt-2 border-t border-[#1b3459]/60 flex items-center justify-between text-[10px]">
-                  <span className="text-slate-400 font-mono font-semibold">{item.sla}</span>
-                  <span className="text-[#D4AF37] font-bold flex items-center space-x-0.5 group-hover:translate-x-0.5 transition-transform">
+                  <span className="text-slate-400 font-mono font-medium truncate max-w-[70%]">{item.sla}</span>
+                  <span className="text-[#D4AF37] font-semibold flex items-center space-x-0.5 group-hover:translate-x-0.5 transition-transform shrink-0">
                     <span>Detail</span>
                     <ChevronRight className="w-3 h-3" />
                   </span>
@@ -657,11 +657,15 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
       {/* FOOTER */}
       <footer className="bg-[#050e1c] border-t border-[#12233c] reveal-on-scroll">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
-          <div className="flex items-center space-x-3">
-            <PoliceEmblem size="sm" />
+          <div className="flex items-center space-x-2.5 sm:space-x-3">
+            <img
+              src="/logo_etat.png"
+              alt="Logo E-TAT"
+              className="h-8 sm:h-9 w-auto object-contain shrink-0 drop-shadow-[0_2px_8px_rgba(212,175,55,0.25)]"
+            />
             <div>
-              <span className="font-bold text-white text-xs font-['Cinzel',serif] block">E-TAT SIAP PULIH · BNNP KALIMANTAN TIMUR</span>
-              <span className="text-[10px] text-slate-500 block mt-0.5">BNNP Kaltim · Ditresnarkoba Polda Kaltim · Kejati Kaltim</span>
+              <span className="font-bold text-white text-xs sm:text-sm block">E-TAT <span className="text-[#D4AF37]">SIAP PULIH</span></span>
+              <span className="text-[10px] text-slate-400 block mt-0.5">BNNP Kaltim &bull; Ditresnarkoba Polda Kaltim &bull; Kejati Kaltim</span>
             </div>
           </div>
           <div className="text-[10px] sm:text-right space-y-0.5">

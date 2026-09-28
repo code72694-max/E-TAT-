@@ -26,10 +26,23 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
   onGoToLogin
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
+
+  const closeMobileMenu = (action?: () => void) => {
+    setIsClosing(true);
+    setTimeout(() => {
+      setMobileMenuOpen(false);
+      setIsClosing(false);
+      if (action) action();
+    }, 280);
+  };
 
   const handleNavClick = (action: () => void) => {
-    setMobileMenuOpen(false);
-    action();
+    if (mobileMenuOpen) {
+      closeMobileMenu(action);
+    } else {
+      action();
+    }
   };
 
   return (
@@ -122,7 +135,10 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
             {/* Mobile Hamburger Button */}
             <button
               type="button"
-              onClick={() => setMobileMenuOpen(true)}
+              onClick={() => {
+                setIsClosing(false);
+                setMobileMenuOpen(true);
+              }}
               aria-label="Buka Menu Navigasi"
               className="md:hidden p-2 rounded-lg bg-[#0d1f38] hover:bg-[#142d52] text-slate-300 hover:text-white border border-[#1b3459] transition-colors cursor-pointer"
             >
@@ -136,24 +152,34 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
       {mobileMenuOpen && (
         <div className="fixed inset-0 z-50 md:hidden">
           <div
-            className="fixed inset-0 bg-black/70 backdrop-blur-sm transition-opacity"
-            onClick={() => setMobileMenuOpen(false)}
+            className={`fixed inset-0 bg-black/70 backdrop-blur-sm transition-opacity duration-300 ${
+              isClosing ? 'opacity-0' : 'opacity-100 animate-in fade-in'
+            }`}
+            onClick={() => closeMobileMenu()}
           />
-          <aside className="fixed inset-y-0 right-0 w-full max-w-[280px] bg-[#071325] border-l border-[#1b3459] shadow-2xl flex flex-col justify-between p-5 z-10 animate-in slide-in-from-right duration-200">
+          <aside
+            className={`fixed inset-y-0 right-0 w-full max-w-[280px] bg-[#071325] border-l border-[#1b3459] shadow-2xl flex flex-col justify-between p-5 z-10 transition-transform duration-300 ease-in-out ${
+              isClosing ? 'translate-x-full' : 'translate-x-0 animate-drawer-in'
+            }`}
+          >
             <div className="space-y-6">
               <div className="flex items-center justify-between pb-4 border-b border-[#1b3459]">
                 <div className="flex items-center space-x-2.5">
-                  <PoliceEmblem size="sm" />
+                  <img
+                    src="/logo_etat.png"
+                    alt="Logo E-TAT"
+                    className="h-10 w-auto object-contain shrink-0 drop-shadow-[0_2px_8px_rgba(212,175,55,0.30)]"
+                  />
                   <div>
-                    <span className="font-extrabold text-sm tracking-wider text-white font-['Cinzel',serif] block">
+                    <span className="font-extrabold text-sm sm:text-base tracking-wider text-white font-['Cinzel',serif] block leading-tight">
                       E-TAT <span className="text-[#D4AF37]">SIAP PULIH</span>
                     </span>
-                    <span className="text-[10px] text-slate-400 font-medium">BNNP Kaltim</span>
+                    <span className="text-[10px] text-slate-400 font-medium block mt-0.5">BNNP Kalimantan Timur</span>
                   </div>
                 </div>
                 <button
                   type="button"
-                  onClick={() => setMobileMenuOpen(false)}
+                  onClick={() => closeMobileMenu()}
                   aria-label="Tutup Menu"
                   className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-[#0d1f38] transition-colors cursor-pointer"
                 >
@@ -228,7 +254,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
             </div>
 
             {/* Bottom Action in Drawer */}
-            <div className="pt-4 border-t border-[#1b3459] space-y-3">
+            <div className="pt-4 border-t border-[#1b3459]">
               <button
                 type="button"
                 onClick={() => handleNavClick(onGoToLogin)}
@@ -237,9 +263,6 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
                 <LogIn className="w-4 h-4 text-white" />
                 <span>Masuk Portal SIAP PULIH</span>
               </button>
-              <div className="text-[10px] text-slate-400 text-center font-mono">
-                Sistem e-TAT SIAP PULIH &copy; 2026 BNNP Kaltim
-              </div>
             </div>
           </aside>
         </div>
