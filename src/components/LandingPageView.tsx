@@ -70,7 +70,7 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
       titleHighlight: 'PULIHKAN MASA DEPAN,',
       titlePart2: 'SIKAT HABIS SINDIKAT.',
       description:
-        'Sinergi penegakan hukum terpadu Tim Asesmen Terpadu (TAT) Ditresnarkoba Polda & BNNP Kalimantan Timur: Merehabilitasi korban penyalahguna secara medis dan sosial, serta menindak tegas sindikat demi kepastian hukum berkeadilan.',
+        'Sinergi Ditresnarkoba Polda & BNNP Kaltim: merehabilitasi medis & sosial korban penyalahguna serta menindak tegas sindikat narkotika.',
       image: '/images/hero/slide-asesmen.jpg',
       imageAlt: 'Pertemuan Koordinasi Tim Asesmen Terpadu BNN & Polri'
     },
@@ -80,7 +80,7 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
       titleHighlight: 'PULIH BERSAMA LAYANAN REHABILITASI,',
       titlePart2: 'MENUJU MASA DEPAN GEMILANG.',
       description:
-        'Pendampingan medis dan psikososial berstandar nasional bersama Klinik Pratama BNN dan Balai Rehabilitasi Tanah Merah untuk memutus siklus adiksi narkotika serta mengembalikan martabat generasi bangsa.',
+        'Layanan rehabilitasi medis dan psikososial berstandar nasional BNNP Kaltim untuk memutus siklus adiksi dan memulihkan masa depan korban.',
       image: '/images/hero/slide-rehabilitasi.jpg',
       imageAlt: 'Konsultasi Medis dan Rehabilitasi Penyalahguna Narkotika Klinik Pratama BNN'
     },
@@ -90,7 +90,7 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
       titleHighlight: 'FORENSIK PRESISI & TRANSPARAN,',
       titlePart2: 'BEBAS DARI INTERVENSI.',
       description:
-        'Pengujian toksikologi urin dan verifikasi barang bukti narkotika bersama Puslabfor Bareskrim Polri dan Laboratorium BNN secara ilmiah, akuntabel, dan mengedepankan integritas pembuktian hukum.',
+        'Pengujian toksikologi urin dan verifikasi barang bukti narkotika Puslabfor Bareskrim Polri dan BNN secara ilmiah, akuntabel, dan transparan.',
       image: '/images/hero/slide-forensik.jpg',
       imageAlt: 'Uji Laboratorium Forensik Narkotika dan Toksikologi Puslabfor Polri'
     }
