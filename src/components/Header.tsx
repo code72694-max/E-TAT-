@@ -112,9 +112,12 @@ export const Header: React.FC<HeaderProps> = ({
               </button>
             )}
 
-            {/* Official Police Seal & Title */}
+            {/* BNN & E-TAT Logos */}
             <div className="flex items-center space-x-3">
-              <PoliceEmblem size="sm" />
+              <div className="flex items-center space-x-2 shrink-0">
+                <img src="/bnn.png" alt="Logo BNN" className="h-9 w-auto object-contain drop-shadow-[0_2px_8px_rgba(212,175,55,0.25)]" />
+                <img src="/logo_etat.png" alt="Logo E-TAT" className="h-9 w-auto object-contain drop-shadow-[0_2px_8px_rgba(212,175,55,0.25)]" />
+              </div>
               <div>
                 <div className="flex items-center space-x-2">
                   <span className="font-extrabold text-base tracking-wider text-white font-['Cinzel',serif] block leading-tight">

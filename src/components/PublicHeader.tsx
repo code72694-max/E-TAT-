@@ -42,7 +42,10 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
             onClick={() => handleNavClick(() => onGoToLanding())}
             className="flex items-center space-x-2.5 sm:space-x-3 text-left focus:outline-none cursor-pointer group"
           >
-            <PoliceEmblem size="sm" />
+            <div className="flex items-center space-x-2 shrink-0">
+              <img src="/bnn.png" alt="Logo BNN" className="h-9 w-auto object-contain drop-shadow-[0_2px_8px_rgba(212,175,55,0.25)]" />
+              <img src="/logo_etat.png" alt="Logo E-TAT" className="h-9 w-auto object-contain drop-shadow-[0_2px_8px_rgba(212,175,55,0.25)]" />
+            </div>
             <div className="flex items-center space-x-2 min-w-0">
               <span className="font-extrabold text-base sm:text-lg tracking-wider text-white font-['Cinzel',serif] truncate group-hover:text-slate-200 transition-colors">
                 E-TAT <span className="text-[#D4AF37]">SIAP PULIH</span>
