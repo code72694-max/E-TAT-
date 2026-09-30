@@ -30,9 +30,12 @@ import {
   ExternalLink,
   Edit3,
   Send,
-  Activity
+  Activity,
+  Mail
 } from 'lucide-react';
 import { PengawasanPascaTatSection } from './PengawasanPascaTatSection';
+import { BeritaAcaraModal } from './BeritaAcaraModal';
+import { sendPengajuanEmailNotification } from '../services/emailService';
 
 interface PermohonanDetailProps {
   permohonan: PermohonanAsesmen;
@@ -63,6 +66,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
   onOpenQrModal
 }) => {
   const [activeTab, setActiveTab] = useState<DetailTab>('ringkasan');
+  const [showBeritaAcara, setShowBeritaAcara] = useState(false);
 
   // Role-specific available tabs
   const availableTabs = useMemo(() => {
@@ -199,6 +203,36 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
   // Local state for document re-upload / correction by Pengaju
   const [selectedDocId, setSelectedDocId] = useState<string | null>(null);
   const [correctionNote, setCorrectionNote] = useState('');
+
+  // Email Notification State
+  const [isSendingEmail, setIsSendingEmail] = useState(false);
+  const [emailBanner, setEmailBanner] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
+  const handleSendEmailNotification = async () => {
+    setIsSendingEmail(true);
+    setEmailBanner(null);
+    try {
+      const res = await sendPengajuanEmailNotification(permohonan);
+      if (res.success) {
+        setEmailBanner({
+          type: 'success',
+          message: `Notifikasi email permohonan berhasil dikirim ke etatsiappulih@gmail.com! (Resend ID: ${res.id})`
+        });
+      } else {
+        setEmailBanner({
+          type: 'error',
+          message: `Gagal mengirim email: ${res.error}`
+        });
+      }
+    } catch (err: any) {
+      setEmailBanner({
+        type: 'error',
+        message: `Error: ${err?.message || 'Terjadi kesalahan saat mengirim email'}`
+      });
+    } finally {
+      setIsSendingEmail(false);
+    }
+  };
 
   // Handle Pengaju confirming receipt of recommendation
   const handlePengajuSignReceipt = () => {
@@ -482,6 +516,13 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
 
   return (
     <div className="space-y-6">
+      {showBeritaAcara && (
+        <BeritaAcaraModal
+          permohonan={permohonan}
+          onClose={() => setShowBeritaAcara(false)}
+        />
+      )}
+
       {/* Compact Status & Action Overview */}
 
       {/* Compact Status & Action Overview */}
@@ -541,13 +582,31 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
             )}
 
             {permohonan.statusProsesUtama === 'verifikasi_berkas' && currentUser.role === 'sekretariat' && (
-              <button
-                onClick={() => setActiveTab('administrasi')}
-                className="bg-[#142642] hover:bg-[#1b3459] text-white text-xs font-semibold px-3 py-1.5 rounded-xl flex items-center justify-center space-x-1.5 transition-all cursor-pointer border border-[#234475] w-full sm:w-auto"
-              >
-                <CheckCircle2 className="w-3.5 h-3.5" />
-                <span>Verifikasi Dokumen</span>
-              </button>
+              <>
+                <button
+                  onClick={() => setActiveTab('administrasi')}
+                  className="bg-[#142642] hover:bg-[#1b3459] text-white text-xs font-semibold px-3 py-1.5 rounded-xl flex items-center justify-center space-x-1.5 transition-all cursor-pointer border border-[#234475] w-full sm:w-auto"
+                >
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  <span>Verifikasi Dokumen</span>
+                </button>
+                <button
+                  onClick={() => {
+                    if (window.confirm('Apakah Anda yakin ingin menyetujui seluruh berkas dan melanjutkan permohonan ini ke tahap Asesmen (Hukum/Medis)?')) {
+                      if (onUpdatePermohonan) {
+                        onUpdatePermohonan({
+                          ...permohonan,
+                          statusProsesUtama: 'asesmen_berlangsung'
+                        });
+                      }
+                    }
+                  }}
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-3 py-1.5 rounded-xl flex items-center justify-center space-x-1.5 transition-all cursor-pointer border border-emerald-500 w-full sm:w-auto"
+                >
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  <span>Setujui Semua Berkas</span>
+                </button>
+              </>
             )}
 
             {permohonan.statusProsesUtama === 'pengesahan_rekomendasi' && userCanSignNow && (
@@ -589,8 +648,41 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
                 <span>Klarifikasi ({permohonan.klarifikasiList.length})</span>
               </button>
             )}
+
+            <button
+              onClick={handleSendEmailNotification}
+              disabled={isSendingEmail}
+              className="bg-gradient-to-r from-emerald-800 via-teal-800 to-emerald-900 hover:from-emerald-700 hover:to-teal-700 text-white text-xs font-semibold px-3 py-1.5 rounded-xl flex items-center justify-center space-x-1.5 transition-all cursor-pointer border border-emerald-500/40 shadow-md shadow-emerald-950/40 w-full sm:w-auto disabled:opacity-50"
+              title="Kirim Notifikasi Email ke etatsiappulih@gmail.com via Resend API"
+            >
+              <Mail className="w-3.5 h-3.5 text-emerald-300" />
+              <span>{isSendingEmail ? 'Mengirim Email...' : 'Kirim Email Notifikasi'}</span>
+            </button>
           </div>
         </div>
+
+        {emailBanner && (
+          <div className={`mt-3 p-3 rounded-xl border text-xs flex items-center justify-between ${
+            emailBanner.type === 'success'
+              ? 'bg-emerald-950/60 border-emerald-500/50 text-emerald-200'
+              : 'bg-rose-950/60 border-rose-500/50 text-rose-200'
+          }`}>
+            <div className="flex items-center space-x-2">
+              {emailBanner.type === 'success' ? (
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+              ) : (
+                <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+              )}
+              <span>{emailBanner.message}</span>
+            </div>
+            <button
+              onClick={() => setEmailBanner(null)}
+              className="text-slate-400 hover:text-white ml-2 text-xs cursor-pointer"
+            >
+              ✕
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Tab Navigation - Filtered dynamically per role */}
@@ -1168,11 +1260,20 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
                   Forum sinkronisasi kesimpulan medis dan hukum, pencatatan dissenting opinion, dan perumusan rekomendasi bersama.
                 </p>
               </div>
-              {permohonan.sidangPleno && (
-                <span className="text-xs bg-[#17375e] text-[#D4AF37] font-semibold px-2.5 py-1 rounded-lg border border-[#234b7d]">
-                  No. BA: {permohonan.sidangPleno.nomorBeritaAcara}
-                </span>
-              )}
+              <div className="flex items-center gap-2">
+                {permohonan.sidangPleno && (
+                  <span className="text-xs bg-[#17375e] text-[#D4AF37] font-semibold px-2.5 py-1 rounded-lg border border-[#234b7d]">
+                    No. BA: {permohonan.sidangPleno.nomorBeritaAcara}
+                  </span>
+                )}
+                <button
+                  onClick={() => setShowBeritaAcara(true)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-[#d4af37] text-[#0b172a] hover:bg-[#e8c84a] transition-colors"
+                >
+                  <FileText className="w-3.5 h-3.5" />
+                  Berita Acara
+                </button>
+              </div>
             </div>
 
             {!permohonan.sidangPleno ? (

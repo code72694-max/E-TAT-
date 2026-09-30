@@ -1,9 +1,84 @@
-import { PermohonanAsesmen, UserProfile, DokumenPersyaratan } from '../types';
+import { PermohonanAsesmen, UserProfile, DokumenPersyaratan, RegistrasiPengguna } from '../types';
+
+export const INITIAL_REGISTRATIONS: RegistrasiPengguna[] = [
+  {
+    id: 'reg-001',
+    nomorRegistrasi: 'REG-TAT/2026/POLRES-001',
+    tanggalDaftar: '2026-09-28T09:30:00',
+    namaLengkap: 'AKBP Kurniadi Syafei, S.I.K., M.H.',
+    pangkat: 'AKBP',
+    nrp: '78090822',
+    jabatan: 'Kapolres',
+    instansi: 'Polres Kutai Barat',
+    kategoriInstansi: 'Polres / Polresta',
+    wilayahHukum: 'Kabupaten Kutai Barat',
+    alamatKantor: 'Jl. Sendawar Raya No. 01, Barong Tongkok, Kutai Barat',
+    email: 'kapolres.kutaibarat@polri.go.id',
+    phone: '0812-5544-3321',
+    teleponKantor: '(0545) 4041110',
+    fotoKtpUrl: 'https://images.unsplash.com/photo-1544717305-2782549b5136?w=600&auto=format&fit=crop&q=80',
+    fotoKtpName: 'KTP_AKBP_Kurniadi.jpg',
+    fotoKtaUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&auto=format&fit=crop&q=80',
+    fotoKtaName: 'KTA_POLRI_78090822.jpg',
+    suratPenunjukanUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
+    suratPenunjukanName: 'Surat_Keputusan_Kapolres_Kubar_2026.pdf',
+    status: 'pending'
+  },
+  {
+    id: 'reg-002',
+    nomorRegistrasi: 'REG-TAT/2026/POLRES-002',
+    tanggalDaftar: '2026-09-29T14:15:00',
+    namaLengkap: 'KOMPOL Dwi Santoso, S.H., S.I.K.',
+    pangkat: 'KOMPOL',
+    nrp: '83110455',
+    jabatan: 'Kasat Resnarkoba',
+    instansi: 'Polresta Samarinda',
+    kategoriInstansi: 'Polres / Polresta',
+    wilayahHukum: 'Kota Samarinda',
+    alamatKantor: 'Jl. Slamet Riyadi No. 01, Samarinda',
+    email: 'satresnarkoba.samarinda@polri.go.id',
+    phone: '0813-7788-9900',
+    teleponKantor: '(0541) 742110',
+    fotoKtpUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=600&auto=format&fit=crop&q=80',
+    fotoKtpName: 'KTP_Kompol_DwiSantoso.jpg',
+    fotoKtaUrl: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=600&auto=format&fit=crop&q=80',
+    fotoKtaName: 'KTA_POLRI_83110455.jpg',
+    suratPenunjukanUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
+    suratPenunjukanName: 'Sprin_Kasatresnarkoba_Polresta_Smd.pdf',
+    status: 'approved',
+    approvedAt: '2026-09-29T16:00:00',
+    approvedBy: 'Administrator Sistem (Pusdatin BNN RI)',
+    catatanAdmin: 'Dokumen KTP, KTA, dan Surat Perintah telah diverifikasi lengkap dan valid.'
+  },
+  {
+    id: 'reg-003',
+    nomorRegistrasi: 'REG-TAT/2026/POLRES-003',
+    tanggalDaftar: '2026-09-30T10:05:00',
+    namaLengkap: 'IPTU Rizki Fadilah, S.Tr.K.',
+    pangkat: 'IPTU',
+    nrp: '94050212',
+    jabatan: 'Kanit 1 Idik Resnarkoba',
+    instansi: 'Polres Balikpapan',
+    kategoriInstansi: 'Polres / Polresta',
+    wilayahHukum: 'Kota Balikpapan',
+    alamatKantor: 'Jl. Jenderal Sudirman No. 69, Balikpapan',
+    email: 'rizki.resnarkoba.bpp@polri.go.id',
+    phone: '0821-9988-1122',
+    teleponKantor: '(0542) 421110',
+    fotoKtpUrl: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=600&auto=format&fit=crop&q=80',
+    fotoKtpName: 'KTP_Iptu_Rizki.jpg',
+    fotoKtaUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=600&auto=format&fit=crop&q=80',
+    fotoKtaName: 'KTA_POLRI_94050212.jpg',
+    suratPenunjukanUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
+    suratPenunjukanName: 'Surat_Tugas_Penyidik_TAT_Balikpapan.pdf',
+    status: 'pending'
+  }
+];
 
 export const MOCK_USERS: UserProfile[] = [
   {
     id: 'user-pengaju',
-    name: 'Penyidik Pengaju Test-1',
+    name: 'Penyidik Pengaju',
     nip: '198907122010121003',
     role: 'pengaju',
     agency: 'Sat Resnarkoba Polresta Samarinda',
@@ -12,7 +87,7 @@ export const MOCK_USERS: UserProfile[] = [
   },
   {
     id: 'user-medis',
-    name: 'Dokter Asesor Medis Test-1',
+    name: 'Dokter Asesor Medis',
     nip: '197908222005012004',
     role: 'medis',
     agency: 'Tim Medis TAT / RSUD Kota Samarinda',
@@ -21,7 +96,7 @@ export const MOCK_USERS: UserProfile[] = [
   },
   {
     id: 'user-hukum',
-    name: 'Asesor Hukum Test-1',
+    name: 'Asesor Hukum',
     nip: '198211052008011005',
     role: 'hukum',
     agency: 'Tim Hukum TAT / Kejaksaan Negeri Samarinda',
@@ -30,7 +105,7 @@ export const MOCK_USERS: UserProfile[] = [
   },
   {
     id: 'user-sekretariat',
-    name: 'Petugas Sekretariat Test-1',
+    name: 'Petugas Sekretariat',
     nip: '198403152006041002',
     role: 'sekretariat',
     agency: 'Sekretariat TAT - BNN Kota Samarinda',
@@ -39,7 +114,7 @@ export const MOCK_USERS: UserProfile[] = [
   },
   {
     id: 'user-admin',
-    name: 'Administrator Sistem Test-1',
+    name: 'Administrator Sistem',
     nip: '199501202020121004',
     role: 'admin',
     agency: 'Pusdatin BNN RI',
@@ -48,7 +123,7 @@ export const MOCK_USERS: UserProfile[] = [
   },
   {
     id: 'user-koordinator',
-    name: 'Koordinator TAT Test-1',
+    name: 'Koordinator TAT',
     nip: '197705142001121001',
     role: 'koordinator',
     agency: 'Ketua Tim Asesmen Terpadu - BNNP Kaltim',
@@ -57,7 +132,7 @@ export const MOCK_USERS: UserProfile[] = [
   },
   {
     id: 'user-pimpinan',
-    name: 'Pimpinan Pengawas Test-1',
+    name: 'Pimpinan Pengawas',
     nip: '196904121992031001',
     role: 'pimpinan',
     agency: 'Kepala BNN Provinsi Kalimantan Timur',
@@ -66,7 +141,7 @@ export const MOCK_USERS: UserProfile[] = [
   },
   {
     id: 'user-rehab',
-    name: 'Petugas Fasilitas Rehab Test-1',
+    name: 'Petugas Fasilitas Rehab',
     nip: '198606182009122003',
     role: 'rehabilitasi',
     agency: 'Balai Besar Rehabilitasi BNN Tanah Merah Bogor',

@@ -17,7 +17,8 @@ import {
   Globe,
   ArrowLeftRight,
   ArrowLeft,
-  QrCode
+  QrCode,
+  User
 } from 'lucide-react';
 import { PermohonanAsesmen } from '../types';
 
@@ -192,25 +193,12 @@ export const Header: React.FC<HeaderProps> = ({
                   </span>
                 </div>
                 <p className="text-[10px] text-slate-400 hidden sm:block leading-tight mt-0.5 truncate">
-                  Sistem Integrasi Asesmen &amp; Pantauan Pemulihan
+                  Sistem Integrasi Asesmen &amp; Pemantauan Pemulihan
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Center: Tactical Search Input */}
-          <div className="hidden md:flex flex-1 max-w-md mx-6">
-            <div className="relative w-full">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => onSearchChange(e.target.value)}
-                placeholder="Cari nomor permohonan, nama tersangka, atau pasal perkara..."
-                className="w-full pl-10 pr-4 py-2 text-xs bg-[#090E1D] focus:bg-[#10182C] border border-[#23355A] rounded-xl text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-[#D4AF37] focus:border-[#D4AF37] transition-all font-medium"
-              />
-            </div>
-          </div>
 
           {/* Right: Actions & User Switcher & Mobile Nav Toggle */}
           <div className="flex items-center space-x-1.5 sm:space-x-3">
@@ -301,18 +289,6 @@ export const Header: React.FC<HeaderProps> = ({
               </button>
             )}
 
-            {/* Quick Landing Page Link */}
-            {onGoToLanding && (
-              <button
-                type="button"
-                onClick={onGoToLanding}
-                className="hidden lg:flex items-center space-x-1.5 text-xs font-semibold text-slate-300 hover:text-[#D4AF37] bg-[#14213D] hover:bg-[#1E2D4A] px-3 py-1.5 rounded-xl border border-[#23355A] transition-colors cursor-pointer"
-                title="Ke Halaman Utama Publik"
-              >
-                <Globe className="w-3.5 h-3.5 text-[#D4AF37]" />
-                <span>Portal Publik</span>
-              </button>
-            )}
 
             {/* Role / User Profile Menu Button (Desktop Only) */}
             <div className="relative hidden md:block">
@@ -322,7 +298,7 @@ export const Header: React.FC<HeaderProps> = ({
                 className="flex items-center space-x-2.5 bg-[#14213D] hover:bg-[#1E2D4A] border border-[#2A3F6D] px-3 py-1.5 rounded-xl transition-all text-xs font-medium cursor-pointer"
               >
                 <div className="w-7 h-7 rounded-lg bg-[#090E1D] border border-[#D4AF37]/30 flex items-center justify-center shrink-0">
-                  <PoliceEmblem size="sm" />
+                  <User className="w-4 h-4 text-[#D4AF37]" />
                 </div>
                 <div className="text-left hidden sm:block max-w-[150px]">
                   <div className="flex items-center space-x-1">

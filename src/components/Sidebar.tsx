@@ -348,16 +348,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Footer Navigation */}
       {(onGoToLanding || onLogout) && (
         <div className="p-3 border-t border-[#1a2e4c] space-y-1 bg-[#071120] shrink-0">
-          {onGoToLanding && (
-            <button
-              type="button"
-              onClick={onGoToLanding}
-              className="w-full flex items-center space-x-2.5 px-3 py-2 text-xs font-semibold text-slate-300 hover:text-white hover:bg-[#142642] rounded-xl transition-colors cursor-pointer"
-            >
-              <Globe className="w-4 h-4 text-slate-400" />
-              <span>Portal Beranda Utama</span>
-            </button>
-          )}
+
           {onLogout && (
             <button
               type="button"

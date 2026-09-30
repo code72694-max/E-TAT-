@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { PermohonanAsesmen, UserProfile } from '../types';
-import { Users, ArrowRight } from 'lucide-react';
+import { Users, ArrowRight, FileText } from 'lucide-react';
+import { BeritaAcaraModal } from './BeritaAcaraModal';
 
 interface PlenoTATViewProps {
   permohonanList: PermohonanAsesmen[];
@@ -13,12 +14,21 @@ export const PlenoTATView: React.FC<PlenoTATViewProps> = ({
   currentUser,
   onSelectPermohonan
 }) => {
+  const [baPermohonan, setBaPermohonan] = useState<PermohonanAsesmen | null>(null);
+
   const plenoList = permohonanList.filter(p => 
     ['siap_pleno', 'pembahasan_pleno', 'pengesahan_rekomendasi', 'rekomendasi_terbit'].includes(p.statusProsesUtama)
   );
 
   return (
     <div className="space-y-5">
+      {baPermohonan && (
+        <BeritaAcaraModal
+          permohonan={baPermohonan}
+          onClose={() => setBaPermohonan(null)}
+        />
+      )}
+
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="text-lg sm:text-xl font-bold text-white flex items-center space-x-2">
@@ -75,16 +85,33 @@ export const PlenoTATView: React.FC<PlenoTATViewProps> = ({
                 </div>
               </div>
 
-              {/* Kesepakatan Final */}
+              {/* Kesepakatan Final + Tombol BA */}
               {item.sidangPleno?.kesepakatanRekomendasi && (
                 <div className="p-3 bg-[#081224] rounded-xl border border-[#1b3459] text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div className="min-w-0 flex-1">
                     <span className="text-[10px] uppercase font-bold text-[#d4af37] block">KESEPAKATAN MUSYAWARAH PLENO:</span>
                     <span className="font-semibold text-white text-xs leading-snug block">{item.sidangPleno.kesepakatanRekomendasi}</span>
                   </div>
-                  <button className="bg-[#142642] hover:bg-[#1b3459] text-white text-xs font-semibold px-3.5 py-2 rounded-xl flex items-center justify-center space-x-1.5 shrink-0 border border-[#234475] transition-colors w-full sm:w-auto">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setBaPermohonan(item); }}
+                    className="bg-[#d4af37] hover:bg-[#e8c84a] text-[#0b172a] text-xs font-bold px-3.5 py-2 rounded-xl flex items-center justify-center space-x-1.5 shrink-0 transition-colors w-full sm:w-auto"
+                  >
+                    <FileText className="w-3.5 h-3.5" />
                     <span>Lihat Berita Acara</span>
-                    <ArrowRight className="w-3.5 h-3.5 text-slate-200" />
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              )}
+
+              {/* Tombol BA meski belum ada kesepakatan (draft) */}
+              {!item.sidangPleno?.kesepakatanRekomendasi && (
+                <div className="flex justify-end">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setBaPermohonan(item); }}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-semibold border border-[#1b3459] text-slate-300 hover:border-[#d4af37]/50 hover:text-[#d4af37] transition-colors"
+                  >
+                    <FileText className="w-3 h-3" />
+                    Draft Berita Acara
                   </button>
                 </div>
               )}

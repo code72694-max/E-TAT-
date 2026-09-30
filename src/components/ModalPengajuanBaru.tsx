@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { PermohonanAsesmen, UserProfile, DokumenPersyaratan } from '../types';
+import { sendPengajuanEmailNotification } from '../services/emailService';
 import {
   X,
   User,
@@ -11,21 +12,38 @@ import {
   Trash2,
   Upload,
   ArrowRight,
-  ArrowLeft
+  ArrowLeft,
+  History,
+  ShieldAlert,
+  Clock,
+  Activity,
+  FileText,
+  AlertTriangle,
+  Mail
 } from 'lucide-react';
 
-const DOC_TEMPLATES = [
-  { id: 'doc-surat', kode: 'SURAT_PERMOHONAN', nama: 'Surat Permohonan Asesmen dari Penyidik', wajib: true, keterangan: 'Tandatangan resmi Kasat / Kanit Penyidik' },
-  { id: 'doc-lp', kode: 'LAPORAN_POLISI', nama: 'Laporan Polisi (LP)', wajib: true, keterangan: 'Surat tanda penerimaan laporan polisi' },
-  { id: 'doc-sp-sidik', kode: 'SP_SIDIK', nama: 'Surat Perintah Penyidikan (Sp.Sidik)', wajib: true, keterangan: 'Surat perintah penyidikan perkara' },
-  { id: 'doc-sp-tangkap', kode: 'SP_TANGKAP', nama: 'Surat Perintah Penangkapan & Penahanan', wajib: true, keterangan: 'Masa penangkapan 3x24 jam maksimal pengajuan' },
-  { id: 'doc-bap', kode: 'BAP_TERPERIKSA', nama: 'Berita Acara Pemeriksaan (BAP) Tersangka', wajib: true, keterangan: 'Pengakuan dan keterangan awal peran terperiksa' },
-  { id: 'doc-sita-bb', kode: 'BA_SITA_BB', nama: 'Surat Tanda Penerimaan & Penyitaan Barang Bukti', wajib: true, keterangan: 'Rincian barang bukti yang diamankan saat penangkapan' },
-  { id: 'doc-timbang', kode: 'BA_TIMBANG', nama: 'Berita Acara Penimbangan / Pembungkusan BB', wajib: true, keterangan: 'Berat netto dan pembungkusan segel barang bukti' },
-  { id: 'doc-lab-urin', kode: 'UJI_LAB_URIN', nama: 'Hasil Pemeriksaan Laboratorium Toksikologi Urin Awal', wajib: true, keterangan: 'Hasil tes strip atau skrining laboratorium forensik' },
-  { id: 'doc-ktp', kode: 'IDENTITAS_KTP', nama: 'Fotokopi KTP / KK / Identitas Terperiksa', wajib: true, keterangan: 'Bukti identitas kependudukan terperiksa' },
-  { id: 'doc-pernyataan', kode: 'SURAT_KELUARGA', nama: 'Surat Pernyataan / Permohonan Rehabilitasi dari Keluarga', wajib: false, keterangan: 'Kesediaan keluarga mendampingi rehabilitasi (opsional)' }
-];
+const getDocTemplates = (jenisPengajuan: string) => {
+  const baseDocs = [
+    { id: 'doc-surat', kode: 'SURAT_PERMOHONAN', nama: 'Surat Permohonan Asesmen dari Penyidik', wajib: true, keterangan: 'Tandatangan resmi pimpinan' },
+    { id: 'doc-ktp', kode: 'IDENTITAS_KTP', nama: 'Fotokopi KTP / KK / Identitas Terperiksa', wajib: true, keterangan: 'Bukti identitas kependudukan terperiksa' },
+    { id: 'doc-lp', kode: 'LAPORAN_POLISI', nama: 'Laporan Polisi (LP) / Laporan Kasus Narkotika', wajib: true, keterangan: 'Surat tanda penerimaan laporan polisi' },
+    { id: 'doc-bap', kode: 'BAP_TERPERIKSA', nama: 'Berita Acara Pemeriksaan (BAP) Tersangka / Interogasi', wajib: true, keterangan: 'Pengakuan dan keterangan awal peran terperiksa' },
+    { id: 'doc-sp-tangkap', kode: 'SP_TANGKAP', nama: 'Surat Perintah Penangkapan & Penahanan', wajib: jenisPengajuan.startsWith('penangkapan'), keterangan: 'Masa penangkapan 3x24 jam maksimal pengajuan' },
+    { id: 'doc-lab-urin', kode: 'SKHPU', nama: 'SKH Pemeriksaan Urine (SKHPU)', wajib: true, keterangan: 'Hasil tes strip atau skrining laboratorium forensik' },
+    { id: 'doc-elektronik', kode: 'BUKTI_ELEKTRONIK', nama: 'Alat Bukti Elektronik', wajib: false, keterangan: 'Bila ada (contoh: tangkapan layar chat, dll)' },
+  ];
+
+  if (jenisPengajuan === 'penangkapan_dengan_bb') {
+    baseDocs.push(
+      { id: 'doc-sp-sidik', kode: 'SP_SIDIK', nama: 'Surat Perintah Penyidikan', wajib: true, keterangan: 'Surat perintah penyidikan perkara' },
+      { id: 'doc-sp-sita-bb', kode: 'SP_SITA_BB', nama: 'Surat Perintah Penyitaan Barang Bukti', wajib: true, keterangan: 'Dasar hukum penyitaan BB' },
+      { id: 'doc-ba-sita-bb', kode: 'BA_SITA_BB', nama: 'Berita Acara Penyitaan Barang Bukti', wajib: true, keterangan: 'Rincian barang bukti yang diamankan saat penangkapan' },
+      { id: 'doc-hasil-lab-bb', kode: 'HASIL_LAB_BB', nama: 'Hasil Pemeriksaan Laboratorium Barang Bukti', wajib: true, keterangan: 'Puslabfor / lab forensik' }
+    );
+  }
+
+  return baseDocs;
+};
 
 interface ModalPengajuanBaruProps {
   currentUser: UserProfile;
@@ -41,6 +59,7 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
   onSubmit
 }) => {
   const [step, setStep] = useState<number>(1);
+  const [terperiksaTab, setTerperiksaTab] = useState<'data' | 'riwayat'>('data');
 
   // Form State: Step 1 (Terperiksa)
   const [namaLengkap, setNamaLengkap] = useState('');
@@ -56,9 +75,23 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
   const [kontakWali, setKontakWali] = useState('');
   const [statusKhusus, setStatusKhusus] = useState<'dewasa' | 'anak_berhadapan_hukum' | 'perlu_penerjemah'>('dewasa');
 
+  // Form State: Riwayat Terperiksa (Tab Riwayat)
+  const [statusResidivis, setStatusResidivis] = useState<'bukan_residivis' | 'residivis_1x' | 'residivis_berulang'>('bukan_residivis');
+  const [riwayatTatSebelumnya, setRiwayatTatSebelumnya] = useState<string>('Belum Pernah (Pengajuan Permohonan Asesmen Pertama)');
+  const [riwayatPerkaraLalu, setRiwayatPerkaraLalu] = useState<string>('Tidak memiliki catatan vonis pidana / DPO / perkara aktif lainnya.');
+  const [riwayatRehabilitasi, setRiwayatRehabilitasi] = useState<string>('Belum pernah menjalani program rehabilitasi medis atau sosial.');
+  const [lamaPenggunaanZat, setLamaPenggunaanZat] = useState<string>('6 - 12 Bulan (Penggunaan Rekreasi)');
+  const [hasilTesUrinAwal, setHasilTesUrinAwal] = useState<string>('Positif Methamphetamine (Sabu) - Skrining Awal');
+  const [catatanProfilingPenyidik, setCatatanProfilingPenyidik] = useState<string>('Hasil interogasi awal & digital forensik: Terperiksa adalah pengguna akhir / pemakai murni, tidak terindikasi masuk sindikat peredaran gelap.');
+
   // Form State: Step 2 (Perkara & Barang Bukti)
+  const [jenisPengajuan, setJenisPengajuan] = useState<'penangkapan_tanpa_bb' | 'penangkapan_dengan_bb' | 'p19' | 'penuntutan' | 'persidangan'>('penangkapan_dengan_bb');
+  const [metodePelaksanaan, setMetodePelaksanaan] = useState<'luring' | 'daring' | 'hybrid'>('luring');
+  const [satuanKerjaTujuan, setSatuanKerjaTujuan] = useState('BNNP Kalimantan Timur');
+  
   const [nomorLp, setNomorLp] = useState('LP/A/142/IX/2026/SPKT/POLRESTA SMD');
   const [tanggalLp, setTanggalLp] = useState('2026-09-07');
+  const [tanggalWaktuPenangkapan, setTanggalWaktuPenangkapan] = useState('2026-09-07T21:00');
   const [namaPenyidik, setNamaPenyidik] = useState(currentUser.name);
   const [nomorHpPenyidik, setNomorHpPenyidik] = useState('0812-3456-7890');
   const [pasal, setPasal] = useState('Pasal 127 ayat (1) huruf a UU No. 35 Tahun 2009');
@@ -76,6 +109,7 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
   const [uploadedDocIds, setUploadedDocIds] = useState<string[]>([
     'doc-std-1', 'doc-std-2', 'doc-std-3', 'doc-std-4', 'doc-std-5'
   ]);
+  const [isSendingEmail, setIsSendingEmail] = useState(false);
 
   if (!isOpen) return null;
 
@@ -111,11 +145,13 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
     }
   };
 
-  const handleSubmitAll = () => {
+  const handleSubmitAll = async () => {
+    setIsSendingEmail(true);
     const randomNum = Math.floor(100 + Math.random() * 900);
     const newNomor = `TAT/2026/09/${randomNum}`;
 
-    const newDocs: DokumenPersyaratan[] = DOC_TEMPLATES.map((std, idx) => {
+    const currentDocTemplates = getDocTemplates(jenisPengajuan);
+    const newDocs: DokumenPersyaratan[] = currentDocTemplates.map((std, idx) => {
       const isAttached = uploadedDocIds.includes(std.id);
       return {
         id: 'doc-' + Date.now() + '-' + idx,
@@ -135,6 +171,9 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
       id: 'tat-' + randomNum,
       nomorPermohonan: newNomor,
       tanggalPengajuan: '8 September 2026',
+      jenisPengajuan,
+      metodePelaksanaan,
+      satuanKerjaTujuan,
       instansiPengaju: currentUser.agency,
       pengajuId: currentUser.id,
       pengajuNama: namaPenyidik,
@@ -173,7 +212,7 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
         namaPenyidik,
         nomorHpPenyidik,
         pasalDipersangkakan: pasal,
-        tanggalWaktuPenangkapan: '7 September 2026 21:00 WIB',
+        tanggalWaktuPenangkapan,
         tempatKejadianPerkara: tkp,
         kronologiSingkat: kronologi,
         barangBuktiList
@@ -192,8 +231,19 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
       ]
     };
 
-    onSubmit(newPermohonan);
-    onClose();
+    // Send email notification to etatsiappulih@gmail.com
+    try {
+      const result = await sendPengajuanEmailNotification(newPermohonan);
+      if (result.success) {
+        console.log('Notifikasi email berhasil dikirim via Resend API:', result.id);
+      }
+    } catch (e) {
+      console.error('Error sending notification email:', e);
+    } finally {
+      setIsSendingEmail(false);
+      onSubmit(newPermohonan);
+      onClose();
+    }
   };
 
   return (
@@ -248,133 +298,346 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
 
         {/* Wizard Step Forms */}
         <div className="p-6 max-h-[60vh] overflow-y-auto space-y-4">
-          {/* STEP 1: IDENTITAS TERPERIKSA */}
+          {/* STEP 1: IDENTITAS TERPERIKSA & RIWAYAT */}
           {step === 1 && (
             <div className="space-y-4 text-xs">
-              <div className="bg-[#081224] border border-[#1b3459] rounded-lg p-3 text-slate-300">
-                Pastikan data identitas sesuai dengan Kartu Tanda Penduduk atau data biometrik kependudukan.
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="font-semibold text-slate-300 block mb-1">Nama Lengkap Terperiksa *</label>
-                  <input
-                    type="text"
-                    value={namaLengkap}
-                    onChange={(e) => setNamaLengkap(e.target.value)}
-                    placeholder="Contoh: Terperiksa Test-1 / Subjek Uji"
-                    className="w-full p-2 border border-[#1b3459] bg-[#081224] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-[#D4AF37] outline-none"
-                    required
-                  />
+              {/* Top Name Input Row (Yang Diadukan) */}
+              <div className="bg-[#081224] border border-[#1b3459] rounded-xl p-4 space-y-3">
+                <div className="flex items-center justify-between pb-2 border-b border-[#1b3459]/60">
+                  <span className="font-bold text-white flex items-center space-x-2 text-xs">
+                    <User className="w-4 h-4 text-[#D4AF37]" />
+                    <span>Identitas Utama Yang Diadukan / Terperiksa</span>
+                  </span>
+                  <span className="text-[10px] text-[#D4AF37] font-mono bg-[#D4AF37]/10 px-2 py-0.5 rounded border border-[#D4AF37]/20">
+                    Wajib Diisi Penyidik
+                  </span>
                 </div>
 
-                <div>
-                  <label className="font-semibold text-slate-300 block mb-1">Nama Panggilan / Alias</label>
-                  <input
-                    type="text"
-                    value={alias}
-                    onChange={(e) => setAlias(e.target.value)}
-                    placeholder="Contoh: Subjek-01 / Test-A"
-                    className="w-full p-2 border border-[#1b3459] bg-[#081224] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-[#D4AF37] outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="font-semibold text-slate-300 block mb-1">Nomor Induk Kependudukan (NIK)</label>
-                  <input
-                    type="text"
-                    value={nik}
-                    onChange={(e) => setNik(e.target.value)}
-                    placeholder="16 Digit NIK"
-                    className="w-full p-2 border border-[#1b3459] bg-[#081224] text-white rounded-lg font-mono focus:ring-2 focus:ring-[#D4AF37] focus:border-[#D4AF37] outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="font-semibold text-slate-300 block mb-1">Status Kategori Terperiksa</label>
-                  <select
-                    value={statusKhusus}
-                    onChange={(e) => setStatusKhusus(e.target.value as any)}
-                    className="w-full p-2 border border-[#1b3459] bg-[#081224] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-[#D4AF37] outline-none"
-                  >
-                    <option value="dewasa">Dewasa Umum</option>
-                    <option value="anak_berhadapan_hukum">Anak Berhadapan Hukum (ABH - Di bawah 18 th)</option>
-                    <option value="perlu_penerjemah">Perlu Penerjemah Bahasa / Isyarat</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="font-semibold text-slate-300 block mb-1">Tempat & Tanggal Lahir</label>
-                  <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="sm:col-span-2">
+                    <label className="font-semibold text-slate-200 block mb-1">
+                      Nama Lengkap Yang Diadukan / Terperiksa *
+                    </label>
                     <input
                       type="text"
-                      value={tempatLahir}
-                      onChange={(e) => setTempatLahir(e.target.value)}
-                      placeholder="Tempat Lahir"
-                      className="p-2 border border-[#1b3459] bg-[#081224] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none"
+                      value={namaLengkap}
+                      onChange={(e) => setNamaLengkap(e.target.value)}
+                      placeholder="Contoh: Muhammad Reza Pratama / Subjek Uji"
+                      className="w-full p-2.5 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-[#D4AF37] outline-none text-xs font-semibold placeholder:font-normal"
+                      required
                     />
+                  </div>
+
+                  <div>
+                    <label className="font-semibold text-slate-300 block mb-1">Nama Panggilan / Alias</label>
                     <input
-                      type="date"
-                      value={tanggalLahir}
-                      onChange={(e) => setTanggalLahir(e.target.value)}
-                      className="p-2 border border-[#1b3459] bg-[#081224] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none"
+                      type="text"
+                      value={alias}
+                      onChange={(e) => setAlias(e.target.value)}
+                      placeholder="Contoh: Reza / Eza"
+                      className="w-full p-2.5 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-[#D4AF37] outline-none text-xs"
                     />
                   </div>
                 </div>
 
-                <div>
-                  <label className="font-semibold text-slate-300 block mb-1">Usia & Jenis Kelamin</label>
-                  <div className="grid grid-cols-2 gap-2">
-                    <input
-                      type="number"
-                      value={usia}
-                      onChange={(e) => setUsia(Number(e.target.value))}
-                      placeholder="Usia (Tahun)"
-                      className="p-2 border border-[#1b3459] bg-[#081224] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none"
-                    />
-                    <select
-                      value={jenisKelamin}
-                      onChange={(e) => setJenisKelamin(e.target.value as any)}
-                      className="p-2 border border-[#1b3459] bg-[#081224] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none"
-                    >
-                      <option value="Laki-laki">Laki-laki</option>
-                      <option value="Perempuan">Perempuan</option>
-                    </select>
+                {/* Subjek live status indicator */}
+                {namaLengkap && (
+                  <div className="flex items-center justify-between pt-1 text-[11px] text-slate-400 bg-[#0d1f38]/60 p-2.5 rounded-lg border border-[#1b3459]/80">
+                    <div className="flex items-center space-x-2">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                      <span>Subjek Aktif: <strong className="text-white">{namaLengkap}</strong></span>
+                    </div>
+                    <span className="text-[10px] text-[#D4AF37] font-mono">
+                      Status: {statusResidivis === 'bukan_residivis' ? 'Subjek Baru' : 'Tercatat Riwayat'}
+                    </span>
                   </div>
+                )}
+              </div>
+
+              {/* Sub-Tab Navigation Under Name: DATA TERPERIKSA vs RIWAYAT */}
+              <div className="bg-[#081224] border border-[#1b3459] rounded-xl overflow-hidden shadow-lg">
+                {/* Tab Header Buttons */}
+                <div className="flex border-b border-[#1b3459] bg-[#050e1c] p-1.5 gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => setTerperiksaTab('data')}
+                    className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold flex items-center justify-center space-x-2 transition-all cursor-pointer ${
+                      terperiksaTab === 'data'
+                        ? 'bg-[#133863] text-white border border-[#245899] shadow-md'
+                        : 'text-slate-400 hover:text-white hover:bg-white/5'
+                    }`}
+                  >
+                    <User className="w-3.5 h-3.5 text-[#D4AF37]" />
+                    <span>Tab Data Pokok Terperiksa</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setTerperiksaTab('riwayat')}
+                    className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold flex items-center justify-center space-x-2 transition-all cursor-pointer ${
+                      terperiksaTab === 'riwayat'
+                        ? 'bg-[#133863] text-white border border-[#245899] shadow-md'
+                        : 'text-slate-400 hover:text-white hover:bg-white/5'
+                    }`}
+                  >
+                    <History className="w-3.5 h-3.5 text-[#D4AF37]" />
+                    <span>Tab Riwayat Perkara &amp; Histori TAT</span>
+                    {statusResidivis !== 'bukan_residivis' && (
+                      <span className="w-2 h-2 rounded-full bg-amber-400"></span>
+                    )}
+                  </button>
                 </div>
 
-                <div className="sm:col-span-2">
-                  <label className="font-semibold text-slate-300 block mb-1">Alamat Sesuai KTP / Domisili</label>
-                  <input
-                    type="text"
-                    value={alamatKtp}
-                    onChange={(e) => setAlamatKtp(e.target.value)}
-                    placeholder="Alamat lengkap terperiksa"
-                    className="w-full p-2 border border-[#1b3459] bg-[#081224] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none"
-                  />
-                </div>
+                {/* TAB 1: DATA IDENTITAS & KEPENDUDUKAN */}
+                {terperiksaTab === 'data' && (
+                  <div className="p-4 space-y-4 animate-in fade-in duration-150">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="font-semibold text-slate-300 block mb-1">
+                          Nomor Induk Kependudukan (NIK)
+                        </label>
+                        <input
+                          type="text"
+                          value={nik}
+                          onChange={(e) => setNik(e.target.value)}
+                          placeholder="16 Digit NIK KTP"
+                          className="w-full p-2 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg font-mono focus:ring-2 focus:ring-[#D4AF37] focus:border-[#D4AF37] outline-none"
+                        />
+                      </div>
 
-                <div>
-                  <label className="font-semibold text-slate-300 block mb-1">Nama Wali / Pendamping Keluarga</label>
-                  <input
-                    type="text"
-                    value={namaWali}
-                    onChange={(e) => setNamaWali(e.target.value)}
-                    placeholder="Nama Orang Tua / Pasangan / Pengacara"
-                    className="w-full p-2 border border-[#1b3459] bg-[#081224] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none"
-                  />
-                </div>
+                      <div>
+                        <label className="font-semibold text-slate-300 block mb-1">Status Kategori Terperiksa</label>
+                        <select
+                          value={statusKhusus}
+                          onChange={(e) => setStatusKhusus(e.target.value as any)}
+                          className="w-full p-2 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-[#D4AF37] outline-none"
+                        >
+                          <option value="dewasa">Dewasa Umum</option>
+                          <option value="anak_berhadapan_hukum">Anak Berhadapan Hukum (ABH - Di bawah 18 th)</option>
+                          <option value="perlu_penerjemah">Perlu Penerjemah Bahasa / Isyarat</option>
+                        </select>
+                      </div>
 
-                <div>
-                  <label className="font-semibold text-slate-300 block mb-1">Kontak Telepon Wali</label>
-                  <input
-                    type="text"
-                    value={kontakWali}
-                    onChange={(e) => setKontakWali(e.target.value)}
-                    placeholder="0812-XXXX-XXXX"
-                    className="w-full p-2 border border-[#1b3459] bg-[#081224] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none"
-                  />
-                </div>
+                      <div>
+                        <label className="font-semibold text-slate-300 block mb-1">Tempat &amp; Tanggal Lahir</label>
+                        <div className="grid grid-cols-2 gap-2">
+                          <input
+                            type="text"
+                            value={tempatLahir}
+                            onChange={(e) => setTempatLahir(e.target.value)}
+                            placeholder="Tempat Lahir"
+                            className="p-2 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none"
+                          />
+                          <input
+                            type="date"
+                            value={tanggalLahir}
+                            onChange={(e) => setTanggalLahir(e.target.value)}
+                            className="p-2 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="font-semibold text-slate-300 block mb-1">Usia &amp; Jenis Kelamin</label>
+                        <div className="grid grid-cols-2 gap-2">
+                          <input
+                            type="number"
+                            value={usia}
+                            onChange={(e) => setUsia(Number(e.target.value))}
+                            placeholder="Usia (Tahun)"
+                            className="p-2 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none"
+                          />
+                          <select
+                            value={jenisKelamin}
+                            onChange={(e) => setJenisKelamin(e.target.value as any)}
+                            className="p-2 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none"
+                          >
+                            <option value="Laki-laki">Laki-laki</option>
+                            <option value="Perempuan">Perempuan</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="font-semibold text-slate-300 block mb-1">Pekerjaan</label>
+                        <input
+                          type="text"
+                          value={pekerjaan}
+                          onChange={(e) => setPekerjaan(e.target.value)}
+                          placeholder="Pekerjaan / Profesi"
+                          className="w-full p-2 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="font-semibold text-slate-300 block mb-1">Nama Wali / Pendamping</label>
+                        <input
+                          type="text"
+                          value={namaWali}
+                          onChange={(e) => setNamaWali(e.target.value)}
+                          placeholder="Nama Orang Tua / Pasangan / Kuasa Hukum"
+                          className="w-full p-2 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none"
+                        />
+                      </div>
+
+                      <div className="sm:col-span-2">
+                        <label className="font-semibold text-slate-300 block mb-1">Alamat Sesuai KTP / Domisili</label>
+                        <input
+                          type="text"
+                          value={alamatKtp}
+                          onChange={(e) => setAlamatKtp(e.target.value)}
+                          placeholder="Alamat lengkap terperiksa saat ini"
+                          className="w-full p-2 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none"
+                        />
+                      </div>
+
+                      <div className="sm:col-span-2">
+                        <label className="font-semibold text-slate-300 block mb-1">Kontak Telepon Wali / Keluarga</label>
+                        <input
+                          type="text"
+                          value={kontakWali}
+                          onChange={(e) => setKontakWali(e.target.value)}
+                          placeholder="0812-XXXX-XXXX"
+                          className="w-full p-2 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* TAB 2: RIWAYAT PERKARA, RESIDIVISME & HISTORI TAT */}
+                {terperiksaTab === 'riwayat' && (
+                  <div className="p-4 space-y-4 animate-in fade-in duration-150">
+                    {/* Quick Preset Buttons */}
+                    <div className="flex items-center justify-between bg-[#050e1c] p-2.5 rounded-lg border border-[#1b3459]">
+                      <span className="text-[11px] text-slate-300 font-semibold flex items-center space-x-1.5">
+                        <Activity className="w-3.5 h-3.5 text-[#D4AF37]" />
+                        <span>Preset Rekam Jejak Terperiksa:</span>
+                      </span>
+                      <div className="flex items-center space-x-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setStatusResidivis('bukan_residivis');
+                            setRiwayatTatSebelumnya('Belum Pernah (Pengajuan Permohonan Asesmen Pertama)');
+                            setRiwayatPerkaraLalu('Tidak memiliki catatan vonis pidana / DPO / perkara aktif lainnya.');
+                            setRiwayatRehabilitasi('Belum pernah menjalani program rehabilitasi medis atau sosial.');
+                          }}
+                          className="text-[10px] font-bold bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25 px-2.5 py-1 rounded border border-emerald-500/30 transition-colors"
+                        >
+                          Bukan Residivis (Baru)
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setStatusResidivis('residivis_1x');
+                            setRiwayatTatSebelumnya('Pernah Asesmen TAT 1x pada Tahun 2024');
+                            setRiwayatPerkaraLalu('Pernah diamankan pada tahun 2024 perkara penyalahgunaan narkotika golongan I bukan tanaman.');
+                            setRiwayatRehabilitasi('Pernah menjalani rawat jalan di Balai Rehabilitasi BNN Kaltim.');
+                          }}
+                          className="text-[10px] font-bold bg-amber-500/15 text-amber-300 hover:bg-amber-500/25 px-2.5 py-1 rounded border border-amber-500/30 transition-colors"
+                        >
+                          Residivis 1x (Pernah TAT)
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="font-semibold text-slate-300 block mb-1">
+                          Status Residivisme Hukum *
+                        </label>
+                        <select
+                          value={statusResidivis}
+                          onChange={(e) => setStatusResidivis(e.target.value as any)}
+                          className="w-full p-2 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none"
+                        >
+                          <option value="bukan_residivis">Bukan Residivis (Tersangka Baru / Pertama Kali)</option>
+                          <option value="residivis_1x">Residivis 1 Kali (Pernah Terjerat Narkotika / TAT)</option>
+                          <option value="residivis_berulang">Residivis Berulang (&gt;1 Kali)</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="font-semibold text-slate-300 block mb-1">
+                          Histori Permohonan Asesmen TAT Sebelumnya
+                        </label>
+                        <input
+                          type="text"
+                          value={riwayatTatSebelumnya}
+                          onChange={(e) => setRiwayatTatSebelumnya(e.target.value)}
+                          placeholder="Contoh: Belum pernah / Pernah asesmen di BNNP Kaltim"
+                          className="w-full p-2 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="font-semibold text-slate-300 block mb-1">
+                          Lama Penggunaan &amp; Frekuensi Zat
+                        </label>
+                        <input
+                          type="text"
+                          value={lamaPenggunaanZat}
+                          onChange={(e) => setLamaPenggunaanZat(e.target.value)}
+                          placeholder="Contoh: 6 bulan, pemakaian 1-2 kali per minggu"
+                          className="w-full p-2 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="font-semibold text-slate-300 block mb-1">
+                          Hasil Pemeriksaan Skrining Urin Awal
+                        </label>
+                        <input
+                          type="text"
+                          value={hasilTesUrinAwal}
+                          onChange={(e) => setHasilTesUrinAwal(e.target.value)}
+                          placeholder="Contoh: Positif Methamphetamine (Sabu)"
+                          className="w-full p-2 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none"
+                        />
+                      </div>
+
+                      <div className="sm:col-span-2">
+                        <label className="font-semibold text-slate-300 block mb-1">
+                          Riwayat Catatan Perkara / Laporan Polisi Lalu
+                        </label>
+                        <textarea
+                          rows={2}
+                          value={riwayatPerkaraLalu}
+                          onChange={(e) => setRiwayatPerkaraLalu(e.target.value)}
+                          placeholder="Tuliskan jika tersangka pernah memiliki LP sebelumnya atau pernah divonis..."
+                          className="w-full p-2 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none text-xs"
+                        />
+                      </div>
+
+                      <div className="sm:col-span-2">
+                        <label className="font-semibold text-slate-300 block mb-1">
+                          Riwayat Program Rehabilitasi Sebelumnya
+                        </label>
+                        <input
+                          type="text"
+                          value={riwayatRehabilitasi}
+                          onChange={(e) => setRiwayatRehabilitasi(e.target.value)}
+                          placeholder="Contoh: Belum pernah / Pernah rawat inap di Balai Rehab BNN Tanah Merah"
+                          className="w-full p-2 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none"
+                        />
+                      </div>
+
+                      <div className="sm:col-span-2">
+                        <label className="font-semibold text-slate-300 block mb-1">
+                          Catatan Profiling Risiko &amp; Intelijen Penyidik
+                        </label>
+                        <textarea
+                          rows={2}
+                          value={catatanProfilingPenyidik}
+                          onChange={(e) => setCatatanProfilingPenyidik(e.target.value)}
+                          placeholder="Keterangan apakah terperiksa adalah pemakai murni, korban penyalahgunaan, atau bukan jaringan pengedar..."
+                          className="w-full p-2 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none text-xs"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -382,6 +645,56 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
           {/* STEP 2: PERKARA & BARANG BUKTI */}
           {step === 2 && (
             <div className="space-y-4 text-xs">
+              <div className="bg-[#081224] border border-[#1b3459] rounded-xl p-4 space-y-4">
+                <div className="flex items-center space-x-2 pb-2 border-b border-[#1b3459]/60">
+                  <Scale className="w-4 h-4 text-[#D4AF37]" />
+                  <span className="font-bold text-white text-xs">Informasi Pengajuan & Perkara</span>
+                </div>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="sm:col-span-2">
+                    <label className="font-semibold text-slate-300 block mb-1">Jenis Pengajuan Asesmen TAT *</label>
+                    <select
+                      value={jenisPengajuan}
+                      onChange={(e) => setJenisPengajuan(e.target.value as any)}
+                      className="w-full p-2.5 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none font-semibold text-xs"
+                    >
+                      <option value="penangkapan_tanpa_bb">Tingkat Penyidikan - Penangkapan TANPA Barang Bukti</option>
+                      <option value="penangkapan_dengan_bb">Tingkat Penyidikan - Penangkapan DENGAN Barang Bukti</option>
+                      <option value="p19">Petunjuk Jaksa (P-19)</option>
+                      <option value="penuntutan">Kepentingan Penuntutan (JPU)</option>
+                      <option value="persidangan">Kepentingan Persidangan (Penetapan Hakim)</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="font-semibold text-slate-300 block mb-1">Metode Pelaksanaan</label>
+                    <select
+                      value={metodePelaksanaan}
+                      onChange={(e) => setMetodePelaksanaan(e.target.value as any)}
+                      className="w-full p-2 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none"
+                    >
+                      <option value="luring">Luring (Tatap Muka Langsung)</option>
+                      <option value="daring">Daring (Online Zoom/Virtual)</option>
+                      <option value="hybrid">Hybrid (Campuran)</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="font-semibold text-slate-300 block mb-1">Satuan Kerja Tujuan TAT</label>
+                    <select
+                      value={satuanKerjaTujuan}
+                      onChange={(e) => setSatuanKerjaTujuan(e.target.value)}
+                      className="w-full p-2 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none"
+                    >
+                      <option value="BNNP Kalimantan Timur">Tim Asesmen Terpadu BNNP Kalimantan Timur</option>
+                      <option value="BNNK Samarinda">Tim Asesmen Terpadu BNNK Samarinda</option>
+                      <option value="BNNK Balikpapan">Tim Asesmen Terpadu BNNK Balikpapan</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="font-semibold text-slate-300 block mb-1">Nomor Laporan Polisi (LP) *</label>
@@ -401,6 +714,17 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
                     onChange={(e) => setTanggalLp(e.target.value)}
                     className="w-full p-2 border border-[#1b3459] bg-[#081224] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none"
                   />
+                </div>
+
+                <div className="sm:col-span-2">
+                  <label className="font-semibold text-slate-300 block mb-1">Tanggal & Waktu Penangkapan (SP.Tangkap) *</label>
+                  <input
+                    type="datetime-local"
+                    value={tanggalWaktuPenangkapan}
+                    onChange={(e) => setTanggalWaktuPenangkapan(e.target.value)}
+                    className="w-full p-2 border border-[#1b3459] bg-[#081224] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none"
+                  />
+                  <p className="text-[10px] text-slate-400 mt-1">Maksimal pengajuan TAT adalah 3x24 Jam sejak penangkapan.</p>
                 </div>
 
                 <div className="sm:col-span-2">
@@ -501,7 +825,7 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
               </div>
 
               <div className="space-y-2">
-                {DOC_TEMPLATES.map((doc) => {
+                {getDocTemplates(jenisPengajuan).map((doc) => {
                   const isChecked = uploadedDocIds.includes(doc.id);
                   return (
                     <div
@@ -533,9 +857,30 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
                         </div>
                       </div>
 
-                      <span className={`text-[11px] font-semibold ${isChecked ? 'text-[#D4AF37]' : 'text-slate-500'}`}>
-                        {isChecked ? 'Terlampir' : 'Belum Dilampirkan'}
-                      </span>
+                      <div className="flex items-center space-x-3" onClick={(e) => e.stopPropagation()}>
+                        <span className={`text-[10px] font-semibold hidden sm:inline ${isChecked ? 'text-emerald-400' : 'text-slate-500'}`}>
+                          {isChecked ? 'Sudah Diunggah' : 'Belum Dilampirkan'}
+                        </span>
+                        <label className={`cursor-pointer px-3 py-1.5 rounded-lg border flex items-center space-x-1.5 transition-colors ${
+                          isChecked 
+                            ? 'bg-[#142642] border-[#234475] text-slate-300 hover:text-white' 
+                            : 'bg-[#1b3459] border-[#2d5289] text-[#D4AF37] hover:bg-[#284c80]'
+                        }`}>
+                          <Upload className="w-3.5 h-3.5" />
+                          <span className="font-semibold text-[10px]">
+                            {isChecked ? 'Ganti File' : 'Unggah File'}
+                          </span>
+                          <input 
+                            type="file" 
+                            className="hidden" 
+                            onChange={(e) => {
+                              if (e.target.files && e.target.files.length > 0) {
+                                if (!isChecked) toggleDocUpload(doc.id);
+                              }
+                            }}
+                          />
+                        </label>
+                      </div>
                     </div>
                   );
                 })}
@@ -559,6 +904,12 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
                   <span className="font-bold text-white">{namaLengkap || 'Belum diisi'}</span>
                 </div>
                 <div className="flex justify-between py-1 border-b border-[#1b3459]">
+                  <span className="text-slate-400">Status Residivisme</span>
+                  <span className="font-semibold text-emerald-400">
+                    {statusResidivis === 'bukan_residivis' ? 'Bukan Residivis (Baru)' : 'Tercatat Residivis / Pernah TAT'}
+                  </span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-[#1b3459]">
                   <span className="text-slate-400">Nomor Laporan Polisi</span>
                   <span className="font-mono font-bold text-white">{nomorLp}</span>
                 </div>
@@ -572,7 +923,7 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
                 </div>
                 <div className="flex justify-between py-1 border-b border-[#1b3459]">
                   <span className="text-slate-400">Dokumen Dilampirkan</span>
-                  <span className="font-bold text-[#D4AF37]">{uploadedDocIds.length} dari {DOC_TEMPLATES.length} Dokumen</span>
+                  <span className="font-bold text-[#D4AF37]">{uploadedDocIds.filter(id => getDocTemplates(jenisPengajuan).some(d => d.id === id)).length} dari {getDocTemplates(jenisPengajuan).length} Dokumen</span>
                 </div>
                 <div className="flex justify-between py-1">
                   <span className="text-slate-400">Instansi Pengaju</span>

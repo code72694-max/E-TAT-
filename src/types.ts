@@ -24,6 +24,42 @@ export interface UserProfile {
   phone: string;
 }
 
+export interface RegistrasiPengguna {
+  id: string;
+  nomorRegistrasi: string; // e.g. REG-TAT/2026/POLRES-001
+  tanggalDaftar: string;
+  namaLengkap: string;
+  pangkat: string; // e.g. 'KOMBES POL', 'AKBP', 'KOMPOL', 'AKP', 'IPTU', 'IPDA', 'AIPDA', 'BRIPKA', 'PNS'
+  nrp: string; // NRP atau NIP
+  jabatan: string; // e.g. 'Kapolres', 'Wakapolres', 'Kasat Resnarkoba', 'Kanit Idik', 'Penyidik Pembantu', 'Kepala BNNK'
+  instansi: string; // e.g. 'Polresta Samarinda', 'Polres Kutai Kartanegara', 'BNNK Samarinda'
+  kategoriInstansi: 'Polres / Polresta' | 'Polda' | 'Polsek' | 'BNNK / BNNP' | 'Kejaksaan' | 'Lainnya';
+  wilayahHukum: string; // Samarinda, Balikpapan, Kukar, dll
+  alamatKantor: string;
+  email: string;
+  phone: string;
+  teleponKantor?: string;
+  password?: string;
+  
+  // Peran dalam Sistem E-TAT
+  peranSistem?: UserRole | string;
+  spesialisasiTugas?: string[];
+  
+  // Dokumen & Foto
+  fotoKtpUrl: string;
+  fotoKtpName: string;
+  fotoKtaUrl: string;
+  fotoKtaName: string;
+  suratPenunjukanUrl?: string;
+  suratPenunjukanName?: string;
+  
+  // Status Persetujuan Admin
+  status: 'pending' | 'approved' | 'rejected';
+  catatanAdmin?: string;
+  approvedAt?: string;
+  approvedBy?: string;
+}
+
 // 4 Kelompok Status Terpisah
 export type StatusProsesUtama =
   | 'draf'
@@ -360,6 +396,9 @@ export interface PermohonanAsesmen {
   id: string;
   nomorPermohonan: string; // e.g. "TAT/2026/09/089"
   tanggalPengajuan: string;
+  jenisPengajuan?: 'penangkapan_tanpa_bb' | 'penangkapan_dengan_bb' | 'p19' | 'penuntutan' | 'persidangan';
+  metodePelaksanaan?: 'luring' | 'daring' | 'hybrid';
+  satuanKerjaTujuan?: string;
   tenggatSlaTanggal: string; // Target SLA operasional
   isMendekatiTenggat: boolean;
   isMelewatiTenggat: boolean;

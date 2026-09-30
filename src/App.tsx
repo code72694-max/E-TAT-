@@ -1,12 +1,7 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
 import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { UserProfile, PermohonanAsesmen, UserRole } from './types';
-import { MOCK_USERS, INITIAL_PERMOHONAN } from './data/initialData';
+import { UserProfile, PermohonanAsesmen, UserRole, RegistrasiPengguna } from './types';
+import { MOCK_USERS, INITIAL_PERMOHONAN, INITIAL_REGISTRATIONS } from './data/initialData';
 import { Header } from './components/Header';
 import { Sidebar, ActiveTab } from './components/Sidebar';
 import { DashboardHome } from './components/DashboardHome';
@@ -27,6 +22,7 @@ import { AboutView } from './components/AboutView';
 import { ProfileView } from './components/ProfileView';
 import { LandingPageView } from './components/LandingPageView';
 import { LoginPage } from './components/LoginPage';
+import { RegisterPage } from './components/RegisterPage';
 import { LacakBerkasPage } from './components/LacakBerkasPage';
 import { MobileBottomNav } from './components/MobileBottomNav';
 
@@ -34,8 +30,14 @@ export default function App() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Navigation / Auth mode: 'landing' (public), 'lacak' (public tracking), 'login' (role selection), or 'dashboard' (authenticated)
-  const [appViewMode, setAppViewMode] = useState<'landing' | 'lacak' | 'login' | 'dashboard'>('landing');
+  // Navigation / Auth mode: 'landing' (public), 'lacak' (public tracking), 'login' (role selection), 'register' (Satwil registration), or 'dashboard' (authenticated)
+  const [appViewMode, setAppViewMode] = useState<'landing' | 'lacak' | 'login' | 'register' | 'dashboard'>('landing');
+
+  // Active Users list (can expand when admin approves new registrations)
+  const [users, setUsers] = useState<UserProfile[]>(MOCK_USERS);
+
+  // Registrations list
+  const [registrations, setRegistrations] = useState<RegistrasiPengguna[]>(INITIAL_REGISTRATIONS);
 
   // Current logged in user (defaults to Sekretariat for comprehensive overview)
   const [currentUser, setCurrentUser] = useState<UserProfile>(MOCK_USERS[1]); // Rina Marlina, S.H. (Sekretariat)
@@ -56,6 +58,8 @@ export default function App() {
       setAppViewMode('lacak');
     } else if (path === '/login') {
       setAppViewMode('login');
+    } else if (path === '/register') {
+      setAppViewMode('register');
     } else if (path.startsWith('/dashboard')) {
       setAppViewMode('dashboard');
       const parts = path.split('/').filter(Boolean);
@@ -73,11 +77,12 @@ export default function App() {
     }
   }, [location.pathname]);
 
-  const changeAppViewMode = (mode: 'landing' | 'lacak' | 'login' | 'dashboard') => {
+  const changeAppViewMode = (mode: 'landing' | 'lacak' | 'login' | 'register' | 'dashboard') => {
     setAppViewMode(mode);
     if (mode === 'landing') navigate('/');
     else if (mode === 'lacak') navigate('/lacak');
     else if (mode === 'login') navigate('/login');
+    else if (mode === 'register') navigate('/register');
     else if (mode === 'dashboard') navigate(`/dashboard/${currentTab}`);
   };
 
@@ -106,6 +111,38 @@ export default function App() {
   const handleCreatePermohonan = (newPermohonan: PermohonanAsesmen) => {
     setPermohonanList(prev => [newPermohonan, ...prev]);
     setSelectedPermohonanId(newPermohonan.id);
+  };
+
+  // Handle User Registrations (Satwil / Kapolres)
+  const handleRegisterSubmit = (newReg: RegistrasiPengguna) => {
+    setRegistrations(prev => [newReg, ...prev]);
+  };
+
+  const handleUpdateRegistration = (updatedReg: RegistrasiPengguna) => {
+    setRegistrations(prev => prev.map(r => r.id === updatedReg.id ? updatedReg : r));
+  };
+
+  const handleApproveRegistration = (reg: RegistrasiPengguna) => {
+    // 1. Update registration status
+    setRegistrations(prev =>
+      prev.map(r => (r.id === reg.id ? { ...reg, status: 'approved' } : r))
+    );
+
+    // 2. Add as active user if not existing yet
+    const existing = users.find(u => u.email.toLowerCase() === reg.email.toLowerCase());
+    if (!existing) {
+      const newUser: UserProfile = {
+        id: `user-${reg.id}`,
+        name: `${reg.pangkat} ${reg.namaLengkap}`,
+        nip: reg.nrp,
+        role: 'pengaju',
+        agency: reg.instansi,
+        email: reg.email,
+        phone: reg.phone,
+        avatar: reg.fotoKtaUrl || undefined
+      };
+      setUsers(prev => [newUser, ...prev]);
+    }
   };
 
   // Open a specific application from anywhere
@@ -253,6 +290,9 @@ export default function App() {
         return (
           <AdministrasiView
             currentUser={currentUser}
+            registrations={registrations}
+            onUpdateRegistration={handleUpdateRegistration}
+            onApproveRegistration={handleApproveRegistration}
           />
         );
 
@@ -292,12 +332,24 @@ export default function App() {
     return (
       <LandingPageView
         onGoToLogin={() => changeAppViewMode('login')}
+        onGoToRegister={() => changeAppViewMode('register')}
         onGoToLacak={() => changeAppViewMode('lacak')}
         permohonanList={permohonanList}
         onOpenPermohonanDetail={(id) => {
           setSelectedPermohonanId(id);
           changeAppViewMode('dashboard');
         }}
+      />
+    );
+  }
+
+  // 1.2 STANDALONE SATWIL REGISTRATION PAGE
+  if (appViewMode === 'register') {
+    return (
+      <RegisterPage
+        onRegisterSubmit={handleRegisterSubmit}
+        onBackToLanding={() => changeAppViewMode('landing')}
+        onGoToLogin={() => changeAppViewMode('login')}
       />
     );
   }
@@ -317,6 +369,7 @@ export default function App() {
           }
         }}
         onGoToLogin={() => changeAppViewMode('login')}
+        onGoToRegister={() => changeAppViewMode('register')}
         onOpenPermohonanDetail={(id) => {
           setSelectedPermohonanId(id);
           changeAppViewMode('dashboard');
@@ -329,11 +382,14 @@ export default function App() {
   if (appViewMode === 'login') {
     return (
       <LoginPage
+        users={users}
+        registrations={registrations}
         onLogin={(user) => {
           handleSelectUser(user);
           changeAppViewMode('dashboard');
         }}
         onBackToLanding={() => changeAppViewMode('landing')}
+        onGoToRegister={() => changeAppViewMode('register')}
       />
     );
   }
