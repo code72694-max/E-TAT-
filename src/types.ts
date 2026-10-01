@@ -391,6 +391,69 @@ export interface AuditLog {
   rincian: string;
 }
 
+// ===================================================================
+// INSTRUMEN KRITERIA PENEMPATAN KLIEN (Client Placement Criteria)
+// Adaptasi ASAM Placement Criteria 3rd Edition
+// ===================================================================
+
+/** Level rekomendasi layanan rehabilitasi (0 = tidak perlu rawatan, 4 = sangat berat / hospitalisasi) */
+export type LevelLayananRehabilitasi = 0 | 1 | 2 | 3 | 4;
+
+/** Label resmi per level layanan */
+export const LABEL_LEVEL_LAYANAN: Record<LevelLayananRehabilitasi, string> = {
+  0: 'Tidak Membutuhkan Rawatan',
+  1: 'Rawat Jalan (Ringan)',
+  2: 'Rawat Jalan Intensif (Sedang)',
+  3: 'Residensial / Pemantauan Medis (Berat)',
+  4: 'Hospitalisasi (Sangat Berat)',
+};
+
+/** 6 Dimensi penilaian ASAM */
+export type DimensiASAM =
+  | 'intoksikasi'           // D1: Intoksikasi Akut / Potensi Putus Zat
+  | 'komplikasi_medis'      // D2: Komplikasi dan Kondisi Medis
+  | 'kondisi_psikologis'    // D3: Komplikasi Emosional, Perilaku, Kognitif
+  | 'kesiapan_berubah'      // D4: Kesiapan Berubah (Motivasi)
+  | 'potensi_kekambuhan'    // D5: Potensi Kekambuhan / Penggunaan Berlanjut
+  | 'lingkungan_pemulihan'; // D6: Lingkungan Tempat Tinggal / Pemulihan
+
+/** Satu baris penilaian per dimensi */
+export interface PenilaianDimensiASAM {
+  dimensi: DimensiASAM;
+  levelDipilih: LevelLayananRehabilitasi;
+  /** Deskripsi kondisi klien yang relevan / alasan pemilihan level */
+  catatanKlinis: string;
+  /** Indikator spesifik yang tercentang sesuai dokumen */
+  indikatorTerpilih: string[];
+}
+
+/** Ringkasan hasil & rekomendasi akhir instrumen */
+export interface HasilInstrumenKriteriaPlasemen {
+  /** Level dengan tanda centang terbanyak / paling berat */
+  levelRekomendasiAkhir: LevelLayananRehabilitasi;
+  /** Narasi penjelasan rekomendasi */
+  justifikasiRekomendasi: string;
+  /** Apakah ada perbedaan indikasi antar dimensi */
+  adaDisparitasDimensi: boolean;
+  catatanDisparitas?: string;
+}
+
+/** Dokumen lengkap instrumen kriteria penempatan klien */
+export interface InstrumenKriteriaPlasemen {
+  id: string;
+  tanggalPengisian: string;
+  petugasNama: string;
+  petugasInstansi: string;
+  /** Apakah wawancara tambahan ke keluarga/wali dilakukan */
+  wawancaraTambahanDilakukan: boolean;
+  catatanWawancara?: string;
+  penilaianPerDimensi: PenilaianDimensiASAM[];
+  hasil: HasilInstrumenKriteriaPlasemen;
+  statusPengisian: 'draf' | 'lengkap' | 'divalidasi';
+  validasiOleh?: string;
+  tanggalValidasi?: string;
+}
+
 // Model Utama: Satu Berkas Permohonan Asesmen Terpadu
 export interface PermohonanAsesmen {
   id: string;
@@ -440,6 +503,7 @@ export interface PermohonanAsesmen {
   rekomendasiResmi?: RekomendasiResmi;
   tindakLanjut?: TindakLanjutLayanan;
   pengawasanKlien?: PengawasanKlien;
+  instrumenKriteriaPlasemen?: InstrumenKriteriaPlasemen;
   
   // Fitur Pendukung
   klarifikasiList: Klarifikasi[];

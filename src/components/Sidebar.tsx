@@ -19,7 +19,9 @@ import {
   LogOut,
   Globe,
   ChevronDown,
-  User
+  User,
+  Activity,
+  ShieldCheck
 } from 'lucide-react';
 
 export type ActiveTab =
@@ -34,6 +36,8 @@ export type ActiveTab =
   | 'tindak_lanjut'
   | 'monitoring'
   | 'administrasi'
+  | 'pemulihan'
+  | 'verifikasi_akun'
   | 'about'
   | 'profile';
 
@@ -50,6 +54,7 @@ interface SidebarProps {
     siapPleno: number;
     menungguPengesahan: number;
     tindakLanjutTerhambat: number;
+    akunPending?: number;
   };
   isMobileOpen?: boolean;
   onCloseMobile?: () => void;
@@ -111,6 +116,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             { id: 'pleno', label: 'Sidang Pleno TAT', icon: <Users className="w-4 h-4" />, badge: badgeCounts.siapPleno || undefined },
             { id: 'dokumen', label: 'Surat Rekomendasi', icon: <FileSignature className="w-4 h-4" />, badge: badgeCounts.menungguPengesahan || undefined },
             { id: 'tindak_lanjut', label: 'Pasca Rehabilitasi', icon: <Share2 className="w-4 h-4" />, badge: badgeCounts.tindakLanjutTerhambat || undefined },
+            { id: 'verifikasi_akun', label: 'Verifikasi Akun', icon: <ShieldCheck className="w-4 h-4" />, badge: badgeCounts.akunPending || undefined },
             { id: 'profile', label: 'Profil Saya', icon: <User className="w-4 h-4" /> },
             { id: 'about', label: 'Bantuan & SOP', icon: <Info className="w-4 h-4" /> }
           ],
@@ -126,6 +132,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             { id: 'medis', label: 'Asesmen Medis', icon: <Stethoscope className="w-4 h-4" /> },
             { id: 'penugasan', label: 'Penugasan & Jadwal', icon: <CalendarCheck className="w-4 h-4" /> },
             { id: 'pleno', label: 'Sidang Pleno TAT', icon: <Users className="w-4 h-4" />, badge: badgeCounts.siapPleno || undefined },
+            { id: 'pemulihan', label: 'Instrumen Pemulihan', icon: <Activity className="w-4 h-4" /> },
             { id: 'profile', label: 'Profil Saya', icon: <User className="w-4 h-4" /> },
             { id: 'about', label: 'Bantuan & SOP', icon: <Info className="w-4 h-4" /> }
           ],

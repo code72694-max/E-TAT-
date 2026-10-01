@@ -34,6 +34,8 @@ import {
   Mail
 } from 'lucide-react';
 import { PengawasanPascaTatSection } from './PengawasanPascaTatSection';
+import { InstrumenKriteriaPlasemenView } from './InstrumenKriteriaPlasemenView';
+import { ModalInputAsesmen } from './ModalInputAsesmen';
 import { BeritaAcaraModal } from './BeritaAcaraModal';
 import { sendPengajuanEmailNotification } from '../services/emailService';
 
@@ -67,6 +69,70 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<DetailTab>('ringkasan');
   const [showBeritaAcara, setShowBeritaAcara] = useState(false);
+  const [modalAsesmenType, setModalAsesmenType] = useState<'medis' | 'hukum' | null>(null);
+
+  const handleSaveAsesmen = (data: any, isFinal: boolean) => {
+    if (!modalAsesmenType) return;
+
+    let updated = { ...permohonan };
+    const now = new Date().toLocaleDateString('id-ID') + ' ' + new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+
+    if (modalAsesmenType === 'medis') {
+      updated.asesmenMedis = {
+        asesorNama: currentUser.name,
+        skorInstrumen: 28,
+        tingkatRisikoInstrumen: 'Tinggi (Ketergantungan)',
+        diagnosisKlinisIcd: 'F15.2 (Mental & Behavioural disorders due to use of other stimulants)',
+        komorbiditasMedis: 'Tidak ada penyerta berat',
+        kebutuhanRawat: 'Rawat Inap',
+        durasiUsulanBulan: 3,
+        riwayatZat: [
+          { jenisZat: 'Metamfetamina', caraPakai: 'Dihisap (Bong)', frekuensi: '4-5x Seminggu', lamaPemakaianBulan: 12, terakhirPakai: '2 hari lalu' }
+        ],
+        hasilUrin: [
+          { parameter: 'MET (Metamfetamina)', hasil: 'Positif' },
+          { parameter: 'THC (Ganja)', hasil: 'Negatif' }
+        ],
+        interpretasiKlinis: 'Klien menunjukkan toleransi tinggi terhadap zat dan withdrawal syndrome jika berhenti. Perlu pemulihan medis tertutup.',
+        catatanKhusus: isFinal ? 'Siap dibawa ke Pleno' : 'Draf medis tersimpan'
+      };
+      
+      if (isFinal) {
+        if (updated.statusProsesUtama === 'asesmen_berlangsung' || updated.statusProsesUtama === 'hukum_selesai') {
+          updated.statusProsesUtama = updated.asesmenHukum ? 'siap_pleno' : 'medis_selesai';
+        }
+      }
+    } else {
+      updated.asesmenHukum = {
+        asesorNama: currentUser.name,
+        analisisPeran: 'Pecandu dan Indikasi Pengedar Skala Kecil',
+        analisisBarangBukti: 'Total BB 0.5g (Di bawah batas SEMA), namun ada indikasi penjualan dari chat HP',
+        rekomendasiHukum: 'Proses hukum dapat dilanjutkan namun hak rehabilitasi tetap diberikan',
+        catatanKhusus: isFinal ? 'Siap dibawa ke Pleno' : 'Draf hukum tersimpan'
+      };
+      
+      if (isFinal) {
+        if (updated.statusProsesUtama === 'asesmen_berlangsung' || updated.statusProsesUtama === 'medis_selesai') {
+          updated.statusProsesUtama = updated.asesmenMedis ? 'siap_pleno' : 'hukum_selesai';
+        }
+      }
+    }
+
+    updated.auditLogs = [
+      ...updated.auditLogs,
+      {
+        id: `log-${Date.now()}`,
+        timestamp: now,
+        aksi: isFinal ? `Finalisasi Asesmen ${modalAsesmenType === 'medis' ? 'Medis' : 'Hukum'}` : `Simpan Draf Asesmen ${modalAsesmenType === 'medis' ? 'Medis' : 'Hukum'}`,
+        actorNama: currentUser.name,
+        actorPeran: currentUser.role,
+        rincian: isFinal ? `Data telah diverifikasi dan disiapkan untuk Sidang Pleno.` : `Draft asesmen disimpan ke sistem.`
+      }
+    ];
+
+    onUpdatePermohonan(updated);
+    setModalAsesmenType(null);
+  };
 
   // Role-specific available tabs
   const availableTabs = useMemo(() => {
@@ -74,100 +140,59 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
     switch (role) {
       case 'pengaju': {
         const tabs: { id: DetailTab; label: string; icon: React.ReactNode }[] = [
-          { id: 'ringkasan', label: 'Ringkasan & Status', icon: <User className="w-3.5 h-3.5" /> },
-          { id: 'administrasi', label: 'Berkas & Perbaikan', icon: <FileText className="w-3.5 h-3.5" /> },
-          { id: 'jadwal', label: 'Jadwal Pemeriksaan', icon: <Calendar className="w-3.5 h-3.5" /> },
+          { id: 'ringkasan', label: 'Status Perkara', icon: <User className="w-3.5 h-3.5" /> },
+          { id: 'administrasi', label: 'Berkas (LP/BAP)', icon: <FileText className="w-3.5 h-3.5" /> },
         ];
         if (permohonan.rekomendasiResmi && (permohonan.statusProsesUtama === 'rekomendasi_terbit' || permohonan.statusProsesUtama === 'selesai_tindak_lanjut')) {
-          tabs.push({ id: 'dokumen', label: 'Rekomendasi Resmi Diterima', icon: <FileSignature className="w-3.5 h-3.5" /> });
+          tabs.push({ id: 'dokumen', label: 'Rekomendasi Terbit', icon: <FileSignature className="w-3.5 h-3.5" /> });
         }
-        if (permohonan.pengawasanKlien || permohonan.statusProsesUtama === 'selesai_tindak_lanjut') {
-          tabs.push({ id: 'pengawasan', label: 'Pengawasan Pasca TAT', icon: <Activity className="w-3.5 h-3.5" /> });
-        }
-        tabs.push({ id: 'klarifikasi', label: `Klarifikasi (${permohonan.klarifikasiList.length})`, icon: <MessageSquare className="w-3.5 h-3.5" /> });
         return tabs;
       }
       case 'sekretariat': {
         const tabs: { id: DetailTab; label: string; icon: React.ReactNode }[] = [
-          { id: 'ringkasan', label: 'Ringkasan & Identitas', icon: <User className="w-3.5 h-3.5" /> },
+          { id: 'ringkasan', label: 'Ringkasan', icon: <User className="w-3.5 h-3.5" /> },
           { id: 'administrasi', label: 'Verifikasi Berkas', icon: <FileText className="w-3.5 h-3.5" /> },
-          { id: 'jadwal', label: 'Penugasan & Jadwal', icon: <Calendar className="w-3.5 h-3.5" /> },
-          { id: 'pleno', label: 'Persiapan Pleno', icon: <Users className="w-3.5 h-3.5" /> },
-          { id: 'dokumen', label: 'Distribusi Dokumen', icon: <FileSignature className="w-3.5 h-3.5" /> },
-          { id: 'tindak_lanjut', label: 'Koordinasi Rujukan', icon: <Share2 className="w-3.5 h-3.5" /> },
+          { id: 'jadwal', label: 'Penjadwalan', icon: <Calendar className="w-3.5 h-3.5" /> }
         ];
-        if (permohonan.pengawasanKlien || permohonan.statusProsesUtama === 'selesai_tindak_lanjut') {
-          tabs.push({ id: 'pengawasan', label: 'Pengawasan Pasca TAT', icon: <Activity className="w-3.5 h-3.5" /> });
-        }
-        tabs.push(
-          { id: 'klarifikasi', label: `Klarifikasi (${permohonan.klarifikasiList.length})`, icon: <MessageSquare className="w-3.5 h-3.5" /> },
-          { id: 'riwayat', label: 'Audit Trail', icon: <History className="w-3.5 h-3.5" /> }
-        );
         return tabs;
       }
       case 'medis':
         return [
-          { id: 'ringkasan', label: 'Identitas Terperiksa', icon: <User className="w-3.5 h-3.5" /> },
-          { id: 'jadwal', label: 'Jadwal Pemeriksaan Klinis', icon: <Calendar className="w-3.5 h-3.5" /> },
-          { id: 'medis', label: 'Asesmen Medis & Klinis', icon: <Stethoscope className="w-3.5 h-3.5" /> },
-          { id: 'pleno', label: 'Klarifikasi Pleno', icon: <Users className="w-3.5 h-3.5" /> },
-          { id: 'klarifikasi', label: `Klarifikasi (${permohonan.klarifikasiList.length})`, icon: <MessageSquare className="w-3.5 h-3.5" /> }
+          { id: 'ringkasan', label: 'Identitas Klien', icon: <User className="w-3.5 h-3.5" /> },
+          { id: 'medis', label: 'Asesmen Medis', icon: <Stethoscope className="w-3.5 h-3.5" /> },
+          { id: 'pengawasan', label: 'Instrumen Pemulihan', icon: <Activity className="w-3.5 h-3.5" /> }
         ];
       case 'hukum':
         return [
-          { id: 'ringkasan', label: 'Identitas & Perkara', icon: <User className="w-3.5 h-3.5" /> },
-          { id: 'administrasi', label: 'Dokumen Perkara (BAP/LP)', icon: <FileText className="w-3.5 h-3.5" /> },
-          { id: 'jadwal', label: 'Jadwal Pemeriksaan', icon: <Calendar className="w-3.5 h-3.5" /> },
-          { id: 'hukum', label: 'Asesmen Hukum & Telaah', icon: <Scale className="w-3.5 h-3.5" /> },
-          { id: 'pleno', label: 'Klarifikasi Pleno', icon: <Users className="w-3.5 h-3.5" /> },
-          { id: 'klarifikasi', label: `Klarifikasi (${permohonan.klarifikasiList.length})`, icon: <MessageSquare className="w-3.5 h-3.5" /> }
+          { id: 'ringkasan', label: 'Identitas Klien', icon: <User className="w-3.5 h-3.5" /> },
+          { id: 'administrasi', label: 'Baca BAP/LP', icon: <FileText className="w-3.5 h-3.5" /> },
+          { id: 'hukum', label: 'Telaah Hukum', icon: <Scale className="w-3.5 h-3.5" /> }
         ];
       case 'koordinator': {
         const tabs: { id: DetailTab; label: string; icon: React.ReactNode }[] = [
-          { id: 'ringkasan', label: 'Ringkasan & Kendali Kasus', icon: <User className="w-3.5 h-3.5" /> },
-          { id: 'jadwal', label: 'Kesiapan Jadwal Tim', icon: <Calendar className="w-3.5 h-3.5" /> },
-          { id: 'pleno', label: 'Sidang Pleno TAT', icon: <Users className="w-3.5 h-3.5" /> },
-          { id: 'dokumen', label: 'Pengesahan Rekomendasi Mandat', icon: <FileSignature className="w-3.5 h-3.5" /> },
-          { id: 'tindak_lanjut', label: 'Monitoring Rujukan', icon: <Share2 className="w-3.5 h-3.5" /> },
+          { id: 'ringkasan', label: 'Kendali Kasus', icon: <User className="w-3.5 h-3.5" /> },
+          { id: 'pleno', label: 'Sidang Pleno', icon: <Users className="w-3.5 h-3.5" /> },
+          { id: 'dokumen', label: 'Pengesahan TTE', icon: <FileSignature className="w-3.5 h-3.5" /> },
+          { id: 'riwayat', label: 'Audit Trail', icon: <History className="w-3.5 h-3.5" /> }
         ];
-        if (permohonan.pengawasanKlien || permohonan.statusProsesUtama === 'selesai_tindak_lanjut') {
-          tabs.push({ id: 'pengawasan', label: 'Pengawasan Pasca TAT', icon: <Activity className="w-3.5 h-3.5" /> });
-        }
-        tabs.push(
-          { id: 'klarifikasi', label: `Klarifikasi (${permohonan.klarifikasiList.length})`, icon: <MessageSquare className="w-3.5 h-3.5" /> },
-          { id: 'riwayat', label: 'Audit Trail Lengkap', icon: <History className="w-3.5 h-3.5" /> }
-        );
         return tabs;
       }
       case 'pimpinan': {
-        const tabs: { id: DetailTab; label: string; icon: React.ReactNode }[] = [
-          { id: 'ringkasan', label: 'Ringkasan Perkara & SLA', icon: <User className="w-3.5 h-3.5" /> },
-          { id: 'jadwal', label: 'Jadwal & Progres', icon: <Calendar className="w-3.5 h-3.5" /> },
-          { id: 'pleno', label: 'Berita Acara Pleno', icon: <Users className="w-3.5 h-3.5" /> },
-          { id: 'dokumen', label: 'Rekomendasi Terbit', icon: <FileSignature className="w-3.5 h-3.5" /> },
-          { id: 'tindak_lanjut', label: 'Realisasi Rujukan', icon: <Share2 className="w-3.5 h-3.5" /> },
+        return [
+          { id: 'ringkasan', label: 'Ringkasan Kasus', icon: <User className="w-3.5 h-3.5" /> },
+          { id: 'dokumen', label: 'Pengesahan TTE', icon: <FileSignature className="w-3.5 h-3.5" /> },
         ];
-        if (permohonan.pengawasanKlien || permohonan.statusProsesUtama === 'selesai_tindak_lanjut') {
-          tabs.push({ id: 'pengawasan', label: 'Pengawasan Pasca TAT', icon: <Activity className="w-3.5 h-3.5" /> });
-        }
-        tabs.push(
-          { id: 'riwayat', label: 'Audit Trail Pengawasan', icon: <History className="w-3.5 h-3.5" /> }
-        );
-        return tabs;
       }
       case 'rehabilitasi': {
-        const tabs: { id: DetailTab; label: string; icon: React.ReactNode }[] = [
-          { id: 'ringkasan', label: 'Informasi Klien Rujukan', icon: <User className="w-3.5 h-3.5" /> },
-          { id: 'dokumen', label: 'Dokumen Rekomendasi Legal', icon: <FileSignature className="w-3.5 h-3.5" /> },
-          { id: 'tindak_lanjut', label: 'Konfirmasi Admisi & Tindak Lanjut', icon: <Share2 className="w-3.5 h-3.5" /> },
-          { id: 'pengawasan', label: 'Pengawasan Klien Pasca TAT', icon: <Activity className="w-3.5 h-3.5" /> }
+        return [
+          { id: 'ringkasan', label: 'Klien Rujukan', icon: <User className="w-3.5 h-3.5" /> },
+          { id: 'pengawasan', label: 'Log Pengawasan', icon: <Activity className="w-3.5 h-3.5" /> }
         ];
-        return tabs;
       }
       case 'admin':
         return [
-          { id: 'ringkasan', label: 'Metadata Registrasi Berkas', icon: <User className="w-3.5 h-3.5" /> },
-          { id: 'riwayat', label: 'Audit Trail & Keamanan', icon: <History className="w-3.5 h-3.5" /> }
+          { id: 'ringkasan', label: 'Metadata Sistem', icon: <User className="w-3.5 h-3.5" /> },
+          { id: 'riwayat', label: 'Audit Trail', icon: <History className="w-3.5 h-3.5" /> }
         ];
       default:
         return [
@@ -639,25 +664,6 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
               </button>
             )}
 
-            {availableTabs.some(t => t.id === 'klarifikasi') && (
-              <button
-                onClick={() => setActiveTab('klarifikasi')}
-                className="bg-[#081224] hover:bg-[#142642] text-slate-200 text-xs font-medium px-3 py-1.5 rounded-xl flex items-center justify-center space-x-1.5 transition-all cursor-pointer border border-[#1b3459] w-full sm:w-auto"
-              >
-                <MessageSquare className="w-3.5 h-3.5 text-[#d4af37]" />
-                <span>Klarifikasi ({permohonan.klarifikasiList.length})</span>
-              </button>
-            )}
-
-            <button
-              onClick={handleSendEmailNotification}
-              disabled={isSendingEmail}
-              className="bg-gradient-to-r from-emerald-800 via-teal-800 to-emerald-900 hover:from-emerald-700 hover:to-teal-700 text-white text-xs font-semibold px-3 py-1.5 rounded-xl flex items-center justify-center space-x-1.5 transition-all cursor-pointer border border-emerald-500/40 shadow-md shadow-emerald-950/40 w-full sm:w-auto disabled:opacity-50"
-              title="Kirim Notifikasi Email ke etatsiappulih@gmail.com via Resend API"
-            >
-              <Mail className="w-3.5 h-3.5 text-emerald-300" />
-              <span>{isSendingEmail ? 'Mengirim Email...' : 'Kirim Email Notifikasi'}</span>
-            </button>
           </div>
         </div>
 
@@ -1081,11 +1087,20 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
             </div>
 
             {!permohonan.asesmenMedis ? (
-              <div className="text-center py-12 text-slate-400">
-                <Stethoscope className="w-8 h-8 text-slate-500 mx-auto mb-2" />
-                <p className="text-sm font-semibold">Asesmen medis belum diisi atau sedang berlangsung.</p>
+              <div className="text-center py-12 text-slate-400 bg-[#0b172a] border border-[#1b3459] rounded-xl">
+                <Stethoscope className="w-8 h-8 text-[#D4AF37] mx-auto mb-3" />
+                <p className="text-sm font-semibold text-white">Asesmen medis belum diisi atau sedang berlangsung.</p>
                 {currentUser.role === 'medis' && (
-                  <p className="text-xs text-[#D4AF37] mt-1">Anda dapat memulai wawancara klinis dan pengisian formulir.</p>
+                  <div className="mt-4">
+                    <p className="text-xs text-slate-400 mb-3">Anda dapat memulai wawancara klinis dan pengisian formulir.</p>
+                    <button 
+                      onClick={() => setModalAsesmenType('medis')}
+                      className="bg-emerald-800 hover:bg-emerald-700 text-emerald-100 px-4 py-2 rounded-lg font-bold text-xs flex items-center space-x-2 mx-auto transition-colors border border-emerald-600 shadow-lg"
+                    >
+                      <Stethoscope className="w-4 h-4" />
+                      <span>Mulai Input Asesmen Medis</span>
+                    </button>
+                  </div>
                 )}
               </div>
             ) : (
@@ -1183,9 +1198,21 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
             </div>
 
             {!permohonan.asesmenHukum ? (
-              <div className="text-center py-12 text-slate-400">
-                <Scale className="w-8 h-8 text-slate-500 mx-auto mb-2" />
-                <p className="text-sm font-semibold">Asesmen hukum belum tersedia atau menunggu klarifikasi penyidikan.</p>
+              <div className="text-center py-12 text-slate-400 bg-[#0b172a] border border-[#1b3459] rounded-xl">
+                <Scale className="w-8 h-8 text-[#D4AF37] mx-auto mb-3" />
+                <p className="text-sm font-semibold text-white">Asesmen hukum belum tersedia atau menunggu klarifikasi penyidikan.</p>
+                {currentUser.role === 'hukum' && (
+                  <div className="mt-4">
+                    <p className="text-xs text-slate-400 mb-3">Silakan input hasil telaah yuridis berdasarkan SEMA 04/2010.</p>
+                    <button 
+                      onClick={() => setModalAsesmenType('hukum')}
+                      className="bg-blue-900 hover:bg-blue-800 text-blue-100 px-4 py-2 rounded-lg font-bold text-xs flex items-center space-x-2 mx-auto transition-colors border border-blue-700 shadow-lg"
+                    >
+                      <Scale className="w-4 h-4" />
+                      <span>Input Asesmen Hukum</span>
+                    </button>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="space-y-4">
@@ -1909,11 +1936,21 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
 
         {/* TAB PENGAWASAN KLIEN PASCA TAT */}
         {activeTab === 'pengawasan' && (
-          <PengawasanPascaTatSection
-            permohonan={permohonan}
-            currentUser={currentUser}
-            onUpdatePermohonan={onUpdatePermohonan}
-          />
+          <div className="space-y-6">
+            {/* 1. Instrumen ASAM - Penilaian Tingkat Keparahan & Plasemen */}
+            <InstrumenKriteriaPlasemenView
+              permohonan={permohonan}
+              currentUser={currentUser}
+              onUpdatePermohonan={onUpdatePermohonan}
+            />
+            
+            {/* 2. Pelaksanaan Pengawasan Klien */}
+            <PengawasanPascaTatSection
+              permohonan={permohonan}
+              currentUser={currentUser}
+              onUpdatePermohonan={onUpdatePermohonan}
+            />
+          </div>
         )}
 
         {/* TAB 9: KLARIFIKASI TERARAH (Targeted Q&A per Role) */}
@@ -2073,6 +2110,17 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
           </div>
         )}
       </div>
+
+      {modalAsesmenType && (
+        <ModalInputAsesmen 
+          isOpen={true} 
+          onClose={() => setModalAsesmenType(null)} 
+          tipeAsesmen={modalAsesmenType} 
+          namaTerperiksa={permohonan.terperiksa.namaLengkap} 
+          nomorTat={permohonan.nomorPermohonan} 
+          onSave={handleSaveAsesmen}
+        />
+      )}
     </div>
   );
 };

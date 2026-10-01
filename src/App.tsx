@@ -14,6 +14,8 @@ import { AsesmenHukumView } from './components/AsesmenHukumView';
 import { PlenoTATView } from './components/PlenoTATView';
 import { DokumenPengesahanView } from './components/DokumenPengesahanView';
 import { RujukanTindakLanjutView } from './components/RujukanTindakLanjutView';
+import { AsesmenPemulihanView } from './components/AsesmenPemulihanView';
+import { VerifikasiAkunView } from './components/VerifikasiAkunView';
 import { MonitoringLaporanView } from './components/MonitoringLaporanView';
 import { AdministrasiView } from './components/AdministrasiView';
 import { ModalPengajuanBaru } from './components/ModalPengajuanBaru';
@@ -77,6 +79,7 @@ export default function App() {
     }
   }, [location.pathname]);
 
+
   const changeAppViewMode = (mode: 'landing' | 'lacak' | 'login' | 'register' | 'dashboard') => {
     setAppViewMode(mode);
     if (mode === 'landing') navigate('/');
@@ -98,9 +101,10 @@ export default function App() {
       siapVerifikasi: permohonanList.filter(p => p.statusProsesUtama === 'verifikasi_berkas' || p.statusProsesUtama === 'diajukan').length,
       siapPleno: permohonanList.filter(p => p.statusProsesUtama === 'siap_pleno').length,
       menungguPengesahan: permohonanList.filter(p => p.statusProsesUtama === 'pengesahan_rekomendasi').length,
-      tindakLanjutTerhambat: permohonanList.filter(p => p.statusTindakLanjut === 'terhambat').length
+      tindakLanjutTerhambat: permohonanList.filter(p => p.statusTindakLanjut === 'terhambat').length,
+      akunPending: registrations.filter(r => r.status === 'pending').length
     };
-  }, [permohonanList]);
+  }, [permohonanList, registrations]);
 
   // Handle updates to an application dossier
   const handleUpdatePermohonan = (updated: PermohonanAsesmen) => {
@@ -164,8 +168,8 @@ export default function App() {
     setSelectedPermohonanId(null);
     const roleAllowedTabs: Record<UserRole, ActiveTab[]> = {
       pengaju: ['beranda', 'permohonan', 'verifikasi', 'penugasan', 'dokumen', 'about', 'profile'],
-      sekretariat: ['beranda', 'permohonan', 'verifikasi', 'penugasan', 'pleno', 'dokumen', 'tindak_lanjut', 'about', 'profile'],
-      medis: ['beranda', 'medis', 'penugasan', 'pleno', 'about', 'profile'],
+      sekretariat: ['beranda', 'permohonan', 'verifikasi', 'penugasan', 'pleno', 'dokumen', 'tindak_lanjut', 'verifikasi_akun', 'about', 'profile'],
+      medis: ['beranda', 'medis', 'pemulihan', 'penugasan', 'pleno', 'about', 'profile'],
       hukum: ['beranda', 'hukum', 'penugasan', 'pleno', 'about', 'profile'],
       koordinator: ['beranda', 'permohonan', 'pleno', 'dokumen', 'tindak_lanjut', 'about', 'profile'],
       pimpinan: ['beranda', 'monitoring', 'permohonan', 'tindak_lanjut', 'about', 'profile'],
@@ -269,12 +273,31 @@ export default function App() {
           />
         );
 
+      case 'pemulihan':
+        return (
+          <AsesmenPemulihanView
+            permohonanList={permohonanList}
+            currentUser={currentUser}
+            onSelectPermohonan={handleOpenPermohonan}
+          />
+        );
+
       case 'tindak_lanjut':
         return (
           <RujukanTindakLanjutView
             permohonanList={permohonanList}
             currentUser={currentUser}
             onSelectPermohonan={handleOpenPermohonan}
+          />
+        );
+
+      case 'verifikasi_akun':
+        return (
+          <VerifikasiAkunView
+            registrations={registrations}
+            onUpdateRegistration={handleUpdateRegistration}
+            onApproveRegistration={handleApproveRegistration}
+            currentUser={currentUser}
           />
         );
 

@@ -179,21 +179,94 @@ export const LacakBerkasPage: React.FC<LacakBerkasPageProps> = ({
             { label: 'Penerbitan Berita Acara Pelaksanaan Asesmen Terpadu', checked: st === 'completed' }
           ]
         };
-      case 6:
+      case 6: {
+        // Prepare dynamic checked states and labels based on actual data
+        const isAsamCompleted = !!p.instrumenKriteriaPlasemen && p.instrumenKriteriaPlasemen.statusPengisian === 'divalidasi';
+        const isPengawasanActive = !!p.pengawasanKlien;
+        const totalSesi = p.pengawasanKlien?.totalSesiWajib || 12;
+        const sesiSelesai = p.pengawasanKlien?.sesiTerselesaikan || 0;
+
         return {
           title: 'Langkah 6: Pemantauan Pasca Rehabilitasi & SKSP',
-          subtitle: 'Pengawasan Kepatuhan Klien & Penerbitan Sertifikat SKSP',
+          subtitle: 'Pengawasan Kepatuhan Klien & Penilaian Instrumen Kriteria Penempatan (ASAM)',
           status: st,
           pj: 'Konselor Pascarehab & Penyidik Pengawas',
-          timestamp: st === 'completed' ? 'Selesai Dilaksanakan' : 'Dalam Pengawasan',
+          timestamp: st === 'completed' ? 'Selesai Dilaksanakan' : isPengawasanActive ? 'Dalam Pengawasan' : 'Menunggu Pelaksanaan',
           items: [
-            { label: 'Serah Terima Klien ke Balai Besar Rehabilitasi BNN', checked: st === 'completed' },
-            { label: 'Pelaksanaan Program Rehabilitasi dengan Kepatuhan Penuh', checked: st === 'completed' },
-            { label: 'Wajib Lapor Berkala & Uji Toksikologi Acak', checked: st === 'completed' },
-            { label: 'Verifikasi Tidak Ada Pelanggaran SP-1/SP-2/SP-3', checked: st === 'completed' },
-            { label: 'Penerbitan Sertifikat SKSP (Surat Keterangan Selesai Program)', checked: st === 'completed' }
+            { 
+              label: p.instrumenKriteriaPlasemen 
+                ? `Penilaian Dimensi ASAM Selesai (Rekomendasi Level ${p.instrumenKriteriaPlasemen.hasil?.levelRekomendasiAkhir})` 
+                : 'Penilaian Instrumen Kriteria Penempatan Klien (Adaptasi ASAM)', 
+              checked: isAsamCompleted,
+              details: isAsamCompleted ? (
+                <div className="text-[10px] space-y-1 mt-1 text-slate-300 bg-[#071326] p-2 rounded-lg border border-[#1b3459]">
+                  {p.instrumenKriteriaPlasemen!.penilaianPerDimensi.map(d => (
+                    <div key={d.dimensi} className="flex justify-between items-center border-b border-[#1b3459]/50 last:border-0 pb-1 last:pb-0">
+                      <span className="capitalize">{d.dimensi.replace(/_/g, ' ')}</span>
+                      <span className="font-bold text-[#D4AF37]">Lv {d.levelDipilih}</span>
+                    </div>
+                  ))}
+                  <div className="mt-1 pt-1 border-t border-[#1b3459]/50 text-[#D4AF37] font-semibold">
+                    Ket: {p.instrumenKriteriaPlasemen!.hasil?.justifikasiRekomendasi}
+                  </div>
+                </div>
+              ) : null
+            },
+            { 
+              label: 'Serah Terima Klien ke Balai / Fasilitas Rehabilitasi', 
+              checked: isPengawasanActive,
+              details: isPengawasanActive ? (
+                <div className="text-[10px] mt-1 text-slate-300">
+                  Fasilitas: <strong className="text-white">{p.pengawasanKlien!.instansiPelaksanaRehab}</strong>
+                </div>
+              ) : null
+            },
+            { 
+              label: isPengawasanActive 
+                ? `Pelaksanaan Program Rehabilitasi & Konseling (Selesai ${sesiSelesai} dari ${totalSesi} Sesi Wajib)` 
+                : 'Pelaksanaan Program Rehabilitasi dengan Kepatuhan Penuh', 
+              checked: isPengawasanActive && sesiSelesai > 0,
+              details: isPengawasanActive && p.pengawasanKlien!.jurnalPengawasan.length > 0 ? (
+                <div className="text-[10px] space-y-1 mt-1 text-slate-300 bg-[#071326] p-2 rounded-lg border border-[#1b3459]">
+                  <span className="text-[#D4AF37] font-semibold">Log Jurnal Terakhir:</span>
+                  {p.pengawasanKlien!.jurnalPengawasan.slice(-2).map(j => (
+                    <div key={j.id} className="flex justify-between border-b border-[#1b3459]/50 last:border-0 pb-1 last:pb-0">
+                      <span>{j.tanggal} ({j.jenisKegiatan})</span>
+                      <span className={j.statusKehadiran === 'Hadir' ? 'text-emerald-400' : 'text-rose-400'}>{j.statusKehadiran}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : null
+            },
+            { 
+              label: p.pengawasanKlien?.riwayatTesUrinBerkala?.length 
+                ? `Wajib Lapor & Uji Toksikologi Acak (${p.pengawasanKlien.riwayatTesUrinBerkala.length} Kali Pemeriksaan)` 
+                : 'Wajib Lapor Berkala & Uji Toksikologi Acak', 
+              checked: !!p.pengawasanKlien?.riwayatTesUrinBerkala?.length,
+              details: p.pengawasanKlien?.riwayatTesUrinBerkala?.length ? (
+                <div className="text-[10px] space-y-1 mt-1 text-slate-300 bg-[#071326] p-2 rounded-lg border border-[#1b3459]">
+                  {p.pengawasanKlien.riwayatTesUrinBerkala.map(t => (
+                    <div key={t.id} className="flex justify-between border-b border-[#1b3459]/50 last:border-0 pb-1 last:pb-0">
+                      <span>Tahap {t.tahapKe} - {t.tanggalTes}</span>
+                      <span className={t.hasil === 'Negatif' ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold'}>{t.hasil}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : null
+            },
+            { 
+              label: 'Penerbitan Sertifikat SKSP (Surat Keterangan Selesai Program)', 
+              checked: st === 'completed',
+              details: st === 'completed' && p.pengawasanKlien?.suratKeteranganSelesai ? (
+                <div className="text-[10px] mt-1 text-slate-300 bg-emerald-900/30 p-2 rounded-lg border border-emerald-500/30">
+                  <p>No: {p.pengawasanKlien.suratKeteranganSelesai.nomorSurat}</p>
+                  <p>Predikat: <strong className="text-emerald-400">{p.pengawasanKlien.suratKeteranganSelesai.predikat}</strong></p>
+                </div>
+              ) : null
+            }
           ]
         };
+      }
       default:
         return null;
     }
@@ -438,32 +511,39 @@ export const LacakBerkasPage: React.FC<LacakBerkasPageProps> = ({
                         Rincian Check-list Tahapan ({dt.items.filter(i => i.checked).length}/{dt.items.length} Selesai):
                       </span>
                       <div className="space-y-2">
-                        {dt.items.map((item, i) => (
+                        {dt.items.map((item: any, i: number) => (
                           <div
                             key={i}
-                            className={`p-3 rounded-xl border text-xs flex items-center justify-between ${
+                            className={`p-3 rounded-xl border text-xs flex flex-col space-y-2 ${
                               item.checked
                                 ? 'bg-emerald-950/20 border-emerald-500/30 text-slate-200'
                                 : 'bg-[#071325] border-[#1b3459] text-slate-500'
                             }`}
                           >
-                            <div className="flex items-center space-x-3">
-                              {item.checked ? (
-                                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                              ) : (
-                                <Clock className="w-4 h-4 text-slate-600 shrink-0" />
-                              )}
-                              <span className={item.checked ? 'font-medium text-slate-200' : 'text-slate-500'}>
-                                {item.label}
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center space-x-3">
+                                {item.checked ? (
+                                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                                ) : (
+                                  <Clock className="w-4 h-4 text-slate-600 shrink-0" />
+                                )}
+                                <span className={item.checked ? 'font-medium text-slate-200' : 'text-slate-500'}>
+                                  {item.label}
+                                </span>
+                              </div>
+                              <span className={`text-[10px] font-semibold px-2 py-0.5 rounded ${
+                                item.checked
+                                  ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
+                                  : 'bg-slate-800 text-slate-500'
+                              }`}>
+                                {item.checked ? '✓ Terverifikasi' : 'Menunggu'}
                               </span>
                             </div>
-                            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded ${
-                              item.checked
-                                ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
-                                : 'bg-slate-800 text-slate-500'
-                            }`}>
-                              {item.checked ? '✓ Terverifikasi' : 'Menunggu'}
-                            </span>
+                            {item.details && (
+                              <div className="pl-7 pt-1">
+                                {item.details}
+                              </div>
+                            )}
                           </div>
                         ))}
                       </div>

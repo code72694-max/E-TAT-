@@ -16,6 +16,7 @@ interface ModalInputAsesmenProps {
   tipeAsesmen: 'medis' | 'hukum';
   namaTerperiksa: string;
   nomorTat: string;
+  onSave?: (data: any, isFinal: boolean) => void;
 }
 
 export const ModalInputAsesmen: React.FC<ModalInputAsesmenProps> = ({
@@ -23,7 +24,8 @@ export const ModalInputAsesmen: React.FC<ModalInputAsesmenProps> = ({
   onClose,
   tipeAsesmen,
   namaTerperiksa,
-  nomorTat
+  nomorTat,
+  onSave
 }) => {
   const [activeTab, setActiveTab] = useState(1);
 
@@ -388,14 +390,34 @@ export const ModalInputAsesmen: React.FC<ModalInputAsesmenProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-[#1b3459] bg-[#081224] rounded-b-2xl flex justify-between items-center">
-          <span className="text-slate-400 text-xs italic">
-            * Data disimpan sebagai draf sementara hingga dikonfirmasi di Sidang Pleno.
+        <div className="p-4 border-t border-[#1b3459] bg-[#081224] rounded-b-2xl flex flex-col sm:flex-row gap-3 justify-between items-center">
+          <span className="text-slate-400 text-xs italic text-center sm:text-left">
+            * Data disimpan sebagai draf sementara hingga Anda mengklik Selesai.
           </span>
-          <button onClick={onClose} className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-2 px-5 rounded-lg text-xs flex items-center space-x-2 shadow-lg cursor-pointer">
-            <Save className="w-4 h-4" />
-            <span>Simpan Draf {tipeAsesmen === 'medis' ? 'Medis' : 'Hukum'}</span>
-          </button>
+          <div className="flex space-x-2 w-full sm:w-auto">
+            <button 
+              onClick={() => { 
+                if (onSave) onSave({}, false); 
+                onClose(); 
+              }} 
+              className="flex-1 sm:flex-none bg-[#0d1f38] hover:bg-[#142642] text-slate-300 border border-[#1b3459] font-bold py-2 px-4 rounded-lg text-xs flex items-center justify-center space-x-2 cursor-pointer transition-colors"
+            >
+              <Save className="w-4 h-4" />
+              <span>Simpan Draf</span>
+            </button>
+            <button 
+              onClick={() => { 
+                if (window.confirm(`Apakah Anda yakin ingin menyelesaikan pengisian Asesmen ${tipeAsesmen === 'medis' ? 'Medis' : 'Hukum'}? Berkas akan diteruskan ke tahap selanjutnya.`)) {
+                  if (onSave) onSave({}, true); 
+                  onClose(); 
+                }
+              }} 
+              className="flex-1 sm:flex-none bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-2 px-5 rounded-lg text-xs flex items-center justify-center space-x-2 shadow-lg cursor-pointer"
+            >
+              <CheckCircle2 className="w-4 h-4" />
+              <span>Selesai & Teruskan</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
