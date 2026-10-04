@@ -35,7 +35,8 @@ import {
   Download,
   Eye,
   Layers,
-  ChevronRight
+  ChevronRight,
+  Info
 } from 'lucide-react';
 
 import TindakLanjutDetailView from './TindakLanjutDetailView';
@@ -143,8 +144,9 @@ const MASTER_CHECKLIST: ChecklistItemDef[] = [
   }
 ];
 
-const getSubTabFromCurrentTab = (tab?: string): 'ceklis_dokumen' | 'pengawasan' | 'rujukan' => {
-  if (tab === 'tindak_lanjut_monitoring' || tab === 'tindak_lanjut_wajib_lapor') return 'pengawasan';
+const getSubTabFromCurrentTab = (tab?: string): 'ceklis_dokumen' | 'monitoring' | 'wajib_lapor' | 'rujukan' => {
+  if (tab === 'tindak_lanjut_monitoring') return 'monitoring';
+  if (tab === 'tindak_lanjut_wajib_lapor') return 'wajib_lapor';
   if (tab === 'tindak_lanjut_rujukan') return 'rujukan';
   return 'ceklis_dokumen';
 };
@@ -158,7 +160,7 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
   onSelectCase,
   currentTab
 }) => {
-  const [activeSubTab, setActiveSubTab] = useState<'ceklis_dokumen' | 'pengawasan' | 'rujukan'>(getSubTabFromCurrentTab(currentTab));
+  const [activeSubTab, setActiveSubTab] = useState<'ceklis_dokumen' | 'monitoring' | 'wajib_lapor' | 'rujukan'>(getSubTabFromCurrentTab(currentTab));
 
   useEffect(() => {
     if (currentTab) {
@@ -508,41 +510,52 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
           </button>
 
           {/* Tab Switcher */}
-          <div className="flex bg-slate-900 border border-slate-800 p-1 rounded-xl text-xs font-semibold shadow-inner">
-          <button
-            onClick={() => setActiveSubTab('ceklis_dokumen')}
-            className={`px-3.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer ${
-              activeSubTab === 'ceklis_dokumen'
-                ? 'bg-blue-600 text-white font-bold shadow-md'
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            <FileCheck2 className="w-3.5 h-3.5" />
-            <span>Ceklis Dokumen &amp; Admisi</span>
-          </button>
-          <button
-            onClick={() => setActiveSubTab('pengawasan')}
-            className={`px-3.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer ${
-              activeSubTab === 'pengawasan'
-                ? 'bg-blue-600 text-white font-bold shadow-md'
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            <Activity className="w-3.5 h-3.5" />
-            <span>Kontrol &amp; Wajib Lapor ({pengawasanList.length})</span>
-          </button>
-          <button
-            onClick={() => setActiveSubTab('rujukan')}
-            className={`px-3.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer ${
-              activeSubTab === 'rujukan'
-                ? 'bg-blue-600 text-white font-bold shadow-md'
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            <Building2 className="w-3.5 h-3.5" />
-            <span>Alur Rujukan &amp; Kuota Bed</span>
-          </button>
-        </div>
+          <div className="flex bg-slate-900 border border-slate-800 p-1 rounded-xl text-xs font-semibold shadow-inner flex-wrap">
+            <button
+              onClick={() => setActiveSubTab('ceklis_dokumen')}
+              className={`px-3.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer ${
+                activeSubTab === 'ceklis_dokumen'
+                  ? 'bg-blue-600 text-white font-bold shadow-md'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <FileCheck2 className="w-3.5 h-3.5" />
+              <span>1. Ceklis Dokumen &amp; Admisi</span>
+            </button>
+            <button
+              onClick={() => setActiveSubTab('monitoring')}
+              className={`px-3.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer ${
+                activeSubTab === 'monitoring'
+                  ? 'bg-blue-600 text-white font-bold shadow-md'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <Activity className="w-3.5 h-3.5 text-emerald-400" />
+              <span>2. Monitoring Rawat Jalan / Inap ({pengawasanList.length})</span>
+            </button>
+            <button
+              onClick={() => setActiveSubTab('wajib_lapor')}
+              className={`px-3.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer ${
+                activeSubTab === 'wajib_lapor'
+                  ? 'bg-blue-600 text-white font-bold shadow-md'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <Calendar className="w-3.5 h-3.5 text-amber-400" />
+              <span>3. Jadwal &amp; Catatan Wajib Lapor</span>
+            </button>
+            <button
+              onClick={() => setActiveSubTab('rujukan')}
+              className={`px-3.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer ${
+                activeSubTab === 'rujukan'
+                  ? 'bg-blue-600 text-white font-bold shadow-md'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <Building2 className="w-3.5 h-3.5 text-cyan-400" />
+              <span>4. Alur Rujukan &amp; Kuota Bed</span>
+            </button>
+          </div>
       </div>
     </div>
 
@@ -717,8 +730,8 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
         </div>
       )}
 
-      {/* TAB 2: PENGAWASAN & KONTROL KLIEN (WAJIB LAPOR & TES URIN) */}
-      {activeSubTab === 'pengawasan' && (
+      {/* TAB 2: MONITORING REHABILITASI RAWAT JALAN / INAP (MEDIS & TES URIN) */}
+      {activeSubTab === 'monitoring' && (
         <div className="space-y-6">
           {/* Summary Scorecards */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -747,23 +760,23 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
             </div>
           </div>
 
-          {/* List Klien dalam Pengawasan */}
+          {/* List Klien dalam Monitoring Medis */}
           <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl p-5 space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#1b3459]">
               <div>
                 <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center space-x-2">
-                  <Activity className="w-4 h-4 text-[#d4af37]" />
-                  <span>Daftar Klien dalam Monitoring &amp; Sesi Kontrol Pasca TAT</span>
+                  <Activity className="w-4 h-4 text-emerald-400" />
+                  <span>Daftar Klien dalam Monitoring Sesi Kontrol Medis &amp; Tes Urin</span>
                 </h3>
                 <p className="text-[11px] text-slate-400 mt-0.5">
-                  Catatan kehadiran sesi wajib lapor mingguan, konseling klinis, serta hasil pengujian toksikologi urin berkala.
+                  Catatan kehadiran sesi konseling klinis, evaluasi perkembangan DPJP, serta pengujian toksikologi urin berkala.
                 </p>
               </div>
             </div>
 
             {filteredList.length === 0 ? (
               <div className="text-center py-8 text-slate-400 text-xs">
-                Tidak ada data klien yang dalam pengawasan.
+                Tidak ada data klien yang dalam pengawasan medis.
               </div>
             ) : (
               <div className="grid grid-cols-1 gap-3.5">
@@ -807,7 +820,7 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
                       {/* Detail Metrics */}
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3.5 bg-slate-950/60 rounded-xl border border-slate-800/60 text-xs">
                         <div>
-                          <span className="text-[11px] font-medium text-slate-400 block">Progres Sesi Kontrol / Wajib Lapor:</span>
+                          <span className="text-[11px] font-medium text-slate-400 block">Progres Sesi Kontrol Medis:</span>
                           <div className="flex items-center gap-2 mt-1">
                             <div className="flex-1 bg-slate-950 h-2 rounded-full overflow-hidden border border-slate-800">
                               <div className="bg-emerald-500 h-full" style={{ width: `${percent}%` }} />
@@ -831,9 +844,9 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
                         </div>
 
                         <div>
-                          <span className="text-[11px] font-medium text-slate-400 block">Lembaga &amp; Konselor Pendamping:</span>
+                          <span className="text-[11px] font-medium text-slate-400 block">Lembaga &amp; DPJP Penanggung Jawab:</span>
                           <span className="text-slate-200 font-medium mt-1 block truncate">
-                            {pgw?.instansiPelaksanaRehab || item.tindakLanjut?.namaFasilitasTujuan || 'BNN Mitra'} • {pgw?.konselorPendamping || 'Konselor Ahli'}
+                            {pgw?.instansiPelaksanaRehab || item.tindakLanjut?.namaFasilitasTujuan || 'BNN Mitra'} • {pgw?.konselorPendamping || 'dr. Rina Lestari, Sp.KJ'}
                           </span>
                         </div>
                       </div>
@@ -865,6 +878,145 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
                           <ChevronRight className="w-3.5 h-3.5" />
                         </button>
                       </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* TAB 3: JURNAL PENGAWASAN & CATATAN WAJIB LAPOR PENYIDIK */}
+      {activeSubTab === 'wajib_lapor' && (
+        <div className="space-y-6">
+          {/* Notice Banner JUKNIS POLRI/BNN */}
+          <div className="bg-[#0b1d38] border border-blue-500/30 rounded-2xl p-4.5 text-xs text-slate-300 space-y-2 shadow-lg">
+            <div className="flex items-center gap-2 font-bold text-blue-400 text-sm">
+              <Info className="w-4.5 h-4.5 text-blue-400 shrink-0" />
+              <span>Ketentuan Pengisian Wajib Lapor (JUKNIS POLRI &amp; BNN):</span>
+            </div>
+            <ul className="list-disc list-inside space-y-1 text-slate-300 pl-1 leading-relaxed">
+              <li><strong>Tanggal Pelaporan Aktual</strong> diisi oleh <strong>Pengaju (Penyidik/JPU Berwenang)</strong> setelah wajib lapor dilaksanakan menggunakan tanggal kejadian sebenarnya (bukan tanggal rencana/otomatis input).</li>
+              <li><strong>Klien TIDAK PERLU login</strong> ke sistem e-TAT. Semua pencatatan dilakukan terpusat oleh Penyidik/JPU penerima.</li>
+              <li><strong>Sistem menyimpan waktu input secara terpisah (`waktuInputSistem`)</strong> untuk keperluan audit log dan verifikasi Admin Sekretariat TAT.</li>
+            </ul>
+          </div>
+
+          {/* List Klien & Records Wajib Lapor */}
+          <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl p-5 space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#1b3459]">
+              <div>
+                <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center space-x-2">
+                  <Calendar className="w-4 h-4 text-amber-400" />
+                  <span>Jurnal Audit &amp; Catatan Wajib Lapor Tersangka / Klien</span>
+                </h3>
+                <p className="text-[11px] text-slate-400 mt-0.5">
+                  Daftar absensi wajib lapor kepada Penyidik Satresnarkoba / BNN beserta stempel waktu input sistem &amp; verifikasi Admin.
+                </p>
+              </div>
+            </div>
+
+            {filteredList.length === 0 ? (
+              <div className="text-center py-8 text-slate-400 text-xs">
+                Tidak ada data pencatatan wajib lapor.
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-4">
+                {filteredList.map(item => {
+                  const mon = item.monitoringTindakLanjut;
+                  const wlList = mon?.buktiWajibLaporList || [];
+
+                  return (
+                    <div
+                      key={item.id}
+                      className="p-5 bg-slate-900/80 border border-slate-800/80 hover:border-amber-500/40 rounded-2xl transition-all shadow-lg space-y-4"
+                    >
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
+                        <div className="flex flex-wrap items-center gap-2.5 min-w-0">
+                          <span className="font-mono bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2.5 py-1 rounded-lg text-xs font-semibold">
+                            {item.nomorPermohonan}
+                          </span>
+                          <h4 className="text-base font-bold text-slate-100 truncate">
+                            {item.terperiksa.namaLengkap} <span className="text-xs font-normal text-slate-400">(NIK: {item.terperiksa.nik || 'Terverifikasi'})</span>
+                          </h4>
+                          <span className="text-xs bg-slate-800 text-slate-300 px-2.5 py-0.5 rounded-full border border-slate-700 font-medium">
+                            Penyidik: {item.perkara.namaPenyidik} ({item.perkara.instansiPenyidik})
+                          </span>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => onSelectCase ? onSelectCase(item.id) : onSelectPermohonan(item.id)}
+                          className="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-xl flex items-center gap-1.5 cursor-pointer text-xs transition-all shadow-md self-start sm:self-auto shrink-0"
+                        >
+                          <CheckSquare className="w-3.5 h-3.5" />
+                          <span>+ Tambah / Kelola Catatan Wajib Lapor</span>
+                        </button>
+                      </div>
+
+                      {/* Display Wajib Lapor Items */}
+                      {wlList.length === 0 ? (
+                        <div className="p-3 bg-slate-950/60 rounded-xl text-xs text-slate-400 text-center italic border border-slate-800/60">
+                          Belum ada catatan wajib lapor yang dimasukkan untuk klien ini. Klik tombol kelola di atas untuk menginput.
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          {wlList.map(wl => {
+                            const isAktual = Boolean(wl.tanggalPelaporanAktual);
+                            return (
+                              <div key={wl.id} className="p-3.5 bg-slate-950/80 border border-slate-800/80 rounded-xl space-y-2 text-xs">
+                                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-2">
+                                  <div className="flex items-center gap-2">
+                                    {isAktual ? (
+                                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                                        ✓ Pelaporan Aktual (Terlaksana)
+                                      </span>
+                                    ) : (
+                                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/30">
+                                        📅 Rencana Wajib Lapor (Belum Aktual)
+                                      </span>
+                                    )}
+                                    {wl.statusVerifikasiAdmin === 'terverifikasi' ? (
+                                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-400 border border-blue-500/30">
+                                        ✓ Verified Admin
+                                      </span>
+                                    ) : (
+                                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-800 text-slate-400 border border-slate-700">
+                                        ⏳ Pending Admin
+                                      </span>
+                                    )}
+                                  </div>
+
+                                  <div className="text-right text-[10px] font-mono text-slate-400">
+                                    <span>Waktu Input Sistem: </span>
+                                    <strong className="text-cyan-300">{wl.waktuInputSistem || wl.tanggalDiunggah || 'Logged'}</strong>
+                                  </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-2 pt-1 text-slate-300">
+                                  <div>
+                                    <span className="text-[10px] uppercase font-bold text-slate-400 block">Tanggal Pelaporan Aktual</span>
+                                    <span className={`font-mono font-bold ${isAktual ? 'text-emerald-400' : 'text-slate-500 italic'}`}>
+                                      {wl.tanggalPelaporanAktual || '— (Belum diisi)'}
+                                    </span>
+                                  </div>
+
+                                  <div>
+                                    <span className="text-[10px] uppercase font-bold text-slate-400 block">Rencana Wajib Lapor</span>
+                                    <span className="font-mono text-slate-200">{wl.tanggalRencanaWajibLapor || wl.tanggalWajibLapor}</span>
+                                  </div>
+
+                                  <div>
+                                    <span className="text-[10px] uppercase font-bold text-slate-400 block">Penyidik / JPU Penerima</span>
+                                    <span className="font-semibold text-slate-100">{wl.namaPenyidikPenerima} ({wl.instansiPenyidik})</span>
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
                     </div>
                   );
                 })}

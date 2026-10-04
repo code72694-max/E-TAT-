@@ -115,8 +115,8 @@ export default function App() {
         } else {
           setSelectedRiwayatHukumId(null);
         }
-      } else if (parts[1] === 'tindak_lanjut') {
-        setCurrentTab('tindak_lanjut');
+      } else if (parts[1] && parts[1].startsWith('tindak_lanjut')) {
+        setCurrentTab(parts[1] as ActiveTab);
         setSelectedPermohonanId(null);
         setSelectedHukumId(null);
         setSelectedMedisId(null);
@@ -289,6 +289,7 @@ export default function App() {
     setSelectedHukumId(null);
     setSelectedMedisId(null);
     setSelectedRiwayatHukumId(null);
+    setSelectedTindakLanjutId(null);
     navigate(`/dashboard/${tab}`);
   };
 
@@ -300,6 +301,7 @@ export default function App() {
     setSelectedHukumId(null);
     setSelectedMedisId(null);
     setSelectedRiwayatHukumId(null);
+    setSelectedTindakLanjutId(null);
     // 4 role kanonis + backward compat untuk role lama
     const roleAllowedTabs: Record<string, ActiveTab[]> = {
       PENGAJU: ['beranda', 'permohonan', 'penugasan', 'dokumen', 'tindak_lanjut', 'about', 'profile'],
