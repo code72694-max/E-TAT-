@@ -323,34 +323,34 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       onClick={() => handleItemClick('tindak_lanjut_monitoring')}
                       className={`w-full text-left px-2.5 py-1.5 text-[11px] font-medium rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer ${
                         currentTab === 'tindak_lanjut_monitoring'
-                          ? 'bg-[#142642] text-emerald-400 font-bold border border-[#234475]'
+                          ? 'bg-[#142642] text-blue-400 font-bold border border-[#234475]'
                           : 'text-slate-300 hover:text-white hover:bg-[#142642]/60'
                       }`}
                     >
-                      <Activity className="w-3 h-3 text-emerald-400" />
+                      <Activity className="w-3 h-3 text-blue-400" />
                       <span>2. Monitoring Rawat Jalan / Inap</span>
                     </button>
                     <button
                       onClick={() => handleItemClick('tindak_lanjut_wajib_lapor')}
                       className={`w-full text-left px-2.5 py-1.5 text-[11px] font-medium rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer ${
                         currentTab === 'tindak_lanjut_wajib_lapor'
-                          ? 'bg-[#142642] text-amber-400 font-bold border border-[#234475]'
+                          ? 'bg-[#142642] text-blue-400 font-bold border border-[#234475]'
                           : 'text-slate-300 hover:text-white hover:bg-[#142642]/60'
                       }`}
                     >
-                      <CalendarCheck className="w-3 h-3 text-amber-400" />
-                      <span>3. Jadwal & Catatan Wajib Lapor</span>
+                      <CalendarCheck className="w-3 h-3 text-blue-400" />
+                      <span>3. Jadwal &amp; Catatan Wajib Lapor</span>
                     </button>
                     <button
                       onClick={() => handleItemClick('tindak_lanjut_rujukan')}
                       className={`w-full text-left px-2.5 py-1.5 text-[11px] font-medium rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer ${
                         currentTab === 'tindak_lanjut_rujukan'
-                          ? 'bg-[#142642] text-cyan-400 font-bold border border-[#234475]'
+                          ? 'bg-[#142642] text-blue-400 font-bold border border-[#234475]'
                           : 'text-slate-300 hover:text-white hover:bg-[#142642]/60'
                       }`}
                     >
-                      <Building2 className="w-3 h-3 text-cyan-400" />
-                      <span>4. Alur Rujukan & Kuota Bed</span>
+                      <Building2 className="w-3 h-3 text-blue-400" />
+                      <span>4. Alur Rujukan &amp; Kuota Bed</span>
                     </button>
                   </div>
                 )}

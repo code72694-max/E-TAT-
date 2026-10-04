@@ -530,7 +530,7 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
-              <Activity className="w-3.5 h-3.5 text-emerald-400" />
+              <Activity className="w-3.5 h-3.5" />
               <span>2. Monitoring Rawat Jalan / Inap ({pengawasanList.length})</span>
             </button>
             <button
@@ -541,7 +541,7 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
-              <Calendar className="w-3.5 h-3.5 text-amber-400" />
+              <Calendar className="w-3.5 h-3.5" />
               <span>3. Jadwal &amp; Catatan Wajib Lapor</span>
             </button>
             <button
@@ -552,7 +552,7 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
-              <Building2 className="w-3.5 h-3.5 text-cyan-400" />
+              <Building2 className="w-3.5 h-3.5" />
               <span>4. Alur Rujukan &amp; Kuota Bed</span>
             </button>
           </div>
@@ -639,8 +639,8 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
                         <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
                           <span className={`text-xs font-semibold px-3 py-1 rounded-full border ${
                             isFullComplete
-                              ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
-                              : 'bg-blue-500/10 text-blue-400 border-blue-500/30'
+                              ? 'bg-blue-500/10 text-blue-400 border-blue-500/30 font-bold'
+                              : 'bg-slate-800 text-slate-300 border-slate-700'
                           }`}>
                             {isFullComplete ? '✓ Dokumen Lengkap 100%' : `Kelengkapan Berkas ${progress}%`}
                           </span>
@@ -664,9 +664,7 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
                         </div>
                         <div className="w-full bg-slate-950 h-2 rounded-full overflow-hidden border border-slate-800">
                           <div
-                            className={`h-full transition-all duration-300 ${
-                              isFullComplete ? 'bg-emerald-500' : 'bg-blue-500'
-                            }`}
+                            className="h-full transition-all duration-300 bg-blue-500"
                             style={{ width: `${progress}%` }}
                           />
                         </div>
@@ -682,12 +680,12 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
                               onClick={() => handleToggleChecklist(item.id, doc.id)}
                               className={`p-2.5 rounded-xl border flex items-center gap-2 text-xs transition-all cursor-pointer ${
                                 checked
-                                  ? 'bg-slate-950/80 border-emerald-500/30 text-slate-200 hover:border-emerald-500/50'
+                                  ? 'bg-slate-950/80 border-blue-500/30 text-slate-200 hover:border-blue-500/50'
                                   : 'bg-slate-950/60 border-slate-800/80 text-slate-400 hover:border-slate-700'
                               }`}
                             >
                               {checked ? (
-                                <CheckSquare className="w-4 h-4 text-emerald-400 shrink-0" />
+                                <CheckSquare className="w-4 h-4 text-blue-400 shrink-0" />
                               ) : (
                                 <Square className="w-4 h-4 text-slate-500 shrink-0" />
                               )}
@@ -742,14 +740,14 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
             </div>
 
             <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl p-4">
-              <span className="text-[11px] font-bold uppercase text-emerald-400 block">Klien Patuh / Bersih</span>
-              <div className="text-xl sm:text-2xl font-bold text-emerald-300 mt-1 font-mono">{klienPatuh} Orang</div>
+              <span className="text-[11px] font-bold uppercase text-blue-400 block">Klien Patuh / Bersih</span>
+              <div className="text-xl sm:text-2xl font-bold text-blue-300 mt-1 font-mono">{klienPatuh} Orang</div>
               <span className="text-[10px] text-slate-400 mt-0.5 block">Nihil mangkir &amp; tes urin negatif</span>
             </div>
 
             <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl p-4">
-              <span className="text-[11px] font-bold uppercase text-amber-400 block">Dalam Peringatan (SP)</span>
-              <div className="text-xl sm:text-2xl font-bold text-amber-300 mt-1 font-mono">{klienPeringatan} Orang</div>
+              <span className="text-[11px] font-bold uppercase text-slate-300 block">Dalam Peringatan (SP)</span>
+              <div className="text-xl sm:text-2xl font-bold text-slate-200 mt-1 font-mono">{klienPeringatan} Orang</div>
               <span className="text-[10px] text-slate-400 mt-0.5 block">Mangkir sesi / terbit SP</span>
             </div>
 
@@ -765,7 +763,7 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#1b3459]">
               <div>
                 <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center space-x-2">
-                  <Activity className="w-4 h-4 text-emerald-400" />
+                  <Activity className="w-4 h-4 text-blue-400" />
                   <span>Daftar Klien dalam Monitoring Sesi Kontrol Medis &amp; Tes Urin</span>
                 </h3>
                 <p className="text-[11px] text-slate-400 mt-0.5">
@@ -808,10 +806,10 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
 
                         <span className={`text-xs font-semibold px-3 py-1 rounded-full border self-start sm:self-auto shrink-0 ${
                           statusKepatuhan === 'sangat_patuh' || statusKepatuhan === 'patuh'
-                            ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
-                            : statusKepatuhan === 'selesai_program'
                             ? 'bg-blue-500/10 text-blue-400 border-blue-500/30'
-                            : 'bg-amber-500/10 text-amber-400 border-amber-500/30'
+                            : statusKepatuhan === 'selesai_program'
+                            ? 'bg-[#d4af37]/10 text-[#d4af37] border-[#d4af37]/30'
+                            : 'bg-slate-800 text-slate-300 border-slate-700'
                         }`}>
                           {statusKepatuhan.replace(/_/g, ' ').toUpperCase()}
                         </span>
@@ -823,7 +821,7 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
                           <span className="text-[11px] font-medium text-slate-400 block">Progres Sesi Kontrol Medis:</span>
                           <div className="flex items-center gap-2 mt-1">
                             <div className="flex-1 bg-slate-950 h-2 rounded-full overflow-hidden border border-slate-800">
-                              <div className="bg-emerald-500 h-full" style={{ width: `${percent}%` }} />
+                              <div className="bg-blue-500 h-full" style={{ width: `${percent}%` }} />
                             </div>
                             <span className="font-bold text-slate-200 font-mono text-xs">{sesiSelesai}/{totalSesi} ({percent}%)</span>
                           </div>
@@ -835,8 +833,8 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
                             <span className="text-slate-200">{pgw?.riwayatTesUrinBerkala.length || 1}x Diuji</span>
                             <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold border ${
                               lastTest?.hasil === 'Positif'
-                                ? 'bg-rose-500/10 text-rose-400 border-rose-500/30'
-                                : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
+                                ? 'bg-slate-800 text-slate-300 border-slate-700'
+                                : 'bg-blue-500/10 text-blue-400 border-blue-500/30'
                             }`}>
                               Terakhir: {lastTest ? `${lastTest.hasil} (${lastTest.tanggalTes})` : 'Negatif'}
                             </span>
@@ -908,7 +906,7 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#1b3459]">
               <div>
                 <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center space-x-2">
-                  <Calendar className="w-4 h-4 text-amber-400" />
+                  <Calendar className="w-4 h-4 text-blue-400" />
                   <span>Jurnal Audit &amp; Catatan Wajib Lapor Tersangka / Klien</span>
                 </h3>
                 <p className="text-[11px] text-slate-400 mt-0.5">
@@ -930,7 +928,7 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
                   return (
                     <div
                       key={item.id}
-                      className="p-5 bg-slate-900/80 border border-slate-800/80 hover:border-amber-500/40 rounded-2xl transition-all shadow-lg space-y-4"
+                      className="p-5 bg-slate-900/80 border border-slate-800/80 hover:border-blue-500/40 rounded-2xl transition-all shadow-lg space-y-4"
                     >
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
                         <div className="flex flex-wrap items-center gap-2.5 min-w-0">
@@ -948,7 +946,7 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
                         <button
                           type="button"
                           onClick={() => onSelectCase ? onSelectCase(item.id) : onSelectPermohonan(item.id)}
-                          className="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold rounded-xl flex items-center gap-1.5 cursor-pointer text-xs transition-all shadow-md self-start sm:self-auto shrink-0"
+                          className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl flex items-center gap-1.5 cursor-pointer text-xs transition-all shadow-md self-start sm:self-auto shrink-0"
                         >
                           <CheckSquare className="w-3.5 h-3.5" />
                           <span>+ Tambah / Kelola Catatan Wajib Lapor</span>
@@ -969,11 +967,11 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
                                 <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-2">
                                   <div className="flex items-center gap-2">
                                     {isAktual ? (
-                                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-400 border border-blue-500/30">
                                         ✓ Pelaporan Aktual (Terlaksana)
                                       </span>
                                     ) : (
-                                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/30">
+                                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-800 text-slate-300 border border-slate-700">
                                         📅 Rencana Wajib Lapor (Belum Aktual)
                                       </span>
                                     )}
@@ -990,14 +988,14 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
 
                                   <div className="text-right text-[10px] font-mono text-slate-400">
                                     <span>Waktu Input Sistem: </span>
-                                    <strong className="text-cyan-300">{wl.waktuInputSistem || wl.tanggalDiunggah || 'Logged'}</strong>
+                                    <strong className="text-blue-300">{wl.waktuInputSistem || wl.tanggalDiunggah || 'Logged'}</strong>
                                   </div>
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-2 pt-1 text-slate-300">
                                   <div>
                                     <span className="text-[10px] uppercase font-bold text-slate-400 block">Tanggal Pelaporan Aktual</span>
-                                    <span className={`font-mono font-bold ${isAktual ? 'text-emerald-400' : 'text-slate-500 italic'}`}>
+                                    <span className={`font-mono font-bold ${isAktual ? 'text-blue-400' : 'text-slate-500 italic'}`}>
                                       {wl.tanggalPelaporanAktual || '— (Belum diisi)'}
                                     </span>
                                   </div>

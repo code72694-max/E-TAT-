@@ -176,7 +176,7 @@ export const InputJadwalKontrolView: React.FC<InputJadwalKontrolViewProps> = ({
           </button>
           <div>
             <h1 className="text-lg font-bold text-slate-100 tracking-tight flex items-center gap-2">
-              <Calendar className="w-5 h-5 text-cyan-400 shrink-0" />
+              <Calendar className="w-5 h-5 text-blue-400 shrink-0" />
               <span>Input Jadwal Kontrol &amp; Wajib Lapor Klien</span>
             </h1>
             <p className="text-xs text-slate-400 mt-0.5">
@@ -185,7 +185,7 @@ export const InputJadwalKontrolView: React.FC<InputJadwalKontrolViewProps> = ({
           </div>
         </div>
 
-        <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 rounded-full text-xs font-semibold shrink-0">
+        <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 bg-blue-500/10 text-blue-400 border border-blue-500/30 rounded-full text-xs font-semibold shrink-0">
           <ShieldCheck className="w-3.5 h-3.5" /> Validasi Sidang Pleno
         </span>
       </div>
@@ -237,8 +237,8 @@ export const InputJadwalKontrolView: React.FC<InputJadwalKontrolViewProps> = ({
                     <span className="text-slate-400 block text-[10px] uppercase">No. LP Perkara</span>
                     <span className="text-slate-200 font-semibold">{selectedClient.perkara.nomorLaporanPolisi}</span>
                   </div>
-                  <span className="px-2.5 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 rounded-lg font-sans font-semibold flex items-center gap-1">
-                    <BadgeCheck className="w-3.5 h-3.5 text-emerald-400" /> Sidang TAT Selesai
+                  <span className="px-2.5 py-1 bg-blue-500/10 text-blue-400 border border-blue-500/30 rounded-lg font-sans font-semibold flex items-center gap-1">
+                    <BadgeCheck className="w-3.5 h-3.5 text-blue-400" /> Sidang TAT Selesai
                   </span>
                 </div>
               </div>
@@ -250,7 +250,7 @@ export const InputJadwalKontrolView: React.FC<InputJadwalKontrolViewProps> = ({
         <div className="bg-[#0a192f] border border-[#1e3a5f] rounded-2xl p-5 space-y-4 shadow-md">
           <div className="flex items-center justify-between border-b border-[#1e3a5f] pb-2.5">
             <h3 className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-2">
-              <Stethoscope className="w-4 h-4 text-cyan-400" />
+              <Stethoscope className="w-4 h-4 text-blue-400" />
               <span>2. Jadwal Kontrol Medis &amp; Modalitas Rehab</span>
             </h3>
             <span className="text-[11px] text-slate-400 font-mono">Tahap 1 Medis</span>
@@ -276,7 +276,7 @@ export const InputJadwalKontrolView: React.FC<InputJadwalKontrolViewProps> = ({
                 onClick={() => setModalitas('Rawat Inap')}
                 className={`px-4 py-2 rounded-lg font-bold text-xs transition-all cursor-pointer ${
                   modalitas === 'Rawat Inap'
-                    ? 'bg-emerald-600 text-white shadow-md'
+                    ? 'bg-blue-600 text-white shadow-md'
                     : 'text-slate-400 hover:text-slate-200'
                 }`}
               >
@@ -339,7 +339,7 @@ export const InputJadwalKontrolView: React.FC<InputJadwalKontrolViewProps> = ({
         <div className="bg-[#0a192f] border border-[#1e3a5f] rounded-2xl p-5 space-y-4 shadow-md">
           <div className="flex items-center justify-between border-b border-[#1e3a5f] pb-2.5">
             <h3 className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-2">
-              <CheckSquare className="w-4 h-4 text-emerald-400" />
+              <CheckSquare className="w-4 h-4 text-blue-400" />
               <span>3. Jadwal Wajib Lapor Kepada Penyidik / JPU</span>
             </h3>
             <span className="text-[11px] text-slate-400 font-mono">Tahap 2 Hukum</span>
@@ -353,7 +353,7 @@ export const InputJadwalKontrolView: React.FC<InputJadwalKontrolViewProps> = ({
                   type="date"
                   value={tanggalWajibLapor}
                   onChange={(e) => setTanggalWajibLapor(e.target.value)}
-                  className="w-full p-2.5 bg-[#071324] border border-[#1e3a5f] rounded-xl text-slate-100 font-mono focus:outline-none focus:border-emerald-500"
+                  className="w-full p-2.5 bg-[#071324] border border-[#1e3a5f] rounded-xl text-slate-100 font-mono focus:outline-none focus:border-blue-500"
                   required
                 />
               </div>
@@ -363,7 +363,7 @@ export const InputJadwalKontrolView: React.FC<InputJadwalKontrolViewProps> = ({
                 <select
                   value={kanalPelaporan}
                   onChange={(e) => setKanalPelaporan(e.target.value as any)}
-                  className="w-full p-2.5 bg-[#071324] border border-[#1e3a5f] rounded-xl text-slate-100 focus:outline-none focus:border-emerald-500"
+                  className="w-full p-2.5 bg-[#071324] border border-[#1e3a5f] rounded-xl text-slate-100 focus:outline-none focus:border-blue-500"
                 >
                   <option value="langsung">Tatap Muka / Datang Langsung</option>
                   <option value="digital">Kanal Digital / Video Call</option>
@@ -377,7 +377,7 @@ export const InputJadwalKontrolView: React.FC<InputJadwalKontrolViewProps> = ({
                   type="text"
                   value={namaPenyidik}
                   onChange={(e) => setNamaPenyidik(e.target.value)}
-                  className="w-full p-2.5 bg-[#071324] border border-[#1e3a5f] rounded-xl text-slate-100 focus:outline-none focus:border-emerald-500"
+                  className="w-full p-2.5 bg-[#071324] border border-[#1e3a5f] rounded-xl text-slate-100 focus:outline-none focus:border-blue-500"
                   required
                 />
               </div>
@@ -388,7 +388,7 @@ export const InputJadwalKontrolView: React.FC<InputJadwalKontrolViewProps> = ({
                   type="text"
                   value={instansiPenyidik}
                   onChange={(e) => setInstansiPenyidik(e.target.value)}
-                  className="w-full p-2.5 bg-[#071324] border border-[#1e3a5f] rounded-xl text-slate-100 focus:outline-none focus:border-emerald-500"
+                  className="w-full p-2.5 bg-[#071324] border border-[#1e3a5f] rounded-xl text-slate-100 focus:outline-none focus:border-blue-500"
                   required
                 />
               </div>
@@ -400,7 +400,7 @@ export const InputJadwalKontrolView: React.FC<InputJadwalKontrolViewProps> = ({
                 rows={2}
                 value={catatanKhusus}
                 onChange={(e) => setCatatanKhusus(e.target.value)}
-                className="w-full p-2.5 bg-[#071324] border border-[#1e3a5f] rounded-xl text-slate-100 focus:outline-none focus:border-emerald-500"
+                className="w-full p-2.5 bg-[#071324] border border-[#1e3a5f] rounded-xl text-slate-100 focus:outline-none focus:border-blue-500"
               />
             </div>
           </div>
