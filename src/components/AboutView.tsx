@@ -197,7 +197,7 @@ export const AboutView: React.FC<AboutViewProps> = ({
   ];
 
   // 8 Roles Details
-  const rolesDetails: Record<
+  const rolesDetails: Partial<Record<
     UserRole,
     {
       name: string;
@@ -210,7 +210,7 @@ export const AboutView: React.FC<AboutViewProps> = ({
       boundaries: string[];
       keyOutputs: string[];
     }
-  > = {
+  >> = {
     pengaju: {
       name: 'Penyidik Pengaju',
       agency: 'Satresnarkoba Polri / BNN Kabupaten/Kota',

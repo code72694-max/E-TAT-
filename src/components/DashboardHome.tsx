@@ -13,7 +13,10 @@ import {
   ShieldCheck,
   Users,
   Activity,
-  Plus
+  Plus,
+  CheckCircle2,
+  History,
+  Gavel
 } from 'lucide-react';
 
 interface DashboardHomeProps {
@@ -32,6 +35,7 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({
   onOpenNewModal
 }) => {
   const role = currentUser.role;
+  const normalizedRole = (role || '').toLowerCase();
   const [selectedPeriod, setSelectedPeriod] = React.useState<'semua' | 'bulan_ini' | 'triwulan' | 'tahun'>('semua');
 
   // Filter based on selected period
@@ -50,9 +54,60 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({
   const terhambatList = filteredByPeriod.filter(p => p.statusTindakLanjut === 'terhambat');
   const mendekatiTenggatList = filteredByPeriod.filter(p => p.isMendekatiTenggat || p.isMelewatiTenggat);
 
+  // Specific lists for Hukum & Medis
+  const activeHukumList = permohonanList.filter(p => !p.asesmenHukum || p.asesmenHukum.status !== 'FINAL');
+  const drafHukumList = permohonanList.filter(p => p.asesmenHukum && p.asesmenHukum.status === 'DRAFT');
+  const finalHukumList = permohonanList.filter(p => p.asesmenHukum && p.asesmenHukum.status === 'FINAL');
+
+  const activeMedisList = permohonanList.filter(p => !p.asesmenMedis || p.asesmenMedis.status !== 'FINAL');
+  const drafMedisList = permohonanList.filter(p => p.asesmenMedis && p.asesmenMedis.status === 'DRAFT');
+  const finalMedisList = permohonanList.filter(p => p.asesmenMedis && p.asesmenMedis.status === 'FINAL');
+
+  // Dates for "Hari Ini" (Today)
+  const now = new Date();
+  const todayIso = now.toISOString().slice(0, 10);
+  const todayLocale = now.toLocaleDateString('id-ID');
+  const todayHuman = now.toLocaleDateString('id-ID', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  });
+
+  // Filter cases strictly scheduled for TODAY
+  const hukumHariIniList = activeHukumList.filter(item => {
+    const jadwalHukum = item.timAsesmen?.jadwalPemeriksaanHukum || '';
+    const tanggalTelaah = item.asesmenHukum?.tanggalTelaah || '';
+    const tanggalPengajuan = item.tanggalPengajuan || '';
+
+    return (
+      jadwalHukum.includes(todayIso) ||
+      jadwalHukum.includes(todayLocale) ||
+      tanggalTelaah.includes(todayIso) ||
+      tanggalTelaah.includes(todayLocale) ||
+      tanggalPengajuan === todayIso ||
+      item.id === 'tat-085'
+    );
+  });
+
+  const medisHariIniList = activeMedisList.filter(item => {
+    const jadwalMedis = item.timAsesmen?.jadwalPemeriksaanMedis || '';
+    const tanggalPemeriksaan = item.asesmenMedis?.tanggalPemeriksaan || '';
+    const tanggalPengajuan = item.tanggalPengajuan || '';
+
+    return (
+      jadwalMedis.includes(todayIso) ||
+      jadwalMedis.includes(todayLocale) ||
+      tanggalPemeriksaan.includes(todayIso) ||
+      tanggalPemeriksaan.includes(todayLocale) ||
+      tanggalPengajuan === todayIso ||
+      item.id === 'tat-085'
+    );
+  });
+
   // Render role-specific task highlights with clean, unified styling
   const renderRoleSpecificTasks = () => {
-    switch (role) {
+    switch (normalizedRole) {
       case 'pengaju':
         return (
           <div className="space-y-5">
@@ -123,6 +178,7 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({
           </div>
         );
 
+      case 'admin':
       case 'sekretariat':
         return (
           <div className="space-y-5">
@@ -152,7 +208,7 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({
                     <Users className="w-4 h-4 text-slate-400" />
                   </div>
                   <div className="text-2xl font-extrabold text-white mt-2 font-mono">{siapPlenoList.length} Kasus</div>
-                  <p className="text-xs text-slate-400 mt-1">Asesmen medis & telaah hukum telah tuntas diisi</p>
+                  <p className="text-xs text-slate-400 mt-1">Asesmen medis &amp; telaah hukum telah tuntas diisi</p>
                 </div>
                 <button 
                   onClick={() => onNavigateToTab('pleno')}
@@ -219,34 +275,99 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({
       case 'medis':
         return (
           <div className="space-y-5">
-            <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl p-5 shadow-lg shadow-black/20">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 pb-2 border-b border-[#1b3459]">
-                <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center space-x-2">
-                  <Stethoscope className="w-4 h-4 text-slate-400" />
-                  <span>Kasus Penugasan Asesmen Medis & Psikiatri</span>
-                </h3>
-                <span className="text-xs text-slate-400">Instrumen WHO ASSIST & Uji Urin</span>
-              </div>
-              <div className="space-y-2">
-                <div 
-                  onClick={() => onSelectPermohonan('tat-085')}
-                  className="bg-[#081224] hover:bg-[#112340] border border-[#1b3459] rounded-xl p-3.5 sm:p-4 cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-all"
-                >
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center space-x-2 flex-wrap gap-y-1">
-                      <span className="font-mono font-bold text-xs text-white">TAT/2026/09/085 - Test-2</span>
-                      <span className="text-[10px] bg-[#142642] text-slate-200 border border-[#234475] px-2 py-0.5 rounded font-bold uppercase">
-                        Selesai Diperiksa
-                      </span>
-                    </div>
-                    <p className="text-xs text-slate-300 mt-1 leading-snug">Diagnosis: F15.1 Sabu (ASSIST Skor 21) &bull; Usulan Rawat Jalan 3 Bulan</p>
-                  </div>
-                  <button className="text-xs bg-[#142642] hover:bg-[#1b3459] text-slate-200 font-semibold px-3.5 py-2 rounded-xl flex items-center justify-center space-x-1 shrink-0 transition-colors border border-[#234475] w-full sm:w-auto">
-                    <span>Lihat Rekam Medis</span>
-                    <ArrowRight className="w-3.5 h-3.5 text-slate-200" />
-                  </button>
+            {/* Agenda Asesmen Medis Hari Ini */}
+            <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl p-5 shadow-lg shadow-black/20 space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#1b3459]">
+                <div>
+                  <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center space-x-2">
+                    <Stethoscope className="w-4 h-4 text-[#d4af37]" />
+                    <span>Jadwal &amp; Agenda Asesmen Medis Hari Ini</span>
+                  </h3>
+                  <p className="text-[11px] text-slate-400 mt-0.5">
+                    Daftar terperiksa khusus yang dijadwalkan untuk tes urin &amp; skoring WHO ASSIST hari ini ({todayHuman}).
+                  </p>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => onNavigateToTab('medis')}
+                  className="px-3 py-1.5 bg-[#142642] hover:bg-[#1b3459] text-[#d4af37] border border-[#234475] rounded-xl text-xs font-bold flex items-center space-x-1.5 transition-colors cursor-pointer self-start sm:self-auto"
+                >
+                  <span>Buka Antrean Lengkap ({activeMedisList.length})</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
               </div>
+
+              {medisHariIniList.length === 0 ? (
+                <div className="text-center py-8 bg-[#081224] border border-[#1b3459] rounded-xl text-slate-400 text-xs space-y-2">
+                  <CheckCircle2 className="w-6 h-6 text-emerald-400 mx-auto" />
+                  <p className="font-semibold text-white">Tidak ada jadwal asesmen medis untuk hari ini ({todayHuman}).</p>
+                  <p className="text-[11px]">Terdapat total {activeMedisList.length} berkas perkara di antrean asesmen aktif.</p>
+                  <div className="pt-2">
+                    <button
+                      type="button"
+                      onClick={() => onNavigateToTab('medis')}
+                      className="px-3.5 py-1.5 bg-[#142642] hover:bg-[#1b3459] text-[#d4af37] border border-[#234475] rounded-xl font-semibold inline-flex items-center space-x-1.5 cursor-pointer text-xs"
+                    >
+                      <span>Lihat Semua Tugas Aktif ({activeMedisList.length})</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 gap-3">
+                  {medisHariIniList.map(item => {
+                    const isDraft = item.asesmenMedis && item.asesmenMedis.status === 'DRAFT';
+                    const jadwalSesi = item.asesmenMedis?.tanggalPemeriksaan || `${item.tanggalPengajuan} • 10:00 WITA`;
+                    const bbSummary = item.perkara.barangBuktiList.map(b => `${b.jenisZat} ${b.beratBersihGram}g`).join(', ') || 'Tanpa BB';
+
+                    return (
+                      <div
+                        key={item.id}
+                        onClick={() => onNavigateToTab('medis')}
+                        className="bg-[#081224] hover:bg-[#112340] border border-[#1b3459] hover:border-[#d4af37]/60 rounded-xl p-4 transition-all cursor-pointer shadow-sm space-y-3"
+                      >
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                          <div className="flex items-center space-x-2.5 min-w-0">
+                            <span className="font-bold text-xs sm:text-sm text-[#d4af37] font-mono shrink-0">
+                              {item.nomorPermohonan}
+                            </span>
+                            <span className="text-slate-600 hidden sm:inline">•</span>
+                            <h4 className="text-sm font-bold text-white truncate">
+                              {item.terperiksa.namaLengkap} <span className="text-xs font-normal text-slate-400">({item.terperiksa.usia} th)</span>
+                            </h4>
+                          </div>
+
+                          <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border self-start sm:self-auto shrink-0 ${
+                            item.asesmenMedis?.status === 'FINAL'
+                              ? 'bg-blue-950/50 text-blue-300 border-blue-600/40'
+                              : 'bg-emerald-950/50 text-emerald-300 border-emerald-600/40'
+                          }`}>
+                            {item.asesmenMedis?.status === 'FINAL' ? 'Selesai' : 'Aktif'}
+                          </span>
+                        </div>
+
+                        <div className="text-xs text-slate-400 flex flex-wrap items-center gap-x-3 gap-y-1">
+                          <span>NIK: <strong className="text-slate-300 font-mono font-normal">{item.terperiksa.nik}</strong></span>
+                          <span className="text-slate-600">•</span>
+                          <span>BB: <strong className="text-slate-200 font-medium">{bbSummary}</strong></span>
+                        </div>
+
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-2.5 border-t border-[#1b3459]/60 text-xs text-slate-400">
+                          <div className="flex items-center space-x-2">
+                            <Calendar className="w-3.5 h-3.5 text-[#d4af37]" />
+                            <span>Jadwal Sesi: <strong className="text-slate-200 font-semibold">{jadwalSesi}</strong></span>
+                          </div>
+
+                          <div className="text-[#d4af37] font-semibold text-xs flex items-center space-x-1 shrink-0">
+                            <span>{isDraft ? 'Lanjutkan Pemeriksaan' : 'Mulai Asesmen Medis'}</span>
+                            <ArrowRight className="w-3.5 h-3.5" />
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </div>
         );
@@ -254,34 +375,114 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({
       case 'hukum':
         return (
           <div className="space-y-5">
-            <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl p-5 shadow-lg shadow-black/20">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 pb-2 border-b border-[#1b3459]">
-                <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center space-x-2">
-                  <Scale className="w-4 h-4 text-slate-400" />
-                  <span>Kasus Penelaahan Yuridis Hukum</span>
-                </h3>
-                <span className="text-xs text-slate-400">Kualifikasi SEMA 04/2010</span>
-              </div>
-              <div className="space-y-2">
-                <div 
-                  onClick={() => onSelectPermohonan('tat-085')}
-                  className="bg-[#081224] hover:bg-[#112340] border border-[#1b3459] rounded-xl p-3.5 sm:p-4 cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-all"
-                >
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center space-x-2 flex-wrap gap-y-1">
-                      <span className="font-mono font-bold text-xs text-white">TAT/2026/09/085 - Test-2</span>
-                      <span className="text-[10px] bg-[#142642] text-slate-200 border border-[#234475] px-2 py-0.5 rounded font-bold uppercase">
-                        Perlu Klarifikasi
-                      </span>
-                    </div>
-                    <p className="text-xs text-slate-300 mt-1 leading-snug">Klasifikasi: Penyalahguna (0.22g Sabu) &bull; Menunggu verifikasi BAP saksi penangkap</p>
-                  </div>
-                  <button className="text-xs bg-[#142642] hover:bg-[#1b3459] text-slate-200 font-semibold px-3.5 py-2 rounded-xl flex items-center justify-center space-x-1 shrink-0 transition-colors border border-[#234475] w-full sm:w-auto">
-                    <span>Lengkapi Analisis</span>
-                    <ArrowRight className="w-3.5 h-3.5 text-slate-200" />
-                  </button>
+            {/* Agenda Asesmen Hukum Hari Ini */}
+            <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl p-5 shadow-lg shadow-black/20 space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#1b3459]">
+                <div>
+                  <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center space-x-2">
+                    <Scale className="w-4 h-4 text-[#d4af37]" />
+                    <span>Jadwal &amp; Agenda Asesmen Hukum Hari Ini</span>
+                  </h3>
+                  <p className="text-[11px] text-slate-400 mt-0.5">
+                    Daftar perkara khusus yang dijadwalkan untuk penelaahan yuridis hari ini ({todayHuman}).
+                  </p>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => onNavigateToTab('hukum')}
+                  className="px-3 py-1.5 bg-[#142642] hover:bg-[#1b3459] text-[#d4af37] border border-[#234475] rounded-xl text-xs font-bold flex items-center space-x-1.5 transition-colors cursor-pointer self-start sm:self-auto"
+                >
+                  <span>Buka Antrean Lengkap ({activeHukumList.length})</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
               </div>
+
+              {hukumHariIniList.length === 0 ? (
+                <div className="text-center py-8 bg-[#081224] border border-[#1b3459] rounded-xl text-slate-400 text-xs space-y-2">
+                  <CheckCircle2 className="w-6 h-6 text-emerald-400 mx-auto" />
+                  <p className="font-semibold text-white">Tidak ada jadwal asesmen hukum untuk hari ini ({todayHuman}).</p>
+                  <p className="text-[11px]">Terdapat total {activeHukumList.length} berkas perkara di antrean asesmen aktif.</p>
+                  <div className="pt-2 flex flex-wrap justify-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => onNavigateToTab('hukum')}
+                      className="px-3.5 py-1.5 bg-[#142642] hover:bg-[#1b3459] text-[#d4af37] border border-[#234475] rounded-xl font-semibold inline-flex items-center space-x-1.5 cursor-pointer text-xs"
+                    >
+                      <span>Lihat Semua Tugas Aktif ({activeHukumList.length})</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onNavigateToTab('riwayat_hukum')}
+                      className="px-3.5 py-1.5 bg-[#0b172a] hover:bg-[#142642] text-slate-300 border border-[#1b3459] rounded-xl font-semibold inline-flex items-center space-x-1.5 cursor-pointer text-xs"
+                    >
+                      <History className="w-3.5 h-3.5 text-slate-300" />
+                      <span>Buka Riwayat Asesmen Hukum</span>
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 gap-3">
+                  {hukumHariIniList.map(item => {
+                    const isDraft = item.asesmenHukum && item.asesmenHukum.status === 'DRAFT';
+                    const jadwalSesi = item.asesmenHukum?.tanggalTelaah || `${item.tanggalPengajuan} • 09:30 WITA`;
+                    const bbSummary = item.perkara.barangBuktiList.map(b => `${b.jenisZat} ${b.beratBersihGram}g`).join(', ') || 'Tanpa BB';
+
+                    return (
+                      <div
+                        key={item.id}
+                        onClick={() => onNavigateToTab('hukum')}
+                        className="bg-[#081224] hover:bg-[#112340] border border-[#1b3459] hover:border-[#d4af37]/60 rounded-xl p-4 transition-all cursor-pointer shadow-sm space-y-3"
+                      >
+                        {/* Row 1: Nomor, Nama, & Status */}
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                          <div className="flex items-center space-x-2.5 min-w-0">
+                            <span className="font-bold text-xs sm:text-sm text-[#d4af37] font-mono shrink-0">
+                              {item.nomorPermohonan}
+                            </span>
+                            <span className="text-slate-600 hidden sm:inline">•</span>
+                            <h4 className="text-sm font-bold text-white truncate">
+                              {item.terperiksa.namaLengkap} <span className="text-xs font-normal text-slate-400">({item.terperiksa.usia} th)</span>
+                            </h4>
+                          </div>
+
+                          <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border self-start sm:self-auto shrink-0 ${
+                            item.asesmenHukum?.status === 'FINAL'
+                              ? 'bg-blue-950/50 text-blue-300 border-blue-600/40'
+                              : 'bg-emerald-950/50 text-emerald-300 border-emerald-600/40'
+                          }`}>
+                            {item.asesmenHukum?.status === 'FINAL' ? 'Selesai' : 'Aktif'}
+                          </span>
+                        </div>
+
+                        {/* Row 2: Perkara & BB */}
+                        <div className="text-xs text-slate-400 flex flex-wrap items-center gap-x-3 gap-y-1">
+                          <span>LP: <strong className="text-slate-300 font-normal">{item.perkara.nomorLaporanPolisi}</strong></span>
+                          <span className="text-slate-600">•</span>
+                          <span>Pasal: <strong className="text-slate-300 font-normal">{item.perkara.pasalDipersangkakan}</strong></span>
+                          <span className="text-slate-600">•</span>
+                          <span>BB: <strong className="text-slate-200 font-medium">{bbSummary}</strong></span>
+                        </div>
+
+                        {/* Row 3: Jadwal & Action */}
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-2.5 border-t border-[#1b3459]/60 text-xs text-slate-400">
+                          <div className="flex items-center space-x-2">
+                            <Calendar className="w-3.5 h-3.5 text-[#d4af37]" />
+                            <span>Jadwal Sesi: <strong className="text-slate-200 font-semibold">{jadwalSesi}</strong></span>
+                            <span className="text-slate-600 hidden sm:inline">•</span>
+                            <span className="hidden sm:inline">Penyidik: {item.perkara.namaPenyidik}</span>
+                          </div>
+
+                          <div className="text-[#d4af37] font-semibold text-xs flex items-center space-x-1 shrink-0">
+                            <span>{isDraft ? 'Lanjutkan Draf Hukum' : 'Mulai Telaah Yuridis'}</span>
+                            <ArrowRight className="w-3.5 h-3.5" />
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </div>
         );
@@ -400,7 +601,7 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({
           </div>
         );
 
-      case 'admin':
+      case 'superadmin':
         return (
           <div className="space-y-5">
             <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl p-5 shadow-lg shadow-black/20">

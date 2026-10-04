@@ -1,21 +1,17 @@
 import React, { useState } from 'react';
 import { UserRole, UserProfile } from '../types';
-import { MOCK_USERS } from '../data/initialData';
 import { PoliceEmblem } from './PoliceEmblem';
 import {
   ShieldCheck,
   Bell,
   Search,
   ChevronDown,
-  UserCheck,
   AlertTriangle,
   Clock,
   FileText,
   Menu,
   X,
   LogOut,
-  Globe,
-  ArrowLeftRight,
   ArrowLeft,
   QrCode,
   User
@@ -24,7 +20,7 @@ import { PermohonanAsesmen } from '../types';
 
 interface HeaderProps {
   currentUser: UserProfile;
-  onSelectUser: (user: UserProfile) => void;
+  onSelectUser?: (user: UserProfile) => void;
   searchQuery: string;
   onSearchChange: (q: string) => void;
   onOpenPermohonan: (id: string) => void;
@@ -41,7 +37,6 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({
   currentUser,
-  onSelectUser,
   searchQuery,
   onSearchChange,
   onOpenPermohonan,
@@ -49,15 +44,12 @@ export const Header: React.FC<HeaderProps> = ({
   onToggleMobileNav,
   isMobileNavOpen,
   onLogout,
-  onGoToLanding,
-  onGoToLogin,
   selectedPermohonan,
   onBackFromDetail,
   onOpenQrModal
 }) => {
   const [showRoleDropdown, setShowRoleDropdown] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
-  const [showQuickList, setShowQuickList] = useState(false);
 
   const getRoleLabel = (role: UserRole) => {
     switch (role) {
@@ -108,31 +100,18 @@ export const Header: React.FC<HeaderProps> = ({
     return (
       <header className="bg-[#0b172a] text-slate-100 border-b border-[#1b3459] sticky top-0 z-30 shadow-md">
         <div className="w-full px-3 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-14 sm:h-16 gap-3">
-            {/* Left: Back Button & Case Title */}
-            <div className="flex items-center space-x-2.5 sm:space-x-3 min-w-0 flex-1">
+          <div className="max-w-7xl mx-auto flex items-center justify-between h-14 sm:h-16 gap-3">
+            {/* Left: Back Button */}
+            <div className="flex items-center space-x-2.5 sm:space-x-3">
               <button
                 type="button"
                 onClick={onBackFromDetail}
-                className="p-2 sm:px-3 sm:py-2 bg-[#081224] border border-[#1b3459] hover:bg-[#142642] rounded-xl text-slate-200 transition-colors cursor-pointer shrink-0 flex items-center space-x-1.5"
-                title="Kembali ke Daftar Permohonan"
+                className="px-3.5 py-2 bg-[#081224] border border-[#1b3459] hover:bg-[#142642] rounded-xl text-slate-200 transition-colors cursor-pointer shrink-0 flex items-center space-x-2 text-xs font-bold shadow-sm"
+                title="Kembali"
               >
                 <ArrowLeft className="w-4 h-4 text-[#d4af37]" />
-                <span className="text-xs font-semibold hidden sm:inline text-slate-200">Kembali</span>
+                <span>Kembali</span>
               </button>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center space-x-2">
-                  <span className="font-mono font-bold text-xs sm:text-sm text-[#d4af37] truncate">
-                    {selectedPermohonan.nomorPermohonan}
-                  </span>
-                  <span className="hidden sm:inline-block text-[10px] text-slate-300 font-mono bg-[#142642] px-2 py-0.5 rounded border border-[#234475] shrink-0">
-                    {selectedPermohonan.statusProsesUtama.replace(/_/g, ' ').toUpperCase()}
-                  </span>
-                </div>
-                <p className="text-xs text-white font-semibold truncate leading-tight mt-0.5">
-                  {selectedPermohonan.terperiksa.namaLengkap}
-                </p>
-              </div>
             </div>
 
             {/* Right: Quick QR Button & Notification Bell */}
@@ -175,28 +154,15 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="w-full px-3 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-14 sm:h-16">
           {/* Left: Brand Identifier */}
-          <div className="flex items-center space-x-2 sm:space-x-3 min-w-0">
-            {/* E-TAT Logo & Brand */}
-            <div className="flex items-center space-x-2 sm:space-x-3 min-w-0">
-              <img
-                src="/logo_etat.png"
-                alt="Logo E-TAT"
-                className="h-10 sm:h-12 w-auto object-contain shrink-0 drop-shadow-[0_2px_8px_rgba(212,175,55,0.30)]"
-              />
-              <div className="min-w-0">
-                <div className="flex items-center space-x-2">
-                  <span className="font-extrabold text-sm sm:text-base tracking-wider text-white font-['Cinzel',serif] block leading-tight truncate">
-                    E-TAT <span className="text-[#D4AF37]">SIAP PULIH</span>
-                  </span>
-                  <span className="hidden sm:inline-block text-[9px] uppercase font-mono font-bold bg-[#D4AF37]/15 text-[#F3E5AB] px-1.5 rounded border border-[#D4AF37]/30 shrink-0">
-                    BNNP KALTIM
-                  </span>
-                </div>
-                <p className="text-[10px] text-slate-400 hidden sm:block leading-tight mt-0.5 truncate">
-                  Sistem Integrasi Asesmen &amp; Pemantauan Pemulihan
-                </p>
-              </div>
-            </div>
+          <div className="flex items-center space-x-2.5 sm:space-x-3 min-w-0">
+            <img
+              src="/logo_etat.png"
+              alt="Logo E-TAT"
+              className="h-9 sm:h-10 w-auto object-contain shrink-0 drop-shadow-[0_2px_8px_rgba(212,175,55,0.30)]"
+            />
+            <span className="font-extrabold text-sm sm:text-base tracking-wider text-white font-['Cinzel',serif] leading-tight truncate">
+              E-TAT <span className="text-[#D4AF37]">SIAP PULIH</span>
+            </span>
           </div>
 
 
@@ -290,34 +256,33 @@ export const Header: React.FC<HeaderProps> = ({
             )}
 
 
-            {/* Role / User Profile Menu Button (Desktop Only) */}
+            {/* Minimalist Profile & Role Menu Button (No BG / Minimalist) */}
             <div className="relative hidden md:block">
               <button
                 id="btn-role-switcher"
                 onClick={() => setShowRoleDropdown(!showRoleDropdown)}
-                className="flex items-center space-x-2.5 bg-[#14213D] hover:bg-[#1E2D4A] border border-[#2A3F6D] px-3 py-1.5 rounded-xl transition-all text-xs font-medium cursor-pointer"
+                className="flex items-center space-x-2.5 bg-transparent hover:bg-white/5 px-2 py-1 rounded-xl transition-colors text-xs cursor-pointer group"
+                title={`Profil: ${currentUser.name}`}
               >
-                <div className="w-7 h-7 rounded-lg bg-[#090E1D] border border-[#D4AF37]/30 flex items-center justify-center shrink-0">
-                  <User className="w-4 h-4 text-[#D4AF37]" />
+                <div className="w-8 h-8 rounded-full bg-[#142642]/80 border border-[#234475] flex items-center justify-center shrink-0 text-[#d4af37] group-hover:border-[#d4af37]/50 transition-colors">
+                  <User className="w-4 h-4" />
                 </div>
-                <div className="text-left hidden sm:block max-w-[150px]">
-                  <div className="flex items-center space-x-1">
-                    <span className="font-bold text-white truncate block text-[11px]">
-                      {currentUser.name.split(',')[0]}
-                    </span>
-                  </div>
-                  <span className="text-[10px] text-[#F3E5AB] truncate block">
-                    {getRoleRankBadge(currentUser.role).label}
+                <div className="text-left hidden lg:block max-w-[220px]">
+                  <span className="font-bold text-white group-hover:text-[#d4af37] truncate block text-xs leading-tight transition-colors">
+                    {currentUser.name}
+                  </span>
+                  <span className="text-[10px] text-slate-400 font-medium truncate block leading-tight mt-0.5">
+                    {getRoleLabel(currentUser.role)}
                   </span>
                 </div>
-                <ChevronDown className="w-3.5 h-3.5 text-[#D4AF37] ml-0.5" />
+                <ChevronDown className="w-3.5 h-3.5 text-slate-400 group-hover:text-white transition-transform duration-150 ml-0.5" />
               </button>
 
-              {/* Profile & Role Dropdown */}
+              {/* Profile Details & Logout Dropdown */}
               {showRoleDropdown && (
-                <div className="absolute right-0 mt-2 w-84 bg-[#0F172A] rounded-2xl border border-[#2A3F6D] text-slate-200 py-2.5 z-50 shadow-2xl animate-in fade-in slide-in-from-top-1 duration-150">
-                  {/* Current User Card */}
-                  <div className="px-4 py-3 border-b border-[#1E2D4A] bg-[#14213D]/60 space-y-1">
+                <div className="absolute right-0 mt-2 w-72 bg-[#0F172A] rounded-2xl border border-[#2A3F6D] text-slate-200 p-2 z-50 shadow-2xl animate-in fade-in slide-in-from-top-1 duration-150">
+                  {/* Current User Profile Card */}
+                  <div className="px-3.5 py-3 rounded-xl bg-[#14213D]/70 border border-[#1E2D4A] space-y-1.5 mb-2">
                     <div className="flex items-center justify-between">
                       <span className="text-[10px] uppercase font-bold text-slate-400">AKUN JABATAN AKTIF</span>
                       <span
@@ -328,108 +293,28 @@ export const Header: React.FC<HeaderProps> = ({
                         {getRoleRankBadge(currentUser.role).label}
                       </span>
                     </div>
-                    <p className="text-xs font-bold text-white mt-1 leading-tight">{currentUser.name}</p>
+                    <p className="text-xs font-bold text-white leading-tight">{currentUser.name}</p>
                     <p className="text-[11px] text-[#F3E5AB] font-medium">{getRoleLabel(currentUser.role)}</p>
-                    <p className="text-[10px] text-slate-400 truncate">{currentUser.agency}</p>
-                    <p className="text-[10px] text-slate-400 font-mono truncate">{currentUser.email}</p>
+                    <div className="pt-1 border-t border-[#1E2D4A]/80 space-y-0.5 text-[10px] text-slate-400">
+                      <p className="truncate font-medium">{currentUser.agency}</p>
+                      <p className="truncate font-mono text-slate-400">{currentUser.email}</p>
+                    </div>
                   </div>
 
-                  {/* Primary Navigation Actions */}
-                  <div className="p-2 space-y-1">
+                  {/* Logout Button */}
+                  {onLogout && (
                     <button
                       type="button"
                       onClick={() => {
                         setShowRoleDropdown(false);
-                        if (onGoToLogin) {
-                          onGoToLogin();
-                        } else if (onLogout) {
-                          onLogout();
-                        }
+                        onLogout();
                       }}
-                      className="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-[#F3E5AB] hover:bg-[#1E2D4A] flex items-center space-x-2 transition-colors cursor-pointer"
+                      className="w-full text-left px-3 py-2.5 rounded-xl text-xs font-semibold text-rose-300 hover:text-white hover:bg-rose-950/50 flex items-center space-x-2 transition-colors cursor-pointer"
                     >
-                      <ArrowLeftRight className="w-4 h-4 text-[#D4AF37]" />
-                      <span>Ganti Otoritas Jabatan di Halaman Login</span>
+                      <LogOut className="w-4 h-4 text-rose-400" />
+                      <span>Keluar / Logout</span>
                     </button>
-
-                    {onGoToLanding && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setShowRoleDropdown(false);
-                          onGoToLanding();
-                        }}
-                        className="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:bg-[#1E2D4A] flex items-center space-x-2 transition-colors cursor-pointer"
-                      >
-                        <Globe className="w-4 h-4 text-cyan-400" />
-                        <span>Ke Halaman Depan Publik</span>
-                      </button>
-                    )}
-
-                    {onLogout && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setShowRoleDropdown(false);
-                          onLogout();
-                        }}
-                        className="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold text-rose-300 hover:bg-rose-950/40 flex items-center space-x-2 transition-colors cursor-pointer"
-                      >
-                        <LogOut className="w-4 h-4 text-slate-300" />
-                        <span>Keluar / Logout</span>
-                      </button>
-                    )}
-                  </div>
-
-                  {/* Quick in-page toggle accordion */}
-                  <div className="border-t border-[#1E2D4A] pt-1">
-                    <button
-                      type="button"
-                      onClick={() => setShowQuickList(!showQuickList)}
-                      className="w-full px-4 py-2 text-left text-[11px] font-semibold text-slate-400 hover:text-white flex items-center justify-between cursor-pointer"
-                    >
-                      <span>Bypass Cepat di Sini ({showQuickList ? 'Tutup' : 'Buka'})</span>
-                      <ChevronDown className={`w-3.5 h-3.5 transition-transform ${showQuickList ? 'rotate-180' : ''}`} />
-                    </button>
-
-                    {showQuickList && (
-                      <div className="max-h-60 overflow-y-auto py-1 divide-y divide-[#1E2D4A]">
-                        {MOCK_USERS.map((user) => {
-                          const isActive = user.id === currentUser.id;
-                          const rank = getRoleRankBadge(user.role);
-                          return (
-                            <button
-                              key={user.id}
-                              id={`switch-user-${user.id}`}
-                              onClick={() => {
-                                onSelectUser(user);
-                                setShowRoleDropdown(false);
-                              }}
-                              className={`w-full text-left px-4 py-2 flex items-start space-x-2 hover:bg-[#1E2D4A] transition-colors ${
-                                isActive ? 'bg-[#1E2D4A] border-l-2 border-[#D4AF37]' : ''
-                              }`}
-                            >
-                              <div className="mt-0.5">
-                                {isActive ? (
-                                  <UserCheck className="w-3.5 h-3.5 text-[#D4AF37]" />
-                                ) : (
-                                  <div className="w-3.5 h-3.5 rounded-full border border-slate-600" />
-                                )}
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <span className="text-xs font-bold text-white truncate block">
-                                  {user.name.split(',')[0]}
-                                </span>
-                                <span className="text-[10px] text-slate-400 truncate block">
-                                  [{rank.label}] {user.agency}
-                                </span>
-                              </div>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
+                  )}
                 </div>
               )}
             </div>

@@ -77,78 +77,47 @@ export const INITIAL_REGISTRATIONS: RegistrasiPengguna[] = [
 
 export const MOCK_USERS: UserProfile[] = [
   {
+    id: 'user-admin',
+    name: 'Rina Marlina, S.H.',
+    nip: '198403152006041002',
+    role: 'ADMIN',
+    agency: 'Sekretariat TAT - BNN Kota Samarinda',
+    email: 'sekretariat.tat@bnn.go.id',
+    phone: '0812-3456-7890',
+    position: 'Kepala Sekretariat TAT'
+  },
+  {
     id: 'user-pengaju',
-    name: 'Penyidik Pengaju',
+    name: 'AKP Ridwan Saputra, S.I.K.',
     nip: '198907122010121003',
-    role: 'pengaju',
+    role: 'PENGAJU',
     agency: 'Sat Resnarkoba Polresta Samarinda',
-    email: 'penyidik.test1@polri.go.id',
-    phone: '0813-8899-1122'
+    email: 'penyidik.samarinda@polri.go.id',
+    phone: '0813-8899-1122',
+    position: 'Kasat Resnarkoba'
   },
   {
     id: 'user-medis',
-    name: 'Dokter Asesor Medis',
+    name: 'dr. Dewi Ratnaningsih, Sp.KJ.',
     nip: '197908222005012004',
-    role: 'medis',
-    agency: 'Tim Medis TAT / RSUD Kota Samarinda',
-    email: 'dokter.test1@dinkes.go.id',
-    phone: '0811-2233-4455'
+    role: 'MEDIS',
+    agency: 'Tim Medis TAT / RSUD AWS Samarinda',
+    email: 'dr.dewi.tat@rsudaws.go.id',
+    phone: '0811-2233-4455',
+    position: 'Dokter Spesialis Kejiwaan (Asesor Medis)'
   },
   {
     id: 'user-hukum',
-    name: 'Asesor Hukum',
+    name: 'Jaksa Pratama, S.H., M.H.',
     nip: '198211052008011005',
-    role: 'hukum',
+    role: 'HUKUM',
     agency: 'Tim Hukum TAT / Kejaksaan Negeri Samarinda',
-    email: 'hukum.test1@kejaksaan.go.id',
-    phone: '0815-7766-5544'
-  },
-  {
-    id: 'user-sekretariat',
-    name: 'Petugas Sekretariat',
-    nip: '198403152006041002',
-    role: 'sekretariat',
-    agency: 'Sekretariat TAT - BNN Kota Samarinda',
-    email: 'sekretariat.test1@bnn.go.id',
-    phone: '0812-3456-7890'
-  },
-  {
-    id: 'user-admin',
-    name: 'Administrator Sistem',
-    nip: '199501202020121004',
-    role: 'admin',
-    agency: 'Pusdatin BNN RI',
-    email: 'admin.test1@bnn.go.id',
-    phone: '0812-9900-1122'
-  },
-  {
-    id: 'user-koordinator',
-    name: 'Koordinator TAT',
-    nip: '197705142001121001',
-    role: 'koordinator',
-    agency: 'Ketua Tim Asesmen Terpadu - BNNP Kaltim',
-    email: 'koordinator.test1@bnn.go.id',
-    phone: '0811-9988-7766'
-  },
-  {
-    id: 'user-pimpinan',
-    name: 'Pimpinan Pengawas',
-    nip: '196904121992031001',
-    role: 'pimpinan',
-    agency: 'Kepala BNN Provinsi Kalimantan Timur',
-    email: 'pimpinan.test1@bnn.go.id',
-    phone: '0811-1234-5678'
-  },
-  {
-    id: 'user-rehab',
-    name: 'Petugas Fasilitas Rehab',
-    nip: '198606182009122003',
-    role: 'rehabilitasi',
-    agency: 'Balai Besar Rehabilitasi BNN Tanah Merah Bogor',
-    email: 'rehab.test1@lido.bnn.go.id',
-    phone: '0813-4455-6677'
+    email: 'jaksa.tat@kejaksaan.go.id',
+    phone: '0815-7766-5544',
+    position: 'Jaksa Fungsional (Asesor Hukum)'
   }
 ];
+
 
 export const STANDARD_DOCUMENTS: Omit<DokumenPersyaratan, 'id' | 'fileUrl' | 'fileName' | 'uploadedAt' | 'statusVerifikasi' | 'catatanKoreksi' | 'versi'>[] = [
   { nama: 'Surat Permohonan Asesmen dari Penyidik', wajib: true },
@@ -220,6 +189,14 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
     statusHukum: 'belum_dimulai',
     statusDokumen: 'draf',
     statusTindakLanjut: 'belum_dikonfirmasi',
+    // === Status Kanonis (rancangan.md v1.1) ===
+    applicationStatus: 'NEEDS_CORRECTION',
+    medicalStatus: 'NOT_STARTED',
+    legalStatus: 'NOT_STARTED',
+    deliveryStatus: 'NOT_ISSUED',
+    followupStatus: 'NOT_APPLICABLE_YET',
+    trackingNumber: 'SIM-2026-089',
+    revision: 3,
     pengajuId: 'user-pengaju',
     pengajuNama: 'Penyidik Pengaju Test-1',
     instansiPengaju: 'Sat Resnarkoba Polresta Samarinda',
@@ -261,14 +238,18 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
           beratBersihGram: 0.38,
           statusUjiLab: 'proses_lab',
           nomorSuratLab: 'Lab/Toksi/112/IX/2026/Puslabfor',
-          keterangan: 'Dibawah batasan SEMA No. 04/2010 (< 1 gram sabu)'
+          tanggalSuratLab: '2026-09-07',
+          keterangan: 'Dibawah batasan SEMA No. 04/2010 (< 1 gram sabu)',
+          fotoBarangBuktiUrl: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=600&auto=format&fit=crop&q=80',
+          fotoUjiLabUrl: 'https://images.unsplash.com/photo-1582719471384-894fbb16e074?w=600&auto=format&fit=crop&q=80'
         },
         {
           id: 'bb-089-2',
-          jenisZat: 'Peralatan Konsumsi (Pipet kaca & Korek)',
+          jenisZat: 'Peralatan Konsumsi (Pipet kaca & Bong)',
           beratBersihGram: 0,
           statusUjiLab: 'belum_uji',
-          keterangan: 'Alat hisap bong sederhana'
+          keterangan: 'Alat hisap bong sederhana dengan sisa residu',
+          fotoBarangBuktiUrl: 'https://images.unsplash.com/photo-1583912267550-d44d95b54637?w=600&auto=format&fit=crop&q=80'
         }
       ]
     },
@@ -335,8 +316,8 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
       {
         id: 'klar-1',
         dariNama: 'Petugas Sekretariat Test-1',
-        dariPeran: 'sekretariat',
-        kepadaPeran: 'pengaju',
+        dariPeran: 'ADMIN',
+        kepadaPeran: 'PENGAJU',
         pertanyaan: 'Mohon penyidik melengkapi BA Penimbangan yang tertera cap stempel resmi serta mengonfirmasi ejaan nama yang baku sesuai e-KTP.',
         tanggalTanya: '2026-09-07 14:00',
         status: 'menunggu_tanggapan'
@@ -347,7 +328,7 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
         id: 'aud-1',
         timestamp: '2026-09-07 10:30',
         actorNama: 'Penyidik Pengaju Test-1',
-        actorPeran: 'pengaju',
+        actorPeran: 'PENGAJU',
         aksi: 'Pengajuan Permohonan Baru',
         rincian: 'Mengirimkan berkas permohonan asesmen terpadu perkara No. LP/A/142/IX/2026.'
       },
@@ -355,7 +336,7 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
         id: 'aud-2',
         timestamp: '2026-09-07 14:15',
         actorNama: 'Petugas Sekretariat Test-1',
-        actorPeran: 'sekretariat',
+        actorPeran: 'ADMIN',
         aksi: 'Verifikasi Berkas Administrasi',
         rincian: 'Mengembalikan berkas dengan status "Perlu Perbaikan" (2 dokumen koreksi).'
       }
@@ -375,6 +356,14 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
     statusHukum: 'menunggu_lab_atau_info',
     statusDokumen: 'draf',
     statusTindakLanjut: 'belum_dikonfirmasi',
+    // === Status Kanonis (rancangan.md v1.1) ===
+    applicationStatus: 'ASSESSMENT_ACTIVE',
+    medicalStatus: 'FINAL',
+    legalStatus: 'DRAFT',
+    deliveryStatus: 'NOT_ISSUED',
+    followupStatus: 'NOT_APPLICABLE_YET',
+    trackingNumber: 'SIM-2026-085',
+    revision: 8,
     pengajuId: 'user-pengaju',
     pengajuNama: 'Penyidik Pengaju Test-1',
     instansiPengaju: 'Sat Resnarkoba Polresta Samarinda',
@@ -539,8 +528,8 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
       {
         id: 'klar-2',
         dariNama: 'Asesor Hukum Test-1',
-        dariPeran: 'hukum',
-        kepadaPeran: 'pengaju',
+        dariPeran: 'HUKUM',
+        kepadaPeran: 'PENGAJU',
         pertanyaan: 'Apakah penyidik telah memeriksa ponsel terperiksa dan memastikan riwayat chat tidak mengandung transaksi sindikat/jaringan?',
         tanggalTanya: '2026-09-06 14:00',
         jawaban: 'Sudah dilakukan digital forensic oleh Subdit Cyber. Hasilnya chat hanya pemesanan kepada penjual eceran untuk konsumsi pribadi, tidak ditemukan chat penjualan.',
@@ -554,7 +543,7 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
         id: 'aud-21',
         timestamp: '2026-09-04 11:00',
         actorNama: 'Petugas Sekretariat Test-1',
-        actorPeran: 'sekretariat',
+        actorPeran: 'ADMIN',
         aksi: 'Penugasan Tim Asesor',
         rincian: 'Menugaskan Dokter Asesor Medis Test-1 dan Asesor Hukum Test-1.'
       },
@@ -562,7 +551,7 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
         id: 'aud-22',
         timestamp: '2026-09-05 16:35',
         actorNama: 'Dokter Asesor Medis Test-1',
-        actorPeran: 'medis',
+        actorPeran: 'MEDIS',
         aksi: 'Penyelesaian Asesmen Medis',
         rincian: 'Asesmen medis selesai dengan rekomendasi Rawat Jalan 3 bulan (ASSIST Skor 21).'
       }
@@ -582,6 +571,14 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
     statusHukum: 'siap_dibahas',
     statusDokumen: 'draf',
     statusTindakLanjut: 'belum_dikonfirmasi',
+    // === Status Kanonis (rancangan.md v1.1) ===
+    applicationStatus: 'READY_FOR_CONFERENCE',
+    medicalStatus: 'FINAL',
+    legalStatus: 'FINAL',
+    deliveryStatus: 'NOT_ISSUED',
+    followupStatus: 'NOT_APPLICABLE_YET',
+    trackingNumber: 'SIM-2026-082',
+    revision: 12,
     pengajuId: 'user-pengaju',
     pengajuNama: 'Penyidik Pengaju Test-1',
     instansiPengaju: 'Sat Resnarkoba Polresta Samarinda',
@@ -758,7 +755,7 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
         id: 'aud-31',
         timestamp: '2026-09-04 17:00',
         actorNama: 'Petugas Sekretariat Test-1',
-        actorPeran: 'sekretariat',
+        actorPeran: 'ADMIN',
         aksi: 'Penjadwalan Sidang Pleno',
         rincian: 'Hasil medis dan hukum lengkap. Menjadwalkan sidang pleno untuk 8 September 2026.'
       }
@@ -778,6 +775,14 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
     statusHukum: 'siap_dibahas',
     statusDokumen: 'menunggu_pengesahan',
     statusTindakLanjut: 'sedang_dikoordinasikan',
+    // === Status Kanonis (rancangan.md v1.1) ===
+    applicationStatus: 'AWAITING_SIGNED_OUTPUTS',
+    medicalStatus: 'FINAL',
+    legalStatus: 'FINAL',
+    deliveryStatus: 'NOT_ISSUED',
+    followupStatus: 'NOT_APPLICABLE_YET',
+    trackingNumber: 'SIM-2026-079',
+    revision: 15,
     pengajuId: 'user-pengaju',
     pengajuNama: 'Penyidik Pengaju Test-1',
     instansiPengaju: 'Sat Resnarkoba Polresta Samarinda',
@@ -992,7 +997,7 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
         id: 'aud-41',
         timestamp: '2026-09-04 11:50',
         actorNama: 'Koordinator TAT Test-1',
-        actorPeran: 'koordinator',
+        actorPeran: 'KOORDINATOR',
         aksi: 'Penyelesaian Sidang Pleno',
         rincian: 'Sidang pleno selesai dengan kesepakatan rekomendasi rawat inap RSKO.'
       },
@@ -1000,7 +1005,7 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
         id: 'aud-42',
         timestamp: '2026-09-04 14:15',
         actorNama: 'Dokter Asesor Medis Test-1',
-        actorPeran: 'medis',
+        actorPeran: 'MEDIS',
         aksi: 'Pengesahan Tanda Tangan Digital',
         rincian: 'Menandatangani lembar rekomendasi resmi No. REK-TAT/079/IX/2026.'
       }
@@ -1020,6 +1025,14 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
     statusHukum: 'siap_dibahas',
     statusDokumen: 'resmi_terbit',
     statusTindakLanjut: 'terhambat',
+    // === Status Kanonis (rancangan.md v1.1) ===
+    applicationStatus: 'RESULTS_ISSUED',
+    medicalStatus: 'FINAL',
+    legalStatus: 'FINAL',
+    deliveryStatus: 'ISSUED_NOT_DELIVERED',
+    followupStatus: 'NOT_YET_REPORTED',
+    trackingNumber: 'SIM-2026-074',
+    revision: 22,
     pengajuId: 'user-pengaju',
     pengajuNama: 'Penyidik Pengaju Test-1',
     instansiPengaju: 'Sat Resnarkoba Polresta Samarinda',
@@ -1116,8 +1129,8 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
       {
         id: 'klar-51',
         dariNama: 'Petugas Fasilitas Rehab Test-1',
-        dariPeran: 'rehabilitasi',
-        kepadaPeran: 'sekretariat',
+        dariPeran: 'REHABILITASI',
+        kepadaPeran: 'ADMIN',
         pertanyaan: 'Konfirmasi dari Bagian Admisi Balai Tanah Merah: Kuota penerimaan rujukan residen pria penuh 300 bed. Tersedia estimasi pembukaan slot pada tanggal 28 September.',
         tanggalTanya: '2026-08-27 09:30',
         jawaban: 'Terima kasih atas informasinya. Kami sedang berkoordinasi dengan penyidik untuk opsi pengalihan sementara ke RSKO Cibubur.',
@@ -1131,7 +1144,7 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
         id: 'aud-51',
         timestamp: '2026-08-25 15:30',
         actorNama: 'Penyidik Pengaju Test-1',
-        actorPeran: 'pengaju',
+        actorPeran: 'PENGAJU',
         aksi: 'Konfirmasi Penerimaan Rekomendasi Resmi',
         rincian: 'Penyidik menerima dokumen fisik dan elektronik rekomendasi No. REK-TAT/074/VIII/2026.'
       },
@@ -1139,7 +1152,7 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
         id: 'aud-52',
         timestamp: '2026-08-27 10:00',
         actorNama: 'Petugas Fasilitas Rehab Test-1',
-        actorPeran: 'rehabilitasi',
+        actorPeran: 'REHABILITASI',
         aksi: 'Update Status Rujukan: Kapasitas Penuh',
         rincian: 'Mencatat status kapasitas penuh pada sistem e-TAT.'
       }
@@ -1159,6 +1172,14 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
     statusHukum: 'siap_dibahas',
     statusDokumen: 'resmi_terbit',
     statusTindakLanjut: 'terlaksana',
+    // === Status Kanonis (rancangan.md v1.1) ===
+    applicationStatus: 'RESULTS_ISSUED',
+    medicalStatus: 'FINAL',
+    legalStatus: 'FINAL',
+    deliveryStatus: 'ACKNOWLEDGED',
+    followupStatus: 'VERIFIED_IMPLEMENTED',
+    trackingNumber: 'SIM-2026-068',
+    revision: 28,
     pengajuId: 'user-pengaju',
     pengajuNama: 'Penyidik Pengaju Test-1',
     instansiPengaju: 'Sat Resnarkoba Polresta Samarinda',
@@ -1345,7 +1366,7 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
         id: 'aud-61',
         timestamp: '2026-08-18 09:30',
         actorNama: 'Petugas Sekretariat Test-1',
-        actorPeran: 'sekretariat',
+        actorPeran: 'ADMIN',
         aksi: 'Konfirmasi Masuk Layanan Rehab',
         rincian: 'Klien anak Terperiksa Test-6 mulai menjalani sesi perdana konseling rawat jalan di Klinik BNN Samarinda.'
       }
@@ -1365,6 +1386,14 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
     statusHukum: 'siap_dibahas',
     statusDokumen: 'resmi_terbit',
     statusTindakLanjut: 'terlaksana',
+    // === Status Kanonis (rancangan.md v1.1) ===
+    applicationStatus: 'RESULTS_ISSUED',
+    medicalStatus: 'FINAL',
+    legalStatus: 'FINAL',
+    deliveryStatus: 'DELIVERED',
+    followupStatus: 'REPORTED_PENDING_VERIFICATION',
+    trackingNumber: 'SIM-2026-055',
+    revision: 18,
     pengajuId: 'user-pengaju',
     pengajuNama: 'Penyidik Pengaju Test-1',
     instansiPengaju: 'Sat Resnarkoba Polresta Samarinda',
@@ -1562,7 +1591,7 @@ export const INITIAL_PERMOHONAN: PermohonanAsesmen[] = [
         id: 'aud-55-1',
         timestamp: '2026-09-14 14:00',
         actorNama: 'Petugas Fasilitas Rehab Test-1',
-        actorPeran: 'rehabilitasi',
+        actorPeran: 'REHABILITASI',
         aksi: 'Penerbitan SP-1 Klien Mangkir',
         rincian: 'Diterbitkan SP-1/TAT-AWAS/055/IX/2026 karena mangkir sesi wajib lapor tanggal 12 September 2026.'
       }

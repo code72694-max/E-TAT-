@@ -34,12 +34,11 @@ export const LoginPage: React.FC<LoginPageProps> = ({
   users = MOCK_USERS,
   registrations = []
 }) => {
-  const FOUR_ROLES: UserRole[] = ['pengaju', 'sekretariat', 'hukum', 'medis'];
+  const FOUR_ROLES: UserRole[] = ['PENGAJU', 'ADMIN', 'HUKUM', 'MEDIS'];
   
-  // Ambil tepat 1 akun untuk masing-masing 4 role: Pengaju, Medis, Hukum, Sekretariat (atau Admin sebagai Sekretariat)
+  // Ambil tepat 1 akun untuk masing-masing 4 role
   const loginUsers = FOUR_ROLES.map(role => {
-    return users.find(u => u.role === role) || 
-           (role === 'sekretariat' ? users.find(u => u.role === 'admin') : undefined);
+    return users.find(u => u.role === role);
   }).filter((u): u is UserProfile => Boolean(u));
 
   const [selectedUserId, setSelectedUserId] = useState<string>(loginUsers[0]?.id || users[0]?.id || '');
@@ -53,14 +52,18 @@ export const LoginPage: React.FC<LoginPageProps> = ({
     message: string;
   } | null>(null);
 
-  const getRoleLabel = (role: UserRole) => {
+  const getRoleLabel = (role: UserRole | string) => {
     switch (role) {
+      case 'PENGAJU':
       case 'pengaju':
         return 'Pengaju';
+      case 'MEDIS':
       case 'medis':
         return 'Medis';
+      case 'HUKUM':
       case 'hukum':
         return 'Hukum';
+      case 'ADMIN':
       case 'sekretariat':
       case 'admin':
         return 'Sekretariat';

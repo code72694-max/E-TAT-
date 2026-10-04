@@ -19,7 +19,10 @@ import {
   Activity,
   FileText,
   AlertTriangle,
-  Mail
+  Mail,
+  Camera,
+  Eye,
+  Image as ImageIcon
 } from 'lucide-react';
 
 const getDocTemplates = (jenisPengajuan: string) => {
@@ -99,11 +102,26 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
   const [kronologi, setKronologi] = useState('Terperiksa diamankan saat menggunakan narkotika di tempat tinggalnya.');
   
   // Barang bukti list
-  const [barangBuktiList, setBarangBuktiList] = useState([
-    { id: 'bb-1', jenisZat: 'Metamfetamina (Sabu)', beratBersihGram: 0.35, statusUjiLab: 'proses_lab' as const, nomorSuratLab: '', keterangan: 'Di bawah ambang batas SEMA (1.0 gr)' }
+  const [barangBuktiList, setBarangBuktiList] = useState<any[]>([
+    {
+      id: 'bb-1',
+      jenisZat: 'Metamfetamina (Sabu)',
+      beratBersihGram: 0.35,
+      statusUjiLab: 'proses_lab',
+      nomorSuratLab: 'Lab/Toksi/112/IX/2026/Puslabfor',
+      tanggalSuratLab: '2026-09-07',
+      keterangan: 'Di bawah ambang batas SEMA (1.0 gr)',
+      fotoBarangBuktiUrl: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=600&auto=format&fit=crop&q=80',
+      fotoUjiLabUrl: 'https://images.unsplash.com/photo-1582719471384-894fbb16e074?w=600&auto=format&fit=crop&q=80'
+    }
   ]);
   const [newJenisZat, setNewJenisZat] = useState('Metamfetamina (Sabu)');
   const [newBerat, setNewBerat] = useState('0.2');
+  const [newStatusLab, setNewStatusLab] = useState<'proses_lab' | 'positif' | 'negatif' | 'belum_uji'>('proses_lab');
+  const [newNomorLab, setNewNomorLab] = useState('');
+  const [newFotoBb, setNewFotoBb] = useState('');
+  const [newFotoLab, setNewFotoLab] = useState('');
+  const [previewModalImg, setPreviewModalImg] = useState<{ url: string; title: string } | null>(null);
 
   // Form State: Step 3 (Dokumen)
   const [uploadedDocIds, setUploadedDocIds] = useState<string[]>([
@@ -112,6 +130,28 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
   const [isSendingEmail, setIsSendingEmail] = useState(false);
 
   if (!isOpen) return null;
+
+  const handleUploadFotoBb = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setNewFotoBb(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleUploadFotoLab = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setNewFotoLab(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleAddBb = () => {
     const beratVal = parseFloat(newBerat);
@@ -125,12 +165,17 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
         id: 'bb-' + Date.now(),
         jenisZat: newJenisZat,
         beratBersihGram: beratVal,
-        statusUjiLab: 'proses_lab',
-        nomorSuratLab: '',
-        keterangan: 'Menunggu hasil uji konfirmasi lab'
+        statusUjiLab: newStatusLab,
+        nomorSuratLab: newNomorLab || (newStatusLab !== 'belum_uji' ? 'Lab/Toksi/' + Math.floor(100 + Math.random() * 900) + '/IX/2026' : undefined),
+        keterangan: beratVal <= 1.0 ? 'Memenuhi ambang batas SEMA 04/2010 (< 1 gr)' : 'Di atas batas gramatur SEMA',
+        fotoBarangBuktiUrl: newFotoBb || 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=600&auto=format&fit=crop&q=80',
+        fotoUjiLabUrl: newFotoLab || (newStatusLab !== 'belum_uji' ? 'https://images.unsplash.com/photo-1582719471384-894fbb16e074?w=600&auto=format&fit=crop&q=80' : undefined)
       }
     ]);
     setNewBerat('');
+    setNewNomorLab('');
+    setNewFotoBb('');
+    setNewFotoLab('');
   };
 
   const handleRemoveBb = (id: string) => {
@@ -182,6 +227,12 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
       statusHukum: 'belum_dimulai',
       statusDokumen: 'draf',
       statusTindakLanjut: 'belum_dikonfirmasi',
+      // === Status Kanonis ===
+      applicationStatus: 'SUBMITTED',
+      medicalStatus: 'NOT_STARTED',
+      legalStatus: 'NOT_STARTED',
+      deliveryStatus: 'NOT_ISSUED',
+      followupStatus: 'NOT_APPLICABLE_YET',
       tenggatSlaTanggal: '14 September 2026',
       isMendekatiTenggat: false,
       isMelewatiTenggat: false,
@@ -381,7 +432,7 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
                     }`}
                   >
                     <History className="w-3.5 h-3.5 text-[#D4AF37]" />
-                    <span>Tab Riwayat Perkara &amp; Histori TAT</span>
+                    <span>Tab Riwayat Kasus</span>
                     {statusResidivis !== 'bukan_residivis' && (
                       <span className="w-2 h-2 rounded-full bg-amber-400"></span>
                     )}
@@ -501,140 +552,96 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
                           className="w-full p-2 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none"
                         />
                       </div>
+                      <div className="sm:col-span-2 pt-3 mt-3 border-t border-[#1b3459]/50">
+                        <h4 className="text-[11px] font-bold text-[#D4AF37] mb-3 uppercase tracking-wider">Informasi Asesmen Awal Penyidik</h4>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div>
+                            <label className="font-semibold text-slate-300 block mb-1">Lama Penggunaan & Frekuensi Zat</label>
+                            <input
+                              type="text"
+                              value={lamaPenggunaanZat}
+                              onChange={(e) => setLamaPenggunaanZat(e.target.value)}
+                              placeholder="Contoh: 6 bulan, 1-2 kali per minggu"
+                              className="w-full p-2 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none"
+                            />
+                          </div>
+                          <div>
+                            <label className="font-semibold text-slate-300 block mb-1">Hasil Pemeriksaan Skrining Urin</label>
+                            <input
+                              type="text"
+                              value={hasilTesUrinAwal}
+                              onChange={(e) => setHasilTesUrinAwal(e.target.value)}
+                              placeholder="Contoh: Positif Methamphetamine (Sabu)"
+                              className="w-full p-2 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none"
+                            />
+                          </div>
+                          <div className="sm:col-span-2">
+                            <label className="font-semibold text-slate-300 block mb-1">Catatan Profiling Risiko & Intelijen</label>
+                            <textarea
+                              rows={2}
+                              value={catatanProfilingPenyidik}
+                              onChange={(e) => setCatatanProfilingPenyidik(e.target.value)}
+                              placeholder="Keterangan apakah terperiksa adalah pemakai murni, korban penyalahgunaan, atau bukan jaringan pengedar..."
+                              className="w-full p-2 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none text-xs"
+                            />
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 )}
 
-                {/* TAB 2: RIWAYAT PERKARA, RESIDIVISME & HISTORI TAT */}
+                {/* TAB 2: RIWAYAT KASUS & HISTORI TAT */}
                 {terperiksaTab === 'riwayat' && (
                   <div className="p-4 space-y-4 animate-in fade-in duration-150">
-                    {/* Quick Preset Buttons */}
-                    <div className="flex items-center justify-between bg-[#050e1c] p-2.5 rounded-lg border border-[#1b3459]">
-                      <span className="text-[11px] text-slate-300 font-semibold flex items-center space-x-1.5">
-                        <Activity className="w-3.5 h-3.5 text-[#D4AF37]" />
-                        <span>Preset Rekam Jejak Terperiksa:</span>
-                      </span>
-                      <div className="flex items-center space-x-2">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setStatusResidivis('bukan_residivis');
-                            setRiwayatTatSebelumnya('Belum Pernah (Pengajuan Permohonan Asesmen Pertama)');
-                            setRiwayatPerkaraLalu('Tidak memiliki catatan vonis pidana / DPO / perkara aktif lainnya.');
-                            setRiwayatRehabilitasi('Belum pernah menjalani program rehabilitasi medis atau sosial.');
-                          }}
-                          className="text-[10px] font-bold bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25 px-2.5 py-1 rounded border border-emerald-500/30 transition-colors"
-                        >
-                          Bukan Residivis (Baru)
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setStatusResidivis('residivis_1x');
-                            setRiwayatTatSebelumnya('Pernah Asesmen TAT 1x pada Tahun 2024');
-                            setRiwayatPerkaraLalu('Pernah diamankan pada tahun 2024 perkara penyalahgunaan narkotika golongan I bukan tanaman.');
-                            setRiwayatRehabilitasi('Pernah menjalani rawat jalan di Balai Rehabilitasi BNN Kaltim.');
-                          }}
-                          className="text-[10px] font-bold bg-amber-500/15 text-amber-300 hover:bg-amber-500/25 px-2.5 py-1 rounded border border-amber-500/30 transition-colors"
-                        >
-                          Residivis 1x (Pernah TAT)
-                        </button>
-                      </div>
+                    <div className="flex items-center justify-between pb-2 border-b border-[#1b3459]">
+                      <h3 className="text-sm font-bold text-white flex items-center space-x-1.5">
+                        <History className="w-4 h-4 text-sky-400" />
+                        <span>Catatan Histori Terperiksa</span>
+                      </h3>
+                      <span className="text-[10px] text-slate-400 bg-[#050e1c] px-2 py-1 rounded border border-[#1b3459]">Data Terintegrasi e-TAT & SIPP</span>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="font-semibold text-slate-300 block mb-1">
-                          Status Residivisme Hukum *
-                        </label>
-                        <select
-                          value={statusResidivis}
-                          onChange={(e) => setStatusResidivis(e.target.value as any)}
-                          className="w-full p-2 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none"
-                        >
-                          <option value="bukan_residivis">Bukan Residivis (Tersangka Baru / Pertama Kali)</option>
-                          <option value="residivis_1x">Residivis 1 Kali (Pernah Terjerat Narkotika / TAT)</option>
-                          <option value="residivis_berulang">Residivis Berulang (&gt;1 Kali)</option>
-                        </select>
+                    <div className="space-y-3">
+                      {/* CARD 1 */}
+                      <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl p-3.5 hover:border-[#D4AF37] transition-all cursor-pointer group shadow-sm hover:shadow-[#D4AF37]/10" onClick={() => alert('Membuka detail perkara sebelumnya (Mockup)')}>
+                        <div className="flex justify-between items-start mb-2">
+                          <div>
+                            <span className="text-[10px] font-bold bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded border border-amber-500/30">Asesmen TAT 2024</span>
+                            <h4 className="text-xs font-bold text-white mt-1 group-hover:text-[#D4AF37] transition-colors">Perkara No. LP/A/45/II/2024/SPKT.SATRESNARKOBA</h4>
+                          </div>
+                          <span className="text-slate-400 text-[10px]">12 Feb 2024</span>
+                        </div>
+                        <p className="text-[11px] text-slate-300 leading-relaxed mb-2">Penyalahgunaan narkotika golongan I bukan tanaman (Sabu 0.12 gram). Rekomendasi: Rehabilitasi Rawat Jalan di Klinik Pratama BNNK Samarinda selama 2 bulan.</p>
+                        <div className="flex items-center space-x-3 text-[10px] text-slate-400">
+                          <span className="flex items-center space-x-1"><CheckCircle2 className="w-3 h-3 text-emerald-400" /> <span>Selesai Program (SKSP Terbit)</span></span>
+                          <span>•</span>
+                          <span>Instansi: Polresta Samarinda</span>
+                        </div>
                       </div>
 
-                      <div>
-                        <label className="font-semibold text-slate-300 block mb-1">
-                          Histori Permohonan Asesmen TAT Sebelumnya
-                        </label>
-                        <input
-                          type="text"
-                          value={riwayatTatSebelumnya}
-                          onChange={(e) => setRiwayatTatSebelumnya(e.target.value)}
-                          placeholder="Contoh: Belum pernah / Pernah asesmen di BNNP Kaltim"
-                          className="w-full p-2 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none"
-                        />
+                      {/* CARD 2 */}
+                      <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl p-3.5 hover:border-[#D4AF37] transition-all cursor-pointer group shadow-sm hover:shadow-[#D4AF37]/10" onClick={() => alert('Membuka detail perkara sebelumnya (Mockup)')}>
+                        <div className="flex justify-between items-start mb-2">
+                          <div>
+                            <span className="text-[10px] font-bold bg-rose-500/20 text-rose-300 px-2 py-0.5 rounded border border-rose-500/30">Putusan Pengadilan 2021</span>
+                            <h4 className="text-xs font-bold text-white mt-1 group-hover:text-[#D4AF37] transition-colors">Perkara No. 112/Pid.Sus/2021/PN Smr</h4>
+                          </div>
+                          <span className="text-slate-400 text-[10px]">05 Mei 2021</span>
+                        </div>
+                        <p className="text-[11px] text-slate-300 leading-relaxed mb-2">Vonis pidana penjara 1 tahun 6 bulan atas kepemilikan narkotika golongan I (Pasal 112 ayat 1 UU 35/2009).</p>
+                        <div className="flex items-center space-x-3 text-[10px] text-slate-400">
+                          <span className="flex items-center space-x-1"><AlertTriangle className="w-3 h-3 text-amber-400" /> <span>Bebas Murni (2022)</span></span>
+                          <span>•</span>
+                          <span>Instansi: Kejaksaan Negeri Samarinda</span>
+                        </div>
                       </div>
 
-                      <div>
-                        <label className="font-semibold text-slate-300 block mb-1">
-                          Lama Penggunaan &amp; Frekuensi Zat
-                        </label>
-                        <input
-                          type="text"
-                          value={lamaPenggunaanZat}
-                          onChange={(e) => setLamaPenggunaanZat(e.target.value)}
-                          placeholder="Contoh: 6 bulan, pemakaian 1-2 kali per minggu"
-                          className="w-full p-2 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="font-semibold text-slate-300 block mb-1">
-                          Hasil Pemeriksaan Skrining Urin Awal
-                        </label>
-                        <input
-                          type="text"
-                          value={hasilTesUrinAwal}
-                          onChange={(e) => setHasilTesUrinAwal(e.target.value)}
-                          placeholder="Contoh: Positif Methamphetamine (Sabu)"
-                          className="w-full p-2 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none"
-                        />
-                      </div>
-
-                      <div className="sm:col-span-2">
-                        <label className="font-semibold text-slate-300 block mb-1">
-                          Riwayat Catatan Perkara / Laporan Polisi Lalu
-                        </label>
-                        <textarea
-                          rows={2}
-                          value={riwayatPerkaraLalu}
-                          onChange={(e) => setRiwayatPerkaraLalu(e.target.value)}
-                          placeholder="Tuliskan jika tersangka pernah memiliki LP sebelumnya atau pernah divonis..."
-                          className="w-full p-2 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none text-xs"
-                        />
-                      </div>
-
-                      <div className="sm:col-span-2">
-                        <label className="font-semibold text-slate-300 block mb-1">
-                          Riwayat Program Rehabilitasi Sebelumnya
-                        </label>
-                        <input
-                          type="text"
-                          value={riwayatRehabilitasi}
-                          onChange={(e) => setRiwayatRehabilitasi(e.target.value)}
-                          placeholder="Contoh: Belum pernah / Pernah rawat inap di Balai Rehab BNN Tanah Merah"
-                          className="w-full p-2 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none"
-                        />
-                      </div>
-
-                      <div className="sm:col-span-2">
-                        <label className="font-semibold text-slate-300 block mb-1">
-                          Catatan Profiling Risiko &amp; Intelijen Penyidik
-                        </label>
-                        <textarea
-                          rows={2}
-                          value={catatanProfilingPenyidik}
-                          onChange={(e) => setCatatanProfilingPenyidik(e.target.value)}
-                          placeholder="Keterangan apakah terperiksa adalah pemakai murni, korban penyalahgunaan, atau bukan jaringan pengedar..."
-                          className="w-full p-2 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none text-xs"
-                        />
-                      </div>
+                      {/* ADD NEW CARD BUTTON */}
+                      <button className="w-full py-2.5 mt-2 border border-dashed border-[#1b3459] text-slate-400 rounded-lg text-xs font-medium hover:text-white hover:border-[#D4AF37] hover:bg-[#D4AF37]/10 transition-colors flex items-center justify-center space-x-1.5" onClick={() => alert('Fitur tambah catatan histori manual')}>
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>Kaitkan Riwayat Perkara Lain</span>
+                      </button>
                     </div>
                   </div>
                 )}
@@ -759,59 +766,252 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
                 </div>
               </div>
 
-              {/* Barang Bukti Sub-Form */}
-              <div className="border border-[#1b3459] rounded-xl p-4 bg-[#081224] space-y-3">
-                <span className="font-bold text-white block">Rincian Barang Bukti Narkotika</span>
+              {/* Barang Bukti & Uji Lab Sub-Form */}
+              <div className="border border-[#1b3459] rounded-xl p-4 bg-[#081224] space-y-3.5">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-white flex items-center space-x-2">
+                    <Scale className="w-4 h-4 text-[#D4AF37]" />
+                    <span>Rincian Barang Bukti &amp; Uji Lab Puslabfor</span>
+                  </span>
+                  <span className="text-[10px] text-slate-400">Lampirkan foto fisik &amp; surat lab jika ada</span>
+                </div>
                 
-                <div className="flex flex-col sm:flex-row items-center gap-2">
-                  <select
-                    value={newJenisZat}
-                    onChange={(e) => setNewJenisZat(e.target.value)}
-                    className="flex-1 p-2 border border-[#1b3459] rounded-lg bg-[#0b172a] text-white focus:ring-2 focus:ring-[#D4AF37] outline-none"
-                  >
-                    <option value="Metamfetamina (Sabu)">Metamfetamina (Sabu)</option>
-                    <option value="Ganja Kering">Ganja Kering</option>
-                    <option value="MDMA / Ekstasi">MDMA / Ekstasi</option>
-                    <option value="Tembakau Sintetis (Gorila)">Tembakau Sintetis (Gorila)</option>
-                    <option value="Obat Keras (Tramadol/Trihex)">Obat Keras (Tramadol/Trihex)</option>
-                  </select>
+                {/* Inputs for adding new BB */}
+                <div className="bg-[#0b172a] p-3 rounded-xl border border-[#1b3459] space-y-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    <div>
+                      <label className="text-[10px] font-semibold text-slate-300 block mb-1">Jenis Zat / Narkotika</label>
+                      <select
+                        value={newJenisZat}
+                        onChange={(e) => setNewJenisZat(e.target.value)}
+                        className="w-full p-2 text-xs border border-[#1b3459] rounded-lg bg-[#081224] text-white focus:ring-2 focus:ring-[#D4AF37] outline-none"
+                      >
+                        <option value="Metamfetamina (Sabu)">Metamfetamina (Sabu)</option>
+                        <option value="Ganja Kering">Ganja Kering</option>
+                        <option value="MDMA / Ekstasi">MDMA / Ekstasi</option>
+                        <option value="Tembakau Sintetis (Gorila)">Tembakau Sintetis (Gorila)</option>
+                        <option value="Obat Keras (Tramadol/Trihex)">Obat Keras (Tramadol/Trihex)</option>
+                        <option value="Psikotropika Gol. IV (Alprazolam)">Psikotropika Gol. IV (Alprazolam)</option>
+                      </select>
+                    </div>
 
-                  <input
-                    type="number"
-                    step="0.01"
-                    placeholder="Berat Bersih (gram)"
-                    value={newBerat}
-                    onChange={(e) => setNewBerat(e.target.value)}
-                    className="w-40 p-2 border border-[#1b3459] bg-[#0b172a] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none"
-                  />
+                    <div>
+                      <label className="text-[10px] font-semibold text-slate-300 block mb-1">Berat Bersih (Netto - Gram)</label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        placeholder="Contoh: 0.35"
+                        value={newBerat}
+                        onChange={(e) => setNewBerat(e.target.value)}
+                        className="w-full p-2 text-xs border border-[#1b3459] bg-[#081224] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none"
+                      />
+                    </div>
 
-                  <button
-                    type="button"
-                    onClick={handleAddBb}
-                    className="bg-[#1b3459] hover:bg-[#284c80] text-[#D4AF37] border border-[#2d5289] font-semibold px-3 py-2 rounded-lg flex items-center space-x-1 shrink-0 cursor-pointer"
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                    <span>Tambah BB</span>
-                  </button>
+                    <div>
+                      <label className="text-[10px] font-semibold text-slate-300 block mb-1">Status Uji Lab Toksikologi</label>
+                      <select
+                        value={newStatusLab}
+                        onChange={(e) => setNewStatusLab(e.target.value as any)}
+                        className="w-full p-2 text-xs border border-[#1b3459] rounded-lg bg-[#081224] text-white focus:ring-2 focus:ring-[#D4AF37] outline-none"
+                      >
+                        <option value="proses_lab">Sedang Proses Lab (Puslabfor)</option>
+                        <option value="positif">Positif Narkotika (Sudah Terbit Lab)</option>
+                        <option value="negatif">Negatif Narkotika</option>
+                        <option value="belum_uji">Belum Diajukan ke Lab</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="text-[10px] font-semibold text-slate-300 block mb-1">Nomor Surat Hasil Lab (Jika Ada)</label>
+                      <input
+                        type="text"
+                        placeholder="Contoh: Lab/Toksi/112/IX/2026/Puslabfor"
+                        value={newNomorLab}
+                        onChange={(e) => setNewNomorLab(e.target.value)}
+                        className="w-full p-2 text-xs border border-[#1b3459] bg-[#081224] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none font-mono"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Upload Foto BB & Lab */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                    {/* Foto Fisik BB */}
+                    <div className="p-2.5 bg-[#081224] rounded-lg border border-[#1b3459] space-y-1.5">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] font-semibold text-slate-300 flex items-center space-x-1.5">
+                          <Camera className="w-3.5 h-3.5 text-[#D4AF37]" />
+                          <span>Foto Fisik Barang Bukti</span>
+                        </span>
+                        {newFotoBb && (
+                          <button
+                            type="button"
+                            onClick={() => setNewFotoBb('')}
+                            className="text-[10px] text-rose-400 hover:underline cursor-pointer"
+                          >
+                            Hapus
+                          </button>
+                        )}
+                      </div>
+
+                      {newFotoBb ? (
+                        <div className="relative group rounded-lg overflow-hidden border border-[#234475] h-20 bg-black flex items-center justify-center">
+                          <img src={newFotoBb} alt="Preview BB" className="h-full w-full object-cover" />
+                          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center space-x-2">
+                            <button
+                              type="button"
+                              onClick={() => setPreviewModalImg({ url: newFotoBb, title: 'Foto Fisik Barang Bukti' })}
+                              className="p-1 bg-[#1b3459] rounded text-white hover:text-[#D4AF37]"
+                            >
+                              <Eye className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <label className="flex flex-col items-center justify-center h-20 border border-dashed border-[#234475] rounded-lg cursor-pointer hover:bg-[#142642]/50 transition-colors">
+                          <ImageIcon className="w-5 h-5 text-slate-400 mb-1" />
+                          <span className="text-[10px] font-medium text-slate-300">Pilih / Unggah Foto BB</span>
+                          <input type="file" accept="image/*" onChange={handleUploadFotoBb} className="hidden" />
+                        </label>
+                      )}
+                    </div>
+
+                    {/* Foto Surat Uji Lab */}
+                    <div className="p-2.5 bg-[#081224] rounded-lg border border-[#1b3459] space-y-1.5">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] font-semibold text-slate-300 flex items-center space-x-1.5">
+                          <FileText className="w-3.5 h-3.5 text-teal-400" />
+                          <span>Foto/Scan Hasil Uji Lab</span>
+                        </span>
+                        {newFotoLab && (
+                          <button
+                            type="button"
+                            onClick={() => setNewFotoLab('')}
+                            className="text-[10px] text-rose-400 hover:underline cursor-pointer"
+                          >
+                            Hapus
+                          </button>
+                        )}
+                      </div>
+
+                      {newFotoLab ? (
+                        <div className="relative group rounded-lg overflow-hidden border border-[#234475] h-20 bg-black flex items-center justify-center">
+                          <img src={newFotoLab} alt="Preview Lab" className="h-full w-full object-cover" />
+                          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center space-x-2">
+                            <button
+                              type="button"
+                              onClick={() => setPreviewModalImg({ url: newFotoLab, title: 'Hasil Uji Laboratorium Forensik' })}
+                              className="p-1 bg-[#1b3459] rounded text-white hover:text-[#D4AF37]"
+                            >
+                              <Eye className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <label className="flex flex-col items-center justify-center h-20 border border-dashed border-[#234475] rounded-lg cursor-pointer hover:bg-[#142642]/50 transition-colors">
+                          <Upload className="w-5 h-5 text-slate-400 mb-1" />
+                          <span className="text-[10px] font-medium text-slate-300">Unggah Surat / Scan Lab</span>
+                          <input type="file" accept="image/*,application/pdf" onChange={handleUploadFotoLab} className="hidden" />
+                        </label>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="pt-2 flex justify-end">
+                    <button
+                      type="button"
+                      onClick={handleAddBb}
+                      className="bg-[#1b3459] hover:bg-[#284c80] text-[#D4AF37] border border-[#2d5289] font-bold px-4 py-2 rounded-lg flex items-center space-x-1.5 text-xs transition-all cursor-pointer shadow-sm"
+                    >
+                      <Plus className="w-4 h-4" />
+                      <span>Tambahkan ke Daftar Barang Bukti</span>
+                    </button>
+                  </div>
                 </div>
 
-                {/* Table of added BB */}
-                <div className="space-y-1.5 pt-2">
-                  {barangBuktiList.map(bb => (
-                    <div key={bb.id} className="flex items-center justify-between p-2 bg-[#0b172a] rounded border border-[#1b3459]">
-                      <div>
-                        <span className="font-bold text-white">{bb.jenisZat}</span>
-                        <span className="text-[#D4AF37] ml-2 font-semibold">({bb.beratBersihGram} gram netto)</span>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveBb(bb.id)}
-                        className="text-slate-300 hover:text-rose-300 p-1 cursor-pointer"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                {/* List of added BB */}
+                <div className="space-y-2 pt-1">
+                  <span className="text-[11px] font-semibold text-slate-400 block uppercase tracking-wider">
+                    Daftar Barang Bukti Terlampir ({barangBuktiList.length}):
+                  </span>
+                  {barangBuktiList.length === 0 ? (
+                    <div className="p-3 text-center text-xs text-slate-500 border border-dashed border-[#1b3459] rounded-lg">
+                      Belum ada barang bukti yang ditambahkan
                     </div>
-                  ))}
+                  ) : (
+                    barangBuktiList.map(bb => (
+                      <div key={bb.id} className="p-2.5 bg-[#0b172a] rounded-xl border border-[#1b3459] flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 hover:border-[#234475] transition-colors">
+                        <div className="flex items-start sm:items-center space-x-3 min-w-0 flex-1">
+                          {/* Photo Thumbnails */}
+                          <div className="flex items-center space-x-1.5 shrink-0">
+                            {bb.fotoBarangBuktiUrl ? (
+                              <button
+                                type="button"
+                                onClick={() => setPreviewModalImg({ url: bb.fotoBarangBuktiUrl, title: `Foto BB: ${bb.jenisZat}` })}
+                                className="relative w-11 h-11 rounded-lg overflow-hidden border border-[#234475] bg-black hover:opacity-80 transition-opacity cursor-pointer group"
+                                title="Klik untuk memperbesar foto BB"
+                              >
+                                <img src={bb.fotoBarangBuktiUrl} alt="Foto BB" className="w-full h-full object-cover" />
+                                <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                                  <Eye className="w-3 h-3 text-white" />
+                                </div>
+                              </button>
+                            ) : (
+                              <div className="w-11 h-11 rounded-lg border border-dashed border-slate-700 bg-[#081224] flex items-center justify-center text-slate-500 text-[9px] text-center p-1">
+                                No BB
+                              </div>
+                            )}
+
+                            {bb.fotoUjiLabUrl ? (
+                              <button
+                                type="button"
+                                onClick={() => setPreviewModalImg({ url: bb.fotoUjiLabUrl, title: `Surat Uji Lab: ${bb.jenisZat}` })}
+                                className="relative w-11 h-11 rounded-lg overflow-hidden border border-teal-800 bg-black hover:opacity-80 transition-opacity cursor-pointer group"
+                                title="Klik untuk memperbesar surat lab"
+                              >
+                                <img src={bb.fotoUjiLabUrl} alt="Surat Lab" className="w-full h-full object-cover" />
+                                <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                                  <Eye className="w-3 h-3 text-teal-300" />
+                                </div>
+                              </button>
+                            ) : (
+                              <div className="w-11 h-11 rounded-lg border border-dashed border-slate-700 bg-[#081224] flex items-center justify-center text-slate-500 text-[9px] text-center p-1">
+                                No Lab
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Info Text */}
+                          <div className="min-w-0 flex-1 text-xs">
+                            <div className="flex items-center space-x-2 flex-wrap">
+                              <span className="font-bold text-white">{bb.jenisZat}</span>
+                              <span className="text-[#D4AF37] font-semibold">({bb.beratBersihGram} gr netto)</span>
+                              <span className={`text-[9px] px-1.5 py-0.5 rounded font-semibold border ${
+                                bb.statusUjiLab === 'positif'
+                                  ? 'bg-emerald-950/60 text-emerald-300 border-emerald-700'
+                                  : bb.statusUjiLab === 'proses_lab'
+                                  ? 'bg-[#142642] text-[#D4AF37] border-[#D4AF37]/30'
+                                  : 'bg-[#142642] text-slate-400 border-[#234475]'
+                              }`}>
+                                {bb.statusUjiLab === 'positif' ? 'Positif Lab' : bb.statusUjiLab === 'proses_lab' ? 'Proses Lab' : 'Belum Uji'}
+                              </span>
+                            </div>
+                            <div className="text-[10px] text-slate-400 mt-0.5 truncate font-mono">
+                              {bb.nomorSuratLab ? `No. Lab: ${bb.nomorSuratLab}` : 'Surat Lab: Menunggu Puslabfor'}
+                            </div>
+                          </div>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveBb(bb.id)}
+                          className="text-slate-400 hover:text-rose-400 p-1.5 rounded-lg hover:bg-rose-950/30 transition-colors cursor-pointer shrink-0"
+                          title="Hapus barang bukti ini"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))
+                  )}
                 </div>
               </div>
             </div>
@@ -967,6 +1167,43 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
           )}
         </div>
       </div>
+
+      {/* Lightbox Modal Preview */}
+      {previewModalImg && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl max-w-2xl w-full overflow-hidden shadow-2xl">
+            <div className="p-3.5 bg-[#081224] border-b border-[#1b3459] flex items-center justify-between">
+              <span className="text-xs font-bold text-white flex items-center space-x-2">
+                <ImageIcon className="w-4 h-4 text-[#D4AF37]" />
+                <span>{previewModalImg.title}</span>
+              </span>
+              <button
+                type="button"
+                onClick={() => setPreviewModalImg(null)}
+                className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-[#142642] transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-4 bg-black flex items-center justify-center max-h-[70vh] overflow-auto">
+              <img
+                src={previewModalImg.url}
+                alt={previewModalImg.title}
+                className="max-h-[65vh] max-w-full object-contain rounded-lg border border-[#1b3459]"
+              />
+            </div>
+            <div className="p-3 bg-[#081224] border-t border-[#1b3459] flex justify-end">
+              <button
+                type="button"
+                onClick={() => setPreviewModalImg(null)}
+                className="bg-[#142642] hover:bg-[#1b3459] text-white text-xs font-semibold px-4 py-1.5 rounded-lg border border-[#234475] cursor-pointer"
+              >
+                Tutup Pratinjau
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
