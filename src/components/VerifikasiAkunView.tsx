@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { RegistrasiPengguna, UserProfile } from '../types';
+import { RegistrasiPengguna, UserProfile, UserRole } from '../types';
+import { registrasiApi, authApi } from '../services/api';
 import {
   ShieldCheck,
   CheckCircle2,
@@ -23,7 +24,10 @@ import {
   Check,
   Briefcase,
   ExternalLink,
-  Calendar
+  Calendar,
+  UserPlus,
+  Lock,
+  Loader2
 } from 'lucide-react';
 
 interface VerifikasiAkunViewProps {
@@ -54,6 +58,18 @@ export const VerifikasiAkunView: React.FC<VerifikasiAkunViewProps> = ({
   const [previewImage, setPreviewImage] = useState<{ url: string; title: string } | null>(null);
   const [successToast, setSuccessToast] = useState<string | null>(null);
 
+  // Direct User Creation Modal State
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isSubmittingUser, setIsSubmittingUser] = useState(false);
+  const [newUserName, setNewUserName] = useState('');
+  const [newUserEmail, setNewUserEmail] = useState('');
+  const [newUserPassword, setNewUserPassword] = useState('password123');
+  const [newUserRole, setNewUserRole] = useState<UserRole>('MEDIS');
+  const [newUserNip, setNewUserNip] = useState('');
+  const [newUserAgency, setNewUserAgency] = useState('');
+  const [newUserPosition, setNewUserPosition] = useState('');
+  const [newUserPhone, setNewUserPhone] = useState('');
+
   // Stats
   const pendingRegistrations = registrations.filter(r => r.status === 'pending');
   const approvedRegistrations = registrations.filter(r => r.status === 'approved');
@@ -64,15 +80,26 @@ export const VerifikasiAkunView: React.FC<VerifikasiAkunViewProps> = ({
     setTimeout(() => setSuccessToast(null), 4000);
   };
 
-  const handleApprove = (reg: RegistrasiPengguna) => {
+  const handleApprove = async (reg: RegistrasiPengguna) => {
     const verifikatorName = currentUser ? `${currentUser.name} (${currentUser.role.toUpperCase()})` : 'Sekretariat TAT POLRI';
-    const updated: RegistrasiPengguna = {
+    const note = reg.catatanAdmin || 'Dokumen KTP, KTA, dan Surat Penunjukan telah diverifikasi sah & valid.';
+    
+    let updated: RegistrasiPengguna = {
       ...reg,
       status: 'approved',
       approvedAt: new Date().toISOString(),
       approvedBy: verifikatorName,
-      catatanAdmin: reg.catatanAdmin || 'Dokumen KTP, KTA, dan Surat Penunjukan telah diverifikasi sah & valid.'
+      catatanAdmin: note
     };
+
+    try {
+      const res = await registrasiApi.approve(reg.id, note);
+      if (res.data) {
+        updated = { ...updated, ...res.data };
+      }
+    } catch (err) {
+      console.warn('Backend approve error, using state:', err);
+    }
 
     if (onApproveRegistration) {
       onApproveRegistration(updated);
@@ -92,14 +119,24 @@ export const VerifikasiAkunView: React.FC<VerifikasiAkunViewProps> = ({
     setRejectReasonInput('');
   };
 
-  const handleConfirmReject = () => {
+  const handleConfirmReject = async () => {
     if (!rejectModalTarget) return;
 
-    const updated: RegistrasiPengguna = {
+    const note = rejectReasonInput.trim() || 'Dokumen persyaratan dinas tidak lengkap atau tidak valid.';
+    let updated: RegistrasiPengguna = {
       ...rejectModalTarget,
       status: 'rejected',
-      catatanAdmin: rejectReasonInput.trim() || 'Dokumen persyaratan tidak memenuhi kualifikasi atau tidak lengkap.'
+      catatanAdmin: note
     };
+
+    try {
+      const res = await registrasiApi.reject(rejectModalTarget.id, note);
+      if (res.data) {
+        updated = { ...updated, ...res.data };
+      }
+    } catch (err) {
+      console.warn('Backend reject error, using state:', err);
+    }
 
     onUpdateRegistration(updated);
 
@@ -107,9 +144,9 @@ export const VerifikasiAkunView: React.FC<VerifikasiAkunViewProps> = ({
       setSelectedRegDetail(updated);
     }
 
+    showToast(`Pendaftaran akun untuk ${getFormattedOfficerName(rejectModalTarget.pangkat, rejectModalTarget.namaLengkap)} telah DITOLAK.`);
     setRejectModalTarget(null);
     setRejectReasonInput('');
-    showToast(`Pendaftaran akun ${rejectModalTarget.namaLengkap} telah ditolak.`);
   };
 
   const handleResetToPending = (reg: RegistrasiPengguna) => {
@@ -128,6 +165,44 @@ export const VerifikasiAkunView: React.FC<VerifikasiAkunViewProps> = ({
     }
 
     showToast(`Status pendaftaran ${reg.namaLengkap} dikembalikan ke antrean Menunggu Verifikasi.`);
+  };
+
+  const handleDirectCreateUserSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newUserName.trim() || !newUserEmail.trim() || !newUserPassword.trim()) {
+      showToast('Nama, Email, dan Kata Sandi wajib diisi!');
+      return;
+    }
+
+    setIsSubmittingUser(true);
+    try {
+      const res = await authApi.createUser({
+        name: newUserName.trim(),
+        email: newUserEmail.trim().toLowerCase(),
+        password: newUserPassword,
+        role: newUserRole,
+        nip: newUserNip.trim() || undefined,
+        agency: newUserAgency.trim() || undefined,
+        position: newUserPosition.trim() || undefined,
+        phone: newUserPhone.trim() || undefined,
+      });
+
+      if (res.data) {
+        showToast(`Akun ${res.data.name} (${res.data.role}) BERHASIL DIBUAT di database!`);
+        setIsCreateModalOpen(false);
+        setNewUserName('');
+        setNewUserEmail('');
+        setNewUserPassword('password123');
+        setNewUserNip('');
+        setNewUserAgency('');
+        setNewUserPosition('');
+        setNewUserPhone('');
+      }
+    } catch (err: any) {
+      showToast(err.message || 'Gagal membuat akun.');
+    } finally {
+      setIsSubmittingUser(false);
+    }
   };
 
   // Helper formatting to avoid duplicate ranks (e.g. "AKBP AKBP Budi")
@@ -242,24 +317,34 @@ export const VerifikasiAkunView: React.FC<VerifikasiAkunViewProps> = ({
           </button>
         </div>
 
-        {/* Clean Search Input */}
-        <div className="relative w-full sm:w-72">
-          <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-          <input
-            type="text"
-            placeholder="Cari nama, NRP, instansi..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-[#091426] text-xs text-slate-200 placeholder-slate-500 pl-8 pr-7 py-2 rounded-xl border border-[#1a2e4c] focus:outline-none focus:border-[#234475] transition-colors"
-          />
-          {searchQuery && (
-            <button
-              onClick={() => setSearchQuery('')}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
-            >
-              <X className="w-3.5 h-3.5" />
-            </button>
-          )}
+        {/* Right Section: Create User Button & Search Input */}
+        <div className="flex items-center space-x-2.5">
+          <button
+            onClick={() => setIsCreateModalOpen(true)}
+            className="inline-flex items-center space-x-1.5 px-3.5 py-2 bg-[#d4af37]/15 hover:bg-[#d4af37]/25 text-[#d4af37] hover:text-[#f3e5ab] text-xs font-bold rounded-xl border border-[#d4af37]/30 transition-colors cursor-pointer shadow-sm shrink-0"
+          >
+            <UserPlus className="w-4 h-4" />
+            <span>+ Buat Akun Petugas</span>
+          </button>
+
+          <div className="relative w-full sm:w-64">
+            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="text"
+              placeholder="Cari nama, NRP, instansi..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-[#091426] text-xs text-slate-200 placeholder-slate-500 pl-8 pr-7 py-2 rounded-xl border border-[#1a2e4c] focus:outline-none focus:border-[#234475] transition-colors"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -852,6 +937,191 @@ export const VerifikasiAkunView: React.FC<VerifikasiAkunViewProps> = ({
             <div className="max-h-[70vh] rounded bg-black flex items-center justify-center overflow-hidden">
               <img src={previewImage.url} alt="Preview" className="max-h-[65vh] w-auto object-contain" />
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL BUAT AKUN PETUGAS LANGSUNG (ADMIN/SEKRETARIAT) */}
+      {isCreateModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-950/80 backdrop-blur-sm overflow-y-auto">
+          <div className="bg-[#091426] border border-[#1a2e4c] rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden my-auto animate-in fade-in zoom-in-95 duration-200">
+            {/* Header */}
+            <div className="px-5 py-4 bg-[#060e1a] border-b border-[#1a2e4c] flex items-center justify-between">
+              <div className="flex items-center space-x-2.5">
+                <div className="w-8 h-8 rounded-lg bg-[#d4af37]/15 border border-[#d4af37]/30 flex items-center justify-center text-[#d4af37]">
+                  <UserPlus className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-white">Buat Akun Petugas Baru</h3>
+                  <p className="text-[11px] text-slate-400">Tambahkan akun Tim TAT (Medis, Hukum, Admin, atau Penyidik)</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsCreateModalOpen(false)}
+                disabled={isSubmittingUser}
+                className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-[#142642] transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Form */}
+            <form onSubmit={handleDirectCreateUserSubmit} className="p-5 space-y-4 text-xs">
+              <div className="space-y-3">
+                {/* Peran / Role */}
+                <div>
+                  <label className="text-slate-300 font-semibold block mb-1">
+                    Peran / Hak Akses Sistem <span className="text-rose-400">*</span>
+                  </label>
+                  <select
+                    value={newUserRole}
+                    onChange={(e) => setNewUserRole(e.target.value as UserRole)}
+                    className="w-full bg-[#060e1a] text-slate-200 border border-[#1a2e4c] focus:border-[#d4af37]/60 rounded-xl px-3 py-2 text-xs focus:outline-none transition-colors"
+                  >
+                    <option value="MEDIS">Tim Asesmen Medis (Dokter/Psikiater)</option>
+                    <option value="HUKUM">Tim Asesmen Hukum (BNN/Penyidik/Jaksa)</option>
+                    <option value="ADMIN">Sekretariat / Administrator TAT</option>
+                    <option value="PENGAJU">Penyidik Satwil (Pengaju Asesmen)</option>
+                  </select>
+                </div>
+
+                {/* Nama Lengkap & Gelar */}
+                <div>
+                  <label className="text-slate-300 font-semibold block mb-1">
+                    Nama Lengkap & Gelar <span className="text-rose-400">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Contoh: dr. Amanda Prasetyo, Sp.KJ"
+                    value={newUserName}
+                    onChange={(e) => setNewUserName(e.target.value)}
+                    className="w-full bg-[#060e1a] text-slate-200 placeholder-slate-500 border border-[#1a2e4c] focus:border-[#d4af37]/60 rounded-xl px-3 py-2 text-xs focus:outline-none transition-colors"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {/* Email */}
+                  <div>
+                    <label className="text-slate-300 font-semibold block mb-1">
+                      Email Kedinasan <span className="text-rose-400">*</span>
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      placeholder="nama@polri.go.id / bnn.go.id"
+                      value={newUserEmail}
+                      onChange={(e) => setNewUserEmail(e.target.value)}
+                      className="w-full bg-[#060e1a] text-slate-200 placeholder-slate-500 border border-[#1a2e4c] focus:border-[#d4af37]/60 rounded-xl px-3 py-2 text-xs focus:outline-none transition-colors"
+                    />
+                  </div>
+
+                  {/* Password */}
+                  <div>
+                    <label className="text-slate-300 font-semibold block mb-1">
+                      Kata Sandi Awal <span className="text-rose-400">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Minimal 6 karakter"
+                      value={newUserPassword}
+                      onChange={(e) => setNewUserPassword(e.target.value)}
+                      className="w-full bg-[#060e1a] text-slate-200 placeholder-slate-500 border border-[#1a2e4c] focus:border-[#d4af37]/60 rounded-xl px-3 py-2 text-xs focus:outline-none transition-colors font-mono"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {/* NRP / NIP */}
+                  <div>
+                    <label className="text-slate-300 font-semibold block mb-1">
+                      NRP / NIP
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Nomor identitas kedinasan"
+                      value={newUserNip}
+                      onChange={(e) => setNewUserNip(e.target.value)}
+                      className="w-full bg-[#060e1a] text-slate-200 placeholder-slate-500 border border-[#1a2e4c] focus:border-[#d4af37]/60 rounded-xl px-3 py-2 text-xs focus:outline-none transition-colors font-mono"
+                    />
+                  </div>
+
+                  {/* No Handphone */}
+                  <div>
+                    <label className="text-slate-300 font-semibold block mb-1">
+                      No. WhatsApp / HP
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="081234567890"
+                      value={newUserPhone}
+                      onChange={(e) => setNewUserPhone(e.target.value)}
+                      className="w-full bg-[#060e1a] text-slate-200 placeholder-slate-500 border border-[#1a2e4c] focus:border-[#d4af37]/60 rounded-xl px-3 py-2 text-xs focus:outline-none transition-colors font-mono"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {/* Instansi */}
+                  <div>
+                    <label className="text-slate-300 font-semibold block mb-1">
+                      Instansi / Satuan Kerja
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Contoh: RS Bhayangkara / BNNP"
+                      value={newUserAgency}
+                      onChange={(e) => setNewUserAgency(e.target.value)}
+                      className="w-full bg-[#060e1a] text-slate-200 placeholder-slate-500 border border-[#1a2e4c] focus:border-[#d4af37]/60 rounded-xl px-3 py-2 text-xs focus:outline-none transition-colors"
+                    />
+                  </div>
+
+                  {/* Jabatan */}
+                  <div>
+                    <label className="text-slate-300 font-semibold block mb-1">
+                      Jabatan
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Contoh: Dokter Psikiatri Forensik"
+                      value={newUserPosition}
+                      onChange={(e) => setNewUserPosition(e.target.value)}
+                      className="w-full bg-[#060e1a] text-slate-200 placeholder-slate-500 border border-[#1a2e4c] focus:border-[#d4af37]/60 rounded-xl px-3 py-2 text-xs focus:outline-none transition-colors"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center justify-end space-x-2.5 pt-3 border-t border-[#1a2e4c]">
+                <button
+                  type="button"
+                  onClick={() => setIsCreateModalOpen(false)}
+                  disabled={isSubmittingUser}
+                  className="px-4 py-2 bg-[#142642] hover:bg-[#1b3459] text-slate-300 hover:text-white rounded-xl text-xs font-semibold border border-[#234475] transition-colors cursor-pointer"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmittingUser}
+                  className="px-4 py-2 bg-[#d4af37] hover:bg-[#c49f2e] text-[#060e1a] rounded-xl text-xs font-bold transition-all shadow-md cursor-pointer flex items-center space-x-1.5 disabled:opacity-50"
+                >
+                  {isSubmittingUser ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      <span>Menyimpan ke DB...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Check className="w-3.5 h-3.5" />
+                      <span>Simpan Akun Petugas</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

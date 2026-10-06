@@ -1,7 +1,7 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { UserProfile, PermohonanAsesmen, UserRole, RegistrasiPengguna } from './types';
-import { MOCK_USERS, INITIAL_PERMOHONAN, INITIAL_REGISTRATIONS } from './data/initialData';
+import { authApi, permohonanApi, registrasiApi, tokenStorage } from './services/api';
 import { Header } from './components/Header';
 import { Sidebar, ActiveTab } from './components/Sidebar';
 import { DashboardHome } from './components/DashboardHome';
@@ -15,6 +15,7 @@ import { PlenoTATView } from './components/PlenoTATView';
 import { DokumenPengesahanView } from './components/DokumenPengesahanView';
 import { RujukanTindakLanjutView } from './components/RujukanTindakLanjutView';
 import { InputJadwalKontrolView } from './components/InputJadwalKontrolView';
+import { JadwalKlienView } from './components/JadwalKlienView';
 import { AsesmenPemulihanView } from './components/AsesmenPemulihanView';
 import { VerifikasiAkunView } from './components/VerifikasiAkunView';
 import { MonitoringLaporanView } from './components/MonitoringLaporanView';
@@ -31,6 +32,17 @@ import { RegisterPage } from './components/RegisterPage';
 import { LacakBerkasPage } from './components/LacakBerkasPage';
 import { MobileBottomNav } from './components/MobileBottomNav';
 
+const DEFAULT_USER: UserProfile = {
+  id: 'user-admin',
+  name: 'Kompol Arya Wicaksono, S.I.K.',
+  nip: '79080512',
+  role: 'ADMIN',
+  agency: 'Sekretariat TAT Polda Metro Jaya',
+  email: 'sekretariat@polri.go.id',
+  phone: '081234567890',
+  position: 'Ketua Tim Sekretariat TAT',
+};
+
 export default function App() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -38,14 +50,14 @@ export default function App() {
   // Navigation / Auth mode: 'landing' (public), 'lacak' (public tracking), 'login' (role selection), 'register' (Satwil registration), or 'dashboard' (authenticated)
   const [appViewMode, setAppViewMode] = useState<'landing' | 'lacak' | 'login' | 'register' | 'dashboard'>('landing');
 
-  // Active Users list (can expand when admin approves new registrations)
-  const [users, setUsers] = useState<UserProfile[]>(MOCK_USERS);
+  // Active Users list
+  const [users, setUsers] = useState<UserProfile[]>([DEFAULT_USER]);
 
   // Registrations list
-  const [registrations, setRegistrations] = useState<RegistrasiPengguna[]>(INITIAL_REGISTRATIONS);
+  const [registrations, setRegistrations] = useState<RegistrasiPengguna[]>([]);
 
-  // Current logged in user (defaults to ADMIN for comprehensive overview)
-  const [currentUser, setCurrentUser] = useState<UserProfile>(MOCK_USERS[0]); // Rina Marlina, S.H. (ADMIN/Sekretariat)
+  // Current logged in user (restored from localStorage if available)
+  const [currentUser, setCurrentUser] = useState<UserProfile>(() => tokenStorage.getUser() || DEFAULT_USER);
   const [currentTab, setCurrentTab] = useState<ActiveTab>('beranda');
   const [selectedPermohonanId, setSelectedPermohonanId] = useState<string | null>(null);
   const [selectedAsesmenId, setSelectedAsesmenId] = useState<string | null>(null);
@@ -53,8 +65,49 @@ export default function App() {
   const [selectedMedisId, setSelectedMedisId] = useState<string | null>(null);
   const [selectedRiwayatHukumId, setSelectedRiwayatHukumId] = useState<string | null>(null);
   const [selectedTindakLanjutId, setSelectedTindakLanjutId] = useState<string | null>(null);
-  const [permohonanList, setPermohonanList] = useState<PermohonanAsesmen[]>(INITIAL_PERMOHONAN);
+  const [selectedScheduleId, setSelectedScheduleId] = useState<string | null>(null);
+  const [selectedScheduleCaseId, setSelectedScheduleCaseId] = useState<string | null>(null);
+  const [permohonanList, setPermohonanList] = useState<PermohonanAsesmen[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isBackendLoading, setIsBackendLoading] = useState(false);
+
+  // Fetch real data from backend API
+  const fetchBackendData = useCallback(async () => {
+    const token = tokenStorage.getAccessToken();
+    if (!token) {
+      return; // Hindari request 401 jika belum login / belum ada token
+    }
+
+    setIsBackendLoading(true);
+    try {
+      const [permohonanRes, regRes] = await Promise.allSettled([
+        permohonanApi.getAll({ limit: 100 }),
+        registrasiApi.getAll(),
+      ]);
+
+      if (permohonanRes.status === 'fulfilled' && permohonanRes.value?.data) {
+        setPermohonanList(permohonanRes.value.data);
+      }
+
+      if (regRes.status === 'fulfilled' && regRes.value?.data) {
+        setRegistrations(regRes.value.data);
+      }
+    } catch (e) {
+      console.warn('Backend data load error:', e);
+    } finally {
+      setIsBackendLoading(false);
+    }
+  }, []);
+
+  // Sync session on startup
+  useEffect(() => {
+    const savedUser = tokenStorage.getUser();
+    const token = tokenStorage.getAccessToken();
+    if (savedUser && token) {
+      setCurrentUser(savedUser);
+      fetchBackendData();
+    }
+  }, [fetchBackendData]);
 
   // Modals
   const [isNewModalOpen, setIsNewModalOpen] = useState(false);
@@ -115,12 +168,28 @@ export default function App() {
         } else {
           setSelectedRiwayatHukumId(null);
         }
+      } else if (parts[1] === 'tindak_lanjut_jadwal') {
+        setCurrentTab('tindak_lanjut_jadwal');
+        setSelectedPermohonanId(null);
+        setSelectedHukumId(null);
+        setSelectedMedisId(null);
+        setSelectedRiwayatHukumId(null);
+        setSelectedTindakLanjutId(null);
+        if (parts[2] === 'detail' && parts[3]) {
+          setSelectedScheduleCaseId(parts[3]);
+          setSelectedScheduleId(parts[4] || null);
+        } else {
+          setSelectedScheduleCaseId(null);
+          setSelectedScheduleId(null);
+        }
       } else if (parts[1] && parts[1].startsWith('tindak_lanjut')) {
         setCurrentTab(parts[1] as ActiveTab);
         setSelectedPermohonanId(null);
         setSelectedHukumId(null);
         setSelectedMedisId(null);
         setSelectedRiwayatHukumId(null);
+        setSelectedScheduleCaseId(null);
+        setSelectedScheduleId(null);
         if (parts[2] === 'detail' && parts[3]) {
           setSelectedTindakLanjutId(parts[3]);
         } else if (parts[2] && parts[2] !== 'detail') {
@@ -135,6 +204,8 @@ export default function App() {
         setSelectedMedisId(null);
         setSelectedRiwayatHukumId(null);
         setSelectedTindakLanjutId(null);
+        setSelectedScheduleCaseId(null);
+        setSelectedScheduleId(null);
       } else {
         setCurrentTab('beranda');
         setSelectedPermohonanId(null);
@@ -142,6 +213,8 @@ export default function App() {
         setSelectedMedisId(null);
         setSelectedRiwayatHukumId(null);
         setSelectedTindakLanjutId(null);
+        setSelectedScheduleCaseId(null);
+        setSelectedScheduleId(null);
       }
     } else {
       setAppViewMode('landing');
@@ -183,12 +256,17 @@ export default function App() {
     return permohonanList.find(p => p.id === selectedTindakLanjutId) || null;
   }, [permohonanList, selectedTindakLanjutId]);
 
+  const selectedSchedulePermohonan = useMemo(() => {
+    return permohonanList.find(p => p.id === selectedScheduleCaseId) || null;
+  }, [permohonanList, selectedScheduleCaseId]);
+
   const activeDetailPermohonan =
     selectedPermohonan ||
     (currentTab === 'asesmen_aktif' ? selectedAsesmenPermohonan : null) ||
     (currentTab === 'hukum' ? selectedHukumPermohonan : null) ||
     (currentTab === 'medis' ? selectedMedisPermohonan : null) ||
     (currentTab === 'riwayat_hukum' ? selectedRiwayatHukumPermohonan : null) ||
+    (currentTab === 'tindak_lanjut_jadwal' ? selectedSchedulePermohonan : null) ||
     (currentTab.startsWith('tindak_lanjut') ? selectedTindakLanjutPermohonan : null);
 
   const isViewingAnyDetail = Boolean(
@@ -197,6 +275,7 @@ export default function App() {
     (currentTab === 'hukum' && selectedHukumId) ||
     (currentTab === 'medis' && selectedMedisId) ||
     (currentTab === 'riwayat_hukum' && selectedRiwayatHukumId) ||
+    (currentTab === 'tindak_lanjut_jadwal' && selectedScheduleCaseId) ||
     (currentTab.startsWith('tindak_lanjut') && selectedTindakLanjutId) ||
     currentTab === 'riwayat'
   );
@@ -304,18 +383,18 @@ export default function App() {
     setSelectedTindakLanjutId(null);
     // 4 role kanonis + backward compat untuk role lama
     const roleAllowedTabs: Record<string, ActiveTab[]> = {
-      PENGAJU: ['beranda', 'permohonan', 'penugasan', 'dokumen', 'tindak_lanjut', 'about', 'profile'],
-      ADMIN: ['beranda', 'permohonan', 'asesmen_aktif', 'riwayat', 'verifikasi', 'penugasan', 'pleno', 'tindak_lanjut', 'verifikasi_akun', 'monitoring', 'about', 'profile'],
+      PENGAJU: ['beranda', 'permohonan', 'penugasan', 'dokumen', 'tindak_lanjut', 'tindak_lanjut_jadwal', 'about', 'profile'],
+      ADMIN: ['beranda', 'permohonan', 'asesmen_aktif', 'riwayat', 'verifikasi', 'penugasan', 'pleno', 'tindak_lanjut', 'tindak_lanjut_jadwal', 'verifikasi_akun', 'monitoring', 'about', 'profile'],
       MEDIS: ['beranda', 'medis', 'pemulihan', 'pleno', 'about', 'profile'],
       HUKUM: ['beranda', 'hukum', 'pleno', 'riwayat_hukum', 'about', 'profile'],
       // Backward compat
       pengaju: ['beranda', 'permohonan', 'verifikasi', 'penugasan', 'dokumen', 'about', 'profile'],
-      sekretariat: ['beranda', 'permohonan', 'verifikasi', 'penugasan', 'pleno', 'tindak_lanjut', 'verifikasi_akun', 'about', 'profile'],
+      sekretariat: ['beranda', 'permohonan', 'verifikasi', 'penugasan', 'pleno', 'tindak_lanjut', 'tindak_lanjut_jadwal', 'verifikasi_akun', 'about', 'profile'],
       medis: ['beranda', 'medis', 'pemulihan', 'pleno', 'about', 'profile'],
       hukum: ['beranda', 'hukum', 'pleno', 'riwayat_hukum', 'about', 'profile'],
-      koordinator: ['beranda', 'permohonan', 'pleno', 'dokumen', 'tindak_lanjut', 'about', 'profile'],
-      pimpinan: ['beranda', 'monitoring', 'permohonan', 'tindak_lanjut', 'about', 'profile'],
-      rehabilitasi: ['beranda', 'tindak_lanjut', 'dokumen', 'about', 'profile'],
+      koordinator: ['beranda', 'permohonan', 'pleno', 'dokumen', 'tindak_lanjut', 'tindak_lanjut_jadwal', 'about', 'profile'],
+      pimpinan: ['beranda', 'monitoring', 'permohonan', 'tindak_lanjut', 'tindak_lanjut_jadwal', 'about', 'profile'],
+      rehabilitasi: ['beranda', 'tindak_lanjut', 'tindak_lanjut_jadwal', 'dokumen', 'about', 'profile'],
       admin: ['beranda', 'administrasi', 'monitoring', 'about', 'profile']
     };
     const allowed = roleAllowedTabs[user.role] || ['beranda'];
@@ -491,6 +570,25 @@ export default function App() {
           />
         );
 
+      case 'tindak_lanjut_jadwal':
+        return (
+          <JadwalKlienView
+            permohonanList={permohonanList}
+            onSelectPermohonan={handleOpenPermohonan}
+            selectedScheduleId={selectedScheduleId}
+            selectedCaseId={selectedScheduleCaseId}
+            onSelectSchedule={(caseId, schedId) => {
+              setSelectedScheduleCaseId(caseId);
+              setSelectedScheduleId(schedId);
+              if (caseId && schedId) {
+                navigate(`/dashboard/tindak_lanjut_jadwal/detail/${caseId}/${schedId}`);
+              } else {
+                navigate('/dashboard/tindak_lanjut_jadwal');
+              }
+            }}
+          />
+        );
+
       case 'tindak_lanjut_input_jadwal':
         return (
           <InputJadwalKontrolView
@@ -510,10 +608,6 @@ export default function App() {
         );
 
       case 'tindak_lanjut':
-      case 'tindak_lanjut_ceklis':
-      case 'tindak_lanjut_monitoring':
-      case 'tindak_lanjut_wajib_lapor':
-      case 'tindak_lanjut_rujukan':
         return (
           <RujukanTindakLanjutView
             permohonanList={permohonanList}
@@ -573,6 +667,7 @@ export default function App() {
         return (
           <ProfileView
             currentUser={currentUser}
+            users={users}
             onSelectUser={handleSelectUser}
             onGoToLogin={() => changeAppViewMode('login')}
             onGoToLanding={() => changeAppViewMode('landing')}
@@ -590,6 +685,17 @@ export default function App() {
           />
         );
     }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await authApi.logout();
+    } catch {
+      // ignore
+    }
+    setPermohonanList([]);
+    setRegistrations([]);
+    changeAppViewMode('login');
   };
 
   // 1. PUBLIC LANDING PAGE
@@ -651,6 +757,8 @@ export default function App() {
         registrations={registrations}
         onLogin={(user) => {
           handleSelectUser(user);
+          tokenStorage.setUser(user);
+          fetchBackendData();
           changeAppViewMode('dashboard');
         }}
         onBackToLanding={() => changeAppViewMode('landing')}
@@ -672,7 +780,7 @@ export default function App() {
         pendingAlertsCount={badgeCounts.perluPerbaikan + (badgeCounts.tindakLanjutTerhambat > 0 ? 1 : 0) + (badgeCounts.menungguPengesahan > 0 ? 1 : 0)}
         onToggleMobileNav={() => setIsMobileNavOpen(!isMobileNavOpen)}
         isMobileNavOpen={isMobileNavOpen}
-        onLogout={() => changeAppViewMode('login')}
+        onLogout={handleLogout}
         onGoToLanding={() => changeAppViewMode('landing')}
         onGoToLogin={() => changeAppViewMode('login')}
         selectedPermohonan={activeDetailPermohonan}
@@ -683,6 +791,7 @@ export default function App() {
           }
           if (selectedAsesmenId) {
             setSelectedAsesmenId(null);
+            navigate('/dashboard/asesmen_aktif');
           }
           if (selectedHukumId) {
             setSelectedHukumId(null);
@@ -695,6 +804,15 @@ export default function App() {
           if (selectedRiwayatHukumId) {
             setSelectedRiwayatHukumId(null);
             navigate('/dashboard/riwayat_hukum');
+          }
+          if (selectedTindakLanjutId) {
+            setSelectedTindakLanjutId(null);
+            navigate('/dashboard/tindak_lanjut');
+          }
+          if (selectedScheduleCaseId) {
+            setSelectedScheduleCaseId(null);
+            setSelectedScheduleId(null);
+            navigate('/dashboard/tindak_lanjut_jadwal');
           }
         }}
         onOpenQrModal={(item) => setQrModalPermohonan(item)}
@@ -709,12 +827,13 @@ export default function App() {
             onSelectTab={handleSelectTab}
             userRole={currentUser.role}
             currentUser={currentUser}
+            users={users}
             onSelectUser={handleSelectUser}
             onOpenNewModal={() => setIsNewModalOpen(true)}
             badgeCounts={badgeCounts}
             isMobileOpen={isMobileNavOpen}
             onCloseMobile={() => setIsMobileNavOpen(false)}
-            onLogout={() => setAppViewMode('login')}
+            onLogout={handleLogout}
             onGoToLanding={() => setAppViewMode('landing')}
             hasTopHeader={true}
           />

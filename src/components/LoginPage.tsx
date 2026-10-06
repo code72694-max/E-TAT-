@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { UserProfile, UserRole, RegistrasiPengguna } from '../types';
-import { MOCK_USERS } from '../data/initialData';
-import { PoliceEmblem } from './PoliceEmblem';
+import { UserProfile, RegistrasiPengguna } from '../types';
+import { authApi } from '../services/api';
 import {
   ArrowLeft,
   LogIn,
@@ -9,14 +8,11 @@ import {
   Mail,
   Eye,
   EyeOff,
-  Shield,
-  KeyRound,
-  UserCheck,
   UserPlus,
-  AlertCircle,
   Clock,
   XCircle,
-  CheckCircle2
+  Loader2,
+  ShieldCheck
 } from 'lucide-react';
 
 interface LoginPageProps {
@@ -31,101 +27,86 @@ export const LoginPage: React.FC<LoginPageProps> = ({
   onLogin,
   onBackToLanding,
   onGoToRegister,
-  users = MOCK_USERS,
   registrations = []
 }) => {
-  const FOUR_ROLES: UserRole[] = ['PENGAJU', 'ADMIN', 'HUKUM', 'MEDIS'];
-  
-  // Ambil tepat 1 akun untuk masing-masing 4 role
-  const loginUsers = FOUR_ROLES.map(role => {
-    return users.find(u => u.role === role);
-  }).filter((u): u is UserProfile => Boolean(u));
-
-  const [selectedUserId, setSelectedUserId] = useState<string>(loginUsers[0]?.id || users[0]?.id || '');
-  const [emailInput, setEmailInput] = useState(loginUsers[0]?.email || users[0]?.email || '');
-  const [passwordInput, setPasswordInput] = useState('••••••••••••');
+  const [emailInput, setEmailInput] = useState<string>('');
+  const [passwordInput, setPasswordInput] = useState<string>('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [loginNotice, setLoginNotice] = useState<{
     type: 'pending' | 'rejected' | 'error';
     title: string;
     message: string;
   } | null>(null);
 
-  const getRoleLabel = (role: UserRole | string) => {
-    switch (role) {
-      case 'PENGAJU':
-      case 'pengaju':
-        return 'Pengaju';
-      case 'MEDIS':
-      case 'medis':
-        return 'Medis';
-      case 'HUKUM':
-      case 'hukum':
-        return 'Hukum';
-      case 'ADMIN':
-      case 'sekretariat':
-      case 'admin':
-        return 'Sekretariat';
-      default:
-        return 'Sekretariat';
-    }
-  };
-
-  const handleDropdownChange = (userId: string) => {
-    setSelectedUserId(userId);
-    setLoginNotice(null);
-    const user = users.find(u => u.id === userId);
-    if (user) {
-      setEmailInput(user.email);
-    }
-  };
-
-  const handleFormSubmit = (e: React.FormEvent) => {
+  const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoginNotice(null);
 
     const inputClean = emailInput.trim().toLowerCase();
+    const passClean = passwordInput.trim();
 
-    // Check if matching a pending or rejected registration
-    const matchedReg = registrations.find(
-      r => r.email.toLowerCase() === inputClean || r.nrp.toLowerCase() === inputClean
-    );
+    if (!inputClean || !passClean) {
+      setLoginNotice({
+        type: 'error',
+        title: 'Form Belum Lengkap',
+        message: 'Silakan masukkan email kedinasan/NRP dan kata sandi Anda.'
+      });
+      return;
+    }
 
-    if (matchedReg) {
-      if (matchedReg.status === 'pending') {
+    setIsLoading(true);
+
+    try {
+      // 1. Call real backend login endpoint
+      const response = await authApi.login(inputClean, passClean);
+      
+      if (response.success && response.data?.accessToken) {
+        // 2. Fetch authenticated profile directly from DB via /api/auth/me
+        const meRes = await authApi.getMe();
+        if (meRes.success && meRes.data) {
+          onLogin(meRes.data);
+        } else {
+          throw new Error('Gagal memuat profil pengguna dari server.');
+        }
+      } else {
+        throw new Error(response.message || 'Login gagal.');
+      }
+    } catch (err: any) {
+      // Check if matching pending or rejected registration for informative message
+      const matchedReg = registrations.find(
+        r => r.email.toLowerCase() === inputClean || r.nrp.toLowerCase() === inputClean
+      );
+
+      if (matchedReg && matchedReg.status === 'pending') {
         setLoginNotice({
           type: 'pending',
           title: 'Akun Menunggu Persetujuan Admin',
-          message: `Permohonan akun untuk ${matchedReg.pangkat} ${matchedReg.namaLengkap} (${matchedReg.instansi}) dengan nomor ${matchedReg.nomorRegistrasi} masih dalam proses verifikasi oleh Administrator BNNP Kaltim.`
+          message: `Permohonan akun untuk ${matchedReg.pangkat} ${matchedReg.namaLengkap} (${matchedReg.instansi}) masih dalam proses verifikasi oleh Admin Sekretariat TAT.`
         });
-        return;
-      }
-      if (matchedReg.status === 'rejected') {
+      } else if (matchedReg && matchedReg.status === 'rejected') {
         setLoginNotice({
           type: 'rejected',
           title: 'Pendaftaran Akun Ditolak',
-          message: `Pendaftaran akun ditolak oleh Admin. Alasan: ${matchedReg.catatanAdmin || 'Dokumen KTP/KTA tidak memenuhi persyaratan.'}`
+          message: `Pendaftaran akun ditolak oleh Admin. Alasan: ${matchedReg.catatanAdmin || 'Dokumen persyaratan belum lengkap.'}`
         });
-        return;
+      } else {
+        setLoginNotice({
+          type: 'error',
+          title: 'Gagal Masuk ke Sistem',
+          message: err.message || 'Email atau kata sandi tidak valid. Pastikan kredensial benar.'
+        });
       }
+    } finally {
+      setIsLoading(false);
     }
-
-    // Match in approved / active users
-    const matchedUser =
-      users.find(u => u.email.toLowerCase() === inputClean) ||
-      users.find(u => u.id === selectedUserId) ||
-      users[0];
-
-    onLogin(matchedUser);
   };
-
-  const selectedUser = users.find(u => u.id === selectedUserId) || users[0];
 
   return (
     <div className="min-h-screen bg-[#071325] text-slate-100 flex flex-col antialiased selection:bg-[#D4AF37] selection:text-slate-950 font-sans">
       {/* Top Header Bar */}
-      <header className="bg-[#071325]/95 border-b border-[#1b3459] px-3.5 sm:px-8 py-3 flex items-center justify-between sticky top-0 z-20 backdrop-blur-sm">
+      <header className="bg-[#071325]/95 border-b border-[#1b3459] px-4 sm:px-8 py-3 flex items-center justify-between sticky top-0 z-20 backdrop-blur-sm">
         <button
           onClick={onBackToLanding}
           className="inline-flex items-center space-x-2 text-xs font-semibold text-slate-300 hover:text-white px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer hover:bg-white/5 border border-[#1b3459]/60 sm:border-transparent"
@@ -146,17 +127,22 @@ export const LoginPage: React.FC<LoginPageProps> = ({
       </header>
 
       {/* Main Content Area */}
-      <main className="flex-1 flex items-center justify-center px-4 sm:px-6 py-6 sm:py-10">
-        <div className="w-full max-w-md space-y-5">
+      <main className="flex-1 flex items-center justify-center px-4 sm:px-6 py-8 sm:py-12">
+        <div className="w-full max-w-md space-y-6">
           {/* Card Header & Branding */}
-          <div className="text-center space-y-1">
+          <div className="text-center space-y-2">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-[#142642] border border-[#234475] shadow-lg mb-1">
+              <ShieldCheck className="w-6 h-6 text-[#D4AF37]" />
+            </div>
             <h1 className="text-xl sm:text-2xl font-bold text-white tracking-wide font-['Cinzel',serif]">
               LOGIN SISTEM E-TAT
             </h1>
-            <p className="text-xs text-slate-400">Portal Otentikasi Petugas Tim Asesmen Terpadu</p>
+            <p className="text-xs text-slate-400">
+              Portal Otentikasi Terpadu Tim Asesmen & Satuan Kerja Kedinasan
+            </p>
           </div>
 
-          {/* Alert Notice if Pending / Rejected */}
+          {/* Alert Notice if Pending / Rejected / Error */}
           {loginNotice && (
             <div
               className={`p-4 rounded-xl border text-xs space-y-1.5 animate-in fade-in duration-200 ${
@@ -177,60 +163,26 @@ export const LoginPage: React.FC<LoginPageProps> = ({
             </div>
           )}
 
-          {/* Clean Card Surface */}
-          <div className="bg-[#0b172a] rounded-2xl border border-[#1b3459] p-4 sm:p-7 shadow-2xl space-y-4">
-            {/* Quick Role Preset Picker */}
-            <div className="space-y-1.5 pb-4 border-b border-[#1b3459]">
-              <label className="flex items-center justify-between text-[11px] font-semibold text-slate-300">
-                <span className="flex items-center space-x-1.5">
-                  <UserCheck className="w-3.5 h-3.5 text-[#D4AF37]" />
-                  <span>Pilih Profil Akun Kedinasan:</span>
-                </span>
-                <span className="text-[10px] text-[#D4AF37] font-mono">Daftar Akun Aktif</span>
-              </label>
-
-              <select
-                value={selectedUserId}
-                onChange={e => handleDropdownChange(e.target.value)}
-                className="w-full bg-[#081224] text-white border border-[#1b3459] focus:border-[#D4AF37] rounded-xl px-3 py-2.5 text-xs font-medium focus:outline-none transition-colors cursor-pointer truncate"
-              >
-                {loginUsers.map((user, index) => (
-                  <option key={user.id} value={user.id}>
-                    {index + 1}. {getRoleLabel(user.role)} — {user.name}
-                  </option>
-                ))}
-              </select>
-
-              {selectedUser && (
-                <div className="text-[11px] text-slate-400 flex items-center justify-between pt-1">
-                  <div className="flex items-center space-x-1.5 truncate">
-                    <span className="text-slate-500 font-mono">Instansi:</span>
-                    <span className="text-slate-300 font-medium truncate">{selectedUser.agency}</span>
-                  </div>
-                  <span className="text-[#D4AF37] font-semibold text-[10px] bg-[#D4AF37]/10 px-2 py-0.5 rounded border border-[#D4AF37]/20 shrink-0">
-                    Role: {getRoleLabel(selectedUser.role)}
-                  </span>
-                </div>
-              )}
-            </div>
-
+          {/* Clean Authentication Card */}
+          <div className="bg-[#0b172a] rounded-2xl border border-[#1b3459] p-6 sm:p-8 shadow-2xl space-y-5">
             {/* Credential Inputs Form */}
             <form onSubmit={handleFormSubmit} className="space-y-4">
               <div className="space-y-1.5">
                 <label className="block text-xs font-semibold text-slate-200">
-                  Email Kedinasan / NRP
+                  Email Kedinasan / Akun Terdaftar
                 </label>
                 <div className="relative">
                   <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-3 pointer-events-none" />
                   <input
-                    type="text"
+                    type="email"
                     required
+                    autoFocus
                     value={emailInput}
                     onChange={e => {
                       setEmailInput(e.target.value);
                       setLoginNotice(null);
                     }}
-                    placeholder="nama.nrp@polri.go.id"
+                    placeholder="nama@polri.go.id / satwil"
                     className="w-full bg-[#081224] text-white pl-10 pr-3.5 py-2.5 rounded-xl border border-[#1b3459] text-xs focus:outline-none focus:border-[#D4AF37] placeholder-slate-500 transition-colors"
                   />
                 </div>
@@ -238,7 +190,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
 
               <div className="space-y-1.5">
                 <label className="block text-xs font-semibold text-slate-200">
-                  Kata Sandi Kedinasan
+                  Kata Sandi
                 </label>
                 <div className="relative">
                   <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3 pointer-events-none" />
@@ -246,9 +198,12 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                     type={showPassword ? 'text' : 'password'}
                     required
                     value={passwordInput}
-                    onChange={e => setPasswordInput(e.target.value)}
-                    placeholder="Masukkan sandi..."
-                    className="w-full bg-[#081224] text-white pl-10 pr-10 py-2.5 rounded-xl border border-[#1b3459] text-xs focus:outline-none focus:border-[#D4AF37] placeholder-slate-500 transition-colors"
+                    onChange={e => {
+                      setPasswordInput(e.target.value);
+                      setLoginNotice(null);
+                    }}
+                    placeholder="Masukkan kata sandi..."
+                    className="w-full bg-[#081224] text-white pl-10 pr-10 py-2.5 rounded-xl border border-[#1b3459] text-xs focus:outline-none focus:border-[#D4AF37] placeholder-slate-500 transition-colors font-mono"
                   />
                   <button
                     type="button"
@@ -261,7 +216,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                 </div>
               </div>
 
-              <div className="flex items-center justify-between text-xs pt-0.5">
+              <div className="flex items-center justify-between text-xs pt-1">
                 <label className="flex items-center space-x-2 text-slate-400 hover:text-slate-300 cursor-pointer select-none">
                   <input
                     type="checkbox"
@@ -269,26 +224,36 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                     onChange={e => setRememberMe(e.target.checked)}
                     className="w-3.5 h-3.5 rounded border-[#1b3459] bg-[#081224] text-[#D4AF37] focus:ring-0 focus:ring-offset-0 cursor-pointer"
                   />
-                  <span>Ingat di perangkat ini</span>
+                  <span>Ingat perangkat ini</span>
                 </label>
                 <button
                   type="button"
                   onClick={() =>
-                    alert('Silakan hubungi Administrator PUSDATIN SIBER untuk reset kata sandi dinas.')
+                    alert('Untuk reset kata sandi, silakan hubungi Administrator Sekretariat TAT.')
                   }
                   className="text-slate-400 hover:text-[#D4AF37] transition-colors cursor-pointer text-xs"
                 >
-                  Bantuan Sandi
+                  Lupa sandi?
                 </button>
               </div>
 
               {/* Clean Primary Login Button */}
               <button
                 type="submit"
-                className="w-full bg-[#142642] hover:bg-[#1b3459] text-white font-bold text-xs sm:text-sm py-2.5 rounded-xl flex items-center justify-center space-x-2 transition-all cursor-pointer border border-[#234475] shadow-md hover:border-[#D4AF37]/50"
+                disabled={isLoading}
+                className="w-full bg-[#142642] hover:bg-[#1b3459] disabled:opacity-50 text-white font-bold text-xs sm:text-sm py-2.5 rounded-xl flex items-center justify-center space-x-2 transition-all cursor-pointer border border-[#234475] shadow-md hover:border-[#D4AF37]/50 mt-2"
               >
-                <LogIn className="w-4 h-4 text-[#D4AF37]" />
-                <span>Masuk ke Dashboard</span>
+                {isLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 text-[#D4AF37] animate-spin" />
+                    <span>Memverifikasi Kredensial...</span>
+                  </>
+                ) : (
+                  <>
+                    <LogIn className="w-4 h-4 text-[#D4AF37]" />
+                    <span>Masuk ke Sistem</span>
+                  </>
+                )}
               </button>
             </form>
 
@@ -296,7 +261,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
             {onGoToRegister && (
               <div className="pt-4 border-t border-[#1b3459] text-center">
                 <p className="text-xs text-slate-400">
-                  Belum memiliki akun kedinasan Satwil / Kapolres?{' '}
+                  Belum memiliki akun kedinasan Satwil?{' '}
                   <button
                     onClick={onGoToRegister}
                     className="text-[#D4AF37] hover:underline font-bold inline-flex items-center space-x-1 cursor-pointer"
@@ -312,5 +277,6 @@ export const LoginPage: React.FC<LoginPageProps> = ({
     </div>
   );
 };
+
 
 

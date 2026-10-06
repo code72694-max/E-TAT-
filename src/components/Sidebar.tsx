@@ -1,6 +1,5 @@
 import React from 'react';
 import { UserRole, UserProfile } from '../types';
-import { MOCK_USERS } from '../data/initialData';
 import {
   LayoutDashboard,
   FileSpreadsheet,
@@ -13,6 +12,7 @@ import {
   Share2,
   BarChart3,
   Settings,
+  Calendar,
   Plus,
   X,
   Info,
@@ -41,10 +41,7 @@ export type ActiveTab =
   | 'dokumen'
   | 'tindak_lanjut'
   | 'tindak_lanjut_input_jadwal'
-  | 'tindak_lanjut_ceklis'
-  | 'tindak_lanjut_monitoring'
-  | 'tindak_lanjut_wajib_lapor'
-  | 'tindak_lanjut_rujukan'
+  | 'tindak_lanjut_jadwal'
   | 'monitoring'
   | 'administrasi'
   | 'pemulihan'
@@ -57,6 +54,7 @@ interface SidebarProps {
   onSelectTab: (tab: ActiveTab) => void;
   userRole: UserRole;
   currentUser?: UserProfile;
+  users?: UserProfile[];
   onSelectUser?: (user: UserProfile) => void;
   onOpenNewModal: () => void;
   badgeCounts: {
@@ -86,6 +84,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onSelectTab,
   userRole,
   currentUser,
+  users = [],
   onSelectUser,
   onOpenNewModal,
   badgeCounts,
@@ -216,14 +215,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <select
                 value={currentUser.id}
                 onChange={(e) => {
-                  const targetUser = MOCK_USERS.find(u => u.id === e.target.value);
+                  const targetUser = (users || [currentUser]).find(u => u.id === e.target.value);
                   if (targetUser) {
                     onSelectUser(targetUser);
                   }
                 }}
                 className="w-full bg-[#142642] text-xs font-semibold text-white border border-[#234475] rounded-xl px-3 py-2 pr-8 appearance-none cursor-pointer focus:outline-none focus:border-blue-500"
               >
-                {MOCK_USERS.map((user) => (
+                {(users && users.length > 0 ? users : [currentUser]).map((user) => (
                   <option key={user.id} value={user.id} className="bg-[#0b172a] text-slate-200">
                     {user.name.split(',')[0]} ({user.role.toUpperCase()})
                   </option>
@@ -306,51 +305,29 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       }`}
                     >
                       <Plus className="w-3.5 h-3.5 text-cyan-300" />
-                      <span>+ Input Jadwal Kontrol &amp; Lapor</span>
+                      <span>Input Jadwal Kontrol & Lapor</span>
                     </button>
                     <button
-                      onClick={() => handleItemClick('tindak_lanjut_ceklis')}
+                      onClick={() => handleItemClick('tindak_lanjut_jadwal')}
                       className={`w-full text-left px-2.5 py-1.5 text-[11px] font-medium rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer ${
-                        currentTab === 'tindak_lanjut_ceklis' || currentTab === 'tindak_lanjut'
+                        currentTab === 'tindak_lanjut_jadwal'
+                          ? 'bg-[#142642] text-[#38bdf8] font-bold border border-[#234475]'
+                          : 'text-slate-300 hover:text-white hover:bg-[#142642]/60'
+                      }`}
+                    >
+                      <Calendar className="w-3 h-3 text-cyan-400" />
+                      <span>Daftar Jadwal (Kontrol & Lapor)</span>
+                    </button>
+                    <button
+                      onClick={() => handleItemClick('tindak_lanjut')}
+                      className={`w-full text-left px-2.5 py-1.5 text-[11px] font-medium rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer ${
+                        currentTab === 'tindak_lanjut'
                           ? 'bg-[#142642] text-[#38bdf8] font-bold border border-[#234475]'
                           : 'text-slate-300 hover:text-white hover:bg-[#142642]/60'
                       }`}
                     >
                       <FileCheck2 className="w-3 h-3 text-blue-400" />
-                      <span>1. Ceklis Dokumen &amp; Admisi</span>
-                    </button>
-                    <button
-                      onClick={() => handleItemClick('tindak_lanjut_monitoring')}
-                      className={`w-full text-left px-2.5 py-1.5 text-[11px] font-medium rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer ${
-                        currentTab === 'tindak_lanjut_monitoring'
-                          ? 'bg-[#142642] text-blue-400 font-bold border border-[#234475]'
-                          : 'text-slate-300 hover:text-white hover:bg-[#142642]/60'
-                      }`}
-                    >
-                      <Activity className="w-3 h-3 text-blue-400" />
-                      <span>2. Monitoring Rawat Jalan / Inap</span>
-                    </button>
-                    <button
-                      onClick={() => handleItemClick('tindak_lanjut_wajib_lapor')}
-                      className={`w-full text-left px-2.5 py-1.5 text-[11px] font-medium rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer ${
-                        currentTab === 'tindak_lanjut_wajib_lapor'
-                          ? 'bg-[#142642] text-blue-400 font-bold border border-[#234475]'
-                          : 'text-slate-300 hover:text-white hover:bg-[#142642]/60'
-                      }`}
-                    >
-                      <CalendarCheck className="w-3 h-3 text-blue-400" />
-                      <span>3. Jadwal &amp; Catatan Wajib Lapor</span>
-                    </button>
-                    <button
-                      onClick={() => handleItemClick('tindak_lanjut_rujukan')}
-                      className={`w-full text-left px-2.5 py-1.5 text-[11px] font-medium rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer ${
-                        currentTab === 'tindak_lanjut_rujukan'
-                          ? 'bg-[#142642] text-blue-400 font-bold border border-[#234475]'
-                          : 'text-slate-300 hover:text-white hover:bg-[#142642]/60'
-                      }`}
-                    >
-                      <Building2 className="w-3 h-3 text-blue-400" />
-                      <span>4. Alur Rujukan &amp; Kuota Bed</span>
+                      <span>Daftar Tindak Lanjut</span>
                     </button>
                   </div>
                 )}

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { RegistrasiPengguna } from '../types';
+import { registrasiApi } from '../services/api';
 import {
   ArrowLeft,
   UserPlus,
@@ -207,6 +208,12 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({
     const finalKtaName = fotoKtaName || 'KTA_POLRI_' + (nrp || 'DEFAULT') + '.jpg';
 
     const randomSuffix = Math.floor(100 + Math.random() * 900);
+    const kategoriMapped = kategoriInstansi === 'Polres / Polresta' 
+      ? 'Polres_Polresta' 
+      : kategoriInstansi === 'BNNK / BNNP' 
+      ? 'BNNK_BNNP' 
+      : (kategoriInstansi as any);
+
     const newReg: RegistrasiPengguna = {
       id: `reg-${Date.now()}`,
       nomorRegistrasi: `REG-TAT/${new Date().getFullYear()}/POLRES-${randomSuffix}`,
@@ -234,8 +241,38 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({
       status: 'pending'
     };
 
-    onRegisterSubmit(newReg);
-    setSubmittedReg(newReg);
+    // Send to backend
+    registrasiApi.submit({
+      namaLengkap,
+      pangkat,
+      nrp,
+      jabatan,
+      instansi,
+      kategoriInstansi: kategoriMapped,
+      wilayahHukum,
+      alamatKantor,
+      email,
+      phone,
+      teleponKantor,
+      fotoKtpUrl: finalKtpUrl,
+      fotoKtpName: finalKtpName,
+      fotoKtaUrl: finalKtaUrl,
+      fotoKtaName: finalKtaName,
+      suratPenunjukanUrl: suratPenunjukanUrl || undefined,
+      suratPenunjukanName: suratPenunjukanName || undefined,
+    }).then((res) => {
+      if (res.data) {
+        onRegisterSubmit(res.data);
+        setSubmittedReg(res.data);
+      } else {
+        onRegisterSubmit(newReg);
+        setSubmittedReg(newReg);
+      }
+    }).catch((err) => {
+      console.warn('Backend registrasi error, using local fallback:', err);
+      onRegisterSubmit(newReg);
+      setSubmittedReg(newReg);
+    });
   };
 
   return (

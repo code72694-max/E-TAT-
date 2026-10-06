@@ -8,7 +8,7 @@ import {
   BuktiWajibLapor,
   MonitoringTindakLanjut
 } from '../types';
-import { REHAB_FACILITIES } from '../data/initialData';
+import { REHAB_FACILITIES } from '../constants/facilities';
 import {
   Share2,
   AlertTriangle,
@@ -51,105 +51,7 @@ interface RujukanTindakLanjutViewProps {
   currentTab?: string;
 }
 
-// Master standard checklist items for post-TAT rehabilitation admission & control
-interface ChecklistItemDef {
-  id: string;
-  kode: string;
-  nama: string;
-  kategori: 'tat' | 'medis' | 'hukum' | 'keluarga';
-  wajib: boolean;
-  keterangan: string;
-}
 
-const MASTER_CHECKLIST: ChecklistItemDef[] = [
-  {
-    id: 'doc-1',
-    kode: 'DOC-TAT-01',
-    nama: 'Petikan Surat Rekomendasi Resmi Tim Asesmen Terpadu (TAT)',
-    kategori: 'tat',
-    wajib: true,
-    keterangan: 'Dokumen ber-QR Code ditandatangani Ketua Tim TAT, Asesor Hukum & Medis'
-  },
-  {
-    id: 'doc-2',
-    kode: 'DOC-TAT-02',
-    nama: 'Berita Acara (BA) Serah Terima Klien ke Balai / Lembaga Rehabilitasi',
-    kategori: 'tat',
-    wajib: true,
-    keterangan: 'Ditandatangani oleh Penyidik Polri/BNN, Petugas Fasilitas Rehab & Klien'
-  },
-  {
-    id: 'doc-3',
-    kode: 'DOC-MED-01',
-    nama: 'Laporan Hasil Asesmen Medis & Skoring WHO ASSIST',
-    kategori: 'medis',
-    wajib: true,
-    keterangan: 'Hasil diagnosis tingkat ketergantungan zat dan rekomendasi modalitas rehab'
-  },
-  {
-    id: 'doc-4',
-    kode: 'DOC-MED-02',
-    nama: 'Hasil Skrining Awal Toksikologi Urin (Multi-Panel 5/6 Parameter)',
-    kategori: 'medis',
-    wajib: true,
-    keterangan: 'Hasil pengujian laboratorium / skrining cepat AMP, MET, THC, BZO, MOP'
-  },
-  {
-    id: 'doc-5',
-    kode: 'DOC-MED-03',
-    nama: 'Pemeriksaan Fisik Dasar, Tanda-Tanda Vital & Riwayat Komorbiditas Medis',
-    kategori: 'medis',
-    wajib: true,
-    keterangan: 'Catatan kondisi kesehatan umum, riwayat penyakit menular/kronis dan alergi'
-  },
-  {
-    id: 'doc-6',
-    kode: 'DOC-HUK-01',
-    nama: 'Surat Pengantar / Pelimpahan Perkara dari Penyidik (Satresnarkoba / BNN)',
-    kategori: 'hukum',
-    wajib: true,
-    keterangan: 'Memuat nomor LP, dasar penangkapan dan tindak lanjut status hukum peradilan/RJ'
-  },
-  {
-    id: 'doc-7',
-    kode: 'DOC-HUK-02',
-    nama: 'Telaah Yuridis & Analisis Peran Tersangka dari Tim Hukum TAT',
-    kategori: 'hukum',
-    wajib: false,
-    keterangan: 'Pertimbangan kesesuaian SEMA 04/2010 dan pembuktian ketiadaan unsur bandar/pengedar'
-  },
-  {
-    id: 'doc-8',
-    kode: 'DOC-FAM-01',
-    nama: 'Surat Persetujuan (Informed Consent) Klien & Keluarga / Penjamin',
-    kategori: 'keluarga',
-    wajib: true,
-    keterangan: 'Kesediaan mengikuti program rehabilitasi penuh dan tata tertib fasilitas'
-  },
-  {
-    id: 'doc-9',
-    kode: 'DOC-FAM-02',
-    nama: 'Pakta Integritas / Komitmen Kepatuhan Wajib Lapor & Tes Urin Berkala',
-    kategori: 'keluarga',
-    wajib: true,
-    keterangan: 'Pernyataan klien bersedia mematuhi jadwal kontrol tanpa mangkir'
-  },
-  {
-    id: 'doc-10',
-    kode: 'DOC-FAM-03',
-    nama: 'Fotokopi KTP / Kartu Identitas Terperiksa & Kontak Darurat Wali/Penjamin',
-    kategori: 'keluarga',
-    wajib: true,
-    keterangan: 'Verifikasi NIK dan nomor kontak aktif pihak penjamin klien'
-  }
-];
-
-const getSubTabFromCurrentTab = (tab?: string): 'ceklis_dokumen' | 'monitoring' | 'wajib_lapor' | 'rujukan' => {
-  if (tab === 'tindak_lanjut_monitoring') return 'monitoring';
-  if (tab === 'tindak_lanjut_wajib_lapor') return 'wajib_lapor';
-  if (tab === 'tindak_lanjut_rujukan') return 'rujukan';
-  return 'ceklis_dokumen';
-};
 
 export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = ({
   permohonanList,
@@ -160,31 +62,10 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
   onSelectCase,
   currentTab
 }) => {
-  const [activeSubTab, setActiveSubTab] = useState<'ceklis_dokumen' | 'monitoring' | 'wajib_lapor' | 'rujukan'>(getSubTabFromCurrentTab(currentTab));
-
-  useEffect(() => {
-    if (currentTab) {
-      setActiveSubTab(getSubTabFromCurrentTab(currentTab));
-    }
-  }, [currentTab]);
-
   const [searchTerm, setSearchTerm] = useState('');
   const [filterModalitas, setFilterModalitas] = useState<'all' | 'Rawat Inap' | 'Rawat Jalan'>('all');
   
-  // Selected client for interactive checklist modal
-  const [selectedForChecklist, setSelectedForChecklist] = useState<PermohonanAsesmen | null>(null);
-  const [customCheckedMap, setCustomCheckedMap] = useState<Record<string, Record<string, boolean>>>({});
 
-  // Quick Log Modal states
-  const [showAddLogModal, setShowAddLogModal] = useState<PermohonanAsesmen | null>(null);
-  const [logType, setLogType] = useState<JurnalPengawasan['jenisKegiatan']>('Wajib Lapor Mingguan');
-  const [logStatus, setLogStatus] = useState<JurnalPengawasan['statusKehadiran']>('Hadir');
-  const [logNotes, setLogNotes] = useState('');
-  
-  // Quick Urine Modal states
-  const [showAddUrineModal, setShowAddUrineModal] = useState<PermohonanAsesmen | null>(null);
-  const [urineResult, setUrineResult] = useState<'Negatif' | 'Positif'>('Negatif');
-  const [urineNotes, setUrineNotes] = useState('Pemeriksaan skrining berkala non-reaktif.');
 
   // New Client Schedule Modal states
   const [showScheduleModal, setShowScheduleModal] = useState(false);
@@ -337,152 +218,7 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
   const klienPeringatan = pengawasanList.filter(p => p.pengawasanKlien?.statusKepatuhan === 'dalam_peringatan' || p.pengawasanKlien?.statusKepatuhan === 'tidak_patuh_mangkir' || p.monitoringTindakLanjut?.statusMonitoring === 'terkendala').length;
   const klienSelesai = pengawasanList.filter(p => p.pengawasanKlien?.statusKepatuhan === 'selesai_program' || p.monitoringTindakLanjut?.statusMonitoring === 'selesai').length;
 
-  // Toggle item in checklist
-  const handleToggleChecklist = (permohonanId: string, docId: string) => {
-    setCustomCheckedMap(prev => {
-      const currentClientMap = prev[permohonanId] || {};
-      const updatedClientMap = {
-        ...currentClientMap,
-        [docId]: !currentClientMap[docId]
-      };
-      return {
-        ...prev,
-        [permohonanId]: updatedClientMap
-      };
-    });
-  };
 
-  // Check if a document is checked for a client (defaults to true for standard seeded items)
-  const isDocChecked = (permohonanId: string, docId: string, defaultChecked: boolean = true) => {
-    const clientMap = customCheckedMap[permohonanId];
-    if (clientMap && clientMap[docId] !== undefined) {
-      return clientMap[docId];
-    }
-    return defaultChecked;
-  };
-
-  const calculateClientDocProgress = (permohonanId: string) => {
-    let completed = 0;
-    MASTER_CHECKLIST.forEach(doc => {
-      if (isDocChecked(permohonanId, doc.id, true)) {
-        completed++;
-      }
-    });
-    return Math.round((completed / MASTER_CHECKLIST.length) * 100);
-  };
-
-  // Submit quick journal log
-  const handleSaveLog = () => {
-    if (!showAddLogModal || !onUpdatePermohonan) return;
-    const item = showAddLogModal;
-    const nowStr = new Date().toLocaleDateString('id-ID');
-    
-    const newEntry: JurnalPengawasan = {
-      id: 'jrn-' + Date.now(),
-      tanggal: nowStr,
-      jenisKegiatan: logType,
-      statusKehadiran: logStatus,
-      catatanPerkembangan: logNotes || `Pencatatan sesi kontrol ${logType} dengan status ${logStatus}.`,
-      petugasPengawas: currentUser.name,
-      instansiPengawas: currentUser.agency
-    };
-
-    let updatedPgw: PengawasanKlien;
-    if (item.pengawasanKlien) {
-      const currentCompleted = logStatus === 'Hadir' ? item.pengawasanKlien.sesiTerselesaikan + 1 : item.pengawasanKlien.sesiTerselesaikan;
-      const currentMangkir = logStatus === 'Mangkir / Tanpa Kabar' ? item.pengawasanKlien.jumlahMangkir + 1 : item.pengawasanKlien.jumlahMangkir;
-      
-      updatedPgw = {
-        ...item.pengawasanKlien,
-        sesiTerselesaikan: currentCompleted,
-        jumlahMangkir: currentMangkir,
-        jurnalPengawasan: [newEntry, ...item.pengawasanKlien.jurnalPengawasan]
-      };
-    } else {
-      updatedPgw = {
-        id: 'pgw-' + Date.now(),
-        statusKepatuhan: logStatus === 'Mangkir / Tanpa Kabar' ? 'dalam_peringatan' : 'patuh',
-        modalitasLayanan: item.asesmenMedis?.kebutuhanRawat === 'Rawat Inap' ? 'Rawat Inap' : 'Rawat Jalan',
-        durasiBulan: item.asesmenMedis?.durasiUsulanBulan || 3,
-        tanggalMulai: nowStr,
-        tanggalTargetSelesai: '3 Bulan Sejak Masuk',
-        instansiPelaksanaRehab: item.tindakLanjut?.namaFasilitasTujuan || 'Balai Rehabilitasi BNN Mitra',
-        konselorPendamping: currentUser.name,
-        penyidikPengawas: item.perkara.namaPenyidik,
-        totalSesiWajib: 12,
-        sesiTerselesaikan: logStatus === 'Hadir' ? 1 : 0,
-        jumlahMangkir: logStatus === 'Mangkir / Tanpa Kabar' ? 1 : 0,
-        suratPeringatanList: [],
-        riwayatTesUrinBerkala: [],
-        jurnalPengawasan: [newEntry],
-        rekomendasiTindakLanjutHukum: 'Lanjut Rehabilitasi'
-      };
-    }
-
-    const updated: PermohonanAsesmen = {
-      ...item,
-      pengawasanKlien: updatedPgw
-    };
-
-    onUpdatePermohonan(updated);
-    setShowAddLogModal(null);
-    setLogNotes('');
-  };
-
-  // Submit quick urine test
-  const handleSaveUrine = () => {
-    if (!showAddUrineModal || !onUpdatePermohonan) return;
-    const item = showAddUrineModal;
-    const nowStr = new Date().toLocaleDateString('id-ID');
-
-    const newTest: TesUrinBerkala = {
-      id: 'urin-' + Date.now(),
-      tanggalTes: nowStr,
-      tahapKe: (item.pengawasanKlien?.riwayatTesUrinBerkala.length || 0) + 1,
-      jenisPemeriksaan: 'Terjadwal',
-      parameter: ['AMP', 'MET', 'THC', 'BZO', 'MOP'],
-      hasil: urineResult,
-      keterangan: urineNotes,
-      petugasPemeriksa: currentUser.name
-    };
-
-    let updatedPgw: PengawasanKlien;
-    if (item.pengawasanKlien) {
-      updatedPgw = {
-        ...item.pengawasanKlien,
-        statusKepatuhan: urineResult === 'Positif' ? 'dalam_peringatan' : item.pengawasanKlien.statusKepatuhan,
-        riwayatTesUrinBerkala: [newTest, ...item.pengawasanKlien.riwayatTesUrinBerkala]
-      };
-    } else {
-      updatedPgw = {
-        id: 'pgw-' + Date.now(),
-        statusKepatuhan: urineResult === 'Positif' ? 'dalam_peringatan' : 'patuh',
-        modalitasLayanan: item.asesmenMedis?.kebutuhanRawat === 'Rawat Inap' ? 'Rawat Inap' : 'Rawat Jalan',
-        durasiBulan: item.asesmenMedis?.durasiUsulanBulan || 3,
-        tanggalMulai: nowStr,
-        tanggalTargetSelesai: '3 Bulan Sejak Masuk',
-        instansiPelaksanaRehab: item.tindakLanjut?.namaFasilitasTujuan || 'Balai Rehabilitasi BNN Mitra',
-        konselorPendamping: currentUser.name,
-        penyidikPengawas: item.perkara.namaPenyidik,
-        totalSesiWajib: 12,
-        sesiTerselesaikan: 1,
-        jumlahMangkir: 0,
-        suratPeringatanList: [],
-        riwayatTesUrinBerkala: [newTest],
-        jurnalPengawasan: [],
-        rekomendasiTindakLanjutHukum: 'Lanjut Rehabilitasi'
-      };
-    }
-
-    const updated: PermohonanAsesmen = {
-      ...item,
-      pengawasanKlien: updatedPgw
-    };
-
-    onUpdatePermohonan(updated);
-    setShowAddUrineModal(null);
-    setUrineNotes('Pemeriksaan skrining berkala non-reaktif.');
-  };
 
   return (
     <div className="space-y-6 text-slate-100 font-sans">
@@ -503,61 +239,13 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
         <div className="flex flex-wrap items-center gap-3 self-start shrink-0">
           <button
             onClick={() => setShowScheduleModal(true)}
-            className="px-4 py-2 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white font-bold rounded-xl text-xs flex items-center gap-2 shadow-lg transition-all cursor-pointer"
+            className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white border border-slate-700 hover:border-slate-600 font-medium rounded-xl text-xs flex items-center gap-2 transition-all cursor-pointer shadow-sm"
           >
-            <Calendar className="w-4 h-4 text-cyan-200" />
-            <span>+ Input Jadwal Kontrol &amp; Lapor Klien</span>
+            <Calendar className="w-3.5 h-3.5 text-slate-400" />
+            <span>+ Input Jadwal Kontrol &amp; Lapor</span>
           </button>
-
-          {/* Tab Switcher */}
-          <div className="flex bg-slate-900 border border-slate-800 p-1 rounded-xl text-xs font-semibold shadow-inner flex-wrap">
-            <button
-              onClick={() => setActiveSubTab('ceklis_dokumen')}
-              className={`px-3.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer ${
-                activeSubTab === 'ceklis_dokumen'
-                  ? 'bg-blue-600 text-white font-bold shadow-md'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              <FileCheck2 className="w-3.5 h-3.5" />
-              <span>1. Ceklis Dokumen &amp; Admisi</span>
-            </button>
-            <button
-              onClick={() => setActiveSubTab('monitoring')}
-              className={`px-3.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer ${
-                activeSubTab === 'monitoring'
-                  ? 'bg-blue-600 text-white font-bold shadow-md'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              <Activity className="w-3.5 h-3.5" />
-              <span>2. Monitoring Rawat Jalan / Inap ({pengawasanList.length})</span>
-            </button>
-            <button
-              onClick={() => setActiveSubTab('wajib_lapor')}
-              className={`px-3.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer ${
-                activeSubTab === 'wajib_lapor'
-                  ? 'bg-blue-600 text-white font-bold shadow-md'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              <Calendar className="w-3.5 h-3.5" />
-              <span>3. Jadwal &amp; Catatan Wajib Lapor</span>
-            </button>
-            <button
-              onClick={() => setActiveSubTab('rujukan')}
-              className={`px-3.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer ${
-                activeSubTab === 'rujukan'
-                  ? 'bg-blue-600 text-white font-bold shadow-md'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              <Building2 className="w-3.5 h-3.5" />
-              <span>4. Alur Rujukan &amp; Kuota Bed</span>
-            </button>
-          </div>
+        </div>
       </div>
-    </div>
 
       {/* FILTER & SEARCH BAR */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-slate-900/90 border border-slate-800 p-3 rounded-2xl shadow-md">
@@ -586,737 +274,132 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
         </div>
       </div>
 
-      {/* TAB 1: CEKLIS BERKAS DOKUMEN & ADMISI */}
-      {activeSubTab === 'ceklis_dokumen' && (
-        <div className="space-y-4">
-          <div className="bg-slate-900/90 border border-slate-800/80 rounded-2xl p-5 space-y-4 shadow-lg">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-800">
-              <div>
-                <h3 className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-2">
-                  <FileCheck2 className="w-4 h-4 text-blue-400" />
-                  <span>Daftar Ceklis Dokumen Persyaratan Admisi Klien</span>
-                </h3>
-                <p className="text-xs text-slate-400 mt-0.5">
-                  Verifikasi lembar ceklis berkas admisi serah terima klien pasca rekomendasi TAT ke fasilitas rehabilitasi mitra.
-                </p>
-              </div>
-              <span className="text-xs text-slate-300 bg-slate-950/80 px-3 py-1.5 rounded-xl border border-slate-800 self-start sm:self-auto font-mono">
-                Total {MASTER_CHECKLIST.length} Dokumen Wajib &amp; Pelengkap
-              </span>
+      {/* Summary Scorecards */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="bg-slate-900/60 border border-slate-800/80 rounded-xl p-3.5">
+          <span className="text-[11px] font-semibold uppercase text-slate-400 block tracking-wider">Total Klien Diawasi</span>
+          <div className="text-xl font-bold text-slate-100 mt-1 font-mono">{totalKlienDiawasi} <span className="text-xs font-normal text-slate-400 font-sans">Orang</span></div>
+          <span className="text-[10px] text-slate-500 mt-0.5 block">Pasca rekomendasi &amp; admisi</span>
+        </div>
+
+        <div className="bg-slate-900/60 border border-slate-800/80 rounded-xl p-3.5">
+          <span className="text-[11px] font-semibold uppercase text-slate-400 block tracking-wider">Klien Patuh / Aktif</span>
+          <div className="text-xl font-bold text-emerald-400 mt-1 font-mono">{klienPatuh} <span className="text-xs font-normal text-slate-400 font-sans">Orang</span></div>
+          <span className="text-[10px] text-slate-500 mt-0.5 block">Nihil mangkir &amp; tes urin negatif</span>
+        </div>
+
+        <div className="bg-slate-900/60 border border-slate-800/80 rounded-xl p-3.5">
+          <span className="text-[11px] font-semibold uppercase text-slate-400 block tracking-wider">Dalam Peringatan (SP)</span>
+          <div className="text-xl font-bold text-amber-400 mt-1 font-mono">{klienPeringatan} <span className="text-xs font-normal text-slate-400 font-sans">Orang</span></div>
+          <span className="text-[10px] text-slate-500 mt-0.5 block">Mangkir sesi / evaluasi khusus</span>
+        </div>
+
+        <div className="bg-slate-900/60 border border-slate-800/80 rounded-xl p-3.5">
+          <span className="text-[11px] font-semibold uppercase text-slate-400 block tracking-wider">Selesai Program (SKSP)</span>
+          <div className="text-xl font-bold text-blue-400 mt-1 font-mono">{klienSelesai} <span className="text-xs font-normal text-slate-400 font-sans">Orang</span></div>
+          <span className="text-[10px] text-slate-500 mt-0.5 block">Tuntas memenuhi syarat</span>
+        </div>
+      </div>
+
+      {/* DAFTAR TINDAK LANJUT */}
+      <div className="space-y-3">
+        <div className="bg-slate-900/60 border border-slate-800/80 rounded-xl p-4 sm:p-5 space-y-3 shadow-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-800/70">
+            <div>
+              <h3 className="text-xs font-semibold text-slate-200 uppercase tracking-wider flex items-center gap-2">
+                <FileCheck2 className="w-4 h-4 text-slate-400" />
+                <span>Daftar Kasus Tindak Lanjut</span>
+              </h3>
+              <p className="text-xs text-slate-400 mt-0.5">
+                Pengawasan berkala klien pasca rekomendasi TAT. Buka detail untuk melihat kelengkapan admisi dan monitoring.
+              </p>
             </div>
+          </div>
 
-            {filteredList.length === 0 ? (
-              <div className="text-center py-10 text-slate-400 text-xs">
-                Tidak ada data klien yang sesuai dengan pencarian.
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 gap-4">
-                {filteredList.map(item => {
-                  const progress = calculateClientDocProgress(item.id);
-                  const isFullComplete = progress === 100;
-                  const modalitas = item.pengawasanKlien?.modalitasLayanan || item.asesmenMedis?.kebutuhanRawat || 'Rawat Jalan';
-                  const fasilitas = item.pengawasanKlien?.instansiPelaksanaRehab || item.tindakLanjut?.namaFasilitasTujuan || 'Klinik Pratama BNN Mitra';
+          {filteredList.length === 0 ? (
+            <div className="text-center py-10 text-slate-400 text-xs">
+              Tidak ada data klien yang sesuai dengan pencarian.
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-2.5">
+              {filteredList.map(item => {
+                const modalitas = item.pengawasanKlien?.modalitasLayanan || item.asesmenMedis?.kebutuhanRawat || 'Rawat Jalan';
+                const status = item.tindakLanjut?.statusMonitoring || (item.pengawasanKlien ? 'Dalam Pengawasan' : 'Menunggu Pelaksanaan');
+                const fasilitas = item.pengawasanKlien?.instansiPelaksanaRehab || item.monitoringTindakLanjut?.pelaksanaanRehab?.namaFasilitasRehab || item.tindakLanjut?.namaFasilitasTujuan || '-';
 
-                  return (
-                    <div
-                      key={item.id}
-                      className="p-5 bg-slate-900/80 border border-slate-800/80 hover:border-blue-500/40 rounded-2xl transition-all shadow-lg hover:shadow-xl space-y-4"
-                    >
-                      {/* Top Header Row */}
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                        <div className="flex flex-wrap items-center gap-2.5 min-w-0">
-                          <span className="font-mono bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2.5 py-1 rounded-lg text-xs font-semibold">
+                return (
+                  <div
+                    key={item.id}
+                    className="group flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 bg-slate-950/50 hover:bg-slate-900/80 border border-slate-800/70 hover:border-slate-700/90 rounded-xl transition-all shadow-sm"
+                  >
+                    {/* Left: Client info & Badges */}
+                    <div className="flex items-start gap-3.5 min-w-0 flex-1">
+                      <div className="w-9 h-9 rounded-lg bg-slate-800/80 border border-slate-700/60 flex items-center justify-center text-slate-300 font-bold text-xs shrink-0 mt-0.5 group-hover:border-slate-600 transition-colors">
+                        {item.terperiksa.namaLengkap.slice(0, 2).toUpperCase()}
+                      </div>
+
+                      <div className="space-y-1.5 min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <h4 className="text-sm font-semibold text-slate-100 group-hover:text-white transition-colors">
+                            {item.terperiksa.namaLengkap}
+                          </h4>
+                          <span className="text-[11px] font-mono text-slate-400 bg-slate-800/60 px-2 py-0.5 rounded border border-slate-700/50">
                             {item.nomorPermohonan}
                           </span>
-                          <h4 className="text-base font-bold text-slate-100 truncate">
-                            {item.terperiksa.namaLengkap} <span className="text-xs font-normal text-slate-400">({item.terperiksa.usia} th)</span>
-                          </h4>
-                          <span className="text-xs bg-slate-800 text-slate-300 px-2.5 py-0.5 rounded-full border border-slate-700 font-medium">
+                        </div>
+
+                        <div className="flex flex-wrap items-center gap-y-1 gap-x-2.5 text-xs text-slate-400">
+                          <span>NIK: <span className="text-slate-300 font-mono">{item.terperiksa.nik || '-'}</span></span>
+                          <span className="text-slate-600">•</span>
+                          <span>Usia: <span className="text-slate-300">{item.terperiksa.usia} th</span></span>
+                          {fasilitas !== '-' && (
+                            <>
+                              <span className="text-slate-600">•</span>
+                              <span className="truncate max-w-[240px] text-slate-300 flex items-center gap-1">
+                                <Building2 className="w-3 h-3 text-slate-400 shrink-0" />
+                                {fasilitas}
+                              </span>
+                            </>
+                          )}
+                        </div>
+
+                        <div className="flex flex-wrap items-center gap-2 pt-0.5">
+                          <span className="text-[11px] font-medium bg-slate-800 text-slate-300 px-2.5 py-0.5 rounded-md border border-slate-700/60">
                             {modalitas}
                           </span>
-                        </div>
-
-                        <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
-                          <span className={`text-xs font-semibold px-3 py-1 rounded-full border ${
-                            isFullComplete
-                              ? 'bg-blue-500/10 text-blue-400 border-blue-500/30 font-bold'
-                              : 'bg-slate-800 text-slate-300 border-slate-700'
-                          }`}>
-                            {isFullComplete ? '✓ Dokumen Lengkap 100%' : `Kelengkapan Berkas ${progress}%`}
+                          <span className="text-[11px] font-medium bg-slate-800/80 text-slate-300 px-2.5 py-0.5 rounded-md border border-slate-700/60 flex items-center gap-1.5">
+                            <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+                            {status.replace(/_/g, ' ')}
                           </span>
-                        </div>
-                      </div>
-
-                      {/* Detail Info Row */}
-                      <div className="text-xs text-slate-400 flex flex-wrap items-center gap-x-4 gap-y-1.5 p-3 bg-slate-950/60 rounded-xl border border-slate-800/60">
-                        <span>Fasilitas Rujukan: <strong className="text-slate-200">{fasilitas}</strong></span>
-                        <span className="text-slate-700">•</span>
-                        <span>Penyidik: <strong className="text-slate-300 font-normal">{item.perkara.namaPenyidik}</strong></span>
-                        <span className="text-slate-700">•</span>
-                        <span>NIK: <strong className="text-slate-300 font-mono font-normal">{item.terperiksa.nik}</strong></span>
-                      </div>
-
-                      {/* Sleek Progress Bar */}
-                      <div className="space-y-1.5">
-                        <div className="flex items-center justify-between text-xs text-slate-400">
-                          <span>Progres Lembar Ceklis Berkas:</span>
-                          <span className="font-bold text-slate-200">{progress}% Terverifikasi</span>
-                        </div>
-                        <div className="w-full bg-slate-950 h-2 rounded-full overflow-hidden border border-slate-800">
-                          <div
-                            className="h-full transition-all duration-300 bg-blue-500"
-                            style={{ width: `${progress}%` }}
-                          />
-                        </div>
-                      </div>
-
-                      {/* Quick Snapshot of Checklist */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
-                        {MASTER_CHECKLIST.slice(0, 4).map(doc => {
-                          const checked = isDocChecked(item.id, doc.id, true);
-                          return (
-                            <div
-                              key={doc.id}
-                              onClick={() => handleToggleChecklist(item.id, doc.id)}
-                              className={`p-2.5 rounded-xl border flex items-center gap-2 text-xs transition-all cursor-pointer ${
-                                checked
-                                  ? 'bg-slate-950/80 border-blue-500/30 text-slate-200 hover:border-blue-500/50'
-                                  : 'bg-slate-950/60 border-slate-800/80 text-slate-400 hover:border-slate-700'
-                              }`}
-                            >
-                              {checked ? (
-                                <CheckSquare className="w-4 h-4 text-blue-400 shrink-0" />
-                              ) : (
-                                <Square className="w-4 h-4 text-slate-500 shrink-0" />
-                              )}
-                              <span className="truncate flex-1">{doc.nama}</span>
-                            </div>
-                          );
-                        })}
-                      </div>
-
-                      {/* Action buttons */}
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-slate-800/80 text-xs">
-                        <span className="text-[11px] text-slate-400">
-                          Klik kotak ceklis di atas untuk mengubah status verifikasi berkas secara langsung.
-                        </span>
-                        <div className="flex items-center gap-2">
-                          <button
-                            type="button"
-                            onClick={() => setSelectedForChecklist(item)}
-                            className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl font-medium flex items-center gap-1.5 cursor-pointer text-xs transition-all"
-                          >
-                            <FileCheck2 className="w-3.5 h-3.5 text-blue-400" />
-                            <span>Buka Semua Ceklis ({MASTER_CHECKLIST.length})</span>
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => onSelectCase ? onSelectCase(item.id) : onSelectPermohonan(item.id)}
-                            className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-semibold flex items-center gap-1.5 cursor-pointer text-xs transition-all shadow-md"
-                          >
-                            <span>Detail Pengawasan &amp; Kontrol</span>
-                            <ChevronRight className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* TAB 2: MONITORING REHABILITASI RAWAT JALAN / INAP (MEDIS & TES URIN) */}
-      {activeSubTab === 'monitoring' && (
-        <div className="space-y-6">
-          {/* Summary Scorecards */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl p-4">
-              <span className="text-[11px] font-bold uppercase text-slate-400 block">Total Klien Diawasi</span>
-              <div className="text-xl sm:text-2xl font-bold text-white mt-1 font-mono">{totalKlienDiawasi} Orang</div>
-              <span className="text-[10px] text-slate-400 mt-0.5 block">Pasca rekomendasi &amp; admisi</span>
-            </div>
-
-            <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl p-4">
-              <span className="text-[11px] font-bold uppercase text-blue-400 block">Klien Patuh / Bersih</span>
-              <div className="text-xl sm:text-2xl font-bold text-blue-300 mt-1 font-mono">{klienPatuh} Orang</div>
-              <span className="text-[10px] text-slate-400 mt-0.5 block">Nihil mangkir &amp; tes urin negatif</span>
-            </div>
-
-            <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl p-4">
-              <span className="text-[11px] font-bold uppercase text-slate-300 block">Dalam Peringatan (SP)</span>
-              <div className="text-xl sm:text-2xl font-bold text-slate-200 mt-1 font-mono">{klienPeringatan} Orang</div>
-              <span className="text-[10px] text-slate-400 mt-0.5 block">Mangkir sesi / terbit SP</span>
-            </div>
-
-            <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl p-4">
-              <span className="text-[11px] font-bold uppercase text-[#d4af37] block">Selesai Program (SKSP)</span>
-              <div className="text-xl sm:text-2xl font-bold text-[#d4af37] mt-1 font-mono">{klienSelesai} Orang</div>
-              <span className="text-[10px] text-slate-400 mt-0.5 block">Tuntas memenuhi syarat</span>
-            </div>
-          </div>
-
-          {/* List Klien dalam Monitoring Medis */}
-          <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl p-5 space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#1b3459]">
-              <div>
-                <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center space-x-2">
-                  <Activity className="w-4 h-4 text-blue-400" />
-                  <span>Daftar Klien dalam Monitoring Sesi Kontrol Medis &amp; Tes Urin</span>
-                </h3>
-                <p className="text-[11px] text-slate-400 mt-0.5">
-                  Catatan kehadiran sesi konseling klinis, evaluasi perkembangan DPJP, serta pengujian toksikologi urin berkala.
-                </p>
-              </div>
-            </div>
-
-            {filteredList.length === 0 ? (
-              <div className="text-center py-8 text-slate-400 text-xs">
-                Tidak ada data klien yang dalam pengawasan medis.
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 gap-3.5">
-                {filteredList.map(item => {
-                  const pgw = item.pengawasanKlien;
-                  const totalSesi = pgw?.totalSesiWajib || 12;
-                  const sesiSelesai = pgw?.sesiTerselesaikan || 1;
-                  const percent = Math.min(100, Math.round((sesiSelesai / totalSesi) * 100));
-                  const statusKepatuhan = pgw?.statusKepatuhan || 'patuh';
-                  const lastTest = pgw?.riwayatTesUrinBerkala[0];
-
-                  return (
-                    <div
-                      key={item.id}
-                      className="p-5 bg-slate-900/80 border border-slate-800/80 hover:border-blue-500/40 rounded-2xl transition-all shadow-lg hover:shadow-xl space-y-4"
-                    >
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                        <div className="flex flex-wrap items-center gap-2.5 min-w-0">
-                          <span className="font-mono bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2.5 py-1 rounded-lg text-xs font-semibold">
-                            {item.nomorPermohonan}
-                          </span>
-                          <h4 className="text-base font-bold text-slate-100 truncate">
-                            {item.terperiksa.namaLengkap} <span className="text-xs font-normal text-slate-400">({item.terperiksa.usia} th)</span>
-                          </h4>
-                          <span className="text-xs bg-slate-800 text-slate-300 px-2.5 py-0.5 rounded-full border border-slate-700 font-medium">
-                            {pgw?.modalitasLayanan || item.asesmenMedis?.kebutuhanRawat || 'Rawat Jalan'}
-                          </span>
-                        </div>
-
-                        <span className={`text-xs font-semibold px-3 py-1 rounded-full border self-start sm:self-auto shrink-0 ${
-                          statusKepatuhan === 'sangat_patuh' || statusKepatuhan === 'patuh'
-                            ? 'bg-blue-500/10 text-blue-400 border-blue-500/30'
-                            : statusKepatuhan === 'selesai_program'
-                            ? 'bg-[#d4af37]/10 text-[#d4af37] border-[#d4af37]/30'
-                            : 'bg-slate-800 text-slate-300 border-slate-700'
-                        }`}>
-                          {statusKepatuhan.replace(/_/g, ' ').toUpperCase()}
-                        </span>
-                      </div>
-
-                      {/* Detail Metrics */}
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3.5 bg-slate-950/60 rounded-xl border border-slate-800/60 text-xs">
-                        <div>
-                          <span className="text-[11px] font-medium text-slate-400 block">Progres Sesi Kontrol Medis:</span>
-                          <div className="flex items-center gap-2 mt-1">
-                            <div className="flex-1 bg-slate-950 h-2 rounded-full overflow-hidden border border-slate-800">
-                              <div className="bg-blue-500 h-full" style={{ width: `${percent}%` }} />
-                            </div>
-                            <span className="font-bold text-slate-200 font-mono text-xs">{sesiSelesai}/{totalSesi} ({percent}%)</span>
-                          </div>
-                        </div>
-
-                        <div>
-                          <span className="text-[11px] font-medium text-slate-400 block">Skrining Toksikologi Urin:</span>
-                          <div className="font-semibold mt-1 flex items-center gap-2">
-                            <span className="text-slate-200">{pgw?.riwayatTesUrinBerkala.length || 1}x Diuji</span>
-                            <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold border ${
-                              lastTest?.hasil === 'Positif'
-                                ? 'bg-slate-800 text-slate-300 border-slate-700'
-                                : 'bg-blue-500/10 text-blue-400 border-blue-500/30'
-                            }`}>
-                              Terakhir: {lastTest ? `${lastTest.hasil} (${lastTest.tanggalTes})` : 'Negatif'}
+                          {item.pengawasanKlien && (
+                            <span className="text-[11px] text-slate-400 bg-slate-800/40 px-2 py-0.5 rounded border border-slate-800/80">
+                              {item.pengawasanKlien.sesiTerselesaikan}/{item.pengawasanKlien.totalSesiWajib} Sesi
                             </span>
-                          </div>
+                          )}
                         </div>
-
-                        <div>
-                          <span className="text-[11px] font-medium text-slate-400 block">Lembaga &amp; DPJP Penanggung Jawab:</span>
-                          <span className="text-slate-200 font-medium mt-1 block truncate">
-                            {pgw?.instansiPelaksanaRehab || item.tindakLanjut?.namaFasilitasTujuan || 'BNN Mitra'} • {pgw?.konselorPendamping || 'dr. Rina Lestari, Sp.KJ'}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Quick Action buttons */}
-                      <div className="flex flex-wrap items-center justify-end gap-2 pt-3 border-t border-slate-800/80">
-                        <button
-                          type="button"
-                          onClick={() => setShowAddLogModal(item)}
-                          className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl font-medium flex items-center gap-1.5 cursor-pointer text-xs transition-all"
-                        >
-                          <PlusCircle className="w-3.5 h-3.5 text-blue-400" />
-                          <span>+ Catat Sesi Kontrol</span>
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setShowAddUrineModal(item)}
-                          className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl font-medium flex items-center gap-1.5 cursor-pointer text-xs transition-all"
-                        >
-                          <Stethoscope className="w-3.5 h-3.5 text-blue-400" />
-                          <span>+ Catat Tes Urin</span>
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => onSelectCase ? onSelectCase(item.id) : onSelectPermohonan(item.id)}
-                          className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-semibold flex items-center gap-1.5 cursor-pointer text-xs transition-all shadow-md"
-                        >
-                          <span>Detail Pengawasan &amp; Kontrol</span>
-                          <ChevronRight className="w-3.5 h-3.5" />
-                        </button>
                       </div>
                     </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
 
-      {/* TAB 3: JURNAL PENGAWASAN & CATATAN WAJIB LAPOR PENYIDIK */}
-      {activeSubTab === 'wajib_lapor' && (
-        <div className="space-y-6">
-          {/* Notice Banner JUKNIS POLRI/BNN */}
-          <div className="bg-[#0b1d38] border border-blue-500/30 rounded-2xl p-4.5 text-xs text-slate-300 space-y-2 shadow-lg">
-            <div className="flex items-center gap-2 font-bold text-blue-400 text-sm">
-              <Info className="w-4.5 h-4.5 text-blue-400 shrink-0" />
-              <span>Ketentuan Pengisian Wajib Lapor (JUKNIS POLRI &amp; BNN):</span>
-            </div>
-            <ul className="list-disc list-inside space-y-1 text-slate-300 pl-1 leading-relaxed">
-              <li><strong>Tanggal Pelaporan Aktual</strong> diisi oleh <strong>Pengaju (Penyidik/JPU Berwenang)</strong> setelah wajib lapor dilaksanakan menggunakan tanggal kejadian sebenarnya (bukan tanggal rencana/otomatis input).</li>
-              <li><strong>Klien TIDAK PERLU login</strong> ke sistem e-TAT. Semua pencatatan dilakukan terpusat oleh Penyidik/JPU penerima.</li>
-              <li><strong>Sistem menyimpan waktu input secara terpisah (`waktuInputSistem`)</strong> untuk keperluan audit log dan verifikasi Admin Sekretariat TAT.</li>
-            </ul>
-          </div>
-
-          {/* List Klien & Records Wajib Lapor */}
-          <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl p-5 space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#1b3459]">
-              <div>
-                <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center space-x-2">
-                  <Calendar className="w-4 h-4 text-blue-400" />
-                  <span>Jurnal Audit &amp; Catatan Wajib Lapor Tersangka / Klien</span>
-                </h3>
-                <p className="text-[11px] text-slate-400 mt-0.5">
-                  Daftar absensi wajib lapor kepada Penyidik Satresnarkoba / BNN beserta stempel waktu input sistem &amp; verifikasi Admin.
-                </p>
-              </div>
-            </div>
-
-            {filteredList.length === 0 ? (
-              <div className="text-center py-8 text-slate-400 text-xs">
-                Tidak ada data pencatatan wajib lapor.
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 gap-4">
-                {filteredList.map(item => {
-                  const mon = item.monitoringTindakLanjut;
-                  const wlList = mon?.buktiWajibLaporList || [];
-
-                  return (
-                    <div
-                      key={item.id}
-                      className="p-5 bg-slate-900/80 border border-slate-800/80 hover:border-blue-500/40 rounded-2xl transition-all shadow-lg space-y-4"
-                    >
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
-                        <div className="flex flex-wrap items-center gap-2.5 min-w-0">
-                          <span className="font-mono bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2.5 py-1 rounded-lg text-xs font-semibold">
-                            {item.nomorPermohonan}
-                          </span>
-                          <h4 className="text-base font-bold text-slate-100 truncate">
-                            {item.terperiksa.namaLengkap} <span className="text-xs font-normal text-slate-400">(NIK: {item.terperiksa.nik || 'Terverifikasi'})</span>
-                          </h4>
-                          <span className="text-xs bg-slate-800 text-slate-300 px-2.5 py-0.5 rounded-full border border-slate-700 font-medium">
-                            Penyidik: {item.perkara.namaPenyidik} ({item.perkara.instansiPenyidik})
-                          </span>
-                        </div>
-
-                        <button
-                          type="button"
-                          onClick={() => onSelectCase ? onSelectCase(item.id) : onSelectPermohonan(item.id)}
-                          className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl flex items-center gap-1.5 cursor-pointer text-xs transition-all shadow-md self-start sm:self-auto shrink-0"
-                        >
-                          <CheckSquare className="w-3.5 h-3.5" />
-                          <span>+ Tambah / Kelola Catatan Wajib Lapor</span>
-                        </button>
-                      </div>
-
-                      {/* Display Wajib Lapor Items */}
-                      {wlList.length === 0 ? (
-                        <div className="p-3 bg-slate-950/60 rounded-xl text-xs text-slate-400 text-center italic border border-slate-800/60">
-                          Belum ada catatan wajib lapor yang dimasukkan untuk klien ini. Klik tombol kelola di atas untuk menginput.
-                        </div>
-                      ) : (
-                        <div className="space-y-3">
-                          {wlList.map(wl => {
-                            const isAktual = Boolean(wl.tanggalPelaporanAktual);
-                            return (
-                              <div key={wl.id} className="p-3.5 bg-slate-950/80 border border-slate-800/80 rounded-xl space-y-2 text-xs">
-                                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-2">
-                                  <div className="flex items-center gap-2">
-                                    {isAktual ? (
-                                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-400 border border-blue-500/30">
-                                        ✓ Pelaporan Aktual (Terlaksana)
-                                      </span>
-                                    ) : (
-                                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-800 text-slate-300 border border-slate-700">
-                                        📅 Rencana Wajib Lapor (Belum Aktual)
-                                      </span>
-                                    )}
-                                    {wl.statusVerifikasiAdmin === 'terverifikasi' ? (
-                                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-400 border border-blue-500/30">
-                                        ✓ Verified Admin
-                                      </span>
-                                    ) : (
-                                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-800 text-slate-400 border border-slate-700">
-                                        ⏳ Pending Admin
-                                      </span>
-                                    )}
-                                  </div>
-
-                                  <div className="text-right text-[10px] font-mono text-slate-400">
-                                    <span>Waktu Input Sistem: </span>
-                                    <strong className="text-blue-300">{wl.waktuInputSistem || wl.tanggalDiunggah || 'Logged'}</strong>
-                                  </div>
-                                </div>
-
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-2 pt-1 text-slate-300">
-                                  <div>
-                                    <span className="text-[10px] uppercase font-bold text-slate-400 block">Tanggal Pelaporan Aktual</span>
-                                    <span className={`font-mono font-bold ${isAktual ? 'text-blue-400' : 'text-slate-500 italic'}`}>
-                                      {wl.tanggalPelaporanAktual || '— (Belum diisi)'}
-                                    </span>
-                                  </div>
-
-                                  <div>
-                                    <span className="text-[10px] uppercase font-bold text-slate-400 block">Rencana Wajib Lapor</span>
-                                    <span className="font-mono text-slate-200">{wl.tanggalRencanaWajibLapor || wl.tanggalWajibLapor}</span>
-                                  </div>
-
-                                  <div>
-                                    <span className="text-[10px] uppercase font-bold text-slate-400 block">Penyidik / JPU Penerima</span>
-                                    <span className="font-semibold text-slate-100">{wl.namaPenyidikPenerima} ({wl.instansiPenyidik})</span>
-                                  </div>
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* TAB 3: RUJUKAN & KAPASITAS FASILITAS MITRA */}
-      {activeSubTab === 'rujukan' && (
-        <div className="space-y-6">
-          {/* Facilities Capacity Monitor */}
-          <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl p-5 space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#1b3459]">
-              <div>
-                <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center space-x-2">
-                  <Building2 className="w-4 h-4 text-[#d4af37]" />
-                  <span>Ketersediaan Kuota &amp; Kapasitas Fasilitas Rehabilitasi Mitra</span>
-                </h3>
-                <p className="text-[11px] text-slate-400 mt-0.5">
-                  Informasi kapasitas bed rawat inap &amp; layanan rawat jalan di balai/klinik rehabilitasi wilayah hukum Kalimantan Timur.
-                </p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-              {REHAB_FACILITIES.map(f => {
-                const isFull = f.kapasitasTersedia <= 0;
-                return (
-                  <div
-                    key={f.id}
-                    className={`p-4 rounded-2xl border flex flex-col justify-between ${
-                      isFull ? 'bg-rose-950/20 border-rose-800/50' : 'bg-[#081224] border-[#1b3459]'
-                    }`}
-                  >
-                    <div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-bold uppercase text-slate-400">{f.tipe}</span>
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${
-                          isFull ? 'bg-rose-500/20 text-rose-300 border-rose-500/40' : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
-                        }`}>
-                          {isFull ? 'Penuh' : 'Tersedia'}
-                        </span>
-                      </div>
-                      <h4 className="font-bold text-xs text-white mt-1.5 leading-snug">{f.nama}</h4>
-                      <p className="text-[11px] text-slate-400 mt-1">{f.alamat}</p>
-                    </div>
-
-                    <div className="mt-3 pt-2.5 border-t border-[#1b3459] flex items-center justify-between text-xs">
-                      <span className="text-slate-400">Sisa Kuota:</span>
-                      <span className={`font-bold font-mono ${isFull ? 'text-rose-400' : 'text-slate-200'}`}>
-                        {f.kapasitasTersedia} / {f.kapasitasTotal} Slot
-                      </span>
+                    {/* Right: Subdued action button */}
+                    <div className="flex items-center justify-end shrink-0 pt-2 md:pt-0 border-t md:border-t-0 border-slate-800/60">
+                      <button
+                        type="button"
+                        onClick={() => onSelectCase ? onSelectCase(item.id) : onSelectPermohonan(item.id)}
+                        className="w-full md:w-auto px-4 py-2 bg-slate-800 hover:bg-slate-700/90 active:bg-slate-700 text-slate-200 hover:text-white border border-slate-700/80 hover:border-slate-600 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-sm"
+                      >
+                        <span>Buka Detail</span>
+                        <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
+                      </button>
                     </div>
                   </div>
                 );
               })}
             </div>
-          </div>
+          )}
         </div>
-      )}
+      </div>
 
-      {/* MODAL 1: FULL CHECKLIST INTERACTIVE DRAWER / MODAL */}
-      {selectedForChecklist && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl max-w-2xl w-full p-6 space-y-5 shadow-2xl">
-            <div className="flex items-center justify-between pb-3 border-b border-[#1b3459]">
-              <div className="flex items-center space-x-2.5">
-                <div className="w-8 h-8 rounded-xl bg-[#142642] text-[#d4af37] border border-[#234475] flex items-center justify-center">
-                  <FileCheck2 className="w-4 h-4" />
-                </div>
-                <div>
-                  <h3 className="text-sm font-bold text-white">Lembar Ceklis Dokumen Admisi Klien</h3>
-                  <p className="text-xs text-slate-400 font-mono">
-                    {selectedForChecklist.nomorPermohonan} • {selectedForChecklist.terperiksa.namaLengkap}
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setSelectedForChecklist(null)}
-                className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-[#142642] cursor-pointer"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
 
-            <div className="space-y-2.5 max-h-[60vh] overflow-y-auto pr-1">
-              {MASTER_CHECKLIST.map((doc, idx) => {
-                const checked = isDocChecked(selectedForChecklist.id, doc.id, true);
-                return (
-                  <div
-                    key={doc.id}
-                    onClick={() => handleToggleChecklist(selectedForChecklist.id, doc.id)}
-                    className={`p-3.5 rounded-xl border flex items-start space-x-3 transition-all cursor-pointer ${
-                      checked
-                        ? 'bg-[#081224] border-emerald-600/50 hover:border-emerald-500'
-                        : 'bg-[#081224] border-[#1b3459] hover:border-amber-500/60'
-                    }`}
-                  >
-                    <div className="mt-0.5">
-                      {checked ? (
-                        <CheckSquare className="w-5 h-5 text-emerald-400 shrink-0" />
-                      ) : (
-                        <Square className="w-5 h-5 text-slate-500 shrink-0" />
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center space-x-2">
-                        <span className="text-[10px] font-mono text-[#d4af37] font-semibold">{doc.kode}</span>
-                        {doc.wajib && (
-                          <span className="text-[9px] font-bold uppercase px-1.5 py-0.2 bg-rose-950/60 text-rose-300 rounded border border-rose-700/40">
-                            Wajib
-                          </span>
-                        )}
-                      </div>
-                      <h4 className={`text-xs font-semibold mt-0.5 ${checked ? 'text-white' : 'text-slate-300'}`}>
-                        {doc.nama}
-                      </h4>
-                      <p className="text-[11px] text-slate-400 mt-0.5 leading-relaxed">
-                        {doc.keterangan}
-                      </p>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            <div className="flex items-center justify-between pt-3 border-t border-[#1b3459]">
-              <span className="text-xs text-slate-400">
-                Kelengkapan: <strong className="text-white">{calculateClientDocProgress(selectedForChecklist.id)}% Terverifikasi</strong>
-              </span>
-              <button
-                type="button"
-                onClick={() => setSelectedForChecklist(null)}
-                className="px-4 py-2 bg-gradient-to-r from-[#144782] to-[#1c64b8] hover:from-[#175194] hover:to-[#2274d4] text-white rounded-xl text-xs font-bold cursor-pointer transition-all shadow-md"
-              >
-                Simpan &amp; Tutup Ceklis
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL 2: QUICK ADD CONTROL SESSION */}
-      {showAddLogModal && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
-            <div className="flex items-center justify-between pb-3 border-b border-[#1b3459]">
-              <h3 className="text-sm font-bold text-white flex items-center space-x-2">
-                <PlusCircle className="w-4 h-4 text-[#d4af37]" />
-                <span>Pencatatan Sesi Kontrol / Wajib Lapor Klien</span>
-              </h3>
-              <button
-                type="button"
-                onClick={() => setShowAddLogModal(null)}
-                className="p-1 text-slate-400 hover:text-white cursor-pointer"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="space-y-3 text-xs">
-              <div>
-                <label className="block text-slate-400 font-semibold mb-1">Jenis Sesi / Intervensi:</label>
-                <select
-                  value={logType}
-                  onChange={(e) => setLogType(e.target.value as any)}
-                  className="w-full p-2.5 bg-[#081224] border border-[#1b3459] rounded-xl text-white focus:outline-none focus:border-[#d4af37]"
-                >
-                  <option value="Wajib Lapor Mingguan">Wajib Lapor Mingguan</option>
-                  <option value="Konseling Individu">Konseling Individu</option>
-                  <option value="Sesi Terapi Kelompok">Sesi Terapi Kelompok</option>
-                  <option value="Home Visit (Kunjungan Rumah)">Home Visit (Kunjungan Rumah)</option>
-                  <option value="Evaluasi Vokasional">Evaluasi Vokasional</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-slate-400 font-semibold mb-1">Status Kehadiran:</label>
-                <select
-                  value={logStatus}
-                  onChange={(e) => setLogStatus(e.target.value as any)}
-                  className="w-full p-2.5 bg-[#081224] border border-[#1b3459] rounded-xl text-white focus:outline-none focus:border-[#d4af37]"
-                >
-                  <option value="Hadir">Hadir</option>
-                  <option value="Izin Sah">Izin Sah</option>
-                  <option value="Mangkir / Tanpa Kabar">Mangkir / Tanpa Kabar</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-slate-400 font-semibold mb-1">Catatan Perkembangan Klien:</label>
-                <textarea
-                  rows={3}
-                  value={logNotes}
-                  onChange={(e) => setLogNotes(e.target.value)}
-                  placeholder="Klien kooperatif, menyampaikan refleksi diri, tidak ada tanda-tanda relaps..."
-                  className="w-full p-2.5 bg-[#081224] border border-[#1b3459] rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-[#d4af37]"
-                />
-              </div>
-            </div>
-
-            <div className="flex items-center justify-end space-x-2 pt-3 border-t border-[#1b3459]">
-              <button
-                type="button"
-                onClick={() => setShowAddLogModal(null)}
-                className="px-3.5 py-2 bg-[#142642] text-slate-300 rounded-xl text-xs font-semibold cursor-pointer"
-              >
-                Batal
-              </button>
-              <button
-                type="button"
-                onClick={handleSaveLog}
-                className="px-4 py-2 bg-gradient-to-r from-[#144782] to-[#1c64b8] hover:from-[#175194] hover:to-[#2274d4] text-white rounded-xl text-xs font-bold cursor-pointer"
-              >
-                Simpan Sesi Kontrol
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL 3: QUICK ADD URINE TEST */}
-      {showAddUrineModal && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
-            <div className="flex items-center justify-between pb-3 border-b border-[#1b3459]">
-              <h3 className="text-sm font-bold text-white flex items-center space-x-2">
-                <Stethoscope className="w-4 h-4 text-cyan-400" />
-                <span>Pencatatan Hasil Uji Skrining Urin Berkala</span>
-              </h3>
-              <button
-                type="button"
-                onClick={() => setShowAddUrineModal(null)}
-                className="p-1 text-slate-400 hover:text-white cursor-pointer"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="space-y-3 text-xs">
-              <div>
-                <label className="block text-slate-400 font-semibold mb-1">Hasil Uji Skrining Toksikologi:</label>
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setUrineResult('Negatif')}
-                    className={`p-3 rounded-xl border font-bold text-center cursor-pointer transition-all ${
-                      urineResult === 'Negatif'
-                        ? 'bg-emerald-950/60 text-emerald-300 border-emerald-500'
-                        : 'bg-[#081224] text-slate-400 border-[#1b3459]'
-                    }`}
-                  >
-                    Negatif (Non-Reaktif)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setUrineResult('Positif')}
-                    className={`p-3 rounded-xl border font-bold text-center cursor-pointer transition-all ${
-                      urineResult === 'Positif'
-                        ? 'bg-rose-950/60 text-rose-300 border-rose-500'
-                        : 'bg-[#081224] text-slate-400 border-[#1b3459]'
-                    }`}
-                  >
-                    Positif (Reaktif Zat)
-                  </button>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-slate-400 font-semibold mb-1">Keterangan / Parameter yang Diuji:</label>
-                <input
-                  type="text"
-                  value={urineNotes}
-                  onChange={(e) => setUrineNotes(e.target.value)}
-                  placeholder="AMP, MET, THC, BZO, MOP non-reaktif"
-                  className="w-full p-2.5 bg-[#081224] border border-[#1b3459] rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-[#d4af37]"
-                />
-              </div>
-            </div>
-
-            <div className="flex items-center justify-end space-x-2 pt-3 border-t border-[#1b3459]">
-              <button
-                type="button"
-                onClick={() => setShowAddUrineModal(null)}
-                className="px-3.5 py-2 bg-[#142642] text-slate-300 rounded-xl text-xs font-semibold cursor-pointer"
-              >
-                Batal
-              </button>
-              <button
-                type="button"
-                onClick={handleSaveUrine}
-                className="px-4 py-2 bg-gradient-to-r from-[#144782] to-[#1c64b8] hover:from-[#175194] hover:to-[#2274d4] text-white rounded-xl text-xs font-bold cursor-pointer"
-              >
-                Simpan Hasil Tes Urin
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* MODAL 0: INPUT JADWAL KONTROL & WAJIB LAPOR KLIEN BARU */}
       {showScheduleModal && (
@@ -1496,15 +579,15 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
               <button
                 type="button"
                 onClick={() => setShowScheduleModal(false)}
-                className="px-4 py-2.5 bg-[#142642] hover:bg-[#1b3459] text-slate-300 rounded-xl text-xs font-semibold transition-all cursor-pointer"
+                className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-medium transition-all cursor-pointer"
               >
                 Batal
               </button>
               <button
                 type="submit"
-                className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold shadow-lg transition-all cursor-pointer flex items-center gap-2"
+                className="px-4 py-2 bg-blue-700/80 hover:bg-blue-600 text-slate-100 rounded-xl text-xs font-semibold shadow transition-all cursor-pointer flex items-center gap-2"
               >
-                <CheckCircle2 className="w-4 h-4" />
+                <CheckCircle2 className="w-4 h-4 text-blue-300" />
                 <span>Simpan Jadwal Kontrol &amp; Wajib Lapor</span>
               </button>
             </div>

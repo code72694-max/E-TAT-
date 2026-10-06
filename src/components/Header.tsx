@@ -106,10 +106,10 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 type="button"
                 onClick={onBackFromDetail}
-                className="px-3.5 py-2 bg-[#081224] border border-[#1b3459] hover:bg-[#142642] rounded-xl text-slate-200 transition-colors cursor-pointer shrink-0 flex items-center space-x-2 text-xs font-bold shadow-sm"
+                className="px-3.5 py-1.5 bg-slate-800 border border-slate-700 hover:bg-slate-700/90 rounded-lg text-slate-200 transition-colors cursor-pointer shrink-0 flex items-center space-x-2 text-xs font-medium shadow-sm"
                 title="Kembali"
               >
-                <ArrowLeft className="w-4 h-4 text-[#d4af37]" />
+                <ArrowLeft className="w-3.5 h-3.5 text-slate-400" />
                 <span>Kembali</span>
               </button>
             </div>

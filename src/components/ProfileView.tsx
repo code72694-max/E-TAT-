@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { UserProfile, UserRole } from '../types';
-import { MOCK_USERS } from '../data/initialData';
 import {
   User,
   UserCheck,
@@ -15,6 +14,7 @@ import {
 
 interface ProfileViewProps {
   currentUser: UserProfile;
+  users?: UserProfile[];
   onSelectUser: (user: UserProfile) => void;
   onGoToLogin?: () => void;
   onGoToLanding?: () => void;
@@ -22,6 +22,7 @@ interface ProfileViewProps {
 
 export const ProfileView: React.FC<ProfileViewProps> = ({
   currentUser,
+  users = [],
   onSelectUser,
   onGoToLogin,
   onGoToLanding
@@ -297,7 +298,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
 
             {showRoleSwitcher && (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
-                {MOCK_USERS.map((user) => {
+                {(users && users.length > 0 ? users : [currentUser]).map((user) => {
                   const isActive = user.id === currentUser.id;
                   const rank = getRoleBadge(user.role);
                   return (

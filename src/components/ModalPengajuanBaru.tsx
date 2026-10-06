@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { PermohonanAsesmen, UserProfile, DokumenPersyaratan } from '../types';
 import { sendPengajuanEmailNotification } from '../services/emailService';
+import { permohonanApi } from '../services/api';
 import {
   X,
   User,
@@ -212,7 +213,7 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
       };
     });
 
-    const newPermohonan: PermohonanAsesmen = {
+    let createdPermohonan: PermohonanAsesmen = {
       id: 'tat-' + randomNum,
       nomorPermohonan: newNomor,
       tanggalPengajuan: '8 September 2026',
@@ -244,8 +245,8 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
         alias: alias || undefined,
         nik: nik || '327301' + Math.floor(1000000000 + Math.random() * 9000000000),
         isNikVerified: true,
-        tempatLahir,
-        tanggalLahir,
+        tempatLahir: tempatLahir || 'Samarinda',
+        tanggalLahir: tanggalLahir || '2001-05-14',
         usia: Number(usia) || 24,
         jenisKelamin,
         pekerjaan,
@@ -257,16 +258,19 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
       },
       perkara: {
         id: 'pk-' + Date.now(),
-        nomorLaporanPolisi: nomorLp,
-        tanggalLp,
-        instansiPenyidik: currentUser.agency,
-        namaPenyidik,
-        nomorHpPenyidik,
-        pasalDipersangkakan: pasal,
+        nomorLaporanPolisi: nomorLp || 'LP/A/142/IX/2026',
+        tanggalLp: tanggalLp || '2026-09-07',
+        instansiPenyidik: currentUser.agency || 'Satresnarkoba',
+        namaPenyidik: namaPenyidik || currentUser.name,
+        nomorHpPenyidik: nomorHpPenyidik || '081234567890',
+        pasalDipersangkakan: pasal || 'Pasal 127 ayat (1)',
         tanggalWaktuPenangkapan,
-        tempatKejadianPerkara: tkp,
-        kronologiSingkat: kronologi,
-        barangBuktiList
+        tempatKejadianPerkara: tkp || 'Samarinda',
+        kronologiSingkat: kronologi || 'Kronologi penangkapan dan tindak pidana penyalahgunaan narkotika.',
+        barangBuktiList: barangBuktiList.map(bb => ({
+          ...bb,
+          beratBersihGram: Number(bb.beratBersihGram) || 0.1,
+        }))
       },
       dokumenList: newDocs,
       klarifikasiList: [],
@@ -282,9 +286,61 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
       ]
     };
 
+    // Try saving to real backend
+    try {
+      const payload = {
+        satuanKerjaTujuan,
+        jenisPengajuan,
+        metodePelaksanaan,
+        terperiksa: {
+          namaLengkap: namaLengkap || 'Nama Terperiksa',
+          alias: alias || undefined,
+          nik: nik || '327301' + Math.floor(1000000000 + Math.random() * 9000000000),
+          isNikVerified: true,
+          tempatLahir: tempatLahir || 'Samarinda',
+          tanggalLahir: tanggalLahir ? new Date(tanggalLahir).toISOString() : new Date().toISOString(),
+          usia: Number(usia) || 24,
+          jenisKelamin,
+          pekerjaan: pekerjaan || 'Wiraswasta',
+          alamatKtp: alamatKtp || 'Jl. Rapak Indah No. 12, Samarinda',
+          alamatDomisili: alamatKtp || 'Jl. Rapak Indah No. 12, Samarinda',
+          statusIdentitasKhusus: statusKhusus,
+          namaWaliPendamping: namaWali || undefined,
+          kontakWali: kontakWali || undefined,
+        },
+        perkara: {
+          nomorLaporanPolisi: nomorLp || 'LP/A/142/IX/2026',
+          tanggalLp: tanggalLp ? new Date(tanggalLp).toISOString() : new Date().toISOString(),
+          instansiPenyidik: currentUser.agency || 'Satresnarkoba',
+          namaPenyidik: namaPenyidik || currentUser.name,
+          nomorHpPenyidik: nomorHpPenyidik || '081234567890',
+          pasalDipersangkakan: pasal || 'Pasal 127 ayat (1)',
+          tempatKejadianPerkara: tkp || 'Samarinda',
+          tanggalWaktuPenangkapan: tanggalWaktuPenangkapan ? new Date(tanggalWaktuPenangkapan).toISOString() : undefined,
+          kronologiSingkat: kronologi || 'Kronologi penangkapan dan penyerahan barang bukti.',
+          barangBuktiList: barangBuktiList.map(bb => ({
+            jenisZat: bb.jenisZat,
+            beratKotorGram: bb.beratKotorGram ? Number(bb.beratKotorGram) : undefined,
+            beratBersihGram: Number(bb.beratBersihGram) || 0.1,
+            statusUjiLab: (bb.statusUjiLab as any) || 'belum_uji',
+            nomorSuratLab: bb.nomorSuratLab,
+            tanggalSuratLab: bb.tanggalSuratLab ? new Date(bb.tanggalSuratLab).toISOString() : undefined,
+            keterangan: bb.keterangan,
+          })),
+        },
+      };
+
+      const res = await permohonanApi.create(payload);
+      if (res.data) {
+        createdPermohonan = { ...createdPermohonan, ...res.data };
+      }
+    } catch (err) {
+      console.warn('Backend permohonan create error, using state:', err);
+    }
+
     // Send email notification to etatsiappulih@gmail.com
     try {
-      const result = await sendPengajuanEmailNotification(newPermohonan);
+      const result = await sendPengajuanEmailNotification(createdPermohonan);
       if (result.success) {
         console.log('Notifikasi email berhasil dikirim via Resend API:', result.id);
       }
@@ -292,7 +348,7 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
       console.error('Error sending notification email:', e);
     } finally {
       setIsSendingEmail(false);
-      onSubmit(newPermohonan);
+      onSubmit(createdPermohonan);
       onClose();
     }
   };

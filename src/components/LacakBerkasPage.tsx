@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { PermohonanAsesmen } from '../types';
+import { permohonanApi } from '../services/api';
 import { PublicHeader } from './PublicHeader';
 import { BeritaAcaraModal } from './BeritaAcaraModal';
 import {
@@ -49,22 +50,44 @@ export const LacakBerkasPage: React.FC<LacakBerkasPageProps> = ({
 
   const sampleNumbers = ['TAT-074', 'TAT-089', 'TAT-068', 'TAT-055'];
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!searchQuery.trim()) return;
 
-    const q = searchQuery.trim().toLowerCase();
+    const q = searchQuery.trim();
+    const qLower = q.toLowerCase();
+
+    // 1. Search in memory list first
     const found = permohonanList.find(
       p =>
-        p.nomorPermohonan.toLowerCase().includes(q) ||
-        p.id.toLowerCase().includes(q) ||
-        p.terperiksa.namaLengkap.toLowerCase().includes(q) ||
-        (p.terperiksa.nik && p.terperiksa.nik.includes(q))
+        p.nomorPermohonan.toLowerCase().includes(qLower) ||
+        p.id.toLowerCase().includes(qLower) ||
+        p.terperiksa?.namaLengkap.toLowerCase().includes(qLower) ||
+        (p.terperiksa?.nik && p.terperiksa.nik.includes(qLower)) ||
+        (p.trackingNumber && p.trackingNumber.toLowerCase().includes(qLower))
     );
 
-    setSearchedPermohonan(found || null);
-    setHasSearched(true);
-    setSelectedStepModal(null);
+    if (found) {
+      setSearchedPermohonan(found);
+      setHasSearched(true);
+      setSelectedStepModal(null);
+      return;
+    }
+
+    // 2. Query backend tracking endpoint
+    try {
+      const res = await permohonanApi.lacak(q);
+      if (res.data) {
+        setSearchedPermohonan(res.data);
+      } else {
+        setSearchedPermohonan(null);
+      }
+    } catch {
+      setSearchedPermohonan(null);
+    } finally {
+      setHasSearched(true);
+      setSelectedStepModal(null);
+    }
   };
 
   const selectSample = (num: string) => {

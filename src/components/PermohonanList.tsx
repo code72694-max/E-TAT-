@@ -54,10 +54,10 @@ export const PermohonanList: React.FC<PermohonanListProps> = ({
       const query = searchQuery.toLowerCase();
       const matchSearch =
         !query ||
-        item.nomorPermohonan.toLowerCase().includes(query) ||
-        item.terperiksa.namaLengkap.toLowerCase().includes(query) ||
-        item.perkara.nomorLaporanPolisi.toLowerCase().includes(query) ||
-        item.perkara.pasalDipersangkakan.toLowerCase().includes(query);
+        (item.nomorPermohonan && item.nomorPermohonan.toLowerCase().includes(query)) ||
+        (item.terperiksa?.namaLengkap && item.terperiksa.namaLengkap.toLowerCase().includes(query)) ||
+        (item.perkara?.nomorLaporanPolisi && item.perkara.nomorLaporanPolisi.toLowerCase().includes(query)) ||
+        (item.perkara?.pasalDipersangkakan && item.perkara.pasalDipersangkakan.toLowerCase().includes(query));
 
       // Stage match
       let matchStage = true;
@@ -330,10 +330,10 @@ export const PermohonanList: React.FC<PermohonanListProps> = ({
                 <div className="space-y-1.5 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="font-bold text-sm text-white group-hover:text-[#D4AF37] transition-colors font-mono">
-                      {item.nomorPermohonan}
+                      {item.nomorPermohonan || 'TAT/PENDING'}
                     </span>
                     {getStageBadge(item)}
-                    {item.terperiksa.statusIdentitasKhusus === 'anak_berhadapan_hukum' && (
+                    {item.terperiksa?.statusIdentitasKhusus === 'anak_berhadapan_hukum' && (
                       <span className="bg-[#081224] text-slate-300 text-[10px] font-semibold px-2 py-0.5 rounded border border-[#1b3459]">
                         ABH (Anak)
                       </span>
@@ -351,20 +351,23 @@ export const PermohonanList: React.FC<PermohonanListProps> = ({
                     <div className="flex items-center space-x-2">
                       <User className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                       <span>
-                        Terperiksa: <strong className="text-white">{item.terperiksa.namaLengkap}</strong> ({item.terperiksa.usia} th, {item.terperiksa.jenisKelamin})
+                        Terperiksa: <strong className="text-white">{item.terperiksa?.namaLengkap || '-'}</strong>
+                        {item.terperiksa?.usia ? ` (${item.terperiksa.usia} th, ${item.terperiksa.jenisKelamin || '-'})` : ''}
                       </span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <Building2 className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                      <span className="truncate text-slate-300">Pengaju: <span className="text-white">{item.instansiPengaju}</span></span>
+                      <span className="truncate text-slate-300">Pengaju: <span className="text-white">{item.instansiPengaju || item.pengaju?.agency || '-'}</span></span>
                     </div>
                   </div>
 
                   {/* Barang Bukti Preview */}
                   <div className="text-[11px] text-slate-400 flex items-center space-x-2 pt-0.5">
                     <span className="font-medium text-slate-300">Barang Bukti:</span>
-                    <span className="text-slate-200">
-                      {item.perkara.barangBuktiList.map(bb => `${bb.jenisZat} (${bb.beratBersihGram} gr)`).join('; ')}
+                    <span className="text-slate-200 truncate">
+                      {item.perkara?.barangBuktiList && item.perkara.barangBuktiList.length > 0
+                        ? item.perkara.barangBuktiList.map(bb => `${bb.jenisZat} (${bb.beratBersihGram} gr)`).join('; ')
+                        : 'Belum ada data barang bukti'}
                     </span>
                   </div>
                 </div>
@@ -373,12 +376,12 @@ export const PermohonanList: React.FC<PermohonanListProps> = ({
                 <div className="lg:w-80 bg-[#081224] rounded-lg p-3 border border-[#1b3459] flex flex-col justify-between shrink-0">
                   <div className="text-[11px] text-slate-400 font-medium">Tindakan Berikutnya:</div>
                   <div className="text-xs font-semibold text-white mt-0.5 line-clamp-2">
-                    {item.tindakanBerikutnyaLabel}
+                    {item.tindakanBerikutnyaLabel || 'Menunggu verifikasi administrasi'}
                   </div>
                   <div className="flex items-center justify-between mt-2 pt-2 border-t border-[#1b3459] text-[11px]">
                     <span className="text-slate-400">Penanggung Jawab:</span>
                     <span className="font-semibold text-slate-200 truncate max-w-[140px]">
-                      {item.penanggungJawabBerikutnya.split('(')[0]}
+                      {(item.penanggungJawabBerikutnya || 'Sekretariat TAT').split('(')[0]}
                     </span>
                   </div>
                 </div>
