@@ -8,11 +8,9 @@ import {
   Mail,
   Eye,
   EyeOff,
-  UserPlus,
   Clock,
   XCircle,
-  Loader2,
-  ShieldCheck
+  Loader2
 } from 'lucide-react';
 
 interface LoginPageProps {
@@ -59,11 +57,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({
     setIsLoading(true);
 
     try {
-      // 1. Call real backend login endpoint
       const response = await authApi.login(inputClean, passClean);
       
       if (response.success && response.data?.accessToken) {
-        // 2. Fetch authenticated profile directly from DB via /api/auth/me
         const meRes = await authApi.getMe();
         if (meRes.success && meRes.data) {
           onLogin(meRes.data);
@@ -74,7 +70,6 @@ export const LoginPage: React.FC<LoginPageProps> = ({
         throw new Error(response.message || 'Login gagal.');
       }
     } catch (err: any) {
-      // Check if matching pending or rejected registration for informative message
       const matchedReg = registrations.find(
         r => r.email.toLowerCase() === inputClean || r.nrp.toLowerCase() === inputClean
       );
@@ -83,7 +78,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
         setLoginNotice({
           type: 'pending',
           title: 'Akun Menunggu Persetujuan Admin',
-          message: `Permohonan akun untuk ${matchedReg.pangkat} ${matchedReg.namaLengkap} (${matchedReg.instansi}) masih dalam proses verifikasi oleh Admin Sekretariat TAT.`
+          message: `Permohonan akun untuk ${matchedReg.pangkat || ''} ${matchedReg.namaLengkap} (${matchedReg.instansi}) masih dalam proses verifikasi oleh Admin Sekretariat TAT.`
         });
       } else if (matchedReg && matchedReg.status === 'rejected') {
         setLoginNotice({
@@ -104,179 +99,190 @@ export const LoginPage: React.FC<LoginPageProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-[#071325] text-slate-100 flex flex-col antialiased selection:bg-[#D4AF37] selection:text-slate-950 font-sans">
-      {/* Top Header Bar */}
-      <header className="bg-[#071325]/95 border-b border-[#1b3459] px-4 sm:px-8 py-3 flex items-center justify-between sticky top-0 z-20 backdrop-blur-sm">
-        <button
-          onClick={onBackToLanding}
-          className="inline-flex items-center space-x-2 text-xs font-semibold text-slate-300 hover:text-white px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer hover:bg-white/5 border border-[#1b3459]/60 sm:border-transparent"
-        >
-          <ArrowLeft className="w-4 h-4 text-[#D4AF37]" />
-          <span className="text-xs">Kembali ke Beranda</span>
-        </button>
+    <div className="min-h-screen w-full bg-[#071325] text-slate-100 flex items-center justify-center md:justify-start px-4 sm:px-8 md:px-14 lg:px-20 xl:px-28 py-8 sm:py-12 relative overflow-hidden antialiased selection:bg-[#D4AF37] selection:text-slate-950 font-sans">
+      
+      {/* Background Foto kantor.png: Fokus Pojok Kanan & Blur Full di Mobile */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+        <img
+          src="/kantor.png"
+          alt="Gedung Presisi POLRI"
+          className="w-full h-full object-cover object-[85%_center] md:object-right filter brightness-[0.55] md:brightness-[0.6] contrast-[1.05]"
+        />
+        {/* Full Screen Blur Khusus Layar Mobile (< md) agar form tetap jelas */}
+        <div className="absolute inset-0 backdrop-blur-md md:backdrop-blur-none bg-[#071325]/75 md:bg-transparent" />
+        
+        {/* Gradasi Siluet Kiri ke Kanan untuk Layar Desktop */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#071325] via-[#071325]/85 md:via-[#071325]/75 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#071325]/90 via-transparent to-[#071325]/50" />
+      </div>
 
-        {onGoToRegister && (
-          <button
-            onClick={onGoToRegister}
-            className="inline-flex items-center space-x-1.5 text-xs font-bold text-[#D4AF37] hover:text-[#F3E5AB] bg-[#D4AF37]/15 hover:bg-[#D4AF37]/25 px-3 py-1.5 rounded-lg transition-colors cursor-pointer border border-[#D4AF37]/30"
-          >
-            <UserPlus className="w-3.5 h-3.5 text-[#D4AF37]" />
-            <span>Registrasi Akun Satwil</span>
-          </button>
-        )}
-      </header>
-
-      {/* Main Content Area */}
-      <main className="flex-1 flex items-center justify-center px-4 sm:px-6 py-8 sm:py-12">
-        <div className="w-full max-w-md space-y-6">
-          {/* Card Header & Branding */}
-          <div className="text-center space-y-2">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-[#142642] border border-[#234475] shadow-lg mb-1">
-              <ShieldCheck className="w-6 h-6 text-[#D4AF37]" />
-            </div>
-            <h1 className="text-xl sm:text-2xl font-bold text-white tracking-wide font-['Cinzel',serif]">
+      {/* Container Form Login di Sisi Kiri (Tengah di Mobile) */}
+      <div className="w-full max-w-[440px] space-y-7 relative z-10 my-auto">
+        
+        {/* Header: Logo Tanpa Border & Judul Sebaris Rata Kiri */}
+        <div className="flex items-center space-x-4 text-left">
+          <img
+            src="/logo_etat.png"
+            alt="Logo E-TAT POLRI"
+            className="w-14 h-14 sm:w-16 sm:h-16 object-contain drop-shadow-xl shrink-0"
+          />
+          <div className="space-y-1">
+            <h1 className="text-xl sm:text-2xl font-bold text-white tracking-normal font-['Roboto',sans-serif] leading-tight">
               LOGIN SISTEM E-TAT
             </h1>
-            <p className="text-xs text-slate-400">
-              Portal Otentikasi Terpadu Tim Asesmen & Satuan Kerja Kedinasan
+            <p className="text-xs text-slate-400 leading-snug">
+              Portal Otentikasi Terpadu Tim Asesmen & Satuan Kerja
             </p>
           </div>
+        </div>
 
-          {/* Alert Notice if Pending / Rejected / Error */}
-          {loginNotice && (
-            <div
-              className={`p-4 rounded-xl border text-xs space-y-1.5 animate-in fade-in duration-200 ${
-                loginNotice.type === 'pending'
-                  ? 'bg-amber-500/15 border-amber-500/40 text-amber-200'
-                  : 'bg-rose-500/15 border-rose-500/40 text-rose-200'
-              }`}
-            >
-              <div className="flex items-center space-x-2 font-bold">
-                {loginNotice.type === 'pending' ? (
-                  <Clock className="w-4 h-4 text-amber-400 shrink-0" />
-                ) : (
-                  <XCircle className="w-4 h-4 text-rose-400 shrink-0" />
-                )}
-                <span>{loginNotice.title}</span>
-              </div>
-              <p className="text-slate-300 leading-relaxed text-[11px]">{loginNotice.message}</p>
+        {/* Alert Notice jika ada error / status akun */}
+        {loginNotice && (
+          <div
+            className={`p-4 rounded-xl border text-xs space-y-1.5 animate-in fade-in duration-200 ${
+              loginNotice.type === 'pending'
+                ? 'bg-amber-500/15 border-amber-500/40 text-amber-200'
+                : 'bg-rose-500/15 border-rose-500/40 text-rose-200'
+            }`}
+          >
+            <div className="flex items-center space-x-2 font-bold">
+              {loginNotice.type === 'pending' ? (
+                <Clock className="w-4 h-4 text-amber-400 shrink-0" />
+              ) : (
+                <XCircle className="w-4 h-4 text-rose-400 shrink-0" />
+              )}
+              <span>{loginNotice.title}</span>
             </div>
-          )}
+            <p className="text-slate-300 leading-relaxed text-[11px]">{loginNotice.message}</p>
+          </div>
+        )}
 
-          {/* Clean Authentication Card */}
-          <div className="bg-[#0b172a] rounded-2xl border border-[#1b3459] p-6 sm:p-8 shadow-2xl space-y-5">
-            {/* Credential Inputs Form */}
-            <form onSubmit={handleFormSubmit} className="space-y-4">
-              <div className="space-y-1.5">
-                <label className="block text-xs font-semibold text-slate-200">
-                  Email Kedinasan / Akun Terdaftar
-                </label>
-                <div className="relative">
-                  <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-3 pointer-events-none" />
-                  <input
-                    type="email"
-                    required
-                    autoFocus
-                    value={emailInput}
-                    onChange={e => {
-                      setEmailInput(e.target.value);
-                      setLoginNotice(null);
-                    }}
-                    placeholder="nama@polri.go.id / satwil"
-                    className="w-full bg-[#081224] text-white pl-10 pr-3.5 py-2.5 rounded-xl border border-[#1b3459] text-xs focus:outline-none focus:border-[#D4AF37] placeholder-slate-500 transition-colors"
-                  />
-                </div>
+        {/* Form Card Lebih Tinggi & Luas */}
+        <div className="bg-[#0b172a]/95 rounded-2xl border border-[#1b3459] p-8 sm:p-9 shadow-2xl backdrop-blur-md space-y-6">
+          <form onSubmit={handleFormSubmit} className="space-y-5">
+            
+            {/* Email Input */}
+            <div className="space-y-2">
+              <label className="block text-xs font-semibold text-slate-200">
+                Email Kedinasan / Akun Terdaftar
+              </label>
+              <div className="relative">
+                <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5 pointer-events-none" />
+                <input
+                  type="email"
+                  required
+                  autoFocus
+                  value={emailInput}
+                  onChange={e => {
+                    setEmailInput(e.target.value);
+                    setLoginNotice(null);
+                  }}
+                  placeholder="nama@polri.go.id / satwil"
+                  className="w-full bg-[#081224] text-white pl-10 pr-3.5 py-3 rounded-xl border border-[#1b3459] text-xs sm:text-[13px] focus:outline-none focus:border-[#D4AF37] placeholder-slate-500 transition-colors"
+                />
               </div>
+            </div>
 
-              <div className="space-y-1.5">
-                <label className="block text-xs font-semibold text-slate-200">
-                  Kata Sandi
-                </label>
-                <div className="relative">
-                  <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3 pointer-events-none" />
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    required
-                    value={passwordInput}
-                    onChange={e => {
-                      setPasswordInput(e.target.value);
-                      setLoginNotice(null);
-                    }}
-                    placeholder="Masukkan kata sandi..."
-                    className="w-full bg-[#081224] text-white pl-10 pr-10 py-2.5 rounded-xl border border-[#1b3459] text-xs focus:outline-none focus:border-[#D4AF37] placeholder-slate-500 transition-colors font-mono"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 top-2.5 text-slate-400 hover:text-white p-0.5 rounded cursor-pointer transition-colors"
-                    aria-label={showPassword ? 'Sembunyikan sandi' : 'Tampilkan sandi'}
-                  >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between text-xs pt-1">
-                <label className="flex items-center space-x-2 text-slate-400 hover:text-slate-300 cursor-pointer select-none">
-                  <input
-                    type="checkbox"
-                    checked={rememberMe}
-                    onChange={e => setRememberMe(e.target.checked)}
-                    className="w-3.5 h-3.5 rounded border-[#1b3459] bg-[#081224] text-[#D4AF37] focus:ring-0 focus:ring-offset-0 cursor-pointer"
-                  />
-                  <span>Ingat perangkat ini</span>
-                </label>
+            {/* Password Input */}
+            <div className="space-y-2">
+              <label className="block text-xs font-semibold text-slate-200">
+                Kata Sandi
+              </label>
+              <div className="relative">
+                <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5 pointer-events-none" />
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  value={passwordInput}
+                  onChange={e => {
+                    setPasswordInput(e.target.value);
+                    setLoginNotice(null);
+                  }}
+                  placeholder="Masukkan kata sandi..."
+                  className="w-full bg-[#081224] text-white pl-10 pr-10 py-3 rounded-xl border border-[#1b3459] text-xs sm:text-[13px] focus:outline-none focus:border-[#D4AF37] placeholder-slate-500 transition-colors font-mono"
+                />
                 <button
                   type="button"
-                  onClick={() =>
-                    alert('Untuk reset kata sandi, silakan hubungi Administrator Sekretariat TAT.')
-                  }
-                  className="text-slate-400 hover:text-[#D4AF37] transition-colors cursor-pointer text-xs"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3.5 top-3 text-slate-400 hover:text-white p-0.5 rounded cursor-pointer transition-colors"
+                  aria-label={showPassword ? 'Sembunyikan sandi' : 'Tampilkan sandi'}
                 >
-                  Lupa sandi?
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
+            </div>
 
-              {/* Clean Primary Login Button */}
+            {/* Remember Me & Forgot Password */}
+            <div className="flex items-center justify-between text-xs pt-0.5">
+              <label className="flex items-center space-x-2 text-slate-400 hover:text-slate-300 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={e => setRememberMe(e.target.checked)}
+                  className="w-3.5 h-3.5 rounded border-[#1b3459] bg-[#081224] text-[#D4AF37] focus:ring-0 focus:ring-offset-0 cursor-pointer"
+                />
+                <span>Ingat perangkat ini</span>
+              </label>
               <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full bg-[#142642] hover:bg-[#1b3459] disabled:opacity-50 text-white font-bold text-xs sm:text-sm py-2.5 rounded-xl flex items-center justify-center space-x-2 transition-all cursor-pointer border border-[#234475] shadow-md hover:border-[#D4AF37]/50 mt-2"
+                type="button"
+                onClick={() =>
+                  alert('Untuk reset kata sandi, silakan hubungi Administrator Sekretariat TAT.')
+                }
+                className="text-slate-400 hover:text-[#D4AF37] transition-colors cursor-pointer text-xs"
               >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="w-4 h-4 text-[#D4AF37] animate-spin" />
-                    <span>Memverifikasi Kredensial...</span>
-                  </>
-                ) : (
-                  <>
-                    <LogIn className="w-4 h-4 text-[#D4AF37]" />
-                    <span>Masuk ke Sistem</span>
-                  </>
-                )}
+                Lupa sandi?
               </button>
-            </form>
+            </div>
 
-            {/* Link to Registration */}
-            {onGoToRegister && (
-              <div className="pt-4 border-t border-[#1b3459] text-center">
-                <p className="text-xs text-slate-400">
-                  Belum memiliki akun kedinasan Satwil?{' '}
-                  <button
-                    onClick={onGoToRegister}
-                    className="text-[#D4AF37] hover:underline font-bold inline-flex items-center space-x-1 cursor-pointer"
-                  >
-                    <span>Daftar Akun Baru</span>
-                  </button>
-                </p>
-              </div>
-            )}
-          </div>
+            {/* Login Button */}
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full bg-[#142642] hover:bg-[#1b3459] disabled:opacity-50 text-white font-bold text-xs sm:text-sm py-3 rounded-xl flex items-center justify-center space-x-2 transition-all cursor-pointer border border-[#234475] shadow-md hover:border-[#D4AF37]/50 mt-3"
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 text-[#D4AF37] animate-spin" />
+                  <span>Memverifikasi Kredensial...</span>
+                </>
+              ) : (
+                <>
+                  <LogIn className="w-4 h-4 text-[#D4AF37]" />
+                  <span>Masuk ke Sistem</span>
+                </>
+              )}
+            </button>
+          </form>
+
+          {/* Registration Link */}
+          {onGoToRegister && (
+            <div className="pt-5 border-t border-[#1b3459] text-center">
+              <p className="text-xs text-slate-400">
+                Belum memiliki akun kedinasan Satwil?{' '}
+                <button
+                  onClick={onGoToRegister}
+                  className="text-[#D4AF37] hover:underline font-bold inline-flex items-center space-x-1 cursor-pointer"
+                >
+                  <span>Daftar Akun Baru</span>
+                </button>
+              </p>
+            </div>
+          )}
         </div>
-      </main>
+
+        {/* Tombol Kembali ke Beranda (Di bawah Container Form) */}
+        <div className="text-center pt-1">
+          <button
+            onClick={onBackToLanding}
+            className="inline-flex items-center space-x-2 text-xs font-semibold text-slate-400 hover:text-[#D4AF37] transition-colors cursor-pointer px-4 py-2.5 rounded-lg hover:bg-white/5"
+          >
+            <ArrowLeft className="w-4 h-4 text-[#D4AF37]" />
+            <span>Kembali ke Beranda</span>
+          </button>
+        </div>
+
+      </div>
+
     </div>
   );
 };
-
-
-
