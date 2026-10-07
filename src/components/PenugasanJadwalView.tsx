@@ -13,16 +13,17 @@ export const PenugasanJadwalView: React.FC<PenugasanJadwalViewProps> = ({
   currentUser,
   onSelectPermohonan
 }) => {
-  const isPengaju = currentUser.role === 'pengaju';
-  const isMedis = currentUser.role === 'medis';
-  const isHukum = currentUser.role === 'hukum';
+  const roleUpper = currentUser.role?.toUpperCase() || '';
+  const isPengaju = roleUpper === 'PENGAJU';
+  const isMedis = roleUpper === 'MEDIS';
+  const isHukum = roleUpper === 'HUKUM';
 
   const activeSchedules = permohonanList.filter(p => {
     if (!p.timAsesmen) return false;
     if (isPengaju) {
       return (
-        p.pengajuNama.toLowerCase().includes(currentUser.name.toLowerCase()) ||
-        p.instansiPengaju.toLowerCase().includes(currentUser.instansi.toLowerCase())
+        (p.pengajuNama && p.pengajuNama.toLowerCase().includes((currentUser.name || '').toLowerCase())) ||
+        (p.instansiPengaju && p.instansiPengaju.toLowerCase().includes((currentUser.agency || currentUser.instansi || '').toLowerCase()))
       );
     }
     return true;
@@ -60,7 +61,18 @@ export const PenugasanJadwalView: React.FC<PenugasanJadwalViewProps> = ({
           </div>
         ) : (
           activeSchedules.map(item => {
-          const tim = item.timAsesmen!;
+          const tim = item.timAsesmen || {};
+          const statusText = (item.statusProsesUtama || item.applicationStatus || 'DIPROSES').replace(/_/g, ' ').toUpperCase();
+          const formatJadwal = (val?: string | Date) => {
+            if (!val) return 'Belum Dijadwalkan';
+            try {
+              const d = new Date(val);
+              return isNaN(d.getTime()) ? String(val) : d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+            } catch {
+              return String(val);
+            }
+          };
+
           return (
             <div
               key={item.id}
@@ -70,11 +82,11 @@ export const PenugasanJadwalView: React.FC<PenugasanJadwalViewProps> = ({
               <div className="flex items-start justify-between">
                 <div>
                   <span className="font-bold text-sm text-white group-hover:text-[#D4AF37] font-mono transition-colors">{item.nomorPermohonan}</span>
-                  <p className="text-xs font-semibold text-slate-200 mt-0.5">Terperiksa: {item.terperiksa.namaLengkap}</p>
-                  <p className="text-[11px] text-slate-400">Pengaju: {item.instansiPengaju}</p>
+                  <p className="text-xs font-semibold text-slate-200 mt-0.5">Terperiksa: {item.terperiksa?.namaLengkap || '-'}</p>
+                  <p className="text-[11px] text-slate-400">Pengaju: {item.instansiPengaju || '-'}</p>
                 </div>
                 <span className="text-[10px] bg-[#1b3459] text-sky-300 font-bold px-2 py-0.5 rounded border border-[#2d5289]">
-                  {item.statusProsesUtama.replace('_', ' ').toUpperCase()}
+                  {statusText}
                 </span>
               </div>
 
@@ -83,8 +95,8 @@ export const PenugasanJadwalView: React.FC<PenugasanJadwalViewProps> = ({
                   <div className="flex items-center space-x-2">
                     <Stethoscope className="w-3.5 h-3.5 text-slate-300" />
                     <div>
-                      <span className="font-bold text-slate-200">{tim.asesorMedisNama}</span>
-                      <p className="text-[10px] text-slate-400">Jadwal Medis: {tim.jadwalPemeriksaanMedis}</p>
+                      <span className="font-bold text-slate-200">{tim.asesorMedisNama || 'Belum Ditugaskan'}</span>
+                      <p className="text-[10px] text-slate-400">Jadwal Medis: {formatJadwal(tim.jadwalPemeriksaanMedis)}</p>
                     </div>
                   </div>
                   <span className="text-[10px] bg-[#142847] text-slate-200 font-semibold px-2 py-0.5 rounded border border-[#1e3c6a]">
@@ -96,8 +108,8 @@ export const PenugasanJadwalView: React.FC<PenugasanJadwalViewProps> = ({
                   <div className="flex items-center space-x-2">
                     <Scale className="w-3.5 h-3.5 text-slate-300" />
                     <div>
-                      <span className="font-bold text-slate-200">{tim.asesorHukumNama}</span>
-                      <p className="text-[10px] text-slate-400">Jadwal Hukum: {tim.jadwalPemeriksaanHukum}</p>
+                      <span className="font-bold text-slate-200">{tim.asesorHukumNama || 'Belum Ditugaskan'}</span>
+                      <p className="text-[10px] text-slate-400">Jadwal Hukum: {formatJadwal(tim.jadwalPemeriksaanHukum)}</p>
                     </div>
                   </div>
                   <span className="text-[10px] bg-[#142847] text-slate-200 font-semibold px-2 py-0.5 rounded border border-[#1e3c6a]">
@@ -110,7 +122,7 @@ export const PenugasanJadwalView: React.FC<PenugasanJadwalViewProps> = ({
                     <Users className="w-3.5 h-3.5 text-[#D4AF37]" />
                     <div>
                       <span className="font-bold text-white">Sidang Pleno Terpadu</span>
-                      <p className="text-[10px] text-slate-300">{tim.jadwalPleno || 'Belum Dijadwalkan'}</p>
+                      <p className="text-[10px] text-slate-300">{formatJadwal(tim.jadwalPleno)}</p>
                     </div>
                   </div>
                   <span className="text-[10px] bg-[#143058] text-[#7dd3fc] font-semibold px-2 py-0.5 rounded border border-[#234d85]">
@@ -120,7 +132,7 @@ export const PenugasanJadwalView: React.FC<PenugasanJadwalViewProps> = ({
               </div>
 
               <div className="flex items-center justify-between pt-2 text-[11px] text-slate-400">
-                <span>Lokasi: {tim.lokasiPemeriksaan}</span>
+                <span>Lokasi: {tim.lokasiPemeriksaan || 'BNNP / Kantor TAT'}</span>
                 <span className="text-slate-300 group-hover:text-white font-semibold flex items-center space-x-1 group-hover:translate-x-0.5 transition-transform">
                   <span>Buka Berkas</span>
                   <ArrowRight className="w-3 h-3 text-[#D4AF37]" />

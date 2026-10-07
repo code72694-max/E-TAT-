@@ -27,17 +27,21 @@ interface RiwayatViewProps {
   onBack?: () => void;
 }
 
-const SELESAI_STATUSES = ["RESULTS_ISSUED","OUTCOME_RECORDED_FOR_DRAFT","AWAITING_SIGNED_OUTPUTS"];
-const SELESAI_PROSES = ["pengesahan_rekomendasi","rekomendasi_terbit","selesai_tindak_lanjut"];
+const SELESAI_STATUSES = ["RESULTS_ISSUED","OUTCOME_RECORDED_FOR_DRAFT","AWAITING_SIGNED_OUTPUTS","REJECTED","OUT_OF_SCOPE_REFERRED"];
+const SELESAI_PROSES = ["pengesahan_rekomendasi","rekomendasi_terbit","selesai_tindak_lanjut","ditolak"];
 
 function getOutcomeBadge(p: PermohonanAsesmen) {
   const s = p.applicationStatus;
-  if (s === "RESULTS_ISSUED" || p.statusProsesUtama === "rekomendasi_terbit")
+  if (s === "RESULTS_ISSUED" || p.statusProsesUtama === "rekomendasi_terbit" || p.statusProsesUtama === "selesai_tindak_lanjut")
     return { label:"Selesai & Terkirim", cls:"bg-emerald-900/60 text-emerald-300 border-emerald-700", icon:<CheckCircle2 className="w-3 h-3"/> };
   if (s === "AWAITING_SIGNED_OUTPUTS" || p.statusProsesUtama === "pengesahan_rekomendasi")
     return { label:"Menunggu Pengesahan", cls:"bg-amber-900/60 text-amber-300 border-amber-700", icon:<Clock className="w-3 h-3"/> };
   if (s === "OUTCOME_RECORDED_FOR_DRAFT" || p.statusDokumen === "draf")
     return { label:"Draf Rekomendasi", cls:"bg-slate-700/60 text-slate-300 border-slate-600", icon:<FileText className="w-3 h-3"/> };
+  if (s === "REJECTED")
+    return { label:"Ditolak / Gugur", cls:"bg-red-900/60 text-red-300 border-red-700", icon:<XCircle className="w-3 h-3"/> };
+  if (s === "OUT_OF_SCOPE_REFERRED")
+    return { label:"Dirujuk (Non-TAT)", cls:"bg-slate-700/60 text-slate-300 border-slate-600", icon:<FileText className="w-3 h-3"/> };
   return { label:s ?? "Selesai", cls:"bg-slate-700 text-slate-300 border-slate-600", icon:<CheckCircle2 className="w-3 h-3"/> };
 }
 

@@ -81,16 +81,23 @@ export default function App() {
 
     setIsBackendLoading(true);
     try {
-      const [permohonanRes, regRes] = await Promise.allSettled([
-        permohonanApi.getAll({ limit: 100 }),
-        registrasiApi.getAll(),
-      ]);
+      const savedUser = tokenStorage.getUser();
+      const isAdmin = savedUser?.role?.toUpperCase() === 'ADMIN';
 
-      if (permohonanRes.status === 'fulfilled' && permohonanRes.value?.data) {
+      const promises: [Promise<any>, Promise<any>?] = [permohonanApi.getAll({ limit: 100 })];
+      if (isAdmin) {
+        promises.push(registrasiApi.getAll());
+      }
+
+      const results = await Promise.allSettled(promises);
+      const permohonanRes = results[0];
+      const regRes = results[1];
+
+      if (permohonanRes && permohonanRes.status === 'fulfilled' && permohonanRes.value?.data) {
         setPermohonanList(permohonanRes.value.data);
       }
 
-      if (regRes.status === 'fulfilled' && regRes.value?.data) {
+      if (regRes && regRes.status === 'fulfilled' && regRes.value?.data) {
         setRegistrations(regRes.value.data);
       }
     } catch (e) {
@@ -410,14 +417,14 @@ export default function App() {
     setSelectedTindakLanjutId(null);
     // 4 role kanonis + backward compat untuk role lama
     const roleAllowedTabs: Record<string, ActiveTab[]> = {
-      PENGAJU: ['beranda', 'permohonan', 'penugasan', 'dokumen', 'tindak_lanjut', 'tindak_lanjut_jadwal', 'about', 'profile'],
+      PENGAJU: ['beranda', 'permohonan', 'asesmen_aktif', 'penugasan', 'dokumen', 'tindak_lanjut', 'tindak_lanjut_jadwal', 'riwayat', 'about', 'profile'],
       ADMIN: ['beranda', 'permohonan', 'asesmen_aktif', 'riwayat', 'verifikasi', 'penugasan', 'pleno', 'tindak_lanjut', 'tindak_lanjut_jadwal', 'verifikasi_akun', 'monitoring', 'about', 'profile'],
-      MEDIS: ['beranda', 'medis', 'pemulihan', 'pleno', 'about', 'profile'],
+      MEDIS: ['beranda', 'medis', 'riwayat_medis', 'tindak_lanjut', 'pleno', 'about', 'profile'],
       HUKUM: ['beranda', 'hukum', 'pleno', 'riwayat_hukum', 'about', 'profile'],
       // Backward compat
-      pengaju: ['beranda', 'permohonan', 'verifikasi', 'penugasan', 'dokumen', 'about', 'profile'],
-      sekretariat: ['beranda', 'permohonan', 'verifikasi', 'penugasan', 'pleno', 'tindak_lanjut', 'tindak_lanjut_jadwal', 'verifikasi_akun', 'about', 'profile'],
-      medis: ['beranda', 'medis', 'pemulihan', 'pleno', 'about', 'profile'],
+      pengaju: ['beranda', 'permohonan', 'asesmen_aktif', 'verifikasi', 'penugasan', 'dokumen', 'riwayat', 'about', 'profile'],
+      sekretariat: ['beranda', 'permohonan', 'verifikasi', 'penugasan', 'pleno', 'tindak_lanjut', 'tindak_lanjut_jadwal', 'riwayat', 'verifikasi_akun', 'about', 'profile'],
+      medis: ['beranda', 'medis', 'riwayat_medis', 'tindak_lanjut', 'pleno', 'about', 'profile'],
       hukum: ['beranda', 'hukum', 'pleno', 'riwayat_hukum', 'about', 'profile'],
       koordinator: ['beranda', 'permohonan', 'pleno', 'dokumen', 'tindak_lanjut', 'tindak_lanjut_jadwal', 'about', 'profile'],
       pimpinan: ['beranda', 'monitoring', 'permohonan', 'tindak_lanjut', 'tindak_lanjut_jadwal', 'about', 'profile'],
@@ -638,6 +645,25 @@ export default function App() {
         );
 
       case 'tindak_lanjut_input_jadwal':
+        if (currentUser.role === 'MEDIS') {
+          return (
+            <RujukanTindakLanjutView
+              permohonanList={permohonanList}
+              currentUser={currentUser}
+              onSelectPermohonan={handleOpenPermohonan}
+              onUpdatePermohonan={handleUpdatePermohonan}
+              selectedCaseId={selectedTindakLanjutId}
+              onSelectCase={(id) => {
+                setSelectedTindakLanjutId(id);
+                if (id) {
+                  navigate(`/dashboard/tindak_lanjut/detail/${id}`);
+                } else {
+                  navigate('/dashboard/tindak_lanjut');
+                }
+              }}
+            />
+          );
+        }
         return (
           <InputJadwalKontrolView
             permohonanList={permohonanList}

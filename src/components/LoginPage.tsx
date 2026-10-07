@@ -178,7 +178,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                     setLoginNotice(null);
                   }}
                   placeholder="nama@polri.go.id / satwil"
-                  className="w-full bg-[#081224] text-white pl-10 pr-3.5 py-3 rounded-xl border border-[#1b3459] text-xs sm:text-[13px] focus:outline-none focus:border-[#D4AF37] placeholder-slate-500 transition-colors"
+                  className="w-full bg-[#081224] focus:bg-[#0c1c34] text-slate-100 focus:text-white pl-10 pr-3.5 py-3 rounded-xl border border-[#1b3459] focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37]/50 text-xs sm:text-[13px] outline-none placeholder-slate-500 transition-all shadow-inner"
                 />
               </div>
             </div>
@@ -199,7 +199,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                     setLoginNotice(null);
                   }}
                   placeholder="Masukkan kata sandi..."
-                  className="w-full bg-[#081224] text-white pl-10 pr-10 py-3 rounded-xl border border-[#1b3459] text-xs sm:text-[13px] focus:outline-none focus:border-[#D4AF37] placeholder-slate-500 transition-colors font-mono"
+                  className="w-full bg-[#081224] focus:bg-[#0c1c34] text-slate-100 focus:text-white pl-10 pr-10 py-3 rounded-xl border border-[#1b3459] focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37]/50 text-xs sm:text-[13px] outline-none placeholder-slate-500 transition-all font-mono shadow-inner"
                 />
                 <button
                   type="button"

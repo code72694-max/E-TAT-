@@ -177,8 +177,9 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
       setIsEditingMedis(false);
     }
 
+    const existingLogs = Array.isArray(updated.auditLogs) ? updated.auditLogs : [];
     updated.auditLogs = [
-      ...updated.auditLogs,
+      ...existingLogs,
       {
         id: `log-${Date.now()}`,
         timestamp: now,
@@ -217,8 +218,9 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
         }
       }
 
+      const existingHukumLogs = Array.isArray(updated.auditLogs) ? updated.auditLogs : [];
       updated.auditLogs = [
-        ...updated.auditLogs,
+        ...existingHukumLogs,
         {
           id: `log-${Date.now()}`,
           timestamp: now,
@@ -2735,7 +2737,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
             </div>
 
             <div className="space-y-3">
-              {permohonan.auditLogs.map((log) => (
+              {(permohonan.auditLogs || []).map((log) => (
                 <div key={log.id} className="p-3 bg-[#081224] border border-[#1b3459] rounded-lg text-xs flex items-start space-x-3">
                   <div className="w-2 h-2 rounded-full bg-[#D4AF37] mt-1.5 shrink-0" />
                   <div className="flex-1 min-w-0">

@@ -42,9 +42,24 @@ export const PermohonanList: React.FC<PermohonanListProps> = ({
 
   const filteredList = useMemo(() => {
     return permohonanList.filter(item => {
+      // Hanya tampilkan berkas yang sedang dalam proses verifikasi (belum diverifikasi ke tahap asesmen)
+      const isPendingVerification = 
+        item.applicationStatus === 'SUBMITTED' || 
+        item.applicationStatus === 'ADMIN_REVIEW' || 
+        item.applicationStatus === 'NEEDS_CORRECTION' || 
+        item.applicationStatus === 'DRAFT' || 
+        item.statusProsesUtama === 'diajukan' || 
+        item.statusProsesUtama === 'verifikasi_berkas' || 
+        item.statusProsesUtama === 'perlu_perbaikan' || 
+        item.statusProsesUtama === 'draf' ||
+        (!item.applicationStatus && !item.statusProsesUtama);
+
+      if (!isPendingVerification) {
+        return false;
+      }
+
       // Role-specific scoping
       if (role === 'rehabilitasi') {
-        // Only show items that have recommendation for rehabilitation or in referral stage
         if (!item.tindakLanjut && item.statusProsesUtama !== 'rekomendasi_terbit' && item.statusProsesUtama !== 'selesai_tindak_lanjut') {
           return false;
         }
@@ -59,14 +74,21 @@ export const PermohonanList: React.FC<PermohonanListProps> = ({
         (item.perkara?.nomorLaporanPolisi && item.perkara.nomorLaporanPolisi.toLowerCase().includes(query)) ||
         (item.perkara?.pasalDipersangkakan && item.perkara.pasalDipersangkakan.toLowerCase().includes(query));
 
-      // Stage match
+      // Stage match (Hanya status sebelum/saat verifikasi)
       let matchStage = true;
       if (selectedStage !== 'all') {
-        if (selectedStage === 'terverifikasi') {
-          const verifiedStages = ['penugasan_jadwal', 'asesmen_berlangsung', 'siap_pleno', 'pembahasan_pleno', 'pengesahan_rekomendasi', 'rekomendasi_terbit', 'selesai_tindak_lanjut'];
-          matchStage = verifiedStages.includes(item.statusProsesUtama) || item.applicationStatus === 'VERIFIED';
-        } else {
-          matchStage = item.statusProsesUtama === selectedStage;
+        if (selectedStage === 'menunggu') {
+          matchStage = 
+            item.applicationStatus === 'SUBMITTED' || 
+            item.applicationStatus === 'ADMIN_REVIEW' || 
+            item.statusProsesUtama === 'diajukan' || 
+            item.statusProsesUtama === 'verifikasi_berkas';
+        } else if (selectedStage === 'perlu_perbaikan') {
+          matchStage = 
+            item.applicationStatus === 'NEEDS_CORRECTION' || 
+            item.applicationStatus === 'DRAFT' ||
+            item.statusProsesUtama === 'perlu_perbaikan' ||
+            item.statusProsesUtama === 'draf';
         }
       }
 
@@ -262,10 +284,9 @@ export const PermohonanList: React.FC<PermohonanListProps> = ({
         {/* Horizontal Status Tabs */}
         <div className="flex overflow-x-auto pb-2 space-x-2 scrollbar-thin scrollbar-thumb-[#1b3459] scrollbar-track-transparent">
           {[
-            { id: 'all', label: 'Semua Berkas' },
-            { id: 'verifikasi_berkas', label: 'Menunggu Verifikasi' },
-            { id: 'perlu_perbaikan', label: 'Perlu Perbaikan' },
-            { id: 'terverifikasi', label: 'Terverifikasi (Jadwal/Asesmen)' },
+            { id: 'all', label: 'Semua Antrean Verifikasi' },
+            { id: 'menunggu', label: 'Menunggu Verifikasi' },
+            { id: 'perlu_perbaikan', label: 'Perlu Perbaikan / Draf' },
           ].map(tab => (
             <button
               key={tab.id}

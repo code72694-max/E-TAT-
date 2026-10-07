@@ -78,8 +78,22 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
   const [schedNamaPenyidik, setSchedNamaPenyidik] = useState('Bripka Heru Susanto');
   const [schedInstansiPenyidik, setSchedInstansiPenyidik] = useState('Satresnarkoba Polresta Samarinda');
 
-  // Filter: Hanya permohonan resmi e-TAT yang SUDAH SELESAI SIDANG PLENO TAT & memiliki rekomendasi resmi
+  // Filter: Hanya permohonan resmi e-TAT yang SUDAH SELESAI SIDANG PLENO TAT & memiliki rekomendasi resmi (Milik pengaju jika role PENGAJU)
+  const isPengajuRole = currentUser.role?.toUpperCase() === 'PENGAJU';
+  const checkOwner = (p: PermohonanAsesmen) => {
+    if (!isPengajuRole) return true;
+    return (
+      p.pengajuId === currentUser.id ||
+      (p.pengajuNama && p.pengajuNama.toLowerCase().includes((currentUser.name || '').toLowerCase())) ||
+      (p.perkara?.namaPenyidik && p.perkara.namaPenyidik.toLowerCase().includes((currentUser.name || '').toLowerCase())) ||
+      (p.instansiPengaju && currentUser.agency && p.instansiPengaju.toLowerCase().includes(currentUser.agency.toLowerCase())) ||
+      (p.instansiPengaju && currentUser.instansi && p.instansiPengaju.toLowerCase().includes(currentUser.instansi.toLowerCase()))
+    );
+  };
+
   const completedSidangList = permohonanList.filter(p => {
+    if (!checkOwner(p)) return false;
+
     const isSubmitted = p.applicationStatus !== 'DRAFT';
     const isSidangBeres = p.plenoAssesmen?.statusPleno === 'SELESAI' ||
       !!p.rekomendasiResmi ||
@@ -193,6 +207,7 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
 
   // Candidates for follow up: items with monitoringTindakLanjut, tindakLanjut, pengawasanKlien, or final assessment
   const eligibleList = permohonanList.filter(p => {
+    if (!checkOwner(p)) return false;
     return !!p.monitoringTindakLanjut || !!p.tindakLanjut || !!p.pengawasanKlien || p.asesmenMedis?.status === 'FINAL' || p.applicationStatus === 'READY_FOR_CONFERENCE' || p.applicationStatus === 'AWAITING_SIGNED_OUTPUTS';
   });
 
@@ -210,7 +225,7 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
     return true;
   });
 
-  const pengawasanList = permohonanList.filter(p => !!p.pengawasanKlien || !!p.monitoringTindakLanjut);
+  const pengawasanList = permohonanList.filter(p => checkOwner(p) && (!!p.pengawasanKlien || !!p.monitoringTindakLanjut));
 
   // Metrics
   const totalKlienDiawasi = pengawasanList.length;
@@ -236,15 +251,17 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3 self-start shrink-0">
-          <button
-            onClick={() => setShowScheduleModal(true)}
-            className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white border border-slate-700 hover:border-slate-600 font-medium rounded-xl text-xs flex items-center gap-2 transition-all cursor-pointer shadow-sm"
-          >
-            <Calendar className="w-3.5 h-3.5 text-slate-400" />
-            <span>+ Input Jadwal Kontrol &amp; Lapor</span>
-          </button>
-        </div>
+        {currentUser.role !== 'MEDIS' && (
+          <div className="flex flex-wrap items-center gap-3 self-start shrink-0">
+            <button
+              onClick={() => setShowScheduleModal(true)}
+              className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white border border-slate-700 hover:border-slate-600 font-medium rounded-xl text-xs flex items-center gap-2 transition-all cursor-pointer shadow-sm"
+            >
+              <Calendar className="w-3.5 h-3.5 text-slate-400" />
+              <span>+ Input Jadwal Kontrol &amp; Lapor</span>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* FILTER & SEARCH BAR */}

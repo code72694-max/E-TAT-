@@ -130,8 +130,23 @@ export const AsesmenHukumView: React.FC<AsesmenHukumViewProps> = ({
     }
   }, [selectedCaseId]);
 
+  const isCompleted = 
+    selectedCase?.asesmenHukum?.status === 'FINAL' || 
+    selectedCase?.legalStatus === 'FINAL' ||
+    selectedCase?.applicationStatus === 'READY_FOR_CONFERENCE' ||
+    selectedCase?.applicationStatus === 'CONFERENCE_HELD' ||
+    selectedCase?.applicationStatus === 'OUTCOME_RECORDED_FOR_DRAFT' ||
+    selectedCase?.applicationStatus === 'AWAITING_SIGNED_OUTPUTS' ||
+    selectedCase?.applicationStatus === 'RESULTS_ISSUED' ||
+    selectedCase?.statusProsesUtama === 'siap_pleno' ||
+    selectedCase?.statusProsesUtama === 'pengesahan_rekomendasi' ||
+    selectedCase?.statusProsesUtama === 'rekomendasi_terbit' ||
+    selectedCase?.statusProsesUtama === 'selesai_tindak_lanjut';
+
+  const isReadOnlyView = isReadOnly || isCompleted;
+
   const toggleFakta = (id: string) => {
-    if (isReadOnly) return;
+    if (isReadOnlyView) return;
     setFaktaList(prev => prev.map(f => f.id === id ? { ...f, checked: !f.checked } : f));
   };
 
@@ -153,7 +168,7 @@ export const AsesmenHukumView: React.FC<AsesmenHukumViewProps> = ({
   };
 
   const handleSaveLegalForm = (isFinal: boolean) => {
-    if (!selectedCase || isReadOnly) return;
+    if (!selectedCase || isReadOnlyView) return;
 
     let updated: PermohonanAsesmen = { ...selectedCase };
     const now = new Date().toLocaleDateString('id-ID') + ' ' + new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
@@ -185,13 +200,15 @@ export const AsesmenHukumView: React.FC<AsesmenHukumViewProps> = ({
     updated.asesmenHukum = asesmenHukumData;
 
     if (isFinal) {
+      updated.legalStatus = 'FINAL';
       if (updated.statusProsesUtama === 'asesmen_berlangsung' || updated.statusProsesUtama === 'penugasan_jadwal') {
         updated.statusProsesUtama = 'siap_pleno';
       }
     }
 
+    const existingLogs = Array.isArray(updated.auditLogs) ? updated.auditLogs : [];
     updated.auditLogs = [
-      ...updated.auditLogs,
+      ...existingLogs,
       {
         id: `log-${Date.now()}`,
         timestamp: now,
@@ -208,8 +225,14 @@ export const AsesmenHukumView: React.FC<AsesmenHukumViewProps> = ({
       onUpdatePermohonan(updated);
     }
 
-    setSaveFeedback(isFinal ? '✅ Asesmen Hukum Berhasil Difinalisasi & Diteruskan ke Sidang Pleno!' : '💾 Draf Asesmen Hukum Berhasil Disimpan!');
-    setTimeout(() => setSaveFeedback(null), 4000);
+    setSaveFeedback(isFinal ? '✅ Asesmen Hukum Berhasil Difinalisasi & Berpindah ke Riwayat Asesmen Hukum!' : '💾 Draf Asesmen Hukum Berhasil Disimpan!');
+    if (isFinal) {
+      setTimeout(() => {
+        handleCloseCase();
+      }, 1500);
+    } else {
+      setTimeout(() => setSaveFeedback(null), 4000);
+    }
   };
 
   // Filtered cases list based on active mode vs history mode
@@ -220,11 +243,24 @@ export const AsesmenHukumView: React.FC<AsesmenHukumViewProps> = ({
     
     if (!matchesSearch) return false;
     
+    const isHukumBeres = 
+      item.asesmenHukum?.status === 'FINAL' || 
+      item.legalStatus === 'FINAL' ||
+      item.applicationStatus === 'READY_FOR_CONFERENCE' ||
+      item.applicationStatus === 'CONFERENCE_HELD' ||
+      item.applicationStatus === 'OUTCOME_RECORDED_FOR_DRAFT' ||
+      item.applicationStatus === 'AWAITING_SIGNED_OUTPUTS' ||
+      item.applicationStatus === 'RESULTS_ISSUED' ||
+      item.statusProsesUtama === 'siap_pleno' ||
+      item.statusProsesUtama === 'pengesahan_rekomendasi' ||
+      item.statusProsesUtama === 'rekomendasi_terbit' ||
+      item.statusProsesUtama === 'selesai_tindak_lanjut';
+
     if (mode === 'history') {
-      return !!item.asesmenHukum && item.asesmenHukum.status === 'FINAL';
+      return isHukumBeres;
     } else {
-      // Active queue: only show active tasks (not yet final)
-      return !item.asesmenHukum || item.asesmenHukum.status !== 'FINAL';
+      // Active queue: only show active tasks (not yet final/done)
+      return !isHukumBeres;
     }
   });
 
@@ -232,18 +268,26 @@ export const AsesmenHukumView: React.FC<AsesmenHukumViewProps> = ({
   // VIEW 2: DEDICATED LEGAL WORKBOOK DETAIL PAGE
   // ==========================================
   if (selectedCase) {
-    const isCompleted = selectedCase.asesmenHukum?.status === 'FINAL';
-
     return (
       <div className="space-y-6 animate-in fade-in duration-200">
         {/* Top Navigation & Case Summary Header */}
         <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl p-4 sm:p-5 shadow-lg space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#1b3459]/80">
-            <div className="flex items-center space-x-2">
-              <Scale className="w-4 h-4 text-[#d4af37]" />
-              <span className="text-xs font-bold text-slate-200 uppercase tracking-wider">
-                {isReadOnly ? 'Arsip Telaah Yuridis Tim Asesor Hukum TAT (Read-Only)' : 'Lembar Telaah Yuridis Tim Asesor Hukum TAT'}
-              </span>
+            <div className="flex items-center space-x-3">
+              <button
+                type="button"
+                onClick={handleCloseCase}
+                className="p-1.5 bg-[#142642] hover:bg-[#1b3459] text-slate-300 hover:text-white rounded-lg border border-[#234475] transition-colors cursor-pointer"
+                title="Kembali ke Daftar"
+              >
+                <ArrowLeft className="w-4 h-4" />
+              </button>
+              <div className="flex items-center space-x-2">
+                <Scale className="w-4 h-4 text-[#d4af37]" />
+                <span className="text-xs font-bold text-slate-200 uppercase tracking-wider">
+                  Lembar Telaah Yuridis Asesmen Hukum TAT {isReadOnlyView && <span className="text-blue-400 font-normal">(Riwayat / Selesai)</span>}
+                </span>
+              </div>
             </div>
             <div className="flex items-center space-x-2">
               <button
@@ -255,11 +299,11 @@ export const AsesmenHukumView: React.FC<AsesmenHukumViewProps> = ({
                 <span>Lihat Dokumen &amp; Barang Bukti</span>
               </button>
               <span className={`text-[10px] font-extrabold px-3 py-1 rounded-full border ${
-                isReadOnly || isCompleted
+                isReadOnlyView
                   ? 'bg-blue-950/60 text-blue-300 border-blue-500/50'
                   : 'bg-emerald-950/60 text-emerald-300 border-emerald-500/50'
               }`}>
-                {isReadOnly || isCompleted ? 'SELESAI' : 'AKTIF'}
+                {isReadOnlyView ? 'RIWAYAT / FINAL' : 'AKTIF / DRAFT'}
               </span>
             </div>
           </div>
@@ -297,6 +341,28 @@ export const AsesmenHukumView: React.FC<AsesmenHukumViewProps> = ({
             </div>
           </div>
         </div>
+
+        {/* Read-Only Status Banner */}
+        {isReadOnlyView && (
+          <div className="bg-[#0e2238] border border-blue-500/40 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs shadow-md animate-in fade-in">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-blue-900/50 rounded-xl text-blue-300 border border-blue-500/30 shrink-0">
+                <Shield className="w-5 h-5 text-blue-400" />
+              </div>
+              <div>
+                <h4 className="font-bold text-white text-sm">Mode Arsip &amp; Telaah Yuridis (Read-Only)</h4>
+                <p className="text-slate-300 text-[11px] mt-0.5">
+                  Berkas telaah hukum ini telah difinalisasi secara sah. Seluruh lembar isian dan telaah yuridis terkunci untuk menjaga keaslian data.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-2">
+              <span className="text-[10px] font-mono px-2.5 py-1 bg-blue-950 text-blue-300 border border-blue-700/60 rounded-lg font-bold">
+                TERKUNCI / FINAL
+              </span>
+            </div>
+          </div>
+        )}
 
         {/* Success Feedback Alert */}
         {saveFeedback && (
@@ -345,11 +411,11 @@ export const AsesmenHukumView: React.FC<AsesmenHukumViewProps> = ({
                 <label className="text-slate-300 font-semibold mb-1.5 block">Nomor Laporan Polisi (LP / LKN)</label>
                 <input
                   type="text"
-                  disabled={isReadOnly}
+                  disabled={isReadOnlyView}
                   value={formData.nomorLp}
                   onChange={(e) => setFormData({ ...formData, nomorLp: e.target.value })}
                   placeholder="LP/A/128/VIII/2026/SPKT/POLRESTA SAMARINDA"
-                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-blue-500 font-mono disabled:opacity-80 disabled:cursor-not-allowed"
+                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-blue-500 font-mono disabled:opacity-75 disabled:cursor-not-allowed"
                 />
               </div>
 
@@ -357,11 +423,11 @@ export const AsesmenHukumView: React.FC<AsesmenHukumViewProps> = ({
                 <label className="text-slate-300 font-semibold mb-1.5 block">Pasal yang Dipersangkakan Penyidik</label>
                 <input
                   type="text"
-                  disabled={isReadOnly}
+                  disabled={isReadOnlyView}
                   value={formData.pasalSangkaan}
                   onChange={(e) => setFormData({ ...formData, pasalSangkaan: e.target.value })}
                   placeholder="Pasal 114 ayat (1) subs Pasal 112 ayat (1) lebih subs Pasal 127 ayat (1) huruf a UU No. 35/2009"
-                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-blue-500 font-mono disabled:opacity-80 disabled:cursor-not-allowed"
+                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-blue-500 font-mono disabled:opacity-75 disabled:cursor-not-allowed"
                 />
               </div>
 
@@ -369,11 +435,11 @@ export const AsesmenHukumView: React.FC<AsesmenHukumViewProps> = ({
                 <label className="text-slate-300 font-semibold mb-1.5 block">Tempat Kejadian Perkara (TKP Penangkapan)</label>
                 <input
                   type="text"
-                  disabled={isReadOnly}
+                  disabled={isReadOnlyView}
                   value={formData.lokasiTkp}
                   onChange={(e) => setFormData({ ...formData, lokasiTkp: e.target.value })}
                   placeholder="Jalan Pelita No. 45, RT 12, Kel. Sungai Pinang Dalam, Kec. Samarinda Utara"
-                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-blue-500 disabled:opacity-80 disabled:cursor-not-allowed"
+                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-blue-500 disabled:opacity-75 disabled:cursor-not-allowed"
                 />
               </div>
 
@@ -381,11 +447,11 @@ export const AsesmenHukumView: React.FC<AsesmenHukumViewProps> = ({
                 <label className="text-slate-300 font-semibold mb-1.5 block">Kronologi Singkat Fakta Penangkapan</label>
                 <textarea
                   rows={4}
-                  disabled={isReadOnly}
+                  disabled={isReadOnlyView}
                   value={formData.kronologiPenangkapan}
                   onChange={(e) => setFormData({ ...formData, kronologiPenangkapan: e.target.value })}
                   placeholder="Tuliskan kronologi singkat saat petugas mengamankan tersangka beserta barang buktinya..."
-                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-blue-500 leading-relaxed disabled:opacity-80 disabled:cursor-not-allowed"
+                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-blue-500 leading-relaxed disabled:opacity-75 disabled:cursor-not-allowed"
                 />
               </div>
             </div>
@@ -416,11 +482,11 @@ export const AsesmenHukumView: React.FC<AsesmenHukumViewProps> = ({
                 <label className="text-slate-300 font-semibold mb-1.5 block">Total Berat Bersih Barang Bukti (Gram)</label>
                 <input
                   type="text"
-                  disabled={isReadOnly}
+                  disabled={isReadOnlyView}
                   value={formData.totalBeratBersihGram}
                   onChange={(e) => setFormData({ ...formData, totalBeratBersihGram: e.target.value })}
                   placeholder="0.42"
-                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-blue-500 font-bold font-mono text-sm disabled:opacity-80 disabled:cursor-not-allowed"
+                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-blue-500 font-bold font-mono text-sm disabled:opacity-75 disabled:cursor-not-allowed"
                 />
               </div>
 
@@ -428,20 +494,20 @@ export const AsesmenHukumView: React.FC<AsesmenHukumViewProps> = ({
                 <label className="text-slate-300 font-semibold mb-1.5 block">Rujukan Ambang Batas SEMA No. 04 Tahun 2010</label>
                 <input
                   type="text"
-                  disabled={isReadOnly}
+                  disabled={isReadOnlyView}
                   value={formData.ambangBatasSema}
                   onChange={(e) => setFormData({ ...formData, ambangBatasSema: e.target.value })}
-                  className="w-full bg-[#050e1c] border border-[#1b3459] text-slate-300 p-2.5 rounded-xl outline-none disabled:opacity-80 disabled:cursor-not-allowed"
+                  className="w-full bg-[#050e1c] border border-[#1b3459] text-slate-300 p-2.5 rounded-xl outline-none disabled:opacity-75 disabled:cursor-not-allowed"
                 />
               </div>
 
               <div className="md:col-span-3">
                 <label className="text-slate-300 font-semibold mb-1.5 block">Status Kesesuaian Gramatur Konsumsi 1 Hari</label>
                 <select
-                  disabled={isReadOnly}
+                  disabled={isReadOnlyView}
                   value={formData.kesesuaianSema}
                   onChange={(e) => setFormData({ ...formData, kesesuaianSema: e.target.value })}
-                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-blue-500 cursor-pointer font-bold text-emerald-400 disabled:opacity-80 disabled:cursor-not-allowed"
+                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-blue-500 cursor-pointer font-bold text-emerald-400 disabled:opacity-75 disabled:cursor-not-allowed"
                 >
                   <option value="Memenuhi Batas Gramatur SEMA 04/2010 (Pemakaian 1 Hari)">Memenuhi Batas Gramatur SEMA 04/2010 (Pemakaian 1 Hari Konsumsi Pribadi)</option>
                   <option value="Melebihi Batas Gramatur SEMA 04/2010 (Indikasi Stok / Penjualan)">Melebihi Batas Gramatur SEMA 04/2010 (Indikasi Stok / Penjualan)</option>
@@ -453,11 +519,11 @@ export const AsesmenHukumView: React.FC<AsesmenHukumViewProps> = ({
                 <label className="text-slate-300 font-semibold mb-1.5 block">Analisis &amp; Pertimbangan Yuridis Barang Bukti</label>
                 <textarea
                   rows={3}
-                  disabled={isReadOnly}
+                  disabled={isReadOnlyView}
                   value={formData.analisisBarangBukti}
                   onChange={(e) => setFormData({ ...formData, analisisBarangBukti: e.target.value })}
                   placeholder="Uraikan evaluasi yuridis terkait barang bukti yang disita penyidik..."
-                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-blue-500 leading-relaxed disabled:opacity-80 disabled:cursor-not-allowed"
+                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-blue-500 leading-relaxed disabled:opacity-75 disabled:cursor-not-allowed"
                 />
               </div>
             </div>
@@ -494,10 +560,10 @@ export const AsesmenHukumView: React.FC<AsesmenHukumViewProps> = ({
               <div>
                 <label className="text-slate-300 font-semibold mb-1.5 block">Kualifikasi Tipologi Peran Terperiksa</label>
                 <select
-                  disabled={isReadOnly}
+                  disabled={isReadOnlyView}
                   value={formData.analisisPeran}
                   onChange={(e: any) => setFormData({ ...formData, analisisPeran: e.target.value })}
-                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-3 rounded-xl outline-none focus:border-blue-500 cursor-pointer font-bold text-sm text-[#d4af37] disabled:opacity-80 disabled:cursor-not-allowed"
+                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-3 rounded-xl outline-none focus:border-blue-500 cursor-pointer font-bold text-sm text-[#d4af37] disabled:opacity-75 disabled:cursor-not-allowed"
                 >
                   <option value="Penyalahguna Murni">Penyalah Guna Murni (Hanya untuk Diri Sendiri / Konsumsi Pribadi)</option>
                   <option value="Pecandu dengan Kepemilikan Terbatas">Pecandu dengan Kepemilikan Terbatas (Patungan / Membeli Bersama)</option>
@@ -516,7 +582,7 @@ export const AsesmenHukumView: React.FC<AsesmenHukumViewProps> = ({
                       key={fakta.id}
                       onClick={() => toggleFakta(fakta.id)}
                       className={`p-3 rounded-xl border flex items-center space-x-3 transition-all ${
-                        isReadOnly ? 'cursor-default' : 'cursor-pointer'
+                        isReadOnlyView ? 'cursor-default' : 'cursor-pointer'
                       } ${
                         fakta.checked
                           ? 'bg-blue-950/40 border-blue-500/60 text-white'
@@ -525,7 +591,7 @@ export const AsesmenHukumView: React.FC<AsesmenHukumViewProps> = ({
                     >
                       <input
                         type="checkbox"
-                        disabled={isReadOnly}
+                        disabled={isReadOnlyView}
                         checked={fakta.checked}
                         onChange={() => toggleFakta(fakta.id)}
                         className="w-4 h-4 accent-blue-600 rounded shrink-0 disabled:cursor-not-allowed"
@@ -540,11 +606,11 @@ export const AsesmenHukumView: React.FC<AsesmenHukumViewProps> = ({
                 <label className="text-slate-300 font-semibold mb-1.5 block">Argumentasi Yuridis Kualifikasi Peran</label>
                 <textarea
                   rows={3}
-                  disabled={isReadOnly}
+                  disabled={isReadOnlyView}
                   value={formData.argumentasiPeran}
                   onChange={(e) => setFormData({ ...formData, argumentasiPeran: e.target.value })}
                   placeholder="Uraikan alasan mengapa tersangka dikualifikasikan pada peran tersebut..."
-                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-blue-500 leading-relaxed disabled:opacity-80 disabled:cursor-not-allowed"
+                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-blue-500 leading-relaxed disabled:opacity-75 disabled:cursor-not-allowed"
                 />
               </div>
 
@@ -552,11 +618,11 @@ export const AsesmenHukumView: React.FC<AsesmenHukumViewProps> = ({
                 <label className="text-slate-300 font-semibold mb-1.5 block">Catatan Fakta yang Belum Cukup Bukti / Masih Ditelusuri</label>
                 <input
                   type="text"
-                  disabled={isReadOnly}
+                  disabled={isReadOnlyView}
                   value={formData.catatanBelumTerverifikasi}
                   onChange={(e) => setFormData({ ...formData, catatanBelumTerverifikasi: e.target.value })}
                   placeholder="Contoh: Pemasok narkotika (DPO) masih dalam penelusuran penyidik..."
-                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-blue-500 disabled:opacity-80 disabled:cursor-not-allowed"
+                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-blue-500 disabled:opacity-75 disabled:cursor-not-allowed"
                 />
               </div>
             </div>
@@ -593,10 +659,10 @@ export const AsesmenHukumView: React.FC<AsesmenHukumViewProps> = ({
               <div>
                 <label className="text-slate-300 font-semibold mb-1.5 block">Status Riwayat Residivis Pidana</label>
                 <select
-                  disabled={isReadOnly}
+                  disabled={isReadOnlyView}
                   value={formData.pernahDitangkap ? 'ya' : 'tidak'}
                   onChange={(e) => setFormData({ ...formData, pernahDitangkap: e.target.value === 'ya' })}
-                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-blue-500 cursor-pointer disabled:opacity-80 disabled:cursor-not-allowed"
+                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-blue-500 cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed"
                 >
                   <option value="tidak">Belum Pernah Ditangkap / Bukan Residivis</option>
                   <option value="ya">Pernah Ditangkap / Residivis</option>
@@ -606,10 +672,10 @@ export const AsesmenHukumView: React.FC<AsesmenHukumViewProps> = ({
               <div>
                 <label className="text-slate-300 font-semibold mb-1.5 block">Keterkaitan dengan Jaringan Sindikat Narkotika</label>
                 <select
-                  disabled={isReadOnly}
+                  disabled={isReadOnlyView}
                   value={formData.keterkaitanSindikat}
                   onChange={(e) => setFormData({ ...formData, keterkaitanSindikat: e.target.value })}
-                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-blue-500 cursor-pointer disabled:opacity-80 disabled:cursor-not-allowed"
+                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-blue-500 cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed"
                 >
                   <option value="Tidak terafiliasi dengan jaringan pengedar terorganisir (Konsumen akhir terputus)">Tidak Terafiliasi Sindikat (Konsumen Terputus)</option>
                   <option value="Terindikasi sebagai perantara / kurir jaringan pengedar lokal">Terindikasi Perantara / Kurir Lokal</option>
@@ -621,11 +687,11 @@ export const AsesmenHukumView: React.FC<AsesmenHukumViewProps> = ({
                 <label className="text-slate-300 font-semibold mb-1.5 block">Keterangan Riwayat Perkara Lalu (Database Kriminal)</label>
                 <input
                   type="text"
-                  disabled={isReadOnly}
+                  disabled={isReadOnlyView}
                   value={formData.keteranganPerkaraLalu}
                   onChange={(e) => setFormData({ ...formData, keteranganPerkaraLalu: e.target.value })}
                   placeholder="Tidak terdaftar dalam database residivis perkara narkotika / SKCK Bersih..."
-                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-blue-500 disabled:opacity-80 disabled:cursor-not-allowed"
+                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-blue-500 disabled:opacity-75 disabled:cursor-not-allowed"
                 />
               </div>
 
@@ -633,11 +699,11 @@ export const AsesmenHukumView: React.FC<AsesmenHukumViewProps> = ({
                 <label className="text-slate-300 font-semibold mb-1.5 block">Pola Transaksi &amp; Sumber Perolehan Narkotika</label>
                 <textarea
                   rows={3}
-                  disabled={isReadOnly}
+                  disabled={isReadOnlyView}
                   value={formData.sumberPerolehan}
                   onChange={(e) => setFormData({ ...formData, sumberPerolehan: e.target.value })}
                   placeholder="Uraikan bagaimana tersangka mendapatkan narkotika (metode tempel, beli tunai, transfer, dll)..."
-                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-blue-500 leading-relaxed disabled:opacity-80 disabled:cursor-not-allowed"
+                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-blue-500 leading-relaxed disabled:opacity-75 disabled:cursor-not-allowed"
                 />
               </div>
             </div>
@@ -674,10 +740,10 @@ export const AsesmenHukumView: React.FC<AsesmenHukumViewProps> = ({
               <div>
                 <label className="text-slate-300 font-semibold mb-1.5 block">Rekomendasi Yuridis Tindak Lanjut Perkara</label>
                 <select
-                  disabled={isReadOnly}
+                  disabled={isReadOnlyView}
                   value={formData.rekomendasiHukum}
                   onChange={(e: any) => setFormData({ ...formData, rekomendasiHukum: e.target.value })}
-                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-3 rounded-xl outline-none focus:border-blue-500 cursor-pointer font-bold text-sm text-emerald-400 disabled:opacity-80 disabled:cursor-not-allowed"
+                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-3 rounded-xl outline-none focus:border-blue-500 cursor-pointer font-bold text-sm text-emerald-400 disabled:opacity-75 disabled:cursor-not-allowed"
                 >
                   <option value="Proses Hukum Dilanjutkan dengan Rehabilitasi">Proses Hukum Dilanjutkan dengan Penempatan Rehabilitasi (Pasal 127)</option>
                   <option value="Penerapan Keadilan Restoratif / Diversi">Penerapan Keadilan Restoratif (Restorative Justice / RJ Jaksa)</option>
@@ -690,11 +756,11 @@ export const AsesmenHukumView: React.FC<AsesmenHukumViewProps> = ({
                 <label className="text-slate-300 font-semibold mb-1.5 block">Kesimpulan &amp; Pertimbangan Yuridis Lengkap</label>
                 <textarea
                   rows={4}
-                  disabled={isReadOnly}
+                  disabled={isReadOnlyView}
                   value={formData.kesimpulanHukum}
                   onChange={(e) => setFormData({ ...formData, kesimpulanHukum: e.target.value })}
                   placeholder="Uraikan dasar pertimbangan hukum, rujukan pasal UU 35/2009, SEMA 04/2010, dan Pedoman Kejaksaan No. 18/2021..."
-                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-blue-500 leading-relaxed disabled:opacity-80 disabled:cursor-not-allowed"
+                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-blue-500 leading-relaxed disabled:opacity-75 disabled:cursor-not-allowed"
                 />
               </div>
 
@@ -702,11 +768,11 @@ export const AsesmenHukumView: React.FC<AsesmenHukumViewProps> = ({
                 <label className="text-slate-300 font-semibold mb-1.5 block">Catatan Klarifikasi Tambahan untuk Ketua TAT &amp; Jaksa</label>
                 <input
                   type="text"
-                  disabled={isReadOnly}
+                  disabled={isReadOnlyView}
                   value={formData.catatanKlarifikasi}
                   onChange={(e) => setFormData({ ...formData, catatanKlarifikasi: e.target.value })}
                   placeholder="Catatan tambahan saat pembahasan Sidang Pleno TAT..."
-                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-blue-500 disabled:opacity-80 disabled:cursor-not-allowed"
+                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-blue-500 disabled:opacity-75 disabled:cursor-not-allowed"
                 />
               </div>
             </div>
@@ -764,15 +830,24 @@ export const AsesmenHukumView: React.FC<AsesmenHukumViewProps> = ({
             </div>
 
             {/* Actions */}
-            {isReadOnly ? (
-              <div className="pt-2 bg-[#050e1c] border border-[#1b3459] rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
-                <div className="flex items-center space-x-2.5 text-slate-300">
-                  <CheckCircle2 className="w-4 h-4 text-blue-400 shrink-0" />
-                  <span>Berkas telaah hukum ini telah difinalisasi dan berstatus <strong>ARSIP RIWAYAT (READ-ONLY)</strong>.</span>
+            {isReadOnlyView ? (
+              <div className="bg-blue-950/40 border border-blue-500/40 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div className="flex items-center space-x-3">
+                  <CheckCircle2 className="w-5 h-5 text-blue-400 shrink-0" />
+                  <div>
+                    <h4 className="text-xs font-bold text-white">Asesmen Hukum Telah Difinalisasi</h4>
+                    <p className="text-[11px] text-blue-300/80">
+                      Berkas telaah yuridis ini telah selesai dan tersimpan di Riwayat Asesmen Hukum (Siap Pleno TAT).
+                    </p>
+                  </div>
                 </div>
-                <span className="text-[11px] px-3 py-1 rounded-full bg-blue-950/70 text-blue-300 border border-blue-500/40 font-mono font-semibold">
-                  Disahkan: {selectedCase.asesmenHukum?.terakhirDiperbarui || selectedCase.asesmenHukum?.tanggalTelaah || 'Terkonfirmasi'}
-                </span>
+                <button
+                  type="button"
+                  onClick={handleCloseCase}
+                  className="px-4 py-2 bg-blue-600/30 hover:bg-blue-600/50 text-blue-200 border border-blue-500/40 rounded-xl text-xs font-bold transition-colors cursor-pointer shrink-0"
+                >
+                  Kembali ke Daftar
+                </button>
               </div>
             ) : (
               <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3">
@@ -869,8 +944,8 @@ export const AsesmenHukumView: React.FC<AsesmenHukumViewProps> = ({
           </div>
         ) : (
           filteredCases.map(item => {
-            const hasHukum = !!item.asesmenHukum && item.asesmenHukum.status === 'FINAL';
-            const isDraft = item.asesmenHukum && item.asesmenHukum.status === 'DRAFT';
+            const hasHukum = (item.asesmenHukum && item.asesmenHukum.status === 'FINAL') || item.legalStatus === 'FINAL' || isReadOnly;
+            const isDraft = !hasHukum && item.asesmenHukum && item.asesmenHukum.status === 'DRAFT';
             const jadwalSesi = item.asesmenHukum?.tanggalTelaah || `${item.tanggalPengajuan} • 09:30 WITA`;
             const bbSummary = item.perkara.barangBuktiList.map(b => `${b.jenisZat} ${b.beratBersihGram}g`).join(', ') || 'Tanpa BB';
 
@@ -893,11 +968,13 @@ export const AsesmenHukumView: React.FC<AsesmenHukumViewProps> = ({
                   </div>
 
                   <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border self-start sm:self-auto shrink-0 ${
-                    isReadOnly || hasHukum
-                      ? 'bg-blue-950/50 text-blue-300 border-blue-600/40'
-                      : 'bg-emerald-950/50 text-emerald-300 border-emerald-600/40'
+                    hasHukum || isReadOnly
+                      ? 'bg-blue-950/60 text-blue-300 border-blue-600/40'
+                      : isDraft
+                      ? 'bg-amber-950/60 text-amber-300 border-amber-600/40'
+                      : 'bg-emerald-950/60 text-emerald-300 border-emerald-600/40'
                   }`}>
-                    {isReadOnly || hasHukum ? 'Selesai' : 'Aktif'}
+                    {hasHukum || isReadOnly ? 'Selesai (Final)' : isDraft ? 'Draf Disimpan' : 'Aktif (Belum Ditelaah)'}
                   </span>
                 </div>
 

@@ -131,7 +131,7 @@ export const PengawasanPascaTatSection: React.FC<PengawasanPascaTatSectionProps>
                     aksi: 'Aktivasi Pengawasan Klien Pasca TAT',
                     rincian: `Program pengawasan diaktifkan dengan modalitas ${initialPengawasan.modalitasLayanan}`
                   },
-                  ...permohonan.auditLogs
+                  ...(Array.isArray(permohonan.auditLogs) ? permohonan.auditLogs : [])
                 ]
               };
               onUpdatePermohonan(updated);
@@ -195,7 +195,7 @@ export const PengawasanPascaTatSection: React.FC<PengawasanPascaTatSectionProps>
           aksi: 'Pencatatan Jurnal Pengawasan Klien',
           rincian: `${jurnalKegiatan} (${jurnalKehadiran}): ${jurnalCatatan.slice(0, 60)}...`
         },
-        ...permohonan.auditLogs
+        ...(Array.isArray(permohonan.auditLogs) ? permohonan.auditLogs : [])
       ]
     };
 
@@ -238,7 +238,7 @@ export const PengawasanPascaTatSection: React.FC<PengawasanPascaTatSectionProps>
           aksi: 'Input Hasil Tes Urin Berkala Pasca TAT',
           rincian: `Uji ke-${newUrin.tahapKe} (${urinJenis}): Hasil ${urinHasil}`
         },
-        ...permohonan.auditLogs
+        ...(Array.isArray(permohonan.auditLogs) ? permohonan.auditLogs : [])
       ]
     };
 
@@ -278,7 +278,7 @@ export const PengawasanPascaTatSection: React.FC<PengawasanPascaTatSectionProps>
           aksi: `Penerbitan ${spTingkat}`,
           rincian: `${newSp.nomorSp}: ${spAlasan}`
         },
-        ...permohonan.auditLogs
+        ...(Array.isArray(permohonan.auditLogs) ? permohonan.auditLogs : [])
       ]
     };
 
@@ -313,7 +313,7 @@ export const PengawasanPascaTatSection: React.FC<PengawasanPascaTatSectionProps>
           aksi: 'Penerbitan Surat Keterangan Selesai Program (SKSP)',
           rincian: `Program pengawasan pasca TAT tuntas dengan predikat ${skspPredikat}`
         },
-        ...permohonan.auditLogs
+        ...(Array.isArray(permohonan.auditLogs) ? permohonan.auditLogs : [])
       ]
     };
 

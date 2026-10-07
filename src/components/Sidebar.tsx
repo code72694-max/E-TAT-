@@ -107,10 +107,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
         return {
           items: [
             { id: 'beranda', label: 'Dashboard', icon: <LayoutDashboard className="w-4 h-4" /> },
-            { id: 'permohonan', label: 'Permohonan Asesmen', icon: <FileSpreadsheet className="w-4 h-4" />, badge: badgeCounts.perluPerbaikan || undefined },
+            { id: 'permohonan', label: 'Permohonan Masuk', icon: <FileSpreadsheet className="w-4 h-4" />, badge: badgeCounts.perluPerbaikan || undefined },
+            { id: 'asesmen_aktif', label: 'Asesmen Aktif', icon: <Zap className="w-4 h-4" /> },
             { id: 'penugasan', label: 'Jadwal & Sesi', icon: <CalendarCheck className="w-4 h-4" /> },
             { id: 'dokumen', label: 'Surat Rekomendasi', icon: <FileSignature className="w-4 h-4" /> },
             { id: 'tindak_lanjut', label: 'Tindak Lanjut', icon: <Share2 className="w-4 h-4" /> },
+            { id: 'riwayat', label: 'Riwayat Permohonan', icon: <History className="w-4 h-4" /> },
             { id: 'about', label: 'Bantuan & SOP', icon: <Info className="w-4 h-4" /> }
           ],
           showCreateButton: true,
@@ -127,6 +129,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             { id: 'asesmen_aktif', label: 'Asesmen Aktif', icon: <Zap className="w-4 h-4" /> },
             { id: 'pleno', label: 'Pembahasan (Pleno)', icon: <Users className="w-4 h-4" />, badge: badgeCounts.siapPleno || undefined },
             { id: 'tindak_lanjut', label: 'Tindak Lanjut', icon: <Share2 className="w-4 h-4" />, badge: badgeCounts.tindakLanjutTerhambat || undefined },
+            { id: 'riwayat', label: 'Riwayat & Arsip', icon: <History className="w-4 h-4" /> },
             { id: 'verifikasi_akun', label: 'Verifikasi Akun', icon: <ShieldCheck className="w-4 h-4" />, badge: badgeCounts.akunPending || undefined },
             { id: 'monitoring', label: 'Laporan & Monitoring', icon: <BarChart3 className="w-4 h-4" /> },
             { id: 'about', label: 'Bantuan & SOP', icon: <Info className="w-4 h-4" /> }
@@ -142,9 +145,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
           items: [
             { id: 'beranda', label: 'Dashboard', icon: <LayoutDashboard className="w-4 h-4" /> },
             { id: 'medis', label: 'Asesmen Medis', icon: <Stethoscope className="w-4 h-4" /> },
-            { id: 'tindak_lanjut', label: 'Tindak Lanjut & Kontrol Rehab', icon: <Share2 className="w-4 h-4" />, badge: badgeCounts.tindakLanjutTerhambat || undefined },
-            { id: 'pleno', label: 'Pembahasan (Pleno)', icon: <Users className="w-4 h-4" />, badge: badgeCounts.siapPleno || undefined },
             { id: 'riwayat_medis', label: 'Riwayat Asesmen Medis', icon: <History className="w-4 h-4" /> },
+            { id: 'pleno', label: 'Pembahasan (Pleno)', icon: <Users className="w-4 h-4" />, badge: badgeCounts.siapPleno || undefined },
+            { id: 'tindak_lanjut', label: 'Tindak Lanjut & Kontrol Rehab', icon: <Share2 className="w-4 h-4" />, badge: badgeCounts.tindakLanjutTerhambat || undefined },
             { id: 'about', label: 'Bantuan & SOP', icon: <Info className="w-4 h-4" /> }
           ],
           showCreateButton: false,
@@ -158,8 +161,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
           items: [
             { id: 'beranda', label: 'Dashboard', icon: <LayoutDashboard className="w-4 h-4" /> },
             { id: 'hukum', label: 'Asesmen Hukum', icon: <Scale className="w-4 h-4" /> },
-            { id: 'pleno', label: 'Pembahasan (Pleno)', icon: <Users className="w-4 h-4" />, badge: badgeCounts.siapPleno || undefined },
             { id: 'riwayat_hukum', label: 'Riwayat Asesmen Hukum', icon: <History className="w-4 h-4" /> },
+            { id: 'pleno', label: 'Pembahasan (Pleno)', icon: <Users className="w-4 h-4" />, badge: badgeCounts.siapPleno || undefined },
             { id: 'about', label: 'Bantuan & SOP', icon: <Info className="w-4 h-4" /> }
           ],
           showCreateButton: false,
@@ -189,7 +192,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     }
   };
 
-  const [isTindakLanjutDropdownOpen, setIsTindakLanjutDropdownOpen] = React.useState(true);
+  const [isTindakLanjutDropdownOpen, setIsTindakLanjutDropdownOpen] = React.useState(false);
 
   const sidebarContent = (
     <aside className="w-full md:w-64 bg-[#091426] text-slate-200 flex flex-col shrink-0 border-r border-[#1a2e4c] select-none h-full shadow-md">
@@ -298,17 +301,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 {/* Sub-menu Dropdown List */}
                 {isTindakLanjutDropdownOpen && (
                   <div className="ml-5 pl-2.5 border-l border-[#1e3a5f] space-y-1.5 pt-1 pb-1">
-                    <button
-                      onClick={() => handleItemClick('tindak_lanjut_input_jadwal')}
-                      className={`w-full text-left px-2.5 py-1.5 text-[11px] font-bold rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
-                        currentTab === 'tindak_lanjut_input_jadwal'
-                          ? 'bg-blue-600 text-white shadow-lg border border-blue-400'
-                          : 'bg-blue-950/60 text-[#38bdf8] hover:bg-blue-900/60 border border-blue-800/60'
-                      }`}
-                    >
-                      <Plus className="w-3.5 h-3.5 text-cyan-300" />
-                      <span>Input Jadwal Kontrol & Lapor</span>
-                    </button>
+                    {userRole !== 'MEDIS' && (
+                      <button
+                        onClick={() => handleItemClick('tindak_lanjut_input_jadwal')}
+                        className={`w-full text-left px-2.5 py-1.5 text-[11px] font-medium rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer ${
+                          currentTab === 'tindak_lanjut_input_jadwal'
+                            ? 'bg-[#142642] text-[#38bdf8] font-bold border border-[#234475]'
+                            : 'text-slate-300 hover:text-white hover:bg-[#142642]/60'
+                        }`}
+                      >
+                        <Plus className="w-3.5 h-3.5 text-blue-400" />
+                        <span>Input Jadwal Kontrol & Lapor</span>
+                      </button>
+                    )}
                     <button
                       onClick={() => handleItemClick('tindak_lanjut_jadwal')}
                       className={`w-full text-left px-2.5 py-1.5 text-[11px] font-medium rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer ${

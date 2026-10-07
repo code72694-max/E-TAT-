@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { PermohonanAsesmen, UserProfile, DokumenPersyaratan } from '../types';
 import { sendPengajuanEmailNotification } from '../services/emailService';
 import { permohonanApi } from '../services/api';
+import { uploadToCloudinary } from '../services/cloudinary';
 import {
   X,
   User,
@@ -140,6 +141,14 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
         setNewFotoBb(reader.result as string);
       };
       reader.readAsDataURL(file);
+
+      uploadToCloudinary(file, 'barang-bukti')
+        .then(res => {
+          if (res?.url) setNewFotoBb(res.url);
+        })
+        .catch(err => {
+          console.warn('Cloudinary BB upload fallback:', err);
+        });
     }
   };
 
@@ -151,6 +160,14 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
         setNewFotoLab(reader.result as string);
       };
       reader.readAsDataURL(file);
+
+      uploadToCloudinary(file, 'hasil-lab')
+        .then(res => {
+          if (res?.url) setNewFotoLab(res.url);
+        })
+        .catch(err => {
+          console.warn('Cloudinary Lab upload fallback:', err);
+        });
     }
   };
 

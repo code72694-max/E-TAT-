@@ -45,8 +45,29 @@ interface AsesmenAktifViewProps {
   onToggleDetail?: (open: boolean) => void;
 }
 
-const ACTIVE_STATUSES = ["ASSESSMENT_ACTIVE", "READY_FOR_CONFERENCE", "SCHEDULED", "APPROVED"];
-const ACTIVE_PROSES = ["asesmen_berlangsung", "penugasan_jadwal", "siap_pleno", "asesmen_berjalan"];
+const ACTIVE_STATUSES = [
+  "APPROVED",
+  "SCHEDULED",
+  "ASSESSMENT_ACTIVE",
+  "READY_FOR_CONFERENCE",
+  "CONFERENCE_HELD",
+  "CONFERENCE_CLARIFICATION_REQUIRED",
+  "OUTCOME_RECORDED_FOR_DRAFT",
+  "AWAITING_SIGNED_OUTPUTS",
+  "RESULTS_ISSUED"
+];
+
+const ACTIVE_PROSES = [
+  "penugasan_jadwal",
+  "asesmen_berlangsung",
+  "siap_pleno",
+  "pembahasan_pleno",
+  "pengesahan_rekomendasi",
+  "rekomendasi_terbit",
+  "selesai_tindak_lanjut",
+  "terverifikasi",
+  "asesmen_berjalan"
+];
 
 type StepStatus = "done" | "active" | "pending";
 
@@ -604,12 +625,24 @@ export const AsesmenAktifView: React.FC<AsesmenAktifViewProps> = ({
 
   const selectedActiveId = propSelectedActiveId !== undefined ? propSelectedActiveId : localSelectedActiveId;
 
+  const isPengajuRole = currentUser?.role?.toUpperCase() === 'PENGAJU';
+  const checkOwner = (p: PermohonanAsesmen) => {
+    if (!isPengajuRole) return true;
+    return (
+      p.pengajuId === currentUser.id ||
+      (p.pengajuNama && p.pengajuNama.toLowerCase().includes((currentUser.name || '').toLowerCase())) ||
+      (p.perkara?.namaPenyidik && p.perkara.namaPenyidik.toLowerCase().includes((currentUser.name || '').toLowerCase())) ||
+      (p.instansiPengaju && currentUser.agency && p.instansiPengaju.toLowerCase().includes(currentUser.agency.toLowerCase())) ||
+      (p.instansiPengaju && currentUser.instansi && p.instansiPengaju.toLowerCase().includes(currentUser.instansi.toLowerCase()))
+    );
+  };
+
   const activeList = useMemo(
     () =>
       permohonanList.filter(
-        p => ACTIVE_STATUSES.includes(p.applicationStatus ?? "") || ACTIVE_PROSES.includes(p.statusProsesUtama ?? "")
+        p => checkOwner(p) && (ACTIVE_STATUSES.includes(p.applicationStatus ?? "") || ACTIVE_PROSES.includes(p.statusProsesUtama ?? ""))
       ),
-    [permohonanList]
+    [permohonanList, currentUser]
   );
 
   const counts = useMemo(

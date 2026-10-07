@@ -404,7 +404,7 @@ export const InstrumenKriteriaPlasemenView: React.FC<Props> = ({
             : 'Simpan Draf Instrumen Kriteria Penempatan Klien (ASAM)',
           rincian: `Rekomendasi Level ${rekomendasiOtomatis}: ${LABEL_LEVEL_LAYANAN[rekomendasiOtomatis]}`,
         },
-        ...permohonan.auditLogs,
+        ...(Array.isArray(permohonan.auditLogs) ? permohonan.auditLogs : []),
       ],
     };
     onUpdatePermohonan(updated);
@@ -894,7 +894,7 @@ export const InstrumenKriteriaPlasemenView: React.FC<Props> = ({
                     aksi: 'Validasi Instrumen Kriteria Penempatan Klien (ASAM)',
                     rincian: `Instrumen divalidasi. Rekomendasi Level ${ikp.hasil.levelRekomendasiAkhir}: ${LABEL_LEVEL_LAYANAN[ikp.hasil.levelRekomendasiAkhir]}`,
                   },
-                  ...permohonan.auditLogs,
+                  ...(Array.isArray(permohonan.auditLogs) ? permohonan.auditLogs : []),
                 ],
               });
             }}

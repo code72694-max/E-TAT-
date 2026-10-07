@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { RegistrasiPengguna } from '../types';
 import { registrasiApi } from '../services/api';
+import { uploadToCloudinary } from '../services/cloudinary';
 import {
   ArrowLeft,
   UserPlus,
@@ -159,6 +160,19 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({
       }
     };
     fileReader.readAsDataURL(file);
+
+    // Upload to Cloudinary to obtain CDN secure URL
+    uploadToCloudinary(file, type)
+      .then(res => {
+        if (res?.url) {
+          if (type === 'ktp') setFotoKtpUrl(res.url);
+          else if (type === 'kta') setFotoKtaUrl(res.url);
+          else if (type === 'surat') setSuratPenunjukanUrl(res.url);
+        }
+      })
+      .catch(err => {
+        console.warn('Cloudinary upload fallback:', err);
+      });
   };
 
   const handleAutofillSample = () => {

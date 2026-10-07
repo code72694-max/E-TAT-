@@ -315,37 +315,33 @@ export const LacakBerkasPage: React.FC<LacakBerkasPageProps> = ({
       />
 
       {/* MAIN TRACKING PAGE CONTENT */}
-      <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 py-8 sm:py-12 space-y-8">
-        {/* Page Hero Header */}
-        <div className="text-center space-y-3">
-          <div className="inline-flex items-center space-x-2 px-3.5 py-1 rounded-full bg-[#0d1f38] border border-[#1b3459] text-[10px] font-bold text-[#D4AF37] uppercase tracking-wider">
-            <Search className="w-3 h-3 text-[#D4AF37]" />
-            <span>PORTAL PELACAKAN TRANSPARAN E-TAT</span>
-          </div>
-          <h1 className="text-2xl sm:text-4xl font-extrabold text-white tracking-wide font-['Cinzel',serif]">
-            Halaman Lacak Berkas Perkara TAT
+      <main className="flex-1 max-w-5xl w-full mx-auto px-3.5 sm:px-6 py-6 sm:py-10 space-y-6 sm:space-y-8">
+        {/* Page Hero Header - Roboto font */}
+        <div className="text-center space-y-2.5 sm:space-y-3">
+          <h1 className="text-xl sm:text-3xl md:text-4xl font-extrabold text-white tracking-tight font-['Roboto',sans-serif] leading-tight">
+            Lacak Berkas Perkara TAT
           </h1>
-          <p className="text-xs sm:text-sm text-slate-400 max-w-xl mx-auto leading-relaxed">
-            Pantau posisi berkas permohonan asesmen terpadu, tahapan verifikasi, asesmen medis/hukum, hingga penerbitan Berita Acara &amp; Rekomendasi Resmi.
+          <p className="text-xs sm:text-sm text-slate-400 max-w-xl mx-auto leading-relaxed px-2">
+            Pantau posisi berkas permohonan asesmen terpadu, tahapan verifikasi formil, pemeriksaan medis/hukum, hingga penerbitan Berita Acara &amp; Rekomendasi Resmi.
           </p>
         </div>
 
         {/* Search Bar Container */}
-        <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl p-6 shadow-2xl space-y-4">
-          <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-3">
+        <div className="bg-[#0b172a]/95 border border-[#1b3459] rounded-2xl p-4 sm:p-6 shadow-2xl backdrop-blur-md space-y-3.5 sm:space-y-4">
+          <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-2.5 sm:gap-3">
             <div className="relative flex-1">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                placeholder="Masukkan Nomor Permohonan (contoh: TAT-074) atau Nama Terperiksa..."
-                className="w-full bg-[#071326] text-white pl-10 pr-4 py-3 rounded-xl border border-[#1b3459] text-xs sm:text-sm focus:outline-none focus:border-[#D4AF37] placeholder-slate-500 font-mono transition-colors"
+                placeholder="Masukkan Nomor Permohonan (contoh: TAT-074) atau Nama..."
+                className="w-full bg-[#081224] focus:bg-[#0c1c34] text-white pl-10 pr-4 py-3 rounded-xl border border-[#1b3459] focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37]/50 text-xs sm:text-sm outline-none placeholder-slate-500 font-mono transition-all shadow-inner"
               />
             </div>
             <button
               type="submit"
-              className="bg-gradient-to-r from-[#144782] to-[#1c64b8] hover:from-[#175194] hover:to-[#2274d4] text-white font-bold text-xs px-6 py-3 rounded-xl border border-[#2d7ad6]/70 shadow-md flex items-center justify-center space-x-2 cursor-pointer transition-all shrink-0"
+              className="w-full sm:w-auto bg-gradient-to-r from-[#144782] to-[#1c64b8] hover:from-[#175194] hover:to-[#2274d4] text-white font-bold text-xs sm:text-sm px-6 py-3 rounded-xl border border-[#2d7ad6]/70 shadow-md flex items-center justify-center space-x-2 cursor-pointer transition-all shrink-0 active:scale-[0.98]"
             >
               <Search className="w-4 h-4 text-[#D4AF37]" />
               <span>Cari Status Berkas</span>
@@ -353,17 +349,17 @@ export const LacakBerkasPage: React.FC<LacakBerkasPageProps> = ({
           </form>
 
           {/* Quick Search Chips */}
-          <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-[#1b3459]/60 text-xs">
-            <span className="text-slate-400 text-[11px] font-semibold">Contoh Kasus Simulasi:</span>
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 pt-2.5 border-t border-[#1b3459]/60 text-xs">
+            <span className="text-slate-400 text-[11px] font-semibold">Simulasi:</span>
             {sampleNumbers.map(num => (
               <button
                 key={num}
                 type="button"
                 onClick={() => selectSample(num)}
-                className={`font-mono text-xs px-3 py-1 rounded-lg border transition-all cursor-pointer ${
+                className={`font-mono text-[11px] sm:text-xs px-2.5 sm:px-3 py-1 rounded-lg border transition-all cursor-pointer ${
                   searchQuery.includes(num)
-                    ? 'bg-[#1b3459] text-[#D4AF37] border-[#D4AF37]/60 font-bold'
-                    : 'bg-[#071326] text-slate-300 border-[#1b3459] hover:border-slate-400'
+                    ? 'bg-[#1b3459] text-[#D4AF37] border-[#D4AF37]/60 font-bold shadow-sm'
+                    : 'bg-[#081224] text-slate-300 border-[#1b3459] hover:border-slate-400'
                 }`}
               >
                 {num}
@@ -376,51 +372,51 @@ export const LacakBerkasPage: React.FC<LacakBerkasPageProps> = ({
         {hasSearched && (
           <div className="space-y-6 animate-in fade-in duration-300">
             {!searchedPermohonan ? (
-              <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl p-12 text-center text-slate-400 space-y-3">
+              <div className="bg-[#0b172a]/95 border border-[#1b3459] rounded-2xl p-8 sm:p-12 text-center text-slate-400 space-y-3 shadow-xl">
                 <AlertTriangle className="w-10 h-10 text-amber-400 mx-auto" />
-                <h3 className="text-base font-bold text-white">Berkas Perkara Tidak Ditemukan</h3>
-                <p className="text-xs text-slate-400 max-w-md mx-auto">
+                <h3 className="text-base font-bold text-white font-['Roboto',sans-serif]">Berkas Perkara Tidak Ditemukan</h3>
+                <p className="text-xs text-slate-400 max-w-md mx-auto leading-relaxed">
                   Nomor permohonan "<span className="font-mono text-[#D4AF37]">{searchQuery}</span>" belum terdaftar pada sistem E-TAT SIAP PULIH. Pastikan format nomor permohonan sudah sesuai.
                 </p>
               </div>
             ) : (
-              <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl p-6 space-y-6 shadow-2xl">
+              <div className="bg-[#0b172a]/95 border border-[#1b3459] rounded-2xl p-4 sm:p-6 space-y-5 sm:space-y-6 shadow-2xl backdrop-blur-md">
                 {/* Header Information Bar */}
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-4 border-b border-[#1b3459]">
-                  <div className="space-y-1">
-                    <div className="flex items-center space-x-2.5">
-                      <span className="text-base font-bold text-white font-mono">{searchedPermohonan.nomorPermohonan}</span>
-                      <span className="text-xs bg-[#071326] text-[#D4AF37] font-bold px-2.5 py-0.5 rounded-full border border-[#1b3459]">
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 sm:gap-4 pb-4 border-b border-[#1b3459]">
+                  <div className="space-y-1.5 min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="text-sm sm:text-base font-bold text-white font-mono">{searchedPermohonan.nomorPermohonan}</span>
+                      <span className="text-[10px] sm:text-xs bg-[#071326] text-[#D4AF37] font-bold px-2.5 py-0.5 rounded-full border border-[#1b3459] truncate max-w-full">
                         {searchedPermohonan.statusProsesUtama.replace(/_/g, ' ').toUpperCase()}
                       </span>
                     </div>
-                    <p className="text-xs text-slate-300">
-                      Terperiksa: <strong className="text-white">{searchedPermohonan.terperiksa.namaLengkap}</strong> • Instansi Pengaju: <span className="text-[#D4AF37]">{searchedPermohonan.instansiPengaju}</span>
+                    <p className="text-xs text-slate-300 leading-snug">
+                      Terperiksa: <strong className="text-white">{searchedPermohonan.terperiksa.namaLengkap}</strong> <span className="text-slate-500">•</span> Instansi: <span className="text-[#D4AF37]">{searchedPermohonan.instansiPengaju}</span>
                     </p>
                   </div>
 
-                  <div className="flex items-center space-x-3 text-xs">
-                    <div className="p-2.5 bg-[#071326] rounded-xl border border-[#1b3459] text-right">
-                      <span className="text-[10px] text-slate-400 block uppercase font-semibold">Tanggal Pengajuan</span>
-                      <span className="font-mono font-bold text-slate-200">{searchedPermohonan.tanggalPengajuan}</span>
+                  <div className="flex items-center space-x-2 text-xs self-start md:self-auto shrink-0">
+                    <div className="p-2 sm:p-2.5 bg-[#081224] rounded-xl border border-[#1b3459] text-left md:text-right">
+                      <span className="text-[10px] text-slate-400 block uppercase font-semibold">Tgl Pengajuan</span>
+                      <span className="font-mono font-bold text-slate-200 text-[11px] sm:text-xs">{searchedPermohonan.tanggalPengajuan}</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Progress Stepper Flow */}
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <h4 className="text-xs font-bold text-white uppercase tracking-wider flex items-center space-x-2">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                    <h4 className="text-xs font-bold text-white uppercase tracking-wider flex items-center space-x-2 font-['Roboto',sans-serif]">
                       <Clock className="w-4 h-4 text-[#D4AF37]" />
-                      <span>Perkembangan Posisi Berkas (Klik Langkah untuk Detail)</span>
+                      <span>Tahapan Proses Berkas Perkara</span>
                     </h4>
-                    <span className="text-[10px] text-[#D4AF37] font-semibold italic">
-                      💡 Klik pada kartu langkah untuk melihat detail centang &amp; progres
+                    <span className="text-[11px] text-[#D4AF37] font-medium">
+                      💡 Ketuk langkah untuk melihat rincian progres
                     </span>
                   </div>
 
-                  {/* 6 Clean Monochromatic Interactive Step Cards */}
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 pt-2">
+                  {/* 6 Clean Monochromatic Interactive Step Cards - Proportional Mobile Grid */}
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-3 pt-1">
                     {[
                       { step: 1, label: 'Registrasi', sub: 'Pendaftaran LP/BAP' },
                       { step: 2, label: 'Verifikasi', sub: 'Administrasi Berkas' },
@@ -435,18 +431,18 @@ export const LacakBerkasPage: React.FC<LacakBerkasPageProps> = ({
                           key={item.step}
                           type="button"
                           onClick={() => setSelectedStepModal(item.step)}
-                          className={`p-3.5 rounded-xl border text-left flex flex-col justify-between space-y-2 transition-all cursor-pointer relative group ${
+                          className={`p-3 sm:p-3.5 rounded-xl border text-left flex flex-col justify-between space-y-2 transition-all cursor-pointer relative group ${
                             st === 'completed'
                               ? 'bg-[#081224] border-[#1b3459] hover:border-slate-400 hover:bg-[#0d1e38]'
                               : st === 'current'
-                              ? 'bg-[#0f274a] border-[#D4AF37] hover:bg-[#143360]'
+                              ? 'bg-[#0f274a] border-[#D4AF37] hover:bg-[#143360] shadow-md shadow-[#D4AF37]/10'
                               : 'bg-[#050c18] border-[#1b3459]/60 text-slate-500 opacity-60 hover:opacity-100 hover:border-slate-400'
                           }`}
                         >
                           <div className="flex items-center justify-between text-[10px]">
-                            <span className="font-mono font-bold text-slate-400">Langkah {item.step}</span>
+                            <span className="font-mono font-bold text-slate-400">Step {item.step}</span>
                             {st === 'completed' ? (
-                              <span className="w-2 h-2 rounded-full bg-slate-300" />
+                              <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-sm" />
                             ) : st === 'current' ? (
                               <span className="w-2 h-2 rounded-full bg-[#D4AF37] animate-pulse" />
                             ) : (
@@ -455,15 +451,15 @@ export const LacakBerkasPage: React.FC<LacakBerkasPageProps> = ({
                           </div>
 
                           <div>
-                            <span className={`text-xs font-bold block ${st === 'current' ? 'text-[#D4AF37]' : 'text-white'}`}>
+                            <span className={`text-xs font-bold block font-['Roboto',sans-serif] ${st === 'current' ? 'text-[#D4AF37]' : 'text-white'}`}>
                               {item.label}
                             </span>
-                            <span className="text-[10px] block text-slate-400 mt-0.5">{item.sub}</span>
+                            <span className="text-[10px] block text-slate-400 mt-0.5 leading-tight">{item.sub}</span>
                           </div>
 
                           <div className="pt-2 border-t border-[#1b3459]/60 text-[10px] font-semibold flex items-center justify-between">
-                            <span className={st === 'completed' ? 'text-slate-300' : st === 'current' ? 'text-[#D4AF37]' : 'text-slate-500'}>
-                              {st === 'completed' ? '✓ Selesai' : st === 'current' ? '⚡ Berlangsung' : 'Menunggu'}
+                            <span className={st === 'completed' ? 'text-emerald-400' : st === 'current' ? 'text-[#D4AF37]' : 'text-slate-500'}>
+                              {st === 'completed' ? '✓ Selesai' : st === 'current' ? '⚡ Aktif' : 'Menunggu'}
                             </span>
                             <ChevronRight className="w-3 h-3 text-slate-400 group-hover:text-white transition-colors" />
                           </div>
@@ -480,9 +476,9 @@ export const LacakBerkasPage: React.FC<LacakBerkasPageProps> = ({
 
       {/* STEP DETAIL MODAL */}
       {selectedStepModal !== null && searchedPermohonan && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200">
           <div
-            className="bg-[#0b172a] border border-[#1b3459] w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200"
+            className="bg-[#0b172a] border border-[#1b3459] w-full max-w-xl sm:max-w-2xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[88vh] animate-in zoom-in-95 duration-200"
             onClick={e => e.stopPropagation()}
           >
             {(() => {
@@ -491,9 +487,9 @@ export const LacakBerkasPage: React.FC<LacakBerkasPageProps> = ({
               return (
                 <>
                   {/* Modal Header */}
-                  <div className="px-6 py-4 border-b border-[#1b3459] flex items-center justify-between bg-[#081224] shrink-0">
-                    <div className="flex items-center space-x-3">
-                      <div className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-sm shrink-0 border ${
+                  <div className="px-4 sm:px-6 py-3.5 sm:py-4 border-b border-[#1b3459] flex items-center justify-between bg-[#081224] shrink-0">
+                    <div className="flex items-center space-x-3 min-w-0">
+                      <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center font-bold text-xs sm:text-sm shrink-0 border ${
                         dt.status === 'completed'
                           ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
                           : dt.status === 'current'
@@ -502,23 +498,23 @@ export const LacakBerkasPage: React.FC<LacakBerkasPageProps> = ({
                       }`}>
                         {selectedStepModal}
                       </div>
-                      <div>
-                        <h3 className="text-base font-bold text-white font-['Cinzel',serif]">{dt.title}</h3>
-                        <p className="text-xs text-slate-400 mt-0.5">{dt.subtitle}</p>
+                      <div className="min-w-0">
+                        <h3 className="text-sm sm:text-base font-bold text-white font-['Roboto',sans-serif] truncate">{dt.title}</h3>
+                        <p className="text-[11px] sm:text-xs text-slate-400 mt-0.5 truncate">{dt.subtitle}</p>
                       </div>
                     </div>
                     <button
                       type="button"
                       onClick={() => setSelectedStepModal(null)}
-                      className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-[#133863] transition-colors cursor-pointer"
+                      className="p-1.5 sm:p-2 rounded-xl text-slate-400 hover:text-white hover:bg-[#133863] transition-colors cursor-pointer shrink-0 ml-2"
                     >
                       <X className="w-5 h-5" />
                     </button>
                   </div>
 
                   {/* Modal Body */}
-                  <div className="p-6 overflow-y-auto space-y-4 text-slate-200 custom-scrollbar">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs bg-[#071325] p-3.5 rounded-xl border border-[#1b3459]">
+                  <div className="p-4 sm:p-6 overflow-y-auto space-y-4 text-slate-200 custom-scrollbar">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 text-xs bg-[#081224] p-3 sm:p-3.5 rounded-xl border border-[#1b3459]">
                       <div>
                         <span className="text-slate-400 text-[10px] uppercase font-semibold block">Penanggung Jawab:</span>
                         <span className="text-slate-200 font-semibold">{dt.pj}</span>
@@ -530,7 +526,7 @@ export const LacakBerkasPage: React.FC<LacakBerkasPageProps> = ({
                     </div>
 
                     <div className="space-y-2">
-                      <span className="text-xs font-bold text-slate-300 block uppercase tracking-wider">
+                      <span className="text-xs font-bold text-slate-300 block uppercase tracking-wider font-['Roboto',sans-serif]">
                         Rincian Check-list Tahapan ({dt.items.filter(i => i.checked).length}/{dt.items.length} Selesai):
                       </span>
                       <div className="space-y-2">
@@ -540,21 +536,21 @@ export const LacakBerkasPage: React.FC<LacakBerkasPageProps> = ({
                             className={`p-3 rounded-xl border text-xs flex flex-col space-y-2 ${
                               item.checked
                                 ? 'bg-emerald-950/20 border-emerald-500/30 text-slate-200'
-                                : 'bg-[#071325] border-[#1b3459] text-slate-500'
+                                : 'bg-[#081224] border-[#1b3459] text-slate-500'
                             }`}
                           >
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center space-x-3">
+                            <div className="flex items-start sm:items-center justify-between gap-2">
+                              <div className="flex items-start sm:items-center space-x-2.5 min-w-0">
                                 {item.checked ? (
-                                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5 sm:mt-0" />
                                 ) : (
-                                  <Clock className="w-4 h-4 text-slate-600 shrink-0" />
+                                  <Clock className="w-4 h-4 text-slate-600 shrink-0 mt-0.5 sm:mt-0" />
                                 )}
-                                <span className={item.checked ? 'font-medium text-slate-200' : 'text-slate-500'}>
+                                <span className={`leading-snug ${item.checked ? 'font-medium text-slate-200' : 'text-slate-500'}`}>
                                   {item.label}
                                 </span>
                               </div>
-                              <span className={`text-[10px] font-semibold px-2 py-0.5 rounded ${
+                              <span className={`text-[10px] font-semibold px-2 py-0.5 rounded shrink-0 ${
                                 item.checked
                                   ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
                                   : 'bg-slate-800 text-slate-500'
@@ -563,7 +559,7 @@ export const LacakBerkasPage: React.FC<LacakBerkasPageProps> = ({
                               </span>
                             </div>
                             {item.details && (
-                              <div className="pl-7 pt-1">
+                              <div className="pl-6 pt-1">
                                 {item.details}
                               </div>
                             )}
@@ -574,11 +570,11 @@ export const LacakBerkasPage: React.FC<LacakBerkasPageProps> = ({
                   </div>
 
                   {/* Modal Footer */}
-                  <div className="px-6 py-3.5 border-t border-[#1b3459] bg-[#081224] flex items-center justify-between shrink-0">
-                    <span className="text-xs text-slate-400 font-mono">
+                  <div className="px-4 sm:px-6 py-3 border-t border-[#1b3459] bg-[#081224] flex flex-col sm:flex-row items-center justify-between gap-2.5 shrink-0">
+                    <span className="text-[11px] text-slate-400 font-mono text-center sm:text-left">
                       Sistem Pelacakan Transparan E-TAT POLRI/BNN
                     </span>
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-2 w-full sm:w-auto justify-end">
                       {(selectedStepModal === 4 || selectedStepModal === 5 || selectedStepModal === 6) && isBaReady && (
                         <button
                           type="button"
@@ -586,7 +582,7 @@ export const LacakBerkasPage: React.FC<LacakBerkasPageProps> = ({
                             setSelectedStepModal(null);
                             setShowBAModal(true);
                           }}
-                          className="bg-[#D4AF37] hover:bg-[#e5bd38] text-slate-950 font-bold text-xs px-4 py-2 rounded-xl transition-all cursor-pointer flex items-center space-x-1.5"
+                          className="flex-1 sm:flex-none bg-[#D4AF37] hover:bg-[#e5bd38] text-slate-950 font-bold text-xs px-3.5 py-2 rounded-xl transition-all cursor-pointer flex items-center justify-center space-x-1.5"
                         >
                           <Printer className="w-4 h-4" />
                           <span>Cetak Berita Acara</span>
@@ -595,7 +591,7 @@ export const LacakBerkasPage: React.FC<LacakBerkasPageProps> = ({
                       <button
                         type="button"
                         onClick={() => setSelectedStepModal(null)}
-                        className="bg-[#133863] hover:bg-[#1a4a82] text-white font-semibold text-xs px-4 py-2 rounded-xl transition-all cursor-pointer border border-[#235594]"
+                        className="flex-1 sm:flex-none bg-[#133863] hover:bg-[#1a4a82] text-white font-semibold text-xs px-4 py-2 rounded-xl transition-all cursor-pointer border border-[#235594] text-center"
                       >
                         Tutup
                       </button>
@@ -617,9 +613,9 @@ export const LacakBerkasPage: React.FC<LacakBerkasPageProps> = ({
       )}
 
       {/* Clean Footer */}
-      <footer className="bg-[#071325] border-t border-[#1b3459] py-6 text-center text-xs text-slate-400 space-y-1">
+      <footer className="bg-[#071325] border-t border-[#1b3459] py-5 sm:py-6 text-center text-xs text-slate-400 space-y-1 px-4">
         <p>© 2026 Teknis Pelaksanaan Asesmen Terpadu (TAT) BNNP Kalimantan Timur. All rights reserved.</p>
-        <p className="text-[10px] text-slate-400">Sistem Integrasi Asesmen dan Pemantauan Pemulihan.</p>
+        <p className="text-[10px] text-slate-500">Sistem Integrasi Asesmen dan Pemantauan Pemulihan.</p>
       </footer>
     </div>
   );

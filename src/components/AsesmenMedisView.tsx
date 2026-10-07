@@ -152,7 +152,23 @@ export const AsesmenMedisView: React.FC<AsesmenMedisViewProps> = ({
     }
   };
 
+  const isCompleted = 
+    selectedCase?.asesmenMedis?.status === 'FINAL' || 
+    selectedCase?.medicalStatus === 'FINAL' ||
+    selectedCase?.applicationStatus === 'READY_FOR_CONFERENCE' ||
+    selectedCase?.applicationStatus === 'CONFERENCE_HELD' ||
+    selectedCase?.applicationStatus === 'OUTCOME_RECORDED_FOR_DRAFT' ||
+    selectedCase?.applicationStatus === 'AWAITING_SIGNED_OUTPUTS' ||
+    selectedCase?.applicationStatus === 'RESULTS_ISSUED' ||
+    selectedCase?.statusProsesUtama === 'siap_pleno' ||
+    selectedCase?.statusProsesUtama === 'pengesahan_rekomendasi' ||
+    selectedCase?.statusProsesUtama === 'rekomendasi_terbit' ||
+    selectedCase?.statusProsesUtama === 'selesai_tindak_lanjut';
+
+  const isReadOnlyView = isReadOnly || isCompleted;
+
   const toggleUrinResult = (index: number) => {
+    if (isReadOnlyView) return;
     setUrinTests(prev => prev.map((item, idx) => {
       if (idx === index) {
         return { ...item, hasil: item.hasil === 'Positif' ? 'Negatif' : 'Positif' };
@@ -212,8 +228,9 @@ export const AsesmenMedisView: React.FC<AsesmenMedisViewProps> = ({
       }
     }
 
+    const existingLogs = Array.isArray(updated.auditLogs) ? updated.auditLogs : [];
     updated.auditLogs = [
-      ...updated.auditLogs,
+      ...existingLogs,
       {
         id: `log-${Date.now()}`,
         timestamp: now,
@@ -301,11 +318,24 @@ export const AsesmenMedisView: React.FC<AsesmenMedisViewProps> = ({
     
     if (!matchesSearch) return false;
 
+    const isMedisBeres = 
+      item.asesmenMedis?.status === 'FINAL' || 
+      item.medicalStatus === 'FINAL' ||
+      item.applicationStatus === 'READY_FOR_CONFERENCE' ||
+      item.applicationStatus === 'CONFERENCE_HELD' ||
+      item.applicationStatus === 'OUTCOME_RECORDED_FOR_DRAFT' ||
+      item.applicationStatus === 'AWAITING_SIGNED_OUTPUTS' ||
+      item.applicationStatus === 'RESULTS_ISSUED' ||
+      item.statusProsesUtama === 'siap_pleno' ||
+      item.statusProsesUtama === 'pengesahan_rekomendasi' ||
+      item.statusProsesUtama === 'rekomendasi_terbit' ||
+      item.statusProsesUtama === 'selesai_tindak_lanjut';
+
     if (mode === 'history') {
-      return item.asesmenMedis?.status === 'FINAL' || item.medicalStatus === 'FINAL';
+      return isMedisBeres;
     } else {
-      // Active queue: only show tasks that are NOT finalized
-      return !item.asesmenMedis || (item.asesmenMedis.status !== 'FINAL' && item.medicalStatus !== 'FINAL');
+      // Active queue: only show tasks that are NOT finalized/done
+      return !isMedisBeres;
     }
   });
 
@@ -389,6 +419,28 @@ export const AsesmenMedisView: React.FC<AsesmenMedisViewProps> = ({
           </div>
         </div>
 
+        {/* Read-Only Status Banner */}
+        {isReadOnlyView && (
+          <div className="bg-[#0e2238] border border-blue-500/40 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs shadow-md animate-in fade-in">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-blue-900/50 rounded-xl text-blue-300 border border-blue-500/30 shrink-0">
+                <Shield className="w-5 h-5 text-emerald-400" />
+              </div>
+              <div>
+                <h4 className="font-bold text-white text-sm">Mode Arsip & Rekam Medis (Read-Only)</h4>
+                <p className="text-slate-300 text-[11px] mt-0.5">
+                  Berkas asesmen medis ini telah difinalisasi secara sah. Seluruh lembar isian dan parameter medis terkunci untuk menjaga keaslian data.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-2">
+              <span className="text-[10px] font-mono px-2.5 py-1 bg-emerald-950 text-emerald-300 border border-emerald-700/60 rounded-lg font-bold">
+                TERKUNCI / FINAL
+              </span>
+            </div>
+          </div>
+        )}
+
         {/* Success Feedback Alert */}
         {saveFeedback && (
           <div className="p-4 bg-emerald-950/80 border border-emerald-500/50 rounded-2xl text-emerald-200 text-xs font-semibold flex items-center space-x-2.5 shadow-lg animate-in fade-in">
@@ -435,9 +487,10 @@ export const AsesmenMedisView: React.FC<AsesmenMedisViewProps> = ({
               <div>
                 <label className="text-slate-300 font-semibold mb-1.5 block">Jenis Zat Narkotika Dominan</label>
                 <select
+                  disabled={isReadOnlyView}
                   value={formData.jenisZat}
                   onChange={(e) => setFormData({ ...formData, jenisZat: e.target.value })}
-                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-emerald-500 cursor-pointer"
+                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-emerald-500 cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed"
                 >
                   <option value="Metamfetamina (Sabu)">Metamfetamina (Sabu)</option>
                   <option value="Ganja / Kanabis">Ganja / Kanabis</option>
@@ -451,9 +504,10 @@ export const AsesmenMedisView: React.FC<AsesmenMedisViewProps> = ({
               <div>
                 <label className="text-slate-300 font-semibold mb-1.5 block">Cara Pemakaian</label>
                 <select
+                  disabled={isReadOnlyView}
                   value={formData.caraPakai}
                   onChange={(e) => setFormData({ ...formData, caraPakai: e.target.value })}
-                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-emerald-500 cursor-pointer"
+                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-emerald-500 cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed"
                 >
                   <option value="Dihisap (Bong / Rokok)">Dihisap (Bong / Rokok)</option>
                   <option value="Ditelan / Minum (Oral)">Ditelan / Minum (Oral)</option>
@@ -465,9 +519,10 @@ export const AsesmenMedisView: React.FC<AsesmenMedisViewProps> = ({
               <div>
                 <label className="text-slate-300 font-semibold mb-1.5 block">Frekuensi Penggunaan</label>
                 <select
+                  disabled={isReadOnlyView}
                   value={formData.frekuensi}
                   onChange={(e) => setFormData({ ...formData, frekuensi: e.target.value })}
-                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-emerald-500 cursor-pointer"
+                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-emerald-500 cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed"
                 >
                   <option value="Setiap Hari (Rutin / Berat)">Setiap Hari (Rutin / Berat)</option>
                   <option value="4-5x Seminggu">4-5x Seminggu</option>
@@ -479,53 +534,58 @@ export const AsesmenMedisView: React.FC<AsesmenMedisViewProps> = ({
               <div>
                 <label className="text-slate-300 font-semibold mb-1.5 block">Lama Pemakaian Aktif (Bulan)</label>
                 <input
+                  disabled={isReadOnlyView}
                   type="number"
                   value={formData.lamaPemakaianBulan}
                   onChange={(e) => setFormData({ ...formData, lamaPemakaianBulan: Number(e.target.value) })}
                   placeholder="12"
-                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-emerald-500"
+                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-emerald-500 disabled:opacity-75 disabled:cursor-not-allowed"
                 />
               </div>
 
               <div>
                 <label className="text-slate-300 font-semibold mb-1.5 block">Usia Pertama Kali Pakai (Tahun)</label>
                 <input
+                  disabled={isReadOnlyView}
                   type="text"
                   value={formData.usiaMulaiPakai}
                   onChange={(e) => setFormData({ ...formData, usiaMulaiPakai: e.target.value })}
                   placeholder="23"
-                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-emerald-500"
+                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-emerald-500 disabled:opacity-75 disabled:cursor-not-allowed"
                 />
               </div>
 
               <div>
                 <label className="text-slate-300 font-semibold mb-1.5 block">Waktu Terakhir Pemakaian</label>
                 <input
+                  disabled={isReadOnlyView}
                   type="text"
                   value={formData.terakhirPakai}
                   onChange={(e) => setFormData({ ...formData, terakhirPakai: e.target.value })}
                   placeholder="Contoh: 2 hari sebelum penangkapan"
-                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-emerald-500"
+                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-emerald-500 disabled:opacity-75 disabled:cursor-not-allowed"
                 />
               </div>
 
               <div className="md:col-span-2">
                 <label className="text-slate-300 font-semibold mb-1.5 block">Riwayat Overdosis / Komplikasi Zat</label>
                 <input
+                  disabled={isReadOnlyView}
                   type="text"
                   value={formData.riwayatOverdosis}
                   onChange={(e) => setFormData({ ...formData, riwayatOverdosis: e.target.value })}
                   placeholder="Tidak ada / Pernah dilarikan ke RS / Kejang"
-                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-emerald-500"
+                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-emerald-500 disabled:opacity-75 disabled:cursor-not-allowed"
                 />
               </div>
 
               <div>
                 <label className="text-slate-300 font-semibold mb-1.5 block">Riwayat Rehabilitasi Sebelumnya</label>
                 <select
+                  disabled={isReadOnlyView}
                   value={formData.riwayatRehabSebelumnya}
                   onChange={(e) => setFormData({ ...formData, riwayatRehabSebelumnya: e.target.value })}
-                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-emerald-500 cursor-pointer"
+                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-emerald-500 cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed"
                 >
                   <option value="Belum pernah menjalani rehabilitasi">Belum Pernah Rehabilitasi</option>
                   <option value="Pernah Rawat Jalan (1 kali)">Pernah Rawat Jalan (1x)</option>
@@ -560,64 +620,70 @@ export const AsesmenMedisView: React.FC<AsesmenMedisViewProps> = ({
               <div>
                 <label className="text-slate-300 font-semibold mb-1.5 block">Tekanan Darah (mmHg)</label>
                 <input
+                  disabled={isReadOnlyView}
                   type="text"
                   value={formData.tekananDarah}
                   onChange={(e) => setFormData({ ...formData, tekananDarah: e.target.value })}
                   placeholder="120/80"
-                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-emerald-500"
+                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-emerald-500 disabled:opacity-75 disabled:cursor-not-allowed"
                 />
               </div>
 
               <div>
                 <label className="text-slate-300 font-semibold mb-1.5 block">Denyut Nadi (x/mnt)</label>
                 <input
+                  disabled={isReadOnlyView}
                   type="text"
                   value={formData.denyutNadi}
                   onChange={(e) => setFormData({ ...formData, denyutNadi: e.target.value })}
                   placeholder="84"
-                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-emerald-500"
+                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-emerald-500 disabled:opacity-75 disabled:cursor-not-allowed"
                 />
               </div>
 
               <div>
                 <label className="text-slate-300 font-semibold mb-1.5 block">Pernapasan (x/mnt)</label>
                 <input
+                  disabled={isReadOnlyView}
                   type="text"
                   value={formData.pernapasan}
                   onChange={(e) => setFormData({ ...formData, pernapasan: e.target.value })}
                   placeholder="18"
-                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-emerald-500"
+                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-emerald-500 disabled:opacity-75 disabled:cursor-not-allowed"
                 />
               </div>
 
               <div>
                 <label className="text-slate-300 font-semibold mb-1.5 block">Suhu Tubuh (°C)</label>
                 <input
+                  disabled={isReadOnlyView}
                   type="text"
                   value={formData.suhuTubuh}
                   onChange={(e) => setFormData({ ...formData, suhuTubuh: e.target.value })}
                   placeholder="36.6"
-                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-emerald-500"
+                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-emerald-500 disabled:opacity-75 disabled:cursor-not-allowed"
                 />
               </div>
 
               <div className="md:col-span-2">
                 <label className="text-slate-300 font-semibold mb-1.5 block">Kondisi Pupil Mata &amp; Refleks Cahaya</label>
                 <input
+                  disabled={isReadOnlyView}
                   type="text"
                   value={formData.kondisiPupil}
                   onChange={(e) => setFormData({ ...formData, kondisiPupil: e.target.value })}
                   placeholder="Isokor (3mm / 3mm), Refleks Cahaya +/+"
-                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-emerald-500"
+                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-emerald-500 disabled:opacity-75 disabled:cursor-not-allowed"
                 />
               </div>
 
               <div>
                 <label className="text-slate-300 font-semibold mb-1.5 block">Bekas Jarum Suntik (Needle Tracks)</label>
                 <select
+                  disabled={isReadOnlyView}
                   value={formData.needleTracks}
                   onChange={(e) => setFormData({ ...formData, needleTracks: e.target.value })}
-                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-emerald-500 cursor-pointer"
+                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-emerald-500 cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed"
                 >
                   <option value="tidak_ada">Tidak Ada Bekas Suntikan</option>
                   <option value="ada_lama">Ada (Bekas Lama / Menghitam)</option>
@@ -628,9 +694,10 @@ export const AsesmenMedisView: React.FC<AsesmenMedisViewProps> = ({
               <div>
                 <label className="text-slate-300 font-semibold mb-1.5 block">Status Sakau / Putus Zat</label>
                 <select
+                  disabled={isReadOnlyView}
                   value={formData.kondisiIntoksikasi}
                   onChange={(e) => setFormData({ ...formData, kondisiIntoksikasi: e.target.value })}
-                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-emerald-500 cursor-pointer"
+                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-emerald-500 cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed"
                 >
                   <option value="stabil">Normal / Stabil (Tidak Sakau)</option>
                   <option value="intoksikasi">Intoksikasi Ringan / Pengaruh Zat</option>
@@ -641,11 +708,12 @@ export const AsesmenMedisView: React.FC<AsesmenMedisViewProps> = ({
               <div className="md:col-span-4">
                 <label className="text-slate-300 font-semibold mb-1.5 block">Komorbiditas Medis / Penyakit Penyerta (Fisik)</label>
                 <input
+                  disabled={isReadOnlyView}
                   type="text"
                   value={formData.komorbiditasMedis}
                   onChange={(e) => setFormData({ ...formData, komorbiditasMedis: e.target.value })}
                   placeholder="Contoh: Tidak ada komorbiditas berat / Riwayat Asma / Hepatitis B / HIV"
-                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-emerald-500"
+                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-emerald-500 disabled:opacity-75 disabled:cursor-not-allowed"
                 />
               </div>
             </div>
@@ -678,7 +746,9 @@ export const AsesmenMedisView: React.FC<AsesmenMedisViewProps> = ({
                 <Activity className="w-4 h-4 text-[#d4af37]" />
                 <h3 className="font-bold text-sm text-white uppercase tracking-wider">Uji Toksikologi Urin Laboratorium Forensik (SKHPU)</h3>
               </div>
-              <span className="text-[11px] text-slate-400 italic">Centang / klik tombol status untuk mengubah hasil</span>
+              <span className="text-[11px] text-slate-400 italic">
+                {isReadOnlyView ? 'Hasil toksikologi urin resmi terlampir (Terkunci)' : 'Centang / klik tombol status untuk mengubah hasil'}
+              </span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
@@ -687,19 +757,22 @@ export const AsesmenMedisView: React.FC<AsesmenMedisViewProps> = ({
                 return (
                   <div
                     key={idx}
-                    onClick={() => toggleUrinResult(idx)}
-                    className={`p-3.5 rounded-2xl border flex items-center justify-between cursor-pointer transition-all ${
+                    onClick={() => !isReadOnlyView && toggleUrinResult(idx)}
+                    className={`p-3.5 rounded-2xl border flex items-center justify-between transition-all ${
+                      isReadOnlyView ? 'cursor-default' : 'cursor-pointer'
+                    } ${
                       isPos
-                        ? 'bg-rose-950/40 border-rose-600/60 shadow-md shadow-rose-950/40 hover:bg-rose-950/60'
-                        : 'bg-[#050e1c] border-[#1b3459] hover:bg-[#10223b]'
+                        ? 'bg-rose-950/40 border-rose-600/60 shadow-md shadow-rose-950/40'
+                        : 'bg-[#050e1c] border-[#1b3459]'
                     }`}
                   >
                     <div className="flex items-center space-x-2.5 min-w-0 flex-1">
                       <input
+                        disabled={isReadOnlyView}
                         type="checkbox"
                         checked={isPos}
-                        onChange={() => toggleUrinResult(idx)}
-                        className="w-4 h-4 accent-rose-600 cursor-pointer rounded"
+                        onChange={() => !isReadOnlyView && toggleUrinResult(idx)}
+                        className="w-4 h-4 accent-rose-600 cursor-pointer disabled:cursor-not-allowed rounded"
                       />
                       <span className="text-xs font-bold text-white truncate">{test.parameter}</span>
                     </div>
@@ -769,10 +842,11 @@ export const AsesmenMedisView: React.FC<AsesmenMedisViewProps> = ({
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                   {[{ l: 'Tidak Pernah (0)', v: 0 }, { l: '1-2 Kali (2)', v: 2 }, { l: 'Bulanan (3)', v: 3 }, { l: 'Mingguan/Harian (4-6)', v: 5 }].map(opt => (
                     <button
+                      disabled={isReadOnlyView}
                       key={opt.v}
                       type="button"
-                      onClick={() => setFormData({ ...formData, q1_frekuensi: opt.v })}
-                      className={`p-2 rounded-lg text-center border font-semibold cursor-pointer transition-colors ${
+                      onClick={() => !isReadOnlyView && setFormData({ ...formData, q1_frekuensi: opt.v })}
+                      className={`p-2 rounded-lg text-center border font-semibold transition-colors disabled:cursor-not-allowed ${
                         formData.q1_frekuensi === opt.v ? 'bg-emerald-900/60 border-emerald-500 text-white' : 'bg-[#0b172a] border-[#1b3459] text-slate-400'
                       }`}
                     >
@@ -787,10 +861,11 @@ export const AsesmenMedisView: React.FC<AsesmenMedisViewProps> = ({
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                   {[{ l: 'Tidak Pernah (0)', v: 0 }, { l: 'Jarang (3)', v: 3 }, { l: 'Mingguan (4)', v: 4 }, { l: 'Hampir Setiap Hari (6)', v: 6 }].map(opt => (
                     <button
+                      disabled={isReadOnlyView}
                       key={opt.v}
                       type="button"
-                      onClick={() => setFormData({ ...formData, q2_dorongan: opt.v })}
-                      className={`p-2 rounded-lg text-center border font-semibold cursor-pointer transition-colors ${
+                      onClick={() => !isReadOnlyView && setFormData({ ...formData, q2_dorongan: opt.v })}
+                      className={`p-2 rounded-lg text-center border font-semibold transition-colors disabled:cursor-not-allowed ${
                         formData.q2_dorongan === opt.v ? 'bg-emerald-900/60 border-emerald-500 text-white' : 'bg-[#0b172a] border-[#1b3459] text-slate-400'
                       }`}
                     >
@@ -805,10 +880,11 @@ export const AsesmenMedisView: React.FC<AsesmenMedisViewProps> = ({
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                   {[{ l: 'Tidak Pernah (0)', v: 0 }, { l: '1-2 Kali (4)', v: 4 }, { l: 'Bulanan (5)', v: 5 }, { l: 'Mingguan / Harian (6)', v: 6 }].map(opt => (
                     <button
+                      disabled={isReadOnlyView}
                       key={opt.v}
                       type="button"
-                      onClick={() => setFormData({ ...formData, q3_masalah: opt.v })}
-                      className={`p-2 rounded-lg text-center border font-semibold cursor-pointer transition-colors ${
+                      onClick={() => !isReadOnlyView && setFormData({ ...formData, q3_masalah: opt.v })}
+                      className={`p-2 rounded-lg text-center border font-semibold transition-colors disabled:cursor-not-allowed ${
                         formData.q3_masalah === opt.v ? 'bg-emerald-900/60 border-emerald-500 text-white' : 'bg-[#0b172a] border-[#1b3459] text-slate-400'
                       }`}
                     >
@@ -823,10 +899,11 @@ export const AsesmenMedisView: React.FC<AsesmenMedisViewProps> = ({
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                   {[{ l: 'Tidak Pernah (0)', v: 0 }, { l: 'Jarang (4)', v: 4 }, { l: 'Bulanan (5)', v: 5 }, { l: 'Hampir Selalu (6)', v: 6 }].map(opt => (
                     <button
+                      disabled={isReadOnlyView}
                       key={opt.v}
                       type="button"
-                      onClick={() => setFormData({ ...formData, q4_kegagalan: opt.v })}
-                      className={`p-2 rounded-lg text-center border font-semibold cursor-pointer transition-colors ${
+                      onClick={() => !isReadOnlyView && setFormData({ ...formData, q4_kegagalan: opt.v })}
+                      className={`p-2 rounded-lg text-center border font-semibold transition-colors disabled:cursor-not-allowed ${
                         formData.q4_kegagalan === opt.v ? 'bg-emerald-900/60 border-emerald-500 text-white' : 'bg-[#0b172a] border-[#1b3459] text-slate-400'
                       }`}
                     >
@@ -839,11 +916,12 @@ export const AsesmenMedisView: React.FC<AsesmenMedisViewProps> = ({
               <div className="pt-2">
                 <label className="text-slate-300 font-semibold mb-1.5 block">Evaluasi Status Mental / Mental Status Examination (MSE)</label>
                 <textarea
+                  disabled={isReadOnlyView}
                   rows={2}
                   value={formData.evaluasiMse}
                   onChange={(e) => setFormData({ ...formData, evaluasiMse: e.target.value })}
                   placeholder="Catatan orientasi, mood, afek, proses pikir, dan ada/tidaknya halusinasi..."
-                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-emerald-500 text-xs"
+                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-emerald-500 text-xs disabled:opacity-75 disabled:cursor-not-allowed"
                 />
               </div>
             </div>
@@ -880,9 +958,10 @@ export const AsesmenMedisView: React.FC<AsesmenMedisViewProps> = ({
               <div className="md:col-span-2">
                 <label className="text-slate-300 font-semibold mb-1.5 block">Diagnosis Klinis ICD-10</label>
                 <select
+                  disabled={isReadOnlyView}
                   value={formData.diagnosisKlinisIcd}
                   onChange={(e) => setFormData({ ...formData, diagnosisKlinisIcd: e.target.value })}
-                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-emerald-500 cursor-pointer font-mono font-bold"
+                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-emerald-500 cursor-pointer font-mono font-bold disabled:opacity-75 disabled:cursor-not-allowed"
                 >
                   <option value="F15.2 (Sindrom Ketergantungan Stimulansia / Metamfetamina)">F15.2 - Ketergantungan Stimulansia (Sabu)</option>
                   <option value="F15.1 (Penggunaan Merugikan Stimulansia / Harmful Use)">F15.1 - Harmful Use Stimulansia</option>
@@ -895,9 +974,10 @@ export const AsesmenMedisView: React.FC<AsesmenMedisViewProps> = ({
               <div>
                 <label className="text-slate-300 font-semibold mb-1.5 block">Modalitas Layanan Rehabilitasi</label>
                 <select
+                  disabled={isReadOnlyView}
                   value={formData.kebutuhanRawat}
                   onChange={(e) => setFormData({ ...formData, kebutuhanRawat: e.target.value })}
-                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-emerald-500 cursor-pointer font-bold text-[#d4af37]"
+                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-emerald-500 cursor-pointer font-bold text-[#d4af37] disabled:opacity-75 disabled:cursor-not-allowed"
                 >
                   <option value="Rawat Inap">Rehabilitasi Rawat Inap (Pemulihan Penuh)</option>
                   <option value="Rawat Jalan">Rehabilitasi Rawat Jalan (Konseling Singkat)</option>
@@ -909,9 +989,10 @@ export const AsesmenMedisView: React.FC<AsesmenMedisViewProps> = ({
               <div>
                 <label className="text-slate-300 font-semibold mb-1.5 block">Usulan Durasi Layanan (Bulan)</label>
                 <select
+                  disabled={isReadOnlyView}
                   value={formData.durasiUsulanBulan}
                   onChange={(e) => setFormData({ ...formData, durasiUsulanBulan: Number(e.target.value) })}
-                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-emerald-500 cursor-pointer font-bold"
+                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-emerald-500 cursor-pointer font-bold disabled:opacity-75 disabled:cursor-not-allowed"
                 >
                   <option value="3">3 Bulan</option>
                   <option value="6">6 Bulan</option>
@@ -922,9 +1003,10 @@ export const AsesmenMedisView: React.FC<AsesmenMedisViewProps> = ({
               <div className="md:col-span-2">
                 <label className="text-slate-300 font-semibold mb-1.5 block">Fasilitas Rujukan Rekomendasi</label>
                 <select
+                  disabled={isReadOnlyView}
                   value={formData.fasilitasRujukan}
                   onChange={(e) => setFormData({ ...formData, fasilitasRujukan: e.target.value })}
-                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-emerald-500 cursor-pointer"
+                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-emerald-500 cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed"
                 >
                   <option value="Balai Rehabilitasi BNN Tanah Merah">Balai Rehabilitasi BNN Tanah Merah (Samarinda)</option>
                   <option value="RSJD Atma Husada Mahakam Samarinda">RSJD Atma Husada Mahakam Samarinda</option>
@@ -936,22 +1018,24 @@ export const AsesmenMedisView: React.FC<AsesmenMedisViewProps> = ({
               <div className="md:col-span-3">
                 <label className="text-slate-300 font-semibold mb-1.5 block">Interpretasi Klinis Asesor Medis</label>
                 <textarea
+                  disabled={isReadOnlyView}
                   rows={3}
                   value={formData.interpretasiKlinis}
                   onChange={(e) => setFormData({ ...formData, interpretasiKlinis: e.target.value })}
                   placeholder="Simpulan klinis hasil pemeriksaan medis, pola adiksi, dan urgensi penempatan rehabilitasi..."
-                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-emerald-500 leading-relaxed"
+                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-emerald-500 leading-relaxed disabled:opacity-75 disabled:cursor-not-allowed"
                 />
               </div>
 
               <div className="md:col-span-3">
                 <label className="text-slate-300 font-semibold mb-1.5 block">Catatan Khusus Rekomendasi untuk Sidang Pleno TAT</label>
                 <input
+                  disabled={isReadOnlyView}
                   type="text"
                   value={formData.catatanKhususPleno}
                   onChange={(e) => setFormData({ ...formData, catatanKhususPleno: e.target.value })}
                   placeholder="Catatan pertimbangan bagi Ketua TAT dan Jaksa saat pleno..."
-                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-emerald-500"
+                  className="w-full bg-[#050e1c] border border-[#1b3459] text-white p-2.5 rounded-xl outline-none focus:border-emerald-500 disabled:opacity-75 disabled:cursor-not-allowed"
                 />
               </div>
             </div>
@@ -1009,7 +1093,7 @@ export const AsesmenMedisView: React.FC<AsesmenMedisViewProps> = ({
             </div>
 
             {/* Actions */}
-            {isCompleted ? (
+            {isReadOnlyView ? (
               <div className="bg-emerald-950/40 border border-emerald-500/40 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
                 <div className="flex items-center space-x-3">
                   <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
@@ -1117,12 +1201,14 @@ export const AsesmenMedisView: React.FC<AsesmenMedisViewProps> = ({
       <div className="grid grid-cols-1 gap-3">
         {filteredCases.length === 0 ? (
           <div className="text-center py-10 bg-[#0b172a] border border-[#1b3459] rounded-xl text-slate-400 text-xs">
-            Tidak ditemukan berkas permohonan asesmen medis yang sesuai.
+            {isReadOnly
+              ? 'Belum ada riwayat asesmen medis yang difinalisasi.'
+              : 'Tidak ada tugas asesmen medis aktif yang perlu diperiksa.'}
           </div>
         ) : (
           filteredCases.map(item => {
-            const hasMedis = !!item.asesmenMedis && item.asesmenMedis.status === 'FINAL';
-            const isDraft = item.asesmenMedis && item.asesmenMedis.status === 'DRAFT';
+            const hasMedis = (item.asesmenMedis && item.asesmenMedis.status === 'FINAL') || item.medicalStatus === 'FINAL' || isReadOnly;
+            const isDraft = !hasMedis && item.asesmenMedis && item.asesmenMedis.status === 'DRAFT';
             const jadwalSesi = item.asesmenMedis?.tanggalPemeriksaan || `${item.tanggalPengajuan} • 10:00 WITA`;
             const bbSummary = item.perkara.barangBuktiList.map(b => `${b.jenisZat} ${b.beratBersihGram}g`).join(', ') || 'Tanpa BB';
 
@@ -1145,11 +1231,13 @@ export const AsesmenMedisView: React.FC<AsesmenMedisViewProps> = ({
                   </div>
 
                   <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border self-start sm:self-auto shrink-0 ${
-                    hasMedis
-                      ? 'bg-blue-950/50 text-blue-300 border-blue-600/40'
-                      : 'bg-emerald-950/50 text-emerald-300 border-emerald-600/40'
+                    hasMedis || isReadOnly
+                      ? 'bg-blue-950/60 text-blue-300 border-blue-600/40'
+                      : isDraft
+                      ? 'bg-amber-950/60 text-amber-300 border-amber-600/40'
+                      : 'bg-emerald-950/60 text-emerald-300 border-emerald-600/40'
                   }`}>
-                    {hasMedis ? 'Selesai' : 'Aktif'}
+                    {hasMedis || isReadOnly ? 'Selesai (Final)' : isDraft ? 'Draf Disimpan' : 'Aktif (Belum Diperiksa)'}
                   </span>
                 </div>
 
@@ -1172,7 +1260,7 @@ export const AsesmenMedisView: React.FC<AsesmenMedisViewProps> = ({
                   </div>
 
                   <div className="text-[#d4af37] font-semibold text-xs flex items-center space-x-1 group-hover:translate-x-1 transition-transform shrink-0">
-                    <span>{isDraft ? 'Lanjutkan Draf' : 'Mulai Asesmen Medis'}</span>
+                    <span>{hasMedis || isReadOnly ? 'Buka Rekam Medis (Arsip)' : isDraft ? 'Lanjutkan Draf' : 'Mulai Asesmen Medis'}</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </div>
                 </div>
