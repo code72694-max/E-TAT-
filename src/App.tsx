@@ -63,6 +63,7 @@ export default function App() {
   const [selectedAsesmenId, setSelectedAsesmenId] = useState<string | null>(null);
   const [selectedHukumId, setSelectedHukumId] = useState<string | null>(null);
   const [selectedMedisId, setSelectedMedisId] = useState<string | null>(null);
+  const [selectedRiwayatMedisId, setSelectedRiwayatMedisId] = useState<string | null>(null);
   const [selectedRiwayatHukumId, setSelectedRiwayatHukumId] = useState<string | null>(null);
   const [selectedTindakLanjutId, setSelectedTindakLanjutId] = useState<string | null>(null);
   const [selectedScheduleId, setSelectedScheduleId] = useState<string | null>(null);
@@ -147,6 +148,7 @@ export default function App() {
         setCurrentTab('medis');
         setSelectedPermohonanId(null);
         setSelectedHukumId(null);
+        setSelectedRiwayatMedisId(null);
         setSelectedRiwayatHukumId(null);
         if (parts[2] === 'detail' && parts[3]) {
           setSelectedMedisId(parts[3]);
@@ -155,11 +157,26 @@ export default function App() {
         } else {
           setSelectedMedisId(null);
         }
+      } else if (parts[1] === 'riwayat_medis') {
+        setCurrentTab('riwayat_medis');
+        setSelectedPermohonanId(null);
+        setSelectedHukumId(null);
+        setSelectedMedisId(null);
+        setSelectedRiwayatHukumId(null);
+        setSelectedTindakLanjutId(null);
+        if (parts[2] === 'detail' && parts[3]) {
+          setSelectedRiwayatMedisId(parts[3]);
+        } else if (parts[2] && parts[2] !== 'detail') {
+          setSelectedRiwayatMedisId(parts[2]);
+        } else {
+          setSelectedRiwayatMedisId(null);
+        }
       } else if (parts[1] === 'riwayat_hukum') {
         setCurrentTab('riwayat_hukum');
         setSelectedPermohonanId(null);
         setSelectedHukumId(null);
         setSelectedMedisId(null);
+        setSelectedRiwayatMedisId(null);
         setSelectedTindakLanjutId(null);
         if (parts[2] === 'detail' && parts[3]) {
           setSelectedRiwayatHukumId(parts[3]);
@@ -173,6 +190,7 @@ export default function App() {
         setSelectedPermohonanId(null);
         setSelectedHukumId(null);
         setSelectedMedisId(null);
+        setSelectedRiwayatMedisId(null);
         setSelectedRiwayatHukumId(null);
         setSelectedTindakLanjutId(null);
         if (parts[2] === 'detail' && parts[3]) {
@@ -187,6 +205,7 @@ export default function App() {
         setSelectedPermohonanId(null);
         setSelectedHukumId(null);
         setSelectedMedisId(null);
+        setSelectedRiwayatMedisId(null);
         setSelectedRiwayatHukumId(null);
         setSelectedScheduleCaseId(null);
         setSelectedScheduleId(null);
@@ -202,6 +221,7 @@ export default function App() {
         setSelectedPermohonanId(null);
         setSelectedHukumId(null);
         setSelectedMedisId(null);
+        setSelectedRiwayatMedisId(null);
         setSelectedRiwayatHukumId(null);
         setSelectedTindakLanjutId(null);
         setSelectedScheduleCaseId(null);
@@ -211,6 +231,7 @@ export default function App() {
         setSelectedPermohonanId(null);
         setSelectedHukumId(null);
         setSelectedMedisId(null);
+        setSelectedRiwayatMedisId(null);
         setSelectedRiwayatHukumId(null);
         setSelectedTindakLanjutId(null);
         setSelectedScheduleCaseId(null);
@@ -248,6 +269,10 @@ export default function App() {
     return permohonanList.find(p => p.id === selectedMedisId) || null;
   }, [permohonanList, selectedMedisId]);
 
+  const selectedRiwayatMedisPermohonan = useMemo(() => {
+    return permohonanList.find(p => p.id === selectedRiwayatMedisId) || null;
+  }, [permohonanList, selectedRiwayatMedisId]);
+
   const selectedRiwayatHukumPermohonan = useMemo(() => {
     return permohonanList.find(p => p.id === selectedRiwayatHukumId) || null;
   }, [permohonanList, selectedRiwayatHukumId]);
@@ -265,6 +290,7 @@ export default function App() {
     (currentTab === 'asesmen_aktif' ? selectedAsesmenPermohonan : null) ||
     (currentTab === 'hukum' ? selectedHukumPermohonan : null) ||
     (currentTab === 'medis' ? selectedMedisPermohonan : null) ||
+    (currentTab === 'riwayat_medis' ? selectedRiwayatMedisPermohonan : null) ||
     (currentTab === 'riwayat_hukum' ? selectedRiwayatHukumPermohonan : null) ||
     (currentTab === 'tindak_lanjut_jadwal' ? selectedSchedulePermohonan : null) ||
     (currentTab.startsWith('tindak_lanjut') ? selectedTindakLanjutPermohonan : null);
@@ -274,6 +300,7 @@ export default function App() {
     (currentTab === 'asesmen_aktif' && selectedAsesmenId) ||
     (currentTab === 'hukum' && selectedHukumId) ||
     (currentTab === 'medis' && selectedMedisId) ||
+    (currentTab === 'riwayat_medis' && selectedRiwayatMedisId) ||
     (currentTab === 'riwayat_hukum' && selectedRiwayatHukumId) ||
     (currentTab === 'tindak_lanjut_jadwal' && selectedScheduleCaseId) ||
     (currentTab.startsWith('tindak_lanjut') && selectedTindakLanjutId) ||
@@ -491,12 +518,33 @@ export default function App() {
             onUpdatePermohonan={handleUpdatePermohonan}
             onSelectPermohonan={handleOpenPermohonan}
             selectedCaseId={selectedMedisId}
+            mode="active"
             onSelectCase={(id) => {
               setSelectedMedisId(id);
               if (id) {
                 navigate(`/dashboard/medis/detail/${id}`);
               } else {
                 navigate('/dashboard/medis');
+              }
+            }}
+          />
+        );
+
+      case 'riwayat_medis':
+        return (
+          <AsesmenMedisView
+            permohonanList={permohonanList}
+            currentUser={currentUser}
+            onUpdatePermohonan={handleUpdatePermohonan}
+            onSelectPermohonan={handleOpenPermohonan}
+            selectedCaseId={selectedRiwayatMedisId}
+            mode="history"
+            onSelectCase={(id) => {
+              setSelectedRiwayatMedisId(id);
+              if (id) {
+                navigate(`/dashboard/riwayat_medis/detail/${id}`);
+              } else {
+                navigate('/dashboard/riwayat_medis');
               }
             }}
           />
@@ -800,6 +848,10 @@ export default function App() {
           if (selectedMedisId) {
             setSelectedMedisId(null);
             navigate('/dashboard/medis');
+          }
+          if (selectedRiwayatMedisId) {
+            setSelectedRiwayatMedisId(null);
+            navigate('/dashboard/riwayat_medis');
           }
           if (selectedRiwayatHukumId) {
             setSelectedRiwayatHukumId(null);

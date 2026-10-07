@@ -25,6 +25,7 @@ import {
   Package
 } from 'lucide-react';
 import { ModalLihatDokumenBb } from './ModalLihatDokumenBb';
+import { asesmenMedisApi } from '../services/api';
 
 interface AsesmenMedisViewProps {
   permohonanList: PermohonanAsesmen[];
@@ -33,6 +34,7 @@ interface AsesmenMedisViewProps {
   onSelectPermohonan?: (id: string) => void;
   selectedCaseId?: string | null;
   onSelectCase?: (id: string | null) => void;
+  mode?: 'active' | 'history';
 }
 
 export const AsesmenMedisView: React.FC<AsesmenMedisViewProps> = ({
@@ -41,8 +43,10 @@ export const AsesmenMedisView: React.FC<AsesmenMedisViewProps> = ({
   onUpdatePermohonan,
   onSelectPermohonan,
   selectedCaseId: propSelectedCaseId,
-  onSelectCase
+  onSelectCase,
+  mode = 'active'
 }) => {
+  const isReadOnly = mode === 'history';
   const [internalSelectedCaseId, setInternalSelectedCaseId] = useState<string | null>(null);
   const selectedCaseId = propSelectedCaseId !== undefined ? propSelectedCaseId : internalSelectedCaseId;
   const [searchQuery, setSearchQuery] = useState('');
@@ -160,7 +164,7 @@ export const AsesmenMedisView: React.FC<AsesmenMedisViewProps> = ({
   const calculatedAssistScore = formData.q1_frekuensi + formData.q2_dorongan + formData.q3_masalah + formData.q4_kegagalan + formData.q5_kecemasan_orang_lain + formData.q6_usaha_berhenti_gagal;
   const assistRiskLevel = calculatedAssistScore >= 27 ? 'Tinggi (Ketergantungan)' : calculatedAssistScore >= 11 ? 'Sedang' : 'Rendah';
 
-  const handleSaveMedicalForm = (isFinal: boolean) => {
+  const handleSaveMedicalForm = async (isFinal: boolean) => {
     if (!selectedCase) return;
 
     let updated: PermohonanAsesmen = { ...selectedCase };
@@ -202,6 +206,7 @@ export const AsesmenMedisView: React.FC<AsesmenMedisViewProps> = ({
     updated.asesmenMedis = asesmenMedisData;
 
     if (isFinal) {
+      updated.medicalStatus = 'FINAL';
       if (updated.statusProsesUtama === 'asesmen_berlangsung' || updated.statusProsesUtama === 'penugasan_jadwal') {
         updated.statusProsesUtama = 'siap_pleno';
       }
@@ -216,43 +221,120 @@ export const AsesmenMedisView: React.FC<AsesmenMedisViewProps> = ({
         actorNama: currentUser.name,
         actorPeran: currentUser.role,
         rincian: isFinal
-          ? `Pemeriksaan medis difinalisasi dengan diagnosis ${formData.diagnosisKlinisIcd} dan rekomendasi ${formData.kebutuhanRawat} (${formData.durasiUsulanBulan} Bulan). Siap Pleno TAT.`
+          ? `Pemeriksaan medis difinalisasi dengan diagnosis ${formData.diagnosisKlinisIcd} dan rekomendasi ${formData.kebutuhanRawat} (${formData.durasiUsulanBulan} Bulan). Masuk Riwayat & Siap Pleno TAT.`
           : `Draf hasil pemeriksaan medis disimpan oleh ${currentUser.name}.`
       }
     ];
+
+    // Sinkronisasi ke backend API jika tersedia
+    try {
+      if (isFinal) {
+        await asesmenMedisApi.saveDraft(selectedCase.id, {
+          kondisiFisik: `TD: ${formData.tekananDarah}, N: ${formData.denyutNadi}, RR: ${formData.pernapasan}`,
+          tekananDarah: formData.tekananDarah,
+          denyutNadi: formData.denyutNadi,
+          tandaBekasSuntikan: formData.needleTracks !== 'tidak_ada',
+          komorbiditasMedis: formData.komorbiditasMedis,
+          kondisiPsikologis: formData.evaluasiMse,
+          instrumen: 'ASSIST',
+          skorInstrumen: calculatedAssistScore,
+          tingkatRisikoInstrumen: assistRiskLevel,
+          diagnosisKlinisIcd: formData.diagnosisKlinisIcd,
+          interpretasiKlinis: formData.interpretasiKlinis,
+          kebutuhanRawat: formData.kebutuhanRawat,
+          durasiUsulanBulan: Number(formData.durasiUsulanBulan),
+          catatanKhusus: formData.catatanKhususPleno,
+          riwayatZat: [
+            {
+              jenisZat: formData.jenisZat,
+              caraPakai: formData.caraPakai,
+              frekuensi: formData.frekuensi,
+              lamaPemakaianBulan: Number(formData.lamaPemakaianBulan),
+              terakhirPakai: formData.terakhirPakai
+            }
+          ],
+          hasilUrin: urinTests
+        }).catch(() => null);
+
+        await asesmenMedisApi.finalisasi(selectedCase.id).catch(() => null);
+      } else {
+        await asesmenMedisApi.saveDraft(selectedCase.id, {
+          kondisiFisik: `TD: ${formData.tekananDarah}, N: ${formData.denyutNadi}, RR: ${formData.pernapasan}`,
+          tekananDarah: formData.tekananDarah,
+          denyutNadi: formData.denyutNadi,
+          tandaBekasSuntikan: formData.needleTracks !== 'tidak_ada',
+          komorbiditasMedis: formData.komorbiditasMedis,
+          kondisiPsikologis: formData.evaluasiMse,
+          instrumen: 'ASSIST',
+          skorInstrumen: calculatedAssistScore,
+          tingkatRisikoInstrumen: assistRiskLevel,
+          diagnosisKlinisIcd: formData.diagnosisKlinisIcd,
+          interpretasiKlinis: formData.interpretasiKlinis,
+          kebutuhanRawat: formData.kebutuhanRawat,
+          durasiUsulanBulan: Number(formData.durasiUsulanBulan),
+          catatanKhusus: formData.catatanKhususPleno,
+        }).catch(() => null);
+      }
+    } catch (apiErr) {
+      console.warn('Backend sync:', apiErr);
+    }
 
     if (onUpdatePermohonan) {
       onUpdatePermohonan(updated);
     }
 
-    setSaveFeedback(isFinal ? '✅ Asesmen Medis Berhasil Difinalisasi & Diteruskan ke Sidang Pleno!' : '💾 Draf Asesmen Medis Berhasil Disimpan!');
-    setTimeout(() => setSaveFeedback(null), 4000);
+    setSaveFeedback(isFinal ? '✅ Asesmen Medis Berhasil Difinalisasi & Berpindah ke Riwayat Asesmen Medis!' : '💾 Draf Asesmen Medis Berhasil Disimpan!');
+    if (isFinal) {
+      setTimeout(() => {
+        handleCloseCase();
+      }, 1500);
+    } else {
+      setTimeout(() => setSaveFeedback(null), 4000);
+    }
   };
 
-  // Filtered cases list: only active cases that are not yet finalized in medical assessment
+  // Filtered cases list based on active mode vs history mode
   const filteredCases = permohonanList.filter(item => {
     const matchesSearch = item.nomorPermohonan.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.terperiksa.namaLengkap.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.terperiksa.nik.includes(searchQuery);
     
     if (!matchesSearch) return false;
-    return !item.asesmenMedis || item.asesmenMedis.status !== 'FINAL';
+
+    if (mode === 'history') {
+      return item.asesmenMedis?.status === 'FINAL' || item.medicalStatus === 'FINAL';
+    } else {
+      // Active queue: only show tasks that are NOT finalized
+      return !item.asesmenMedis || (item.asesmenMedis.status !== 'FINAL' && item.medicalStatus !== 'FINAL');
+    }
   });
 
   // ==========================================
   // VIEW 2: DEDICATED MEDICAL WORKBOOK DETAIL PAGE
   // ==========================================
   if (selectedCase) {
-    const isCompleted = selectedCase.asesmenMedis?.status === 'FINAL';
+    const isCompleted = selectedCase.asesmenMedis?.status === 'FINAL' || selectedCase.medicalStatus === 'FINAL';
 
     return (
       <div className="space-y-6 animate-in fade-in duration-200">
         {/* Top Navigation & Case Summary Header */}
         <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl p-4 sm:p-5 shadow-lg space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#1b3459]/80">
-            <div className="flex items-center space-x-2">
-              <Stethoscope className="w-4 h-4 text-[#d4af37]" />
-              <span className="text-xs font-bold text-slate-200 uppercase tracking-wider">Lembar Kerja Asesmen Medis TAT</span>
+            <div className="flex items-center space-x-3">
+              <button
+                type="button"
+                onClick={handleCloseCase}
+                className="p-1.5 bg-[#142642] hover:bg-[#1b3459] text-slate-300 hover:text-white rounded-lg border border-[#234475] transition-colors cursor-pointer"
+                title="Kembali ke Daftar"
+              >
+                <ArrowLeft className="w-4 h-4" />
+              </button>
+              <div className="flex items-center space-x-2">
+                <Stethoscope className="w-4 h-4 text-[#d4af37]" />
+                <span className="text-xs font-bold text-slate-200 uppercase tracking-wider">
+                  Lembar Kerja Asesmen Medis TAT {isCompleted && <span className="text-emerald-400 font-normal">(Riwayat / Selesai)</span>}
+                </span>
+              </div>
             </div>
             <div className="flex items-center space-x-2">
               <button
@@ -265,10 +347,10 @@ export const AsesmenMedisView: React.FC<AsesmenMedisViewProps> = ({
               </button>
               <span className={`text-[10px] font-extrabold px-3 py-1 rounded-full border ${
                 isCompleted
-                  ? 'bg-blue-950/60 text-blue-300 border-blue-500/50'
-                  : 'bg-emerald-950/60 text-emerald-300 border-emerald-500/50'
+                  ? 'bg-emerald-950/60 text-emerald-300 border-emerald-500/50'
+                  : 'bg-amber-950/60 text-amber-300 border-amber-500/50'
               }`}>
-                {isCompleted ? 'SELESAI' : 'AKTIF'}
+                {isCompleted ? 'RIWAYAT / FINAL' : 'AKTIF / DRAFT'}
               </span>
             </div>
           </div>
@@ -927,33 +1009,54 @@ export const AsesmenMedisView: React.FC<AsesmenMedisViewProps> = ({
             </div>
 
             {/* Actions */}
-            <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3">
-              <span className="text-slate-400 text-xs italic">
-                * Simpan draf jika pemeriksaan belum rampung, atau Finalisasi jika sudah siap dibawa ke Sidang Pleno TAT.
-              </span>
-              <div className="flex items-center space-x-2 w-full sm:w-auto">
+            {isCompleted ? (
+              <div className="bg-emerald-950/40 border border-emerald-500/40 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div className="flex items-center space-x-3">
+                  <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+                  <div>
+                    <h4 className="text-xs font-bold text-white">Asesmen Medis Telah Difinalisasi</h4>
+                    <p className="text-[11px] text-emerald-300/80">
+                      Berkas ini telah selesai pada tahap asesmen medis dan tersimpan di Riwayat Asesmen Medis (Siap Pleno TAT).
+                    </p>
+                  </div>
+                </div>
                 <button
                   type="button"
-                  onClick={() => handleSaveMedicalForm(false)}
-                  className="flex-1 sm:flex-none px-4 py-2.5 bg-[#142642] hover:bg-[#1b3459] text-slate-200 border border-[#234475] rounded-xl text-xs font-bold flex items-center justify-center space-x-2 transition-colors cursor-pointer"
+                  onClick={handleCloseCase}
+                  className="px-4 py-2 bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-200 border border-emerald-500/40 rounded-xl text-xs font-bold transition-colors cursor-pointer shrink-0"
                 >
-                  <Save className="w-4 h-4 text-slate-300" />
-                  <span>Simpan Draf Medis</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (window.confirm('Apakah Anda yakin ingin menyelesaikan dan memfinalisasi Asesmen Medis ini? Berkas akan diteruskan ke Sidang Pleno TAT.')) {
-                      handleSaveMedicalForm(true);
-                    }
-                  }}
-                  className="flex-1 sm:flex-none px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold rounded-xl text-xs flex items-center justify-center space-x-2 shadow-lg shadow-emerald-950/50 transition-all cursor-pointer"
-                >
-                  <CheckCircle2 className="w-4 h-4" />
-                  <span>Finalisasi &amp; Teruskan ke Pleno</span>
+                  Kembali ke Daftar
                 </button>
               </div>
-            </div>
+            ) : (
+              <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <span className="text-slate-400 text-xs italic">
+                  * Simpan draf jika pemeriksaan belum rampung, atau Finalisasi jika sudah siap dibawa ke Sidang Pleno TAT.
+                </span>
+                <div className="flex items-center space-x-2 w-full sm:w-auto">
+                  <button
+                    type="button"
+                    onClick={() => handleSaveMedicalForm(false)}
+                    className="flex-1 sm:flex-none px-4 py-2.5 bg-[#142642] hover:bg-[#1b3459] text-slate-200 border border-[#234475] rounded-xl text-xs font-bold flex items-center justify-center space-x-2 transition-colors cursor-pointer"
+                  >
+                    <Save className="w-4 h-4 text-slate-300" />
+                    <span>Simpan Draf Medis</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (window.confirm('Apakah Anda yakin ingin menyelesaikan dan memfinalisasi Asesmen Medis ini? Berkas akan diteruskan ke Sidang Pleno TAT dan berpindah ke Riwayat Medis.')) {
+                        handleSaveMedicalForm(true);
+                      }
+                    }}
+                    className="flex-1 sm:flex-none px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold rounded-xl text-xs flex items-center justify-center space-x-2 shadow-lg shadow-emerald-950/50 transition-all cursor-pointer"
+                  >
+                    <CheckCircle2 className="w-4 h-4" />
+                    <span>Finalisasi &amp; Teruskan ke Pleno</span>
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -977,17 +1080,23 @@ export const AsesmenMedisView: React.FC<AsesmenMedisViewProps> = ({
         <div>
           <h1 className="text-lg sm:text-xl font-bold text-white flex items-center space-x-2">
             <Stethoscope className="w-5 h-5 text-[#d4af37]" />
-            <span>Asesmen Medis &amp; Psikiatri TAT</span>
+            <span>{mode === 'history' ? 'Riwayat Asesmen Medis TAT' : 'Asesmen Medis & Psikiatri TAT'}</span>
           </h1>
           <p className="text-xs text-slate-400 mt-1">
-            Daftar berkas perkara aktif yang ditugaskan untuk pemeriksaan medis, uji urine laboratorium, dan skoring WHO ASSIST.
+            {mode === 'history'
+              ? 'Daftar berkas perkara yang telah selesai dilakukan asesmen medis & psikologis dan telah difinalisasi.'
+              : 'Daftar berkas perkara aktif yang ditugaskan untuk pemeriksaan medis, uji urine laboratorium, dan skoring WHO ASSIST.'}
           </p>
         </div>
 
         {/* Counter Badge */}
         <div className="self-start sm:self-auto">
-          <span className="px-3 py-1.5 rounded-xl text-xs font-bold border bg-[#142642] text-[#d4af37] border-[#234475]">
-            {filteredCases.length} Tugas Aktif
+          <span className={`px-3 py-1.5 rounded-xl text-xs font-bold border ${
+            mode === 'history'
+              ? 'bg-emerald-950/50 text-emerald-300 border-emerald-700/50'
+              : 'bg-[#142642] text-[#d4af37] border-[#234475]'
+          }`}>
+            {filteredCases.length} {mode === 'history' ? 'Berkas Selesai' : 'Tugas Aktif'}
           </span>
         </div>
       </div>

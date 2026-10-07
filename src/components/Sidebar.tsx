@@ -32,6 +32,7 @@ export type ActiveTab =
   | 'permohonan'
   | 'asesmen_aktif'
   | 'riwayat'
+  | 'riwayat_medis'
   | 'riwayat_hukum'
   | 'verifikasi'
   | 'penugasan'
@@ -143,6 +144,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             { id: 'medis', label: 'Asesmen Medis', icon: <Stethoscope className="w-4 h-4" /> },
             { id: 'tindak_lanjut', label: 'Tindak Lanjut & Kontrol Rehab', icon: <Share2 className="w-4 h-4" />, badge: badgeCounts.tindakLanjutTerhambat || undefined },
             { id: 'pleno', label: 'Pembahasan (Pleno)', icon: <Users className="w-4 h-4" />, badge: badgeCounts.siapPleno || undefined },
+            { id: 'riwayat_medis', label: 'Riwayat Asesmen Medis', icon: <History className="w-4 h-4" /> },
             { id: 'about', label: 'Bantuan & SOP', icon: <Info className="w-4 h-4" /> }
           ],
           showCreateButton: false,
