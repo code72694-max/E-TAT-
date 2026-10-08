@@ -22,7 +22,7 @@ import { MonitoringLaporanView } from './components/MonitoringLaporanView';
 import { AdministrasiView } from './components/AdministrasiView';
 import { AsesmenAktifView } from './components/AsesmenAktifView';
 import { RiwayatView } from './components/RiwayatView';
-import { ModalPengajuanBaru } from './components/ModalPengajuanBaru';
+import { PengajuanBaruView } from './components/PengajuanBaruView';
 import { ModalVerifikasiQR } from './components/ModalVerifikasiQR';
 import { AboutView } from './components/AboutView';
 import { ProfileView } from './components/ProfileView';
@@ -118,7 +118,6 @@ export default function App() {
   }, [fetchBackendData]);
 
   // Modals
-  const [isNewModalOpen, setIsNewModalOpen] = useState(false);
   const [qrModalPermohonan, setQrModalPermohonan] = useState<PermohonanAsesmen | null>(null);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
 
@@ -134,7 +133,14 @@ export default function App() {
     } else if (path.startsWith('/dashboard')) {
       setAppViewMode('dashboard');
       const parts = path.split('/').filter(Boolean);
-      if (parts[1] === 'detail' && parts[2]) {
+      if (parts[1] === 'pengajuan_baru' || parts[1] === 'pengajuan-baru' || (parts[1] === 'pengajuan' && parts[2] === 'baru')) {
+        setCurrentTab('pengajuan_baru');
+        setSelectedPermohonanId(null);
+        setSelectedHukumId(null);
+        setSelectedMedisId(null);
+        setSelectedRiwayatHukumId(null);
+        setSelectedTindakLanjutId(null);
+      } else if (parts[1] === 'detail' && parts[2]) {
         setSelectedPermohonanId(parts[2]);
         setSelectedHukumId(null);
         setSelectedMedisId(null);
@@ -311,7 +317,8 @@ export default function App() {
     (currentTab === 'riwayat_hukum' && selectedRiwayatHukumId) ||
     (currentTab === 'tindak_lanjut_jadwal' && selectedScheduleCaseId) ||
     (currentTab.startsWith('tindak_lanjut') && selectedTindakLanjutId) ||
-    currentTab === 'riwayat'
+    currentTab === 'riwayat' ||
+    currentTab === 'pengajuan_baru'
   );
 
   // Badge calculations for sidebar (menggunakan applicationStatus kanonis)
@@ -417,16 +424,16 @@ export default function App() {
     setSelectedTindakLanjutId(null);
     // 4 role kanonis + backward compat untuk role lama
     const roleAllowedTabs: Record<string, ActiveTab[]> = {
-      PENGAJU: ['beranda', 'permohonan', 'asesmen_aktif', 'penugasan', 'dokumen', 'tindak_lanjut', 'tindak_lanjut_jadwal', 'riwayat', 'about', 'profile'],
-      ADMIN: ['beranda', 'permohonan', 'asesmen_aktif', 'riwayat', 'verifikasi', 'penugasan', 'pleno', 'tindak_lanjut', 'tindak_lanjut_jadwal', 'verifikasi_akun', 'monitoring', 'about', 'profile'],
+      PENGAJU: ['beranda', 'permohonan', 'pengajuan_baru', 'asesmen_aktif', 'penugasan', 'dokumen', 'tindak_lanjut', 'tindak_lanjut_jadwal', 'riwayat', 'about', 'profile'],
+      ADMIN: ['beranda', 'permohonan', 'pengajuan_baru', 'asesmen_aktif', 'riwayat', 'verifikasi', 'penugasan', 'pleno', 'tindak_lanjut', 'tindak_lanjut_jadwal', 'verifikasi_akun', 'monitoring', 'about', 'profile'],
       MEDIS: ['beranda', 'medis', 'riwayat_medis', 'tindak_lanjut', 'pleno', 'about', 'profile'],
       HUKUM: ['beranda', 'hukum', 'pleno', 'riwayat_hukum', 'about', 'profile'],
       // Backward compat
-      pengaju: ['beranda', 'permohonan', 'asesmen_aktif', 'verifikasi', 'penugasan', 'dokumen', 'riwayat', 'about', 'profile'],
-      sekretariat: ['beranda', 'permohonan', 'verifikasi', 'penugasan', 'pleno', 'tindak_lanjut', 'tindak_lanjut_jadwal', 'riwayat', 'verifikasi_akun', 'about', 'profile'],
+      pengaju: ['beranda', 'permohonan', 'pengajuan_baru', 'asesmen_aktif', 'verifikasi', 'penugasan', 'dokumen', 'riwayat', 'about', 'profile'],
+      sekretariat: ['beranda', 'permohonan', 'pengajuan_baru', 'verifikasi', 'penugasan', 'pleno', 'tindak_lanjut', 'tindak_lanjut_jadwal', 'riwayat', 'verifikasi_akun', 'about', 'profile'],
       medis: ['beranda', 'medis', 'riwayat_medis', 'tindak_lanjut', 'pleno', 'about', 'profile'],
       hukum: ['beranda', 'hukum', 'pleno', 'riwayat_hukum', 'about', 'profile'],
-      koordinator: ['beranda', 'permohonan', 'pleno', 'dokumen', 'tindak_lanjut', 'tindak_lanjut_jadwal', 'about', 'profile'],
+      koordinator: ['beranda', 'permohonan', 'pengajuan_baru', 'pleno', 'dokumen', 'tindak_lanjut', 'tindak_lanjut_jadwal', 'about', 'profile'],
       pimpinan: ['beranda', 'monitoring', 'permohonan', 'tindak_lanjut', 'tindak_lanjut_jadwal', 'about', 'profile'],
       rehabilitasi: ['beranda', 'tindak_lanjut', 'tindak_lanjut_jadwal', 'dokumen', 'about', 'profile'],
       admin: ['beranda', 'administrasi', 'monitoring', 'about', 'profile']
@@ -463,13 +470,22 @@ export default function App() {
           />
         );
 
+      case 'pengajuan_baru':
+        return (
+          <PengajuanBaruView
+            currentUser={currentUser}
+            onBack={() => handleSelectTab('beranda')}
+            onSubmit={handleCreatePermohonan}
+          />
+        );
+
       case 'permohonan':
         return (
           <PermohonanList
             permohonanList={permohonanList}
             currentUser={currentUser}
             onSelectPermohonan={handleOpenPermohonan}
-            onOpenNewModal={() => setIsNewModalOpen(true)}
+            onOpenNewModal={() => handleSelectTab('pengajuan_baru')}
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
             onNavigateToRiwayat={() => handleSelectTab('riwayat')}
@@ -755,7 +771,7 @@ export default function App() {
             permohonanList={permohonanList}
             onSelectPermohonan={handleOpenPermohonan}
             onNavigateToTab={(tab) => handleSelectTab(tab)}
-            onOpenNewModal={() => setIsNewModalOpen(true)}
+            onOpenNewModal={() => handleSelectTab('pengajuan_baru')}
           />
         );
     }
@@ -858,7 +874,12 @@ export default function App() {
         onGoToLanding={() => changeAppViewMode('landing')}
         onGoToLogin={() => changeAppViewMode('login')}
         selectedPermohonan={activeDetailPermohonan}
+        isPengajuanBaru={currentTab === 'pengajuan_baru'}
         onBackFromDetail={() => {
+          if (currentTab === 'pengajuan_baru') {
+            handleSelectTab('beranda');
+            return;
+          }
           if (selectedPermohonanId) {
             setSelectedPermohonanId(null);
             navigate(`/dashboard/${currentTab}`);
@@ -907,7 +928,7 @@ export default function App() {
             currentUser={currentUser}
             users={users}
             onSelectUser={handleSelectUser}
-            onOpenNewModal={() => setIsNewModalOpen(true)}
+            onOpenNewModal={() => handleSelectTab('pengajuan_baru')}
             badgeCounts={badgeCounts}
             isMobileOpen={isMobileNavOpen}
             onCloseMobile={() => setIsMobileNavOpen(false)}
@@ -931,18 +952,10 @@ export default function App() {
           userRole={currentUser.role}
           currentTab={currentTab}
           onSelectTab={handleSelectTab}
-          onOpenNewModal={() => setIsNewModalOpen(true)}
+          onOpenNewModal={() => handleSelectTab('pengajuan_baru')}
           badgeCounts={badgeCounts}
         />
       )}
-
-      {/* Modal: Pengajuan Permohonan Asesmen Baru */}
-      <ModalPengajuanBaru
-        currentUser={currentUser}
-        isOpen={isNewModalOpen}
-        onClose={() => setIsNewModalOpen(false)}
-        onSubmit={handleCreatePermohonan}
-      />
 
       {/* Modal: Verifikasi QR Publik */}
       <ModalVerifikasiQR

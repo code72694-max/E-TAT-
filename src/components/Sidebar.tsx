@@ -30,6 +30,7 @@ import {
 export type ActiveTab =
   | 'beranda'
   | 'permohonan'
+  | 'pengajuan_baru'
   | 'asesmen_aktif'
   | 'riwayat'
   | 'riwayat_medis'
@@ -245,10 +246,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <button
             id="btn-buat-permohonan-sidebar"
             onClick={() => {
-              onOpenNewModal();
+              onSelectTab('pengajuan_baru');
               if (onCloseMobile) onCloseMobile();
             }}
-            className="w-full flex items-center justify-center space-x-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 px-3.5 rounded-xl border border-blue-500/40 transition-colors text-xs cursor-pointer shadow-sm"
+            className={`w-full flex items-center justify-center space-x-2 font-semibold py-2.5 px-3.5 rounded-xl border transition-colors text-xs cursor-pointer shadow-sm ${
+              currentTab === 'pengajuan_baru'
+                ? 'bg-blue-700 text-white border-blue-400 shadow-blue-900/40'
+                : 'bg-blue-600 hover:bg-blue-500 text-white border-blue-500/40'
+            }`}
           >
             <Plus className="w-4 h-4" />
             <span>{navConfig.buttonLabel}</span>

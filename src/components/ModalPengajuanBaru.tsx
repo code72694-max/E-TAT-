@@ -24,6 +24,9 @@ import {
   Mail,
   Camera,
   Eye,
+  Search,
+  Database,
+  ShieldCheck,
   Image as ImageIcon
 } from 'lucide-react';
 
@@ -64,7 +67,6 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
   onSubmit
 }) => {
   const [step, setStep] = useState<number>(1);
-  const [terperiksaTab, setTerperiksaTab] = useState<'data' | 'riwayat'>('data');
 
   // Form State: Step 1 (Terperiksa)
   const [namaLengkap, setNamaLengkap] = useState('');
@@ -80,7 +82,7 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
   const [kontakWali, setKontakWali] = useState('');
   const [statusKhusus, setStatusKhusus] = useState<'dewasa' | 'anak_berhadapan_hukum' | 'perlu_penerjemah'>('dewasa');
 
-  // Form State: Riwayat Terperiksa (Tab Riwayat)
+  // Form State: Riwayat Terperiksa (Step 2)
   const [statusResidivis, setStatusResidivis] = useState<'bukan_residivis' | 'residivis_1x' | 'residivis_berulang'>('bukan_residivis');
   const [riwayatTatSebelumnya, setRiwayatTatSebelumnya] = useState<string>('Belum Pernah (Pengajuan Permohonan Asesmen Pertama)');
   const [riwayatPerkaraLalu, setRiwayatPerkaraLalu] = useState<string>('Tidak memiliki catatan vonis pidana / DPO / perkara aktif lainnya.');
@@ -387,16 +389,17 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
         </div>
 
         {/* Wizard Step Indicators */}
-        <div className="bg-[#081224] border-b border-[#1b3459] px-6 py-3 flex items-center justify-between text-xs font-semibold">
+        <div className="bg-[#081224] border-b border-[#1b3459] px-6 py-3 flex items-center justify-between text-xs font-semibold overflow-x-auto">
           {[
             { num: 1, label: 'Identitas Terperiksa' },
-            { num: 2, label: 'Perkara & Barang Bukti' },
-            { num: 3, label: 'Kelengkapan Dokumen' },
-            { num: 4, label: 'Konfirmasi Pengajuan' }
+            { num: 2, label: 'Riwayat Kasus (NIK)' },
+            { num: 3, label: 'Perkara & Barang Bukti' },
+            { num: 4, label: 'Kelengkapan Dokumen' },
+            { num: 5, label: 'Konfirmasi Pengajuan' }
           ].map((s) => (
             <div
               key={s.num}
-              className={`flex items-center space-x-2 ${
+              className={`flex items-center space-x-2 shrink-0 ${
                 step === s.num
                   ? 'text-[#D4AF37] font-bold'
                   : step > s.num
@@ -422,15 +425,14 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
 
         {/* Wizard Step Forms */}
         <div className="p-6 max-h-[60vh] overflow-y-auto space-y-4">
-          {/* STEP 1: IDENTITAS TERPERIKSA & RIWAYAT */}
+          {/* STEP 1: IDENTITAS UTAMA TERPERIKSA */}
           {step === 1 && (
             <div className="space-y-4 text-xs">
-              {/* Top Name Input Row (Yang Diadukan) */}
-              <div className="bg-[#081224] border border-[#1b3459] rounded-xl p-4 space-y-3">
+              <div className="bg-[#081224] border border-[#1b3459] rounded-xl p-4 space-y-4">
                 <div className="flex items-center justify-between pb-2 border-b border-[#1b3459]/60">
                   <span className="font-bold text-white flex items-center space-x-2 text-xs">
                     <User className="w-4 h-4 text-[#D4AF37]" />
-                    <span>Identitas Utama Yang Diadukan / Terperiksa</span>
+                    <span>Data Pokok Identitas Terperiksa / Yang Diadukan</span>
                   </span>
                   <span className="text-[10px] text-[#D4AF37] font-mono bg-[#D4AF37]/10 px-2 py-0.5 rounded border border-[#D4AF37]/20">
                     Wajib Diisi Penyidik
@@ -464,266 +466,375 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
                   </div>
                 </div>
 
-                {/* Subjek live status indicator */}
-                {namaLengkap && (
-                  <div className="flex items-center justify-between pt-1 text-[11px] text-slate-400 bg-[#0d1f38]/60 p-2.5 rounded-lg border border-[#1b3459]/80">
-                    <div className="flex items-center space-x-2">
-                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                      <span>Subjek Aktif: <strong className="text-white">{namaLengkap}</strong></span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-[#1b3459]/40">
+                  <div>
+                    <label className="font-semibold text-slate-300 block mb-1">
+                      Nomor Induk Kependudukan (NIK) *
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={nik}
+                        onChange={(e) => setNik(e.target.value)}
+                        placeholder="16 Digit NIK KTP (Contoh: 6472011405010002)"
+                        className="w-full p-2.5 pl-3 pr-8 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg font-mono focus:ring-2 focus:ring-[#D4AF37] focus:border-[#D4AF37] outline-none text-xs"
+                      />
+                      <Search className="w-3.5 h-3.5 text-slate-500 absolute right-3 top-3" />
                     </div>
-                    <span className="text-[10px] text-[#D4AF37] font-mono">
-                      Status: {statusResidivis === 'bukan_residivis' ? 'Subjek Baru' : 'Tercatat Riwayat'}
-                    </span>
+                    <p className="text-[10px] text-slate-400 mt-1">
+                      NIK akan diverifikasi pada pangkalan data rekam jejak kriminal & e-TAT di Step 2.
+                    </p>
                   </div>
-                )}
-              </div>
 
-              {/* Sub-Tab Navigation Under Name: DATA TERPERIKSA vs RIWAYAT */}
-              <div className="bg-[#081224] border border-[#1b3459] rounded-xl overflow-hidden shadow-lg">
-                {/* Tab Header Buttons */}
-                <div className="flex border-b border-[#1b3459] bg-[#050e1c] p-1.5 gap-1.5">
-                  <button
-                    type="button"
-                    onClick={() => setTerperiksaTab('data')}
-                    className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold flex items-center justify-center space-x-2 transition-all cursor-pointer ${
-                      terperiksaTab === 'data'
-                        ? 'bg-[#133863] text-white border border-[#245899] shadow-md'
-                        : 'text-slate-400 hover:text-white hover:bg-white/5'
-                    }`}
-                  >
-                    <User className="w-3.5 h-3.5 text-[#D4AF37]" />
-                    <span>Tab Data Pokok Terperiksa</span>
-                  </button>
+                  <div>
+                    <label className="font-semibold text-slate-300 block mb-1">Status Kategori Terperiksa</label>
+                    <select
+                      value={statusKhusus}
+                      onChange={(e) => setStatusKhusus(e.target.value as any)}
+                      className="w-full p-2.5 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-[#D4AF37] outline-none text-xs"
+                    >
+                      <option value="dewasa">Dewasa Umum</option>
+                      <option value="anak_berhadapan_hukum">Anak Berhadapan Hukum (ABH - Di bawah 18 th)</option>
+                      <option value="perlu_penerjemah">Perlu Penerjemah Bahasa / Isyarat</option>
+                    </select>
+                  </div>
 
-                  <button
-                    type="button"
-                    onClick={() => setTerperiksaTab('riwayat')}
-                    className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold flex items-center justify-center space-x-2 transition-all cursor-pointer ${
-                      terperiksaTab === 'riwayat'
-                        ? 'bg-[#133863] text-white border border-[#245899] shadow-md'
-                        : 'text-slate-400 hover:text-white hover:bg-white/5'
-                    }`}
-                  >
-                    <History className="w-3.5 h-3.5 text-[#D4AF37]" />
-                    <span>Tab Riwayat Kasus</span>
-                    {statusResidivis !== 'bukan_residivis' && (
-                      <span className="w-2 h-2 rounded-full bg-amber-400"></span>
-                    )}
-                  </button>
+                  <div>
+                    <label className="font-semibold text-slate-300 block mb-1">Tempat &amp; Tanggal Lahir</label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <input
+                        type="text"
+                        value={tempatLahir}
+                        onChange={(e) => setTempatLahir(e.target.value)}
+                        placeholder="Tempat Lahir"
+                        className="p-2 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none text-xs"
+                      />
+                      <input
+                        type="date"
+                        value={tanggalLahir}
+                        onChange={(e) => setTanggalLahir(e.target.value)}
+                        className="p-2 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none text-xs"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="font-semibold text-slate-300 block mb-1">Usia &amp; Jenis Kelamin</label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <input
+                        type="number"
+                        value={usia}
+                        onChange={(e) => setUsia(Number(e.target.value))}
+                        placeholder="Usia (Tahun)"
+                        className="p-2 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none text-xs"
+                      />
+                      <select
+                        value={jenisKelamin}
+                        onChange={(e) => setJenisKelamin(e.target.value as any)}
+                        className="p-2 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none text-xs"
+                      >
+                        <option value="Laki-laki">Laki-laki</option>
+                        <option value="Perempuan">Perempuan</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="font-semibold text-slate-300 block mb-1">Pekerjaan</label>
+                    <input
+                      type="text"
+                      value={pekerjaan}
+                      onChange={(e) => setPekerjaan(e.target.value)}
+                      placeholder="Pekerjaan / Profesi"
+                      className="w-full p-2 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none text-xs"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="font-semibold text-slate-300 block mb-1">Nama Wali / Pendamping</label>
+                    <input
+                      type="text"
+                      value={namaWali}
+                      onChange={(e) => setNamaWali(e.target.value)}
+                      placeholder="Nama Orang Tua / Pasangan / Kuasa Hukum"
+                      className="w-full p-2 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none text-xs"
+                    />
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <label className="font-semibold text-slate-300 block mb-1">Alamat Sesuai KTP / Domisili</label>
+                    <input
+                      type="text"
+                      value={alamatKtp}
+                      onChange={(e) => setAlamatKtp(e.target.value)}
+                      placeholder="Alamat lengkap terperiksa saat ini"
+                      className="w-full p-2 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none text-xs"
+                    />
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <label className="font-semibold text-slate-300 block mb-1">Kontak Telepon Wali / Keluarga</label>
+                    <input
+                      type="text"
+                      value={kontakWali}
+                      onChange={(e) => setKontakWali(e.target.value)}
+                      placeholder="0812-XXXX-XXXX"
+                      className="w-full p-2 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none text-xs"
+                    />
+                  </div>
                 </div>
 
-                {/* TAB 1: DATA IDENTITAS & KEPENDUDUKAN */}
-                {terperiksaTab === 'data' && (
-                  <div className="p-4 space-y-4 animate-in fade-in duration-150">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="font-semibold text-slate-300 block mb-1">
-                          Nomor Induk Kependudukan (NIK)
-                        </label>
-                        <input
-                          type="text"
-                          value={nik}
-                          onChange={(e) => setNik(e.target.value)}
-                          placeholder="16 Digit NIK KTP"
-                          className="w-full p-2 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg font-mono focus:ring-2 focus:ring-[#D4AF37] focus:border-[#D4AF37] outline-none"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="font-semibold text-slate-300 block mb-1">Status Kategori Terperiksa</label>
-                        <select
-                          value={statusKhusus}
-                          onChange={(e) => setStatusKhusus(e.target.value as any)}
-                          className="w-full p-2 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-[#D4AF37] outline-none"
-                        >
-                          <option value="dewasa">Dewasa Umum</option>
-                          <option value="anak_berhadapan_hukum">Anak Berhadapan Hukum (ABH - Di bawah 18 th)</option>
-                          <option value="perlu_penerjemah">Perlu Penerjemah Bahasa / Isyarat</option>
-                        </select>
-                      </div>
-
-                      <div>
-                        <label className="font-semibold text-slate-300 block mb-1">Tempat &amp; Tanggal Lahir</label>
-                        <div className="grid grid-cols-2 gap-2">
-                          <input
-                            type="text"
-                            value={tempatLahir}
-                            onChange={(e) => setTempatLahir(e.target.value)}
-                            placeholder="Tempat Lahir"
-                            className="p-2 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none"
-                          />
-                          <input
-                            type="date"
-                            value={tanggalLahir}
-                            onChange={(e) => setTanggalLahir(e.target.value)}
-                            className="p-2 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none"
-                          />
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="font-semibold text-slate-300 block mb-1">Usia &amp; Jenis Kelamin</label>
-                        <div className="grid grid-cols-2 gap-2">
-                          <input
-                            type="number"
-                            value={usia}
-                            onChange={(e) => setUsia(Number(e.target.value))}
-                            placeholder="Usia (Tahun)"
-                            className="p-2 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none"
-                          />
-                          <select
-                            value={jenisKelamin}
-                            onChange={(e) => setJenisKelamin(e.target.value as any)}
-                            className="p-2 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none"
-                          >
-                            <option value="Laki-laki">Laki-laki</option>
-                            <option value="Perempuan">Perempuan</option>
-                          </select>
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="font-semibold text-slate-300 block mb-1">Pekerjaan</label>
-                        <input
-                          type="text"
-                          value={pekerjaan}
-                          onChange={(e) => setPekerjaan(e.target.value)}
-                          placeholder="Pekerjaan / Profesi"
-                          className="w-full p-2 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="font-semibold text-slate-300 block mb-1">Nama Wali / Pendamping</label>
-                        <input
-                          type="text"
-                          value={namaWali}
-                          onChange={(e) => setNamaWali(e.target.value)}
-                          placeholder="Nama Orang Tua / Pasangan / Kuasa Hukum"
-                          className="w-full p-2 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none"
-                        />
-                      </div>
-
-                      <div className="sm:col-span-2">
-                        <label className="font-semibold text-slate-300 block mb-1">Alamat Sesuai KTP / Domisili</label>
-                        <input
-                          type="text"
-                          value={alamatKtp}
-                          onChange={(e) => setAlamatKtp(e.target.value)}
-                          placeholder="Alamat lengkap terperiksa saat ini"
-                          className="w-full p-2 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none"
-                        />
-                      </div>
-
-                      <div className="sm:col-span-2">
-                        <label className="font-semibold text-slate-300 block mb-1">Kontak Telepon Wali / Keluarga</label>
-                        <input
-                          type="text"
-                          value={kontakWali}
-                          onChange={(e) => setKontakWali(e.target.value)}
-                          placeholder="0812-XXXX-XXXX"
-                          className="w-full p-2 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none"
-                        />
-                      </div>
-                      <div className="sm:col-span-2 pt-3 mt-3 border-t border-[#1b3459]/50">
-                        <h4 className="text-[11px] font-bold text-[#D4AF37] mb-3 uppercase tracking-wider">Informasi Asesmen Awal Penyidik</h4>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                          <div>
-                            <label className="font-semibold text-slate-300 block mb-1">Lama Penggunaan & Frekuensi Zat</label>
-                            <input
-                              type="text"
-                              value={lamaPenggunaanZat}
-                              onChange={(e) => setLamaPenggunaanZat(e.target.value)}
-                              placeholder="Contoh: 6 bulan, 1-2 kali per minggu"
-                              className="w-full p-2 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none"
-                            />
-                          </div>
-                          <div>
-                            <label className="font-semibold text-slate-300 block mb-1">Hasil Pemeriksaan Skrining Urin</label>
-                            <input
-                              type="text"
-                              value={hasilTesUrinAwal}
-                              onChange={(e) => setHasilTesUrinAwal(e.target.value)}
-                              placeholder="Contoh: Positif Methamphetamine (Sabu)"
-                              className="w-full p-2 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none"
-                            />
-                          </div>
-                          <div className="sm:col-span-2">
-                            <label className="font-semibold text-slate-300 block mb-1">Catatan Profiling Risiko & Intelijen</label>
-                            <textarea
-                              rows={2}
-                              value={catatanProfilingPenyidik}
-                              onChange={(e) => setCatatanProfilingPenyidik(e.target.value)}
-                              placeholder="Keterangan apakah terperiksa adalah pemakai murni, korban penyalahgunaan, atau bukan jaringan pengedar..."
-                              className="w-full p-2 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none text-xs"
-                            />
-                          </div>
-                        </div>
-                      </div>
+                <div className="pt-3 mt-3 border-t border-[#1b3459]/60">
+                  <h4 className="text-[11px] font-bold text-[#D4AF37] mb-3 uppercase tracking-wider flex items-center space-x-1.5">
+                    <Activity className="w-3.5 h-3.5" />
+                    <span>Informasi Asesmen Awal Penyidik</span>
+                  </h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="font-semibold text-slate-300 block mb-1">Lama Penggunaan & Frekuensi Zat</label>
+                      <input
+                        type="text"
+                        value={lamaPenggunaanZat}
+                        onChange={(e) => setLamaPenggunaanZat(e.target.value)}
+                        placeholder="Contoh: 6 bulan, 1-2 kali per minggu"
+                        className="w-full p-2 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none text-xs"
+                      />
+                    </div>
+                    <div>
+                      <label className="font-semibold text-slate-300 block mb-1">Hasil Pemeriksaan Skrining Urin</label>
+                      <input
+                        type="text"
+                        value={hasilTesUrinAwal}
+                        onChange={(e) => setHasilTesUrinAwal(e.target.value)}
+                        placeholder="Contoh: Positif Methamphetamine (Sabu)"
+                        className="w-full p-2 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none text-xs"
+                      />
+                    </div>
+                    <div className="sm:col-span-2">
+                      <label className="font-semibold text-slate-300 block mb-1">Catatan Profiling Risiko & Intelijen</label>
+                      <textarea
+                        rows={2}
+                        value={catatanProfilingPenyidik}
+                        onChange={(e) => setCatatanProfilingPenyidik(e.target.value)}
+                        placeholder="Keterangan apakah terperiksa adalah pemakai murni, korban penyalahgunaan, atau bukan jaringan pengedar..."
+                        className="w-full p-2 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none text-xs"
+                      />
                     </div>
                   </div>
-                )}
-
-                {/* TAB 2: RIWAYAT KASUS & HISTORI TAT */}
-                {terperiksaTab === 'riwayat' && (
-                  <div className="p-4 space-y-4 animate-in fade-in duration-150">
-                    <div className="flex items-center justify-between pb-2 border-b border-[#1b3459]">
-                      <h3 className="text-sm font-bold text-white flex items-center space-x-1.5">
-                        <History className="w-4 h-4 text-sky-400" />
-                        <span>Catatan Histori Terperiksa</span>
-                      </h3>
-                      <span className="text-[10px] text-slate-400 bg-[#050e1c] px-2 py-1 rounded border border-[#1b3459]">Data Terintegrasi e-TAT & SIPP</span>
-                    </div>
-
-                    <div className="space-y-3">
-                      {/* CARD 1 */}
-                      <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl p-3.5 hover:border-[#D4AF37] transition-all cursor-pointer group shadow-sm hover:shadow-[#D4AF37]/10" onClick={() => alert('Membuka detail perkara sebelumnya (Mockup)')}>
-                        <div className="flex justify-between items-start mb-2">
-                          <div>
-                            <span className="text-[10px] font-bold bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded border border-amber-500/30">Asesmen TAT 2024</span>
-                            <h4 className="text-xs font-bold text-white mt-1 group-hover:text-[#D4AF37] transition-colors">Perkara No. LP/A/45/II/2024/SPKT.SATRESNARKOBA</h4>
-                          </div>
-                          <span className="text-slate-400 text-[10px]">12 Feb 2024</span>
-                        </div>
-                        <p className="text-[11px] text-slate-300 leading-relaxed mb-2">Penyalahgunaan narkotika golongan I bukan tanaman (Sabu 0.12 gram). Rekomendasi: Rehabilitasi Rawat Jalan di Klinik Pratama BNNK Samarinda selama 2 bulan.</p>
-                        <div className="flex items-center space-x-3 text-[10px] text-slate-400">
-                          <span className="flex items-center space-x-1"><CheckCircle2 className="w-3 h-3 text-emerald-400" /> <span>Selesai Program (SKSP Terbit)</span></span>
-                          <span>•</span>
-                          <span>Instansi: Polresta Samarinda</span>
-                        </div>
-                      </div>
-
-                      {/* CARD 2 */}
-                      <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl p-3.5 hover:border-[#D4AF37] transition-all cursor-pointer group shadow-sm hover:shadow-[#D4AF37]/10" onClick={() => alert('Membuka detail perkara sebelumnya (Mockup)')}>
-                        <div className="flex justify-between items-start mb-2">
-                          <div>
-                            <span className="text-[10px] font-bold bg-rose-500/20 text-rose-300 px-2 py-0.5 rounded border border-rose-500/30">Putusan Pengadilan 2021</span>
-                            <h4 className="text-xs font-bold text-white mt-1 group-hover:text-[#D4AF37] transition-colors">Perkara No. 112/Pid.Sus/2021/PN Smr</h4>
-                          </div>
-                          <span className="text-slate-400 text-[10px]">05 Mei 2021</span>
-                        </div>
-                        <p className="text-[11px] text-slate-300 leading-relaxed mb-2">Vonis pidana penjara 1 tahun 6 bulan atas kepemilikan narkotika golongan I (Pasal 112 ayat 1 UU 35/2009).</p>
-                        <div className="flex items-center space-x-3 text-[10px] text-slate-400">
-                          <span className="flex items-center space-x-1"><AlertTriangle className="w-3 h-3 text-amber-400" /> <span>Bebas Murni (2022)</span></span>
-                          <span>•</span>
-                          <span>Instansi: Kejaksaan Negeri Samarinda</span>
-                        </div>
-                      </div>
-
-                      {/* ADD NEW CARD BUTTON */}
-                      <button className="w-full py-2.5 mt-2 border border-dashed border-[#1b3459] text-slate-400 rounded-lg text-xs font-medium hover:text-white hover:border-[#D4AF37] hover:bg-[#D4AF37]/10 transition-colors flex items-center justify-center space-x-1.5" onClick={() => alert('Fitur tambah catatan histori manual')}>
-                        <Plus className="w-3.5 h-3.5" />
-                        <span>Kaitkan Riwayat Perkara Lain</span>
-                      </button>
-                    </div>
-                  </div>
-                )}
+                </div>
               </div>
             </div>
           )}
 
-          {/* STEP 2: PERKARA & BARANG BUKTI */}
+          {/* STEP 2: RIWAYAT KASUS & PEMERIKSAAN NIK */}
           {step === 2 && (
+            <div className="space-y-4 text-xs">
+              {/* Header Box Pencarian NIK */}
+              <div className="bg-[#081224] border border-[#1b3459] rounded-xl p-4 space-y-3">
+                <div className="flex items-center justify-between pb-2 border-b border-[#1b3459]/60">
+                  <div className="flex items-center space-x-2">
+                    <Database className="w-4 h-4 text-[#D4AF37]" />
+                    <span className="font-bold text-white text-xs">Pemeriksaan Rekam Jejak Terpadu (Berdasarkan NIK)</span>
+                  </div>
+                  <span className="text-[10px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded flex items-center space-x-1">
+                    <ShieldCheck className="w-3 h-3" />
+                    <span>Terhubung e-TAT & SIPP</span>
+                  </span>
+                </div>
+
+                <div className="bg-[#050e1c] border border-[#1b3459] rounded-lg p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div>
+                    <div className="text-[11px] text-slate-400">Subjek Terperiksa:</div>
+                    <div className="font-bold text-white text-sm">
+                      {namaLengkap || 'Nama belum diisi di Step 1'} {alias ? `(${alias})` : ''}
+                    </div>
+                  </div>
+                  <div className="sm:text-right">
+                    <div className="text-[11px] text-slate-400">NIK Terverifikasi:</div>
+                    <div className="font-mono font-bold text-[#D4AF37] text-sm">
+                      {nik || 'Belum diisi (Kembali ke Step 1)'}
+                    </div>
+                  </div>
+                </div>
+
+                {nik ? (
+                  <div className="p-3 bg-sky-950/20 border border-sky-500/30 rounded-lg flex items-start space-x-2 text-[11px] text-sky-200">
+                    <Search className="w-4 h-4 text-sky-400 shrink-0 mt-0.5" />
+                    <div>
+                      <span>Pemeriksaan otomatis berhasil dijalankan untuk NIK <strong className="font-mono text-white">{nik}</strong>. Sistem telah mencocokkan basis data nasional riwayat TAT, rekam perkara pidana narkotika, dan layanan rehabilitasi.</span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="p-3 bg-amber-950/20 border border-amber-500/30 rounded-lg flex items-start space-x-2 text-[11px] text-amber-200">
+                    <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                    <div>
+                      <span>NIK belum dimasukkan pada Step 1. Silakan kembali ke Step 1 dan lengkapi 16 digit NIK untuk verifikasi rekam jejak otomatis yang akurat.</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Status Residivis Selector & Indikator */}
+              <div className="bg-[#081224] border border-[#1b3459] rounded-xl p-4 space-y-3">
+                <label className="font-semibold text-slate-200 block text-xs">
+                  Klasifikasi Status Residivisme & Hasil Pemeriksaan *
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                  <button
+                    type="button"
+                    onClick={() => setStatusResidivis('bukan_residivis')}
+                    className={`p-3 rounded-lg border text-left transition-all cursor-pointer ${
+                      statusResidivis === 'bukan_residivis'
+                        ? 'border-emerald-500 bg-emerald-950/20 text-white shadow-sm'
+                        : 'border-[#1b3459] bg-[#050e1c] text-slate-400 hover:text-white hover:border-slate-600'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="font-bold text-xs text-white">Bukan Residivis</span>
+                      {statusResidivis === 'bukan_residivis' && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />}
+                    </div>
+                    <p className="text-[10px] text-slate-400 leading-tight">Pengajuan asesmen pertama kali, belum pernah dipidana / TAT.</p>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setStatusResidivis('residivis_1x')}
+                    className={`p-3 rounded-lg border text-left transition-all cursor-pointer ${
+                      statusResidivis === 'residivis_1x'
+                        ? 'border-amber-500 bg-amber-950/20 text-white shadow-sm'
+                        : 'border-[#1b3459] bg-[#050e1c] text-slate-400 hover:text-white hover:border-slate-600'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="font-bold text-xs text-amber-300">Residivis 1x</span>
+                      {statusResidivis === 'residivis_1x' && <AlertCircle className="w-3.5 h-3.5 text-amber-400" />}
+                    </div>
+                    <p className="text-[10px] text-slate-400 leading-tight">Pernah 1 kali asesmen TAT atau pernah menjalani vonis perkara.</p>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setStatusResidivis('residivis_berulang')}
+                    className={`p-3 rounded-lg border text-left transition-all cursor-pointer ${
+                      statusResidivis === 'residivis_berulang'
+                        ? 'border-rose-500 bg-rose-950/20 text-white shadow-sm'
+                        : 'border-[#1b3459] bg-[#050e1c] text-slate-400 hover:text-white hover:border-slate-600'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="font-bold text-xs text-rose-300">Residivis Berulang</span>
+                      {statusResidivis === 'residivis_berulang' && <AlertTriangle className="w-3.5 h-3.5 text-rose-400" />}
+                    </div>
+                    <p className="text-[10px] text-slate-400 leading-tight">Lebih dari 1 kali riwayat perkara / rehabilitasi sebelumnya.</p>
+                  </button>
+                </div>
+              </div>
+
+              {/* Rincian Catatan Riwayat Kasus */}
+              <div className="bg-[#081224] border border-[#1b3459] rounded-xl p-4 space-y-3">
+                <div className="flex items-center justify-between pb-2 border-b border-[#1b3459]/60">
+                  <h3 className="text-xs font-bold text-white flex items-center space-x-1.5">
+                    <History className="w-4 h-4 text-[#D4AF37]" />
+                    <span>Rincian Rekam Jejak Perkara & Histori Asesmen</span>
+                  </h3>
+                  <span className="text-[10px] text-slate-400 font-mono">
+                    {statusResidivis === 'bukan_residivis' ? '0 Riwayat Kasus' : '2 Riwayat Terdeteksi'}
+                  </span>
+                </div>
+
+                {statusResidivis === 'bukan_residivis' ? (
+                  <div className="p-4 bg-[#050e1c] rounded-lg border border-emerald-500/20 text-center space-y-1">
+                    <CheckCircle2 className="w-6 h-6 text-emerald-400 mx-auto" />
+                    <p className="font-bold text-white text-xs">Tidak Ada Riwayat Kasus Sebelumnya</p>
+                    <p className="text-[11px] text-slate-400 max-w-md mx-auto">
+                      Subjek terperiksa dengan NIK <strong className="font-mono text-slate-300">{nik || '(Belum terisi)'}</strong> belum pernah tercatat mengajukan permohonan asesmen TAT atau memiliki riwayat vonis narkotika sebelumnya di pangkalan data e-TAT & SIPP.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {/* CARD 1 */}
+                    <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl p-3.5 hover:border-[#D4AF37] transition-all cursor-pointer group shadow-sm hover:shadow-[#D4AF37]/10" onClick={() => alert('Membuka detail perkara sebelumnya (Mockup)')}>
+                      <div className="flex justify-between items-start mb-2">
+                        <div>
+                          <span className="text-[10px] font-bold bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded border border-amber-500/30">Asesmen TAT 2024</span>
+                          <h4 className="text-xs font-bold text-white mt-1 group-hover:text-[#D4AF37] transition-colors">Perkara No. LP/A/45/II/2024/SPKT.SATRESNARKOBA</h4>
+                        </div>
+                        <span className="text-slate-400 text-[10px]">12 Feb 2024</span>
+                      </div>
+                      <p className="text-[11px] text-slate-300 leading-relaxed mb-2">Penyalahgunaan narkotika golongan I bukan tanaman (Sabu 0.12 gram). Rekomendasi: Rehabilitasi Rawat Jalan di Klinik Pratama BNNK Samarinda selama 2 bulan.</p>
+                      <div className="flex items-center space-x-3 text-[10px] text-slate-400">
+                        <span className="flex items-center space-x-1"><CheckCircle2 className="w-3 h-3 text-emerald-400" /> <span>Selesai Program (SKSP Terbit)</span></span>
+                        <span>•</span>
+                        <span>Instansi: Polresta Samarinda</span>
+                      </div>
+                    </div>
+
+                    {/* CARD 2 */}
+                    <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl p-3.5 hover:border-[#D4AF37] transition-all cursor-pointer group shadow-sm hover:shadow-[#D4AF37]/10" onClick={() => alert('Membuka detail perkara sebelumnya (Mockup)')}>
+                      <div className="flex justify-between items-start mb-2">
+                        <div>
+                          <span className="text-[10px] font-bold bg-rose-500/20 text-rose-300 px-2 py-0.5 rounded border border-rose-500/30">Putusan Pengadilan 2021</span>
+                          <h4 className="text-xs font-bold text-white mt-1 group-hover:text-[#D4AF37] transition-colors">Perkara No. 112/Pid.Sus/2021/PN Smr</h4>
+                        </div>
+                        <span className="text-slate-400 text-[10px]">05 Mei 2021</span>
+                      </div>
+                      <p className="text-[11px] text-slate-300 leading-relaxed mb-2">Vonis pidana penjara 1 tahun 6 bulan atas kepemilikan narkotika golongan I (Pasal 112 ayat 1 UU 35/2009).</p>
+                      <div className="flex items-center space-x-3 text-[10px] text-slate-400">
+                        <span className="flex items-center space-x-1"><AlertTriangle className="w-3 h-3 text-amber-400" /> <span>Bebas Murni (2022)</span></span>
+                        <span>•</span>
+                        <span>Instansi: Kejaksaan Negeri Samarinda</span>
+                      </div>
+                    </div>
+
+                    {/* ADD NEW CARD BUTTON */}
+                    <button className="w-full py-2.5 mt-2 border border-dashed border-[#1b3459] text-slate-400 rounded-lg text-xs font-medium hover:text-white hover:border-[#D4AF37] hover:bg-[#D4AF37]/10 transition-colors flex items-center justify-center space-x-1.5 cursor-pointer" onClick={() => alert('Fitur tambah catatan histori manual')}>
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>Kaitkan Riwayat Perkara Lain / Catatan Tambahan</span>
+                    </button>
+                  </div>
+                )}
+
+                {/* Form Input Detail Riwayat */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-3 border-t border-[#1b3459]/50">
+                  <div>
+                    <label className="font-semibold text-slate-300 block mb-1">Riwayat Asesmen TAT Sebelumnya</label>
+                    <input
+                      type="text"
+                      value={riwayatTatSebelumnya}
+                      onChange={(e) => setRiwayatTatSebelumnya(e.target.value)}
+                      placeholder="Contoh: Pernah Asesmen 1x pada Feb 2024 di BNNK Samarinda"
+                      className="w-full p-2 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none text-xs"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="font-semibold text-slate-300 block mb-1">Riwayat Program Rehabilitasi</label>
+                    <input
+                      type="text"
+                      value={riwayatRehabilitasi}
+                      onChange={(e) => setRiwayatRehabilitasi(e.target.value)}
+                      placeholder="Contoh: Rawat Jalan di Klinik Pratama BNNK (2 Bulan)"
+                      className="w-full p-2 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none text-xs"
+                    />
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <label className="font-semibold text-slate-300 block mb-1">Riwayat Perkara Lalu & Putusan Pidana</label>
+                    <textarea
+                      rows={2}
+                      value={riwayatPerkaraLalu}
+                      onChange={(e) => setRiwayatPerkaraLalu(e.target.value)}
+                      placeholder="Rincian vonis hakim, pasal yang diputus, masa pidana, dan eksekusi..."
+                      className="w-full p-2 border border-[#1b3459] bg-[#050e1c] text-white rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none text-xs"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* STEP 3: PERKARA & BARANG BUKTI */}
+          {step === 3 && (
             <div className="space-y-4 text-xs">
               <div className="bg-[#081224] border border-[#1b3459] rounded-xl p-4 space-y-4">
                 <div className="flex items-center space-x-2 pb-2 border-b border-[#1b3459]/60">
@@ -1090,8 +1201,8 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
             </div>
           )}
 
-          {/* STEP 3: KELENGKAPAN DOKUMEN PERSYARATAN */}
-          {step === 3 && (
+          {/* STEP 4: KELENGKAPAN DOKUMEN PERSYARATAN */}
+          {step === 4 && (
             <div className="space-y-3 text-xs">
               <div className="bg-[#081224] border border-[#1b3459] rounded-lg p-3 text-slate-300">
                 Pilih atau tandai dokumen persyaratan administrasi yang dilampirkan dalam berkas fisik/digital:
@@ -1161,8 +1272,8 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
             </div>
           )}
 
-          {/* STEP 4: KONFIRMASI PENGESAHAN */}
-          {step === 4 && (
+          {/* STEP 5: KONFIRMASI PENGESAHAN */}
+          {step === 5 && (
             <div className="space-y-4 text-xs">
               <div className="bg-emerald-950/30 border border-emerald-500/40 rounded-xl p-4">
                 <h4 className="font-bold text-slate-200 text-sm mb-1 font-['Cinzel',serif]">Konfirmasi Ringkasan Pengajuan</h4>
@@ -1177,9 +1288,13 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
                   <span className="font-bold text-white">{namaLengkap || 'Belum diisi'}</span>
                 </div>
                 <div className="flex justify-between py-1 border-b border-[#1b3459]">
+                  <span className="text-slate-400">Nomor Induk Kependudukan (NIK)</span>
+                  <span className="font-mono font-bold text-[#D4AF37]">{nik || 'Belum diisi'}</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-[#1b3459]">
                   <span className="text-slate-400">Status Residivisme</span>
-                  <span className="font-semibold text-emerald-400">
-                    {statusResidivis === 'bukan_residivis' ? 'Bukan Residivis (Baru)' : 'Tercatat Residivis / Pernah TAT'}
+                  <span className={`font-semibold ${statusResidivis === 'bukan_residivis' ? 'text-emerald-400' : 'text-amber-400'}`}>
+                    {statusResidivis === 'bukan_residivis' ? 'Bukan Residivis (Baru)' : statusResidivis === 'residivis_1x' ? 'Residivis 1x' : 'Residivis Berulang'}
                   </span>
                 </div>
                 <div className="flex justify-between py-1 border-b border-[#1b3459]">
@@ -1221,7 +1336,7 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
             <div />
           )}
 
-          {step < 4 ? (
+          {step < 5 ? (
             <button
               onClick={() => setStep(step + 1)}
               className="bg-gradient-to-r from-[#144782] via-[#17549c] to-[#1c64b8] hover:from-[#175194] hover:via-[#1c60b0] hover:to-[#2274d4] text-white px-5 py-2 rounded-xl text-xs font-bold flex items-center space-x-1.5 border border-[#2d7ad6]/70 shadow-[0_2px_10px_rgba(20,83,154,0.35)] cursor-pointer transition-all"
