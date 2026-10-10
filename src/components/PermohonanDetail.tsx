@@ -4,7 +4,8 @@ import {
   UserProfile,
   UserRole,
   StatusProsesUtama,
-  DokumenPersyaratan
+  DokumenPersyaratan,
+  StatusVerifikasiDokumen
 } from '../types';
 import {
   ArrowLeft,
@@ -625,7 +626,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
   };
 
   // Handle Sekretariat verifying a document
-  const handleVerifyDocumentItem = async (docId: string, status: 'sesuai' | 'perlu_perbaikan', note?: string) => {
+  const handleVerifyDocumentItem = async (docId: string, status: StatusVerifikasiDokumen, note?: string) => {
     const listToUse = (permohonan.dokumenList && permohonan.dokumenList.length > 0)
       ? permohonan.dokumenList
       : DEFAULT_REQUIRED_DOCUMENTS;
@@ -666,10 +667,12 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
           timestamp: new Date().toLocaleDateString('id-ID') + ' ' + new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
           actorNama: currentUser.name,
           actorPeran: currentUser.role,
-          aksi: status === 'perlu_perbaikan' ? 'Minta Perbaikan Berkas' : 'Verifikasi Berkas Sesuai',
+          aksi: status === 'perlu_perbaikan' ? 'Minta Perbaikan Berkas' : status === 'sesuai' ? 'Verifikasi Berkas Sesuai' : 'Ubah Status Verifikasi Berkas',
           rincian: status === 'perlu_perbaikan'
             ? `Dokumen '${docId}' perlu diperbaiki. Catatan: ${note || '-'}`
-            : `Dokumen '${docId}' dinyatakan sesuai & valid.`
+            : status === 'sesuai'
+            ? `Dokumen '${docId}' dinyatakan sesuai & valid.`
+            : `Status verifikasi dokumen '${docId}' diubah menjadi '${status}'.`
         },
         ...(permohonan.auditLogs || [])
       ]
