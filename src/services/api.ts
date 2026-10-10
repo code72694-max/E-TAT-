@@ -1,4 +1,4 @@
-import { PermohonanAsesmen, RegistrasiPengguna, UserProfile, UserRole } from '../types';
+import { PermohonanAsesmen, RegistrasiPengguna, UserProfile, UserRole, PrasyaratPemeriksaan } from '../types';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '/api';
 
@@ -482,5 +482,21 @@ export const dashboardApi = {
 
   getAnalytics: async () => {
     return request<any>('/dashboard/analytics');
+  },
+};
+
+// =====================================================================
+// PRASYARAT PEMERIKSAAN API
+// =====================================================================
+export const prasyaratApi = {
+  getByPermohonan: async (permohonanId: string) => {
+    return request<{ permohonan: any; prasyarat: PrasyaratPemeriksaan | null }>(`/prasyarat-pemeriksaan/${permohonanId}`);
+  },
+
+  save: async (permohonanId: string, payload: Partial<PrasyaratPemeriksaan>) => {
+    return request<PrasyaratPemeriksaan>(`/prasyarat-pemeriksaan/${permohonanId}`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
   },
 };

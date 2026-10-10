@@ -1,20 +1,71 @@
 import React, { useState } from 'react';
 import { PermohonanAsesmen, UserProfile } from '../types';
-import { Users, ArrowRight, FileText } from 'lucide-react';
+import { Users, ArrowRight, FileText, Edit } from 'lucide-react';
 import { BeritaAcaraModal } from './BeritaAcaraModal';
+import { FormHasilPlenoModal } from './FormHasilPlenoModal';
+import { sidangPlenoApi } from '../services/api';
 
 interface PlenoTATViewProps {
   permohonanList: PermohonanAsesmen[];
   currentUser: UserProfile;
   onSelectPermohonan: (id: string) => void;
+  onUpdatePermohonan?: (id: string, updated: any) => void;
 }
 
 export const PlenoTATView: React.FC<PlenoTATViewProps> = ({
   permohonanList,
   currentUser,
-  onSelectPermohonan
+  onSelectPermohonan,
+  onUpdatePermohonan
 }) => {
   const [baPermohonan, setBaPermohonan] = useState<PermohonanAsesmen | null>(null);
+  const [formPlenoItem, setFormPlenoItem] = useState<PermohonanAsesmen | null>(null);
+
+  const handleSavePleno = async (permohonanId: string, payload: any) => {
+    try {
+      const response = await sidangPlenoApi.simpanHasil(permohonanId, payload);
+      
+      if (response.success && onUpdatePermohonan) {
+        // Find existing permohonan to merge
+        const existing = permohonanList.find(p => p.id === permohonanId);
+        if (existing) {
+          const updatedPermohonan = {
+            ...existing,
+            sidangPleno: response.data,
+            statusProsesUtama: payload.statusPleno === 'selesai_sepakat' 
+              ? 'pengesahan_rekomendasi' 
+              : existing.statusProsesUtama,
+            applicationStatus: payload.statusPleno === 'selesai_sepakat' 
+              ? 'RESULTS_ISSUED' 
+              : existing.applicationStatus
+          };
+          onUpdatePermohonan(permohonanId, updatedPermohonan);
+        }
+      }
+      setFormPlenoItem(null);
+    } catch (error) {
+      console.error("Failed to save hasil pleno", error);
+      alert("Gagal menyimpan hasil pleno.");
+    }
+  };
+
+  const handleUploadBA = async (permohonanId: string, file: File) => {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const response = await sidangPlenoApi.uploadBeritaAcara(permohonanId, formData);
+      if (response.success && onUpdatePermohonan) {
+        const existing = permohonanList.find(p => p.id === permohonanId);
+        if (existing) {
+          onUpdatePermohonan(permohonanId, { ...existing, sidangPleno: response.data });
+        }
+        alert('Berita Acara berhasil diunggah.');
+      }
+    } catch (error) {
+      console.error("Upload failed", error);
+      alert("Gagal mengunggah Berita Acara.");
+    }
+  };
 
   const plenoList = permohonanList.filter(p => 
     ['siap_pleno', 'pembahasan_pleno', 'pengesahan_rekomendasi', 'rekomendasi_terbit'].includes(p.statusProsesUtama)
@@ -26,6 +77,14 @@ export const PlenoTATView: React.FC<PlenoTATViewProps> = ({
         <BeritaAcaraModal
           permohonan={baPermohonan}
           onClose={() => setBaPermohonan(null)}
+        />
+      )}
+
+      {formPlenoItem && (
+        <FormHasilPlenoModal
+          permohonan={formPlenoItem}
+          onClose={() => setFormPlenoItem(null)}
+          onSave={handleSavePleno}
         />
       )}
 
@@ -92,26 +151,69 @@ export const PlenoTATView: React.FC<PlenoTATViewProps> = ({
                     <span className="text-[10px] uppercase font-bold text-[#d4af37] block">KESEPAKATAN MUSYAWARAH PLENO:</span>
                     <span className="font-semibold text-white text-xs leading-snug block">{item.sidangPleno.kesepakatanRekomendasi}</span>
                   </div>
-                  <button
-                    onClick={(e) => { e.stopPropagation(); setBaPermohonan(item); }}
-                    className="bg-[#d4af37] hover:bg-[#e8c84a] text-[#0b172a] text-xs font-bold px-3.5 py-2 rounded-xl flex items-center justify-center space-x-1.5 shrink-0 transition-colors w-full sm:w-auto"
-                  >
-                    <FileText className="w-3.5 h-3.5" />
-                    <span>Lihat Berita Acara</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
+                  <div className="flex items-center gap-2 mt-2 sm:mt-0 w-full sm:w-auto">
+                    <label className="bg-[#142642] hover:bg-[#1b3459] text-white text-xs font-bold px-3.5 py-2 rounded-xl flex items-center justify-center space-x-1.5 cursor-pointer border border-[#234475] transition-colors flex-1 sm:flex-none">
+                      <input 
+                        type="file" 
+                        className="hidden" 
+                        accept="application/pdf"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleUploadBA(item.id, file);
+                          e.target.value = '';
+                        }}
+                      />
+                      <span>{item.sidangPleno.fileBeritaAcaraSigned ? 'Ubah BA Tersimpan' : 'Unggah BA TTD'}</span>
+                    </label>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setBaPermohonan(item); }}
+                      className="bg-[#d4af37] hover:bg-[#e8c84a] text-[#0b172a] text-xs font-bold px-3.5 py-2 rounded-xl flex items-center justify-center space-x-1.5 shrink-0 transition-colors flex-1 sm:flex-none"
+                    >
+                      <FileText className="w-3.5 h-3.5" />
+                      <span>{item.sidangPleno.fileBeritaAcaraSigned ? 'Lihat Draf / Cetak' : 'Lihat Berita Acara'}</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                    {item.sidangPleno.fileBeritaAcaraSigned && (
+                       <a 
+                         href={item.sidangPleno.fileBeritaAcaraSigned} 
+                         target="_blank" 
+                         rel="noreferrer"
+                         onClick={e => e.stopPropagation()}
+                         className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3.5 py-2 rounded-xl flex items-center justify-center space-x-1.5 shrink-0 transition-colors flex-1 sm:flex-none"
+                       >
+                         Lihat PDF Final
+                       </a>
+                    )}
+                  </div>
                 </div>
               )}
 
-              {/* Tombol BA meski belum ada kesepakatan (draft) */}
-              {!item.sidangPleno?.kesepakatanRekomendasi && (
-                <div className="flex justify-end">
+              {/* Tombol Input Hasil Pleno / BA */}
+              {!item.sidangPleno?.kesepakatanRekomendasi ? (
+                <div className="flex flex-wrap justify-end gap-2">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setFormPlenoItem(item); }}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-semibold bg-[#1b3459] text-white hover:bg-[#234475] transition-colors"
+                  >
+                    <Edit className="w-3 h-3" />
+                    Input Hasil Pleno
+                  </button>
                   <button
                     onClick={(e) => { e.stopPropagation(); setBaPermohonan(item); }}
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-semibold border border-[#1b3459] text-slate-300 hover:border-[#d4af37]/50 hover:text-[#d4af37] transition-colors"
                   >
                     <FileText className="w-3 h-3" />
                     Draft Berita Acara
+                  </button>
+                </div>
+              ) : (
+                <div className="flex justify-end gap-2 mt-2">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setFormPlenoItem(item); }}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-semibold bg-[#1b3459] text-white hover:bg-[#234475] transition-colors"
+                  >
+                    <Edit className="w-3 h-3" />
+                    Revisi Pleno
                   </button>
                 </div>
               )}

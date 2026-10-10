@@ -619,6 +619,7 @@ export default function App() {
             permohonanList={permohonanList}
             currentUser={currentUser}
             onSelectPermohonan={handleOpenPermohonan}
+            onUpdatePermohonan={handleUpdatePermohonan}
           />
         );
 

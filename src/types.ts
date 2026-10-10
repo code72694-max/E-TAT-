@@ -213,6 +213,63 @@ export interface Terperiksa {
   kontakWali?: string;
 }
 
+// Prasyarat Pemeriksaan & Penerimaan Subjek (Section 8 flow.md)
+export interface PrasyaratPemeriksaan {
+  id?: string;
+  permohonanId?: string;
+
+  // 1. Checklist Kehadiran & Kedatangan Subjek
+  waktuKedatangan?: string;
+  kehadiranSubjek: boolean;
+  pencocokanIdentitas: boolean;
+  catatanPencocokanIdentitas?: string;
+
+  // 2. Petugas Pengantar & Pendamping/Wali Hadir
+  namaPengantar?: string;
+  instansiPengantar?: string;
+  jabatanPengantar?: string;
+  kehadiranPengantar: boolean;
+
+  kehadiranPendamping: boolean;
+  namaPendamping?: string;
+  hubunganPendamping?: string;
+  dasarKeterlibatan?: string;
+  kontakPendamping?: string;
+
+  // 3. Penerjemah
+  membutuhkanPenerjemah: boolean;
+  namaPenerjemah?: string;
+  bahasaPenerjemah?: string;
+  kehadiranPenerjemah: boolean;
+  nomorPenugasanPenerjemah?: string;
+
+  // 4. Form Persetujuan / Assent (Informed Consent)
+  sudahDisetujui: boolean;
+  jenisFormPersetujuan?: string;
+  tanggalPersetujuan?: string;
+  penandatanganPersetujuan?: string;
+  dokumenPersetujuanUrl?: string;
+
+  // 5. Pernyataan Bebas Biaya
+  pernyataanBebasBiaya: boolean;
+  tanggalPernyataanBebasBiaya?: string;
+  dokumenBebasBiayaUrl?: string;
+
+  // Catatan Tambahan / Kondisi Khusus
+  kondisiKhususDarurat: boolean;
+  catatanKondisiKhusus?: string;
+  tindakanDaruratRujukan?: string;
+
+  petugasPenerimaId?: string;
+  petugasPenerima?: {
+    id: string;
+    name: string;
+    role: string;
+  };
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 // Perkara Hukum Terkait
 export interface PerkaraHukum {
   id: string;
@@ -787,6 +844,7 @@ export interface PermohonanAsesmen {
   pengawasanKlien?: PengawasanKlien;
   monitoringTindakLanjut?: MonitoringTindakLanjut; // JUKNIS-aligned monitoring module
   instrumenKriteriaPlasemen?: InstrumenKriteriaPlasemen;
+  prasyaratPemeriksaan?: PrasyaratPemeriksaan;
 
   // Fitur Pendukung
   klarifikasiList: Klarifikasi[];

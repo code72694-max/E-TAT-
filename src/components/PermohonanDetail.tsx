@@ -32,6 +32,7 @@ import {
   Edit3,
   Send,
   Activity,
+  FileCheck,
   Mail,
   Camera,
   Eye,
@@ -50,6 +51,7 @@ import { PengawasanPascaTatSection } from './PengawasanPascaTatSection';
 import { InstrumenKriteriaPlasemenView } from './InstrumenKriteriaPlasemenView';
 import { ModalInputAsesmen } from './ModalInputAsesmen';
 import { BeritaAcaraModal } from './BeritaAcaraModal';
+import { PrasyaratPemeriksaanView } from './PrasyaratPemeriksaanView';
 import { sendPengajuanEmailNotification } from '../services/emailService';
 
 interface PermohonanDetailProps {
@@ -62,6 +64,7 @@ interface PermohonanDetailProps {
 
 export type DetailTab =
   | 'ringkasan'
+  | 'prasyarat'
   | 'administrasi'
   | 'jadwal'
   | 'medis'
@@ -244,6 +247,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
       case 'pengaju': {
         const tabs: { id: DetailTab; label: string; icon: React.ReactNode }[] = [
           { id: 'ringkasan', label: 'Status Perkara', icon: <User className="w-3.5 h-3.5" /> },
+          { id: 'prasyarat', label: 'Prasyarat & Kedatangan', icon: <FileCheck className="w-3.5 h-3.5" /> },
           { id: 'administrasi', label: 'Berkas (LP/BAP)', icon: <FileText className="w-3.5 h-3.5" /> },
         ];
         if (permohonan.rekomendasiResmi && ((permohonan.applicationStatus === 'RESULTS_ISSUED' || permohonan.statusProsesUtama === 'rekomendasi_terbit') || (permohonan.followupStatus === 'VERIFIED_IMPLEMENTED' || permohonan.statusProsesUtama === 'selesai_tindak_lanjut'))) {
@@ -257,20 +261,25 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
       case 'SEKRETARIAT': {
         const tabs: { id: DetailTab; label: string; icon: React.ReactNode }[] = [
           { id: 'ringkasan', label: 'Ringkasan', icon: <User className="w-3.5 h-3.5" /> },
+          { id: 'prasyarat', label: 'Prasyarat & Kedatangan', icon: <FileCheck className="w-3.5 h-3.5" /> },
           { id: 'administrasi', label: 'Verifikasi Berkas', icon: <FileText className="w-3.5 h-3.5" /> },
           { id: 'jadwal', label: 'Penjadwalan', icon: <Calendar className="w-3.5 h-3.5" /> }
         ];
         return tabs;
       }
       case 'medis':
+      case 'MEDIS':
         return [
           { id: 'ringkasan', label: 'Identitas Klien', icon: <User className="w-3.5 h-3.5" /> },
+          { id: 'prasyarat', label: 'Prasyarat & Kedatangan', icon: <FileCheck className="w-3.5 h-3.5" /> },
           { id: 'medis', label: 'Asesmen Medis', icon: <Stethoscope className="w-3.5 h-3.5" /> },
           { id: 'pengawasan', label: 'Instrumen Pemulihan', icon: <Activity className="w-3.5 h-3.5" /> }
         ];
       case 'hukum':
+      case 'HUKUM':
         return [
           { id: 'ringkasan', label: 'Identitas Klien', icon: <User className="w-3.5 h-3.5" /> },
+          { id: 'prasyarat', label: 'Prasyarat & Kedatangan', icon: <FileCheck className="w-3.5 h-3.5" /> },
           { id: 'administrasi', label: 'Baca BAP/LP', icon: <FileText className="w-3.5 h-3.5" /> },
           { id: 'hukum', label: 'Telaah Hukum', icon: <Scale className="w-3.5 h-3.5" /> }
         ];
@@ -526,12 +535,13 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
     const updated: PermohonanAsesmen = {
       ...permohonan,
       dokumenList: updatedDocs,
-      applicationStatus: hasErrors ? 'NEEDS_CORRECTION' : allApproved ? 'SCHEDULED' : 'ADMIN_REVIEW', statusProsesUtama: hasErrors ? 'perlu_perbaikan' : allApproved ? 'penugasan_jadwal' : 'verifikasi_berkas',
-      penanggungJawabBerikutnya: hasErrors ? 'Penyidik Pengaju' : allApproved ? 'Sekretariat TAT' : 'Sekretariat TAT',
+      applicationStatus: hasErrors ? 'NEEDS_CORRECTION' : allApproved ? 'AWAITING_DISPOSITION' : 'ADMIN_REVIEW',
+      statusProsesUtama: hasErrors ? 'perlu_perbaikan' : allApproved ? 'verifikasi_berkas' : 'verifikasi_berkas',
+      penanggungJawabBerikutnya: hasErrors ? 'Penyidik Pengaju' : allApproved ? 'Ketua TAT (via Admin)' : 'Sekretariat TAT',
       tindakanBerikutnyaLabel: hasErrors
         ? 'Daftar perbaikan berkas diterbitkan. Menunggu unggah ulang dari penyidik.'
         : allApproved
-        ? 'Administrasi lengkap & diverifikasi. Menunggu penetapan jadwal dan tim asesor.'
+        ? 'Administrasi lengkap & diverifikasi. Menunggu catatan disposisi dari Ketua TAT.'
         : 'Sedang dalam proses verifikasi berkas oleh Sekretariat.',
       auditLogs: [
         {
@@ -692,22 +702,59 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
                 <CheckCircle2 className="w-3.5 h-3.5" />
                 <span>Verifikasi Dokumen</span>
               </button>
-              <button
-                onClick={() => {
-                  if (window.confirm('Apakah Anda yakin ingin menyetujui seluruh berkas dan melanjutkan permohonan ini ke tahap Asesmen (Hukum/Medis)?')) {
-                    if (onUpdatePermohonan) {
-                      onUpdatePermohonan({
-                        ...permohonan,
-                        statusProsesUtama: 'asesmen_berlangsung'
-                      });
+              {permohonan.applicationStatus === 'AWAITING_DISPOSITION' ? (
+                <button
+                  onClick={() => {
+                    const hasil = window.prompt('Masukkan hasil disposisi Ketua TAT (disetujui/ditolak):');
+                    if (hasil && (hasil.toLowerCase() === 'disetujui' || hasil.toLowerCase() === 'ditolak')) {
+                      const isApproved = hasil.toLowerCase() === 'disetujui';
+                      if (onUpdatePermohonan) {
+                        onUpdatePermohonan({
+                          ...permohonan,
+                          applicationStatus: isApproved ? 'APPROVED' : 'REJECTED',
+                          statusProsesUtama: isApproved ? 'penugasan_jadwal' : 'ditolak',
+                          penanggungJawabBerikutnya: isApproved ? 'Sekretariat TAT' : 'Selesai',
+                          tindakanBerikutnyaLabel: isApproved ? 'Menunggu penetapan jadwal dan tim asesor.' : 'Permohonan ditolak oleh Ketua TAT.',
+                          auditLogs: [
+                            {
+                              id: 'aud-' + Date.now(),
+                              timestamp: new Date().toLocaleDateString('id-ID') + ' ' + new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
+                              actorNama: currentUser.name,
+                              actorPeran: currentUser.role,
+                              aksi: 'CATAT_DISPOSISI',
+                              rincian: `Disposisi Ketua TAT: ${isApproved ? 'Disetujui' : 'Ditolak'}`
+                            },
+                            ...(permohonan.auditLogs || [])
+                          ]
+                        });
+                      }
+                    } else if (hasil) {
+                      alert('Mohon masukkan "disetujui" atau "ditolak"');
                     }
-                  }
-                }}
-                className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-3 py-1.5 rounded-xl flex items-center justify-center space-x-1.5 transition-all cursor-pointer border border-emerald-500 w-full sm:w-auto"
-              >
-                <CheckCircle2 className="w-3.5 h-3.5" />
-                <span>Setujui Semua Berkas</span>
-              </button>
+                  }}
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-3 py-1.5 rounded-xl flex items-center justify-center space-x-1.5 transition-all cursor-pointer border border-emerald-500 w-full sm:w-auto"
+                >
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  <span>Catat Disposisi Ketua</span>
+                </button>
+              ) : (
+                <button
+                  onClick={() => {
+                    if (window.confirm('Apakah Anda yakin ingin menyetujui seluruh berkas dan melanjutkan permohonan ini ke tahap Asesmen (Hukum/Medis)?')) {
+                      if (onUpdatePermohonan) {
+                        onUpdatePermohonan({
+                          ...permohonan,
+                          statusProsesUtama: 'asesmen_berlangsung'
+                        });
+                      }
+                    }
+                  }}
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-3 py-1.5 rounded-xl flex items-center justify-center space-x-1.5 transition-all cursor-pointer border border-emerald-500 w-full sm:w-auto"
+                >
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  <span>Setujui Semua Berkas</span>
+                </button>
+              )}
             </>
           )}
 
@@ -799,6 +846,16 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
 
       {/* TAB CONTENT AREA */}
       <div className="space-y-6 min-h-[420px] pt-3">
+        {/* TAB PRASYARAT PEMERIKSAAN & KEDATANGAN SUBJEK */}
+        {activeTab === 'prasyarat' && (
+          <PrasyaratPemeriksaanView
+            permohonan={permohonan}
+            currentUser={currentUser}
+            onUpdatePermohonan={onUpdatePermohonan}
+            isReadonly={currentUser.role === 'pengaju' || currentUser.role === 'PENGAJU'}
+          />
+        )}
+
         {/* TAB 1: RINGKASAN & IDENTITAS (Separation of Person, Case, and Application) */}
         {activeTab === 'ringkasan' && (
           <div className="space-y-6">
