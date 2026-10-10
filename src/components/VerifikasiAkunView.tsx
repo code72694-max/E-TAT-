@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { RegistrasiPengguna, UserProfile, UserRole } from '../types';
+import { RegistrasiPengguna, UserProfile, UserRole, PermohonanAsesmen } from '../types';
 import { registrasiApi, authApi } from '../services/api';
 import {
   ShieldCheck,
@@ -27,7 +27,13 @@ import {
   Calendar,
   UserPlus,
   Lock,
-  Loader2
+  Loader2,
+  UserX,
+  Activity,
+  History,
+  FileSpreadsheet,
+  ShieldAlert,
+  ArrowLeft
 } from 'lucide-react';
 
 interface VerifikasiAkunViewProps {
@@ -35,13 +41,19 @@ interface VerifikasiAkunViewProps {
   onUpdateRegistration: (updated: RegistrasiPengguna) => void;
   onApproveRegistration?: (reg: RegistrasiPengguna) => void;
   currentUser?: UserProfile;
+  permohonanList?: PermohonanAsesmen[];
+  selectedRegistrasiId?: string | null;
+  onSelectRegistrasi?: (id: string | null) => void;
 }
 
 export const VerifikasiAkunView: React.FC<VerifikasiAkunViewProps> = ({
   registrations,
   onUpdateRegistration,
   onApproveRegistration,
-  currentUser
+  currentUser,
+  permohonanList = [],
+  selectedRegistrasiId,
+  onSelectRegistrasi
 }) => {
   // Tab State: 'menunggu' (Pending) or 'daftar' (All Accounts)
   const [activeTab, setActiveTab] = useState<'menunggu' | 'daftar'>('menunggu');
@@ -51,12 +63,49 @@ export const VerifikasiAkunView: React.FC<VerifikasiAkunViewProps> = ({
   const [statusFilter, setStatusFilter] = useState<'all' | 'approved' | 'rejected' | 'pending'>('all');
   const [instansiFilter, setInstansiFilter] = useState<string>('all');
 
-  // Detail Modal & Actions
-  const [selectedRegDetail, setSelectedRegDetail] = useState<RegistrasiPengguna | null>(null);
+  // Detail Page & Actions State
+  const [internalSelectedRegId, setInternalSelectedRegId] = useState<string | null>(null);
+  const activeSelectedRegId = selectedRegistrasiId !== undefined ? selectedRegistrasiId : internalSelectedRegId;
+
+  const handleSelectRegistration = (id: string | null) => {
+    if (onSelectRegistrasi) {
+      onSelectRegistrasi(id);
+    } else {
+      setInternalSelectedRegId(id);
+    }
+  };
+
+  const selectedRegDetail = registrations.find(r => r.id === activeSelectedRegId) || null;
+  const [modalSubTab, setModalSubTab] = useState<'profile' | 'activity'>('profile');
   const [rejectModalTarget, setRejectModalTarget] = useState<RegistrasiPengguna | null>(null);
   const [rejectReasonInput, setRejectReasonInput] = useState('');
   const [previewImage, setPreviewImage] = useState<{ url: string; title: string } | null>(null);
   const [successToast, setSuccessToast] = useState<string | null>(null);
+
+  // Filter permohonan / activity history for selected user
+  const getUserPermohonanActivity = (reg: RegistrasiPengguna) => {
+    if (!permohonanList || permohonanList.length === 0) return [];
+    
+    const regName = (reg.namaLengkap || '').toLowerCase();
+    const regInstansi = (reg.instansi || '').toLowerCase();
+
+    return permohonanList.filter(p => {
+      const isPengajuMatch = 
+        p.pengajuId === reg.id || 
+        (p.instansiPengaju && p.instansiPengaju.toLowerCase().includes(regInstansi)) ||
+        (p.perkara?.namaPenyidik && p.perkara.namaPenyidik.toLowerCase().includes(regName));
+
+      const isMedisMatch = 
+        (p.timAsesmen?.asesorMedisNama && p.timAsesmen.asesorMedisNama.toLowerCase().includes(regName)) ||
+        (p.asesmenMedis?.asesorNama && p.asesmenMedis.asesorNama.toLowerCase().includes(regName));
+
+      const isHukumMatch = 
+        (p.timAsesmen?.asesorHukumNama && p.timAsesmen.asesorHukumNama.toLowerCase().includes(regName)) ||
+        (p.asesmenHukum?.asesorNama && p.asesmenHukum.asesorNama.toLowerCase().includes(regName));
+
+      return isPengajuMatch || isMedisMatch || isHukumMatch;
+    });
+  };
 
   // Direct User Creation Modal State
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -107,10 +156,6 @@ export const VerifikasiAkunView: React.FC<VerifikasiAkunViewProps> = ({
       onUpdateRegistration(updated);
     }
 
-    if (selectedRegDetail?.id === reg.id) {
-      setSelectedRegDetail(updated);
-    }
-
     showToast(`Akun ${getFormattedOfficerName(reg.pangkat, reg.namaLengkap)} (${reg.instansi}) BERHASIL DISETUJUI!`);
   };
 
@@ -140,11 +185,7 @@ export const VerifikasiAkunView: React.FC<VerifikasiAkunViewProps> = ({
 
     onUpdateRegistration(updated);
 
-    if (selectedRegDetail?.id === rejectModalTarget.id) {
-      setSelectedRegDetail(updated);
-    }
-
-    showToast(`Pendaftaran akun untuk ${getFormattedOfficerName(rejectModalTarget.pangkat, rejectModalTarget.namaLengkap)} telah DITOLAK.`);
+    showToast(`Status akun ${getFormattedOfficerName(rejectModalTarget.pangkat, rejectModalTarget.namaLengkap)} telah diperbarui.`);
     setRejectModalTarget(null);
     setRejectReasonInput('');
   };
@@ -159,10 +200,6 @@ export const VerifikasiAkunView: React.FC<VerifikasiAkunViewProps> = ({
     };
 
     onUpdateRegistration(updated);
-
-    if (selectedRegDetail?.id === reg.id) {
-      setSelectedRegDetail(updated);
-    }
 
     showToast(`Status pendaftaran ${reg.namaLengkap} dikembalikan ke antrean Menunggu Verifikasi.`);
   };
@@ -245,19 +282,29 @@ export const VerifikasiAkunView: React.FC<VerifikasiAkunViewProps> = ({
     }
   };
 
+  const formatApprovedBy = (approvedBy: any): string => {
+    if (!approvedBy) return '';
+    if (typeof approvedBy === 'object') {
+      const name = approvedBy.name || 'Admin';
+      const role = approvedBy.role ? ` (${String(approvedBy.role).toUpperCase()})` : '';
+      return `${name}${role}`;
+    }
+    return String(approvedBy);
+  };
+
   // Filtered List for "Daftar Akun" tab
   const filteredDaftarAkun = registrations.filter(reg => {
     if (statusFilter !== 'all' && reg.status !== statusFilter) return false;
     if (instansiFilter !== 'all' && reg.kategoriInstansi !== instansiFilter) return false;
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
-      const matchName = reg.namaLengkap.toLowerCase().includes(q);
-      const matchNrp = reg.nrp.toLowerCase().includes(q);
-      const matchInstansi = reg.instansi.toLowerCase().includes(q);
-      const matchNomorReg = reg.nomorRegistrasi.toLowerCase().includes(q);
-      const matchEmail = reg.email.toLowerCase().includes(q);
-      const matchJabatan = reg.jabatan.toLowerCase().includes(q);
-      const matchWilayah = reg.wilayahHukum.toLowerCase().includes(q);
+      const matchName = (reg.namaLengkap || '').toLowerCase().includes(q);
+      const matchNrp = (reg.nrp || '').toLowerCase().includes(q);
+      const matchInstansi = (reg.instansi || '').toLowerCase().includes(q);
+      const matchNomorReg = (reg.nomorRegistrasi || '').toLowerCase().includes(q);
+      const matchEmail = (reg.email || '').toLowerCase().includes(q);
+      const matchJabatan = (reg.jabatan || '').toLowerCase().includes(q);
+      const matchWilayah = (reg.wilayahHukum || '').toLowerCase().includes(q);
       return matchName || matchNrp || matchInstansi || matchNomorReg || matchEmail || matchJabatan || matchWilayah;
     }
     return true;
@@ -265,6 +312,449 @@ export const VerifikasiAkunView: React.FC<VerifikasiAkunViewProps> = ({
 
   const categoryOptions = Array.from(new Set(registrations.map(r => r.kategoriInstansi).filter(Boolean)));
 
+  // =========================================================
+  // IF A USER IS SELECTED -> RENDER FULL DEDICATED PAGE DETAIL VIEW
+  // =========================================================
+  if (selectedRegDetail) {
+    const userActivities = getUserPermohonanActivity(selectedRegDetail);
+    return (
+      <div className="space-y-5 pb-12 animate-fade-in">
+        {/* Toast Notification */}
+        {successToast && (
+          <div className="fixed top-20 right-6 z-50 bg-[#0c1a30] border border-[#234475] text-slate-200 px-4 py-3 rounded-xl shadow-2xl flex items-center space-x-3 text-xs font-medium backdrop-blur-md">
+            <CheckCircle2 className="w-4 h-4 text-[#d4af37] shrink-0" />
+            <span>{successToast}</span>
+          </div>
+        )}
+
+        {/* Top Header & Navigation Bar */}
+        <div className="flex flex-wrap items-center justify-between gap-3 bg-[#091426] border border-[#1a2e4c] rounded-2xl p-4 sm:p-5 shadow-sm">
+          <div className="flex items-center space-x-3.5">
+            <button
+              onClick={() => handleSelectRegistration(null)}
+              className="p-2 bg-[#142642] hover:bg-[#1b3459] text-slate-300 hover:text-white rounded-xl border border-[#234475] transition-colors cursor-pointer flex items-center space-x-1.5 text-xs font-semibold"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span>Kembali</span>
+            </button>
+
+            <div>
+              <div className="flex items-center space-x-2">
+                <span className="font-mono text-xs text-[#d4af37] font-bold">
+                  {selectedRegDetail.nomorRegistrasi}
+                </span>
+                {selectedRegDetail.status === 'approved' && (
+                  <span className="px-2.5 py-0.5 bg-[#17382d] text-emerald-300 border border-emerald-700/50 rounded-full text-[11px] font-semibold flex items-center space-x-1">
+                    <CheckCircle2 className="w-3 h-3" />
+                    <span>Disetujui / Aktif</span>
+                  </span>
+                )}
+                {selectedRegDetail.status === 'pending' && (
+                  <span className="px-2.5 py-0.5 bg-[#2d2415] text-amber-300 border border-amber-700/50 rounded-full text-[11px] font-semibold flex items-center space-x-1">
+                    <Clock className="w-3 h-3" />
+                    <span>Menunggu Verifikasi</span>
+                  </span>
+                )}
+                {selectedRegDetail.status === 'rejected' && (
+                  <span className="px-2.5 py-0.5 bg-[#26161b] text-rose-300 border border-rose-800/50 rounded-full text-[11px] font-semibold flex items-center space-x-1">
+                    <XCircle className="w-3 h-3" />
+                    <span>Ditolak / Nonaktif</span>
+                  </span>
+                )}
+              </div>
+              <h1 className="text-base sm:text-lg font-bold text-white mt-0.5">
+                Detail & Aktivitas Akun Pengguna
+              </h1>
+            </div>
+          </div>
+
+          {/* Action Buttons in Page Header */}
+          <div className="flex items-center space-x-2">
+            {/* For APPROVED / ACTIVE Accounts: Show "Nonaktifkan Akun" (No "Tolak" button!) */}
+            {selectedRegDetail.status === 'approved' && (
+              <button
+                onClick={() => handleOpenRejectModal(selectedRegDetail)}
+                className="px-4 py-2 bg-[#26161b] hover:bg-[#341b24] text-rose-300 hover:text-rose-200 rounded-xl text-xs font-semibold border border-rose-800/50 cursor-pointer flex items-center space-x-1.5 shadow-sm"
+              >
+                <UserX className="w-4 h-4" />
+                <span>Nonaktifkan Akun</span>
+              </button>
+            )}
+
+            {/* For PENDING Accounts: Show "Setujui Akun" and "Tolak Pendaftaran" */}
+            {selectedRegDetail.status === 'pending' && (
+              <>
+                <button
+                  onClick={() => handleApprove(selectedRegDetail)}
+                  className="px-4 py-2 bg-[#17382d] hover:bg-[#1e473a] text-emerald-300 hover:text-emerald-200 rounded-xl text-xs font-semibold border border-emerald-700/50 cursor-pointer flex items-center space-x-1.5 shadow-sm"
+                >
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>Setujui Akun</span>
+                </button>
+                <button
+                  onClick={() => handleOpenRejectModal(selectedRegDetail)}
+                  className="px-4 py-2 bg-[#26161b] hover:bg-[#341b24] text-rose-300 hover:text-rose-200 rounded-xl text-xs font-semibold border border-rose-800/50 cursor-pointer flex items-center space-x-1.5 shadow-sm"
+                >
+                  <XCircle className="w-4 h-4" />
+                  <span>Tolak Pendaftaran</span>
+                </button>
+              </>
+            )}
+
+            {/* For REJECTED / NONAKTIF Accounts: Show "Aktifkan Kembali" */}
+            {selectedRegDetail.status === 'rejected' && (
+              <button
+                onClick={() => handleApprove(selectedRegDetail)}
+                className="px-4 py-2 bg-[#17382d] hover:bg-[#1e473a] text-emerald-300 hover:text-emerald-200 rounded-xl text-xs font-semibold border border-emerald-700/50 cursor-pointer flex items-center space-x-1.5 shadow-sm"
+              >
+                <CheckCircle2 className="w-4 h-4" />
+                <span>Aktifkan Kembali</span>
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Profile Card Banner */}
+        <div className="bg-[#091426] border border-[#1a2e4c] rounded-2xl p-5 shadow-sm">
+          <div className="flex items-center justify-between flex-wrap gap-4">
+            <div className="flex items-center space-x-4">
+              <div className="w-16 h-16 rounded-2xl bg-[#142642] border border-[#234475] overflow-hidden shrink-0 shadow-md">
+                <img
+                  src={selectedRegDetail.fotoKtaUrl || selectedRegDetail.fotoKtpUrl || 'https://images.unsplash.com/photo-1544717305-2782549b5136?w=600&auto=format&fit=crop&q=80'}
+                  alt={selectedRegDetail.namaLengkap}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div>
+                <h2 className="text-base font-bold text-white">
+                  {getFormattedOfficerName(selectedRegDetail.pangkat, selectedRegDetail.namaLengkap)}
+                </h2>
+                <p className="text-slate-300 text-xs font-mono mt-0.5">
+                  NRP/NIP: <span className="text-white font-semibold">{selectedRegDetail.nrp}</span> • {selectedRegDetail.jabatan}
+                </p>
+                <p className="text-slate-400 text-xs mt-0.5">
+                  {selectedRegDetail.instansi} ({selectedRegDetail.wilayahHukum})
+                </p>
+              </div>
+            </div>
+
+            {/* Page Sub Tabs Navigation */}
+            <div className="flex items-center space-x-1.5 bg-[#060e1a] p-1.5 rounded-xl border border-[#1a2e4c]">
+              <button
+                onClick={() => setModalSubTab('profile')}
+                className={`px-4 py-2 rounded-lg text-xs font-semibold transition-colors cursor-pointer flex items-center space-x-2 ${
+                  modalSubTab === 'profile' ? 'bg-[#142642] text-white shadow' : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                <User className="w-4 h-4" />
+                <span>Profil & Identitas</span>
+              </button>
+              <button
+                onClick={() => setModalSubTab('activity')}
+                className={`px-4 py-2 rounded-lg text-xs font-semibold transition-colors cursor-pointer flex items-center space-x-2 ${
+                  modalSubTab === 'activity' ? 'bg-[#142642] text-[#d4af37] shadow' : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                <Activity className="w-4 h-4 text-amber-400" />
+                <span>Aktivitas Berkas ({userActivities.length})</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Tab 1: Profil & Identitas */}
+        {modalSubTab === 'profile' && (
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Satwil / Instansi */}
+              <div className="bg-[#091426] border border-[#1a2e4c] rounded-2xl p-4 space-y-3">
+                <h3 className="text-xs font-bold text-white border-b border-[#1a2e4c] pb-2 flex items-center space-x-2">
+                  <Building2 className="w-4 h-4 text-slate-400" />
+                  <span>Instansi & Satuan Kerja</span>
+                </h3>
+                <div className="space-y-2 text-xs">
+                  <div>
+                    <span className="text-[10px] text-slate-500 uppercase">Instansi Kedinasan:</span>
+                    <p className="text-slate-200 font-medium text-sm">{selectedRegDetail.instansi}</p>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-slate-500 uppercase">Kategori & Wilayah Hukum:</span>
+                    <p className="text-slate-200">{selectedRegDetail.kategoriInstansi || 'Polres / Polresta'} • {selectedRegDetail.wilayahHukum}</p>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-slate-500 uppercase">Alamat Kantor:</span>
+                    <p className="text-slate-300 leading-relaxed">{selectedRegDetail.alamatKantor || '-'}</p>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-slate-500 uppercase">Telepon Kantor:</span>
+                    <p className="text-slate-300 font-mono">{selectedRegDetail.teleponKantor || '-'}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Role & Kontak */}
+              <div className="bg-[#091426] border border-[#1a2e4c] rounded-2xl p-4 space-y-3">
+                <h3 className="text-xs font-bold text-white border-b border-[#1a2e4c] pb-2 flex items-center space-x-2">
+                  <Shield className="w-4 h-4 text-slate-400" />
+                  <span>Hak Akses System & Kontak</span>
+                </h3>
+                <div className="space-y-2 text-xs">
+                  <div>
+                    <span className="text-[10px] text-slate-500 uppercase">Peran Sistem:</span>
+                    <p className="text-slate-200 font-bold text-sm text-[#d4af37]">{getRoleLabel(selectedRegDetail.peranSistem)}</p>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-slate-500 uppercase">Spesialisasi Tugas:</span>
+                    <p className="text-slate-300">
+                      {selectedRegDetail.spesialisasiTugas && selectedRegDetail.spesialisasiTugas.length > 0
+                        ? selectedRegDetail.spesialisasiTugas.join(', ')
+                        : 'Penyidik / Asesor Reguler'}
+                    </p>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-slate-500 uppercase">Email Kedinasan:</span>
+                    <p className="text-slate-200 font-mono text-xs">{selectedRegDetail.email}</p>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-slate-500 uppercase">No. Handphone:</span>
+                    <p className="text-slate-200 font-mono text-xs">{selectedRegDetail.phone}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Dokumen Lampiran */}
+            <div className="bg-[#091426] border border-[#1a2e4c] rounded-2xl p-4 space-y-3">
+              <h3 className="text-xs font-bold text-white border-b border-[#1a2e4c] pb-2 flex items-center space-x-2">
+                <FileText className="w-4 h-4 text-slate-400" />
+                <span>Dokumen Verifikasi Identitas</span>
+              </h3>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {/* KTA */}
+                <div className="bg-[#060e1a] border border-[#1a2e4c] rounded-xl p-3 space-y-2">
+                  <div className="flex items-center justify-between text-xs font-semibold text-slate-300">
+                    <span>KTA Kedinasan</span>
+                    <button
+                      onClick={() => setPreviewImage({ url: selectedRegDetail.fotoKtaUrl, title: `KTA: ${selectedRegDetail.namaLengkap}` })}
+                      className="text-slate-400 hover:text-white cursor-pointer"
+                    >
+                      <ZoomIn className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <div
+                    onClick={() => setPreviewImage({ url: selectedRegDetail.fotoKtaUrl, title: `KTA: ${selectedRegDetail.namaLengkap}` })}
+                    className="h-28 rounded-lg bg-[#0c1a30] overflow-hidden cursor-pointer border border-[#1a2e4c]"
+                  >
+                    <img
+                      src={selectedRegDetail.fotoKtaUrl || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&auto=format&fit=crop&q=80'}
+                      alt="KTA"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                </div>
+
+                {/* KTP */}
+                <div className="bg-[#060e1a] border border-[#1a2e4c] rounded-xl p-3 space-y-2">
+                  <div className="flex items-center justify-between text-xs font-semibold text-slate-300">
+                    <span>KTP Sipil</span>
+                    <button
+                      onClick={() => setPreviewImage({ url: selectedRegDetail.fotoKtpUrl, title: `KTP: ${selectedRegDetail.namaLengkap}` })}
+                      className="text-slate-400 hover:text-white cursor-pointer"
+                    >
+                      <ZoomIn className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <div
+                    onClick={() => setPreviewImage({ url: selectedRegDetail.fotoKtpUrl, title: `KTP: ${selectedRegDetail.namaLengkap}` })}
+                    className="h-28 rounded-lg bg-[#0c1a30] overflow-hidden cursor-pointer border border-[#1a2e4c]"
+                  >
+                    <img
+                      src={selectedRegDetail.fotoKtpUrl || 'https://images.unsplash.com/photo-1544717305-2782549b5136?w=600&auto=format&fit=crop&q=80'}
+                      alt="KTP"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                </div>
+
+                {/* Surat Penunjukan */}
+                <div className="bg-[#060e1a] border border-[#1a2e4c] rounded-xl p-3 space-y-2 flex flex-col justify-between">
+                  <div className="text-xs font-semibold text-slate-300">
+                    Surat Penunjukan
+                  </div>
+                  <div className="text-center py-3">
+                    <FileText className="w-8 h-8 text-slate-400 mx-auto" />
+                    <span className="text-xs text-slate-400 truncate block mt-1 font-mono">
+                      {selectedRegDetail.suratPenunjukanName || 'Surat_Penunjukan.pdf'}
+                    </span>
+                  </div>
+                  <a
+                    href={selectedRegDetail.suratPenunjukanUrl || '#'}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="w-full py-2 bg-[#142642] hover:bg-[#1b3459] text-slate-200 text-center rounded-lg text-xs font-semibold border border-[#234475] flex items-center justify-center space-x-1.5 cursor-pointer"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5" />
+                    <span>Buka Document PDF</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            {/* Audit Log */}
+            {(selectedRegDetail.approvedBy || selectedRegDetail.catatanAdmin) && (
+              <div className="bg-[#091426] border border-[#1a2e4c] rounded-2xl p-4 text-xs space-y-1">
+                {selectedRegDetail.approvedBy && (
+                  <p className="text-slate-400">
+                    Diverifikasi oleh: <strong className="text-slate-200">{formatApprovedBy(selectedRegDetail.approvedBy)}</strong> pada {formatTanggal(selectedRegDetail.approvedAt)}
+                  </p>
+                )}
+                {selectedRegDetail.catatanAdmin && (
+                  <p className="text-slate-300">
+                    Catatan Verifikasi: {selectedRegDetail.catatanAdmin}
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Tab 2: Aktivitas Berkas */}
+        {modalSubTab === 'activity' && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between bg-[#091426] border border-[#1a2e4c] p-4 rounded-2xl">
+              <div className="flex items-center space-x-2">
+                <FileSpreadsheet className="w-5 h-5 text-[#d4af37]" />
+                <span className="font-bold text-white text-sm">Riwayat Berkas Pengajuan / Input Asesmen</span>
+              </div>
+              <span className="text-xs text-slate-400 font-mono">
+                Total: <strong className="text-amber-400 font-bold">{userActivities.length} Berkas</strong>
+              </span>
+            </div>
+
+            {userActivities.length === 0 ? (
+              <div className="bg-[#091426] border border-[#1a2e4c] rounded-2xl p-12 text-center space-y-3">
+                <History className="w-10 h-10 text-slate-600 mx-auto" />
+                <p className="text-sm text-slate-300 font-semibold">
+                  Belum ada riwayat permohonan atau aktivitas asesmen terdaftar atas nama {selectedRegDetail.namaLengkap}.
+                </p>
+                <p className="text-xs text-slate-500 max-w-md mx-auto">
+                  Setiap permohonan baru yang diajukan atau disetujui/di-input oleh petugas ini dalam sistem e-TAT akan tercatat secara otomatis di halaman ini.
+                </p>
+              </div>
+            ) : (
+              <div className="bg-[#091426] border border-[#1a2e4c] rounded-2xl overflow-hidden shadow-sm divide-y divide-[#1a2e4c]">
+                {userActivities.map((p) => (
+                  <div key={p.id} className="p-4 hover:bg-[#0c1a30] transition-colors flex items-center justify-between text-xs gap-4">
+                    <div className="space-y-1">
+                      <div className="flex items-center space-x-2">
+                        <span className="font-mono text-slate-200 font-bold text-sm">{p.nomorPermohonan}</span>
+                        <span className="text-[11px] px-2.5 py-0.5 rounded bg-[#142642] text-slate-300 font-mono">
+                          {p.trackingNumber}
+                        </span>
+                      </div>
+                      <p className="text-slate-200 font-medium">
+                        Terperiksa: <span className="text-white font-bold">{p.terperiksa?.namaLengkap || 'Tersangka'}</span>
+                      </p>
+                      <p className="text-slate-400 text-[11px]">
+                        Pasal: {p.perkara?.pasalDipersangkakan || '-'} • Pengaju: {p.instansiPengaju}
+                      </p>
+                    </div>
+
+                    <div className="text-right space-y-1 shrink-0">
+                      <span className="inline-block px-3 py-1 rounded-full text-xs font-bold bg-[#142642] text-amber-300 border border-amber-700/50">
+                        {p.applicationStatus}
+                      </span>
+                      <p className="text-[11px] text-slate-500 block">
+                        Diajukan: {formatTanggal(p.tanggalPengajuan)}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* REJECT / DEACTIVATE MODAL */}
+        {rejectModalTarget && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+            <div className="bg-[#091426] border border-[#1a2e4c] rounded-xl w-full max-w-md p-5 space-y-3.5 shadow-2xl">
+              <div>
+                <h3 className="text-sm font-bold text-white">
+                  {rejectModalTarget.status === 'approved' ? 'Nonaktifkan Akun Pengguna' : 'Tolak Pendaftaran Akun'}
+                </h3>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  {getFormattedOfficerName(rejectModalTarget.pangkat, rejectModalTarget.namaLengkap)} ({rejectModalTarget.instansi})
+                </p>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs text-slate-300 block">
+                  {rejectModalTarget.status === 'approved'
+                    ? 'Alasan Penonaktifan Akun:'
+                    : 'Alasan Penolakan Pendaftaran:'}
+                </label>
+                <textarea
+                  value={rejectReasonInput}
+                  onChange={(e) => setRejectReasonInput(e.target.value)}
+                  placeholder={
+                    rejectModalTarget.status === 'approved'
+                      ? 'Misal: Mutasi dinas, pencabutan wewenang penyidik, atau permintaan resmi.'
+                      : 'Misal: Dokumen KTA buram, silakan upload ulang.'
+                  }
+                  rows={3}
+                  className="w-full bg-[#060e1a] text-xs text-slate-200 border border-[#1a2e4c] focus:border-[#234475] rounded-lg p-2.5 focus:outline-none"
+                />
+              </div>
+
+              <div className="flex items-center justify-end space-x-2 pt-1">
+                <button
+                  onClick={() => setRejectModalTarget(null)}
+                  className="px-3 py-1.5 bg-[#142642] text-slate-300 hover:text-white rounded-lg text-xs cursor-pointer"
+                >
+                  Batal
+                </button>
+                <button
+                  onClick={handleConfirmReject}
+                  className="px-3.5 py-1.5 bg-rose-900/80 hover:bg-rose-800 text-rose-200 rounded-lg text-xs font-semibold cursor-pointer"
+                >
+                  {rejectModalTarget.status === 'approved' ? 'Konfirmasi Nonaktifkan' : 'Konfirmasi Tolak'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* IMAGE PREVIEW LIGHTBOX */}
+        {previewImage && (
+          <div
+            onClick={() => setPreviewImage(null)}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-sm cursor-zoom-out"
+          >
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="bg-[#091426] border border-[#1a2e4c] rounded-xl max-w-xl w-full p-3.5 space-y-2 shadow-2xl cursor-default"
+            >
+              <div className="flex items-center justify-between pb-1.5 border-b border-[#1a2e4c]">
+                <span className="text-xs font-semibold text-slate-200">{previewImage.title}</span>
+                <button onClick={() => setPreviewImage(null)} className="text-slate-400 hover:text-white">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              <div className="max-h-[70vh] rounded bg-black flex items-center justify-center overflow-hidden">
+                <img src={previewImage.url} alt="Preview" className="max-h-[65vh] w-auto object-contain" />
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // =========================================================
+  // OTHERWISE -> RENDER DEFAULT MAIN LIST VIEW
+  // =========================================================
   return (
     <div className="space-y-5 pb-12">
       {/* Toast Notification */}
@@ -367,12 +857,11 @@ export const VerifikasiAkunView: React.FC<VerifikasiAkunViewProps> = ({
               Tidak ada pendaftaran akun baru yang menunggu verifikasi.
             </div>
           ) : (
-            /* BERJAJAR KE BAWAH (VERTICAL LIST) */
             <div className="flex flex-col space-y-2.5">
               {pendingRegistrations.map((reg) => (
                 <div
                   key={reg.id}
-                  onClick={() => setSelectedRegDetail(reg)}
+                  onClick={() => handleSelectRegistration(reg.id)}
                   className="bg-[#091426] hover:bg-[#0c1a30] border border-[#1a2e4c] hover:border-[#234475] rounded-xl p-3.5 transition-all flex flex-col md:flex-row md:items-center justify-between gap-3.5 cursor-pointer group shadow-sm"
                 >
                   {/* Left: Officer & Rank */}
@@ -420,7 +909,7 @@ export const VerifikasiAkunView: React.FC<VerifikasiAkunViewProps> = ({
                   {/* Right: Actions */}
                   <div className="flex items-center space-x-2 shrink-0 md:justify-end pt-2 md:pt-0 border-t md:border-t-0 border-[#1a2e4c]" onClick={(e) => e.stopPropagation()}>
                     <button
-                      onClick={() => setSelectedRegDetail(reg)}
+                      onClick={() => handleSelectRegistration(reg.id)}
                       className="px-3 py-1.5 bg-[#142642] hover:bg-[#1b3459] text-slate-200 hover:text-white text-xs font-medium rounded-lg border border-[#234475] transition-colors cursor-pointer flex items-center space-x-1.5"
                     >
                       <Eye className="w-3.5 h-3.5 text-slate-400" />
@@ -535,7 +1024,7 @@ export const VerifikasiAkunView: React.FC<VerifikasiAkunViewProps> = ({
                     filteredDaftarAkun.map((reg) => (
                       <tr
                         key={reg.id}
-                        onClick={() => setSelectedRegDetail(reg)}
+                        onClick={() => handleSelectRegistration(reg.id)}
                         className="hover:bg-[#0c1a30] transition-colors cursor-pointer group"
                       >
                         <td className="px-4 py-3">
@@ -589,7 +1078,7 @@ export const VerifikasiAkunView: React.FC<VerifikasiAkunViewProps> = ({
 
                         <td className="px-4 py-3 text-center" onClick={(e) => e.stopPropagation()}>
                           <button
-                            onClick={() => setSelectedRegDetail(reg)}
+                            onClick={() => handleSelectRegistration(reg.id)}
                             className="px-2.5 py-1 bg-[#142642] hover:bg-[#1b3459] text-slate-200 hover:text-white text-xs rounded-lg border border-[#234475] transition-colors cursor-pointer"
                           >
                             Detail
@@ -605,296 +1094,33 @@ export const VerifikasiAkunView: React.FC<VerifikasiAkunViewProps> = ({
         </div>
       )}
 
-      {/* ========================================================= */}
-      {/* MODAL DETAIL DATA LENGKAP REGISTRASI */}
-      {/* ========================================================= */}
-      {selectedRegDetail && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-950/80 backdrop-blur-sm overflow-y-auto">
-          <div className="bg-[#091426] border border-[#1a2e4c] rounded-2xl w-full max-w-3xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden my-auto">
-            {/* Modal Header */}
-            <div className="px-5 py-3.5 bg-[#060e1a] border-b border-[#1a2e4c] flex items-center justify-between shrink-0">
-              <div className="flex items-center space-x-3">
-                <div>
-                  <span className="font-mono text-[10px] text-slate-400 font-semibold">
-                    {selectedRegDetail.nomorRegistrasi}
-                  </span>
-                  <h2 className="text-sm font-bold text-white">
-                    Detail Data Registrasi Akun
-                  </h2>
-                </div>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                {selectedRegDetail.status === 'approved' && (
-                  <span className="px-2.5 py-0.5 bg-[#17382d] text-emerald-300 border border-emerald-700/50 rounded-lg text-xs font-semibold flex items-center space-x-1">
-                    <CheckCircle2 className="w-3 h-3" />
-                    <span>Disetujui / Aktif</span>
-                  </span>
-                )}
-                {selectedRegDetail.status === 'pending' && (
-                  <span className="px-2.5 py-0.5 bg-[#2d2415] text-amber-300 border border-amber-700/50 rounded-lg text-xs font-semibold flex items-center space-x-1">
-                    <Clock className="w-3 h-3" />
-                    <span>Menunggu Verifikasi</span>
-                  </span>
-                )}
-                {selectedRegDetail.status === 'rejected' && (
-                  <span className="px-2.5 py-0.5 bg-[#26161b] text-rose-300 border border-rose-800/50 rounded-lg text-xs font-semibold flex items-center space-x-1">
-                    <XCircle className="w-3 h-3" />
-                    <span>Ditolak</span>
-                  </span>
-                )}
-
-                <button
-                  onClick={() => setSelectedRegDetail(null)}
-                  className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-[#142642] cursor-pointer"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-
-            {/* Modal Body */}
-            <div className="p-5 overflow-y-auto space-y-4 text-slate-300 text-xs">
-              {/* Profile Card */}
-              <div className="bg-[#060e1a] border border-[#1a2e4c] rounded-xl p-4 flex items-center space-x-4">
-                <div className="w-14 h-14 rounded-xl bg-[#142642] border border-[#234475] overflow-hidden shrink-0">
-                  <img
-                    src={selectedRegDetail.fotoKtaUrl || selectedRegDetail.fotoKtpUrl || 'https://images.unsplash.com/photo-1544717305-2782549b5136?w=600&auto=format&fit=crop&q=80'}
-                    alt={selectedRegDetail.namaLengkap}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <h3 className="text-sm font-bold text-white">
-                    {getFormattedOfficerName(selectedRegDetail.pangkat, selectedRegDetail.namaLengkap)}
-                  </h3>
-                  <p className="text-slate-400 text-xs">
-                    NRP/NIP: <span className="text-slate-200 font-mono">{selectedRegDetail.nrp}</span> • {selectedRegDetail.jabatan}
-                  </p>
-                  <p className="text-slate-400 text-xs mt-0.5">
-                    {selectedRegDetail.instansi} ({selectedRegDetail.wilayahHukum})
-                  </p>
-                </div>
-              </div>
-
-              {/* Data Fields */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-                {/* Satwil / Instansi */}
-                <div className="bg-[#060e1a] border border-[#1a2e4c] rounded-xl p-3.5 space-y-2">
-                  <h4 className="text-xs font-bold text-white border-b border-[#1a2e4c] pb-1.5 flex items-center space-x-1.5">
-                    <Building2 className="w-3.5 h-3.5 text-slate-400" />
-                    <span>Instansi & Satuan Kerja</span>
-                  </h4>
-                  <div className="space-y-1.5 text-xs">
-                    <div>
-                      <span className="text-[10px] text-slate-500 uppercase">Instansi:</span>
-                      <p className="text-slate-200 font-medium">{selectedRegDetail.instansi}</p>
-                    </div>
-                    <div>
-                      <span className="text-[10px] text-slate-500 uppercase">Kategori & Wilayah:</span>
-                      <p className="text-slate-200">{selectedRegDetail.kategoriInstansi || 'Polres / Polresta'} • {selectedRegDetail.wilayahHukum}</p>
-                    </div>
-                    <div>
-                      <span className="text-[10px] text-slate-500 uppercase">Alamat Kantor:</span>
-                      <p className="text-slate-300 leading-relaxed">{selectedRegDetail.alamatKantor || '-'}</p>
-                    </div>
-                    <div>
-                      <span className="text-[10px] text-slate-500 uppercase">Telepon Kantor:</span>
-                      <p className="text-slate-300 font-mono">{selectedRegDetail.teleponKantor || '-'}</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Role & Kontak */}
-                <div className="bg-[#060e1a] border border-[#1a2e4c] rounded-xl p-3.5 space-y-2">
-                  <h4 className="text-xs font-bold text-white border-b border-[#1a2e4c] pb-1.5 flex items-center space-x-1.5">
-                    <Shield className="w-3.5 h-3.5 text-slate-400" />
-                    <span>Hak Akses & Kontak</span>
-                  </h4>
-                  <div className="space-y-1.5 text-xs">
-                    <div>
-                      <span className="text-[10px] text-slate-500 uppercase">Peran Sistem:</span>
-                      <p className="text-slate-200 font-semibold">{getRoleLabel(selectedRegDetail.peranSistem)}</p>
-                    </div>
-                    <div>
-                      <span className="text-[10px] text-slate-500 uppercase">Spesialisasi Tugas:</span>
-                      <p className="text-slate-300">
-                        {selectedRegDetail.spesialisasiTugas && selectedRegDetail.spesialisasiTugas.length > 0
-                          ? selectedRegDetail.spesialisasiTugas.join(', ')
-                          : 'Penyidik Reguler'}
-                      </p>
-                    </div>
-                    <div>
-                      <span className="text-[10px] text-slate-500 uppercase">Email Kedinasan:</span>
-                      <p className="text-slate-200 font-mono">{selectedRegDetail.email}</p>
-                    </div>
-                    <div>
-                      <span className="text-[10px] text-slate-500 uppercase">No. Handphone:</span>
-                      <p className="text-slate-200 font-mono">{selectedRegDetail.phone}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Dokumen Lampiran */}
-              <div className="bg-[#060e1a] border border-[#1a2e4c] rounded-xl p-3.5 space-y-2.5">
-                <h4 className="text-xs font-bold text-white border-b border-[#1a2e4c] pb-1.5 flex items-center space-x-1.5">
-                  <FileText className="w-3.5 h-3.5 text-slate-400" />
-                  <span>Dokumen Verifikasi Identitas</span>
-                </h4>
-
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                  {/* KTA */}
-                  <div className="bg-[#091426] border border-[#1a2e4c] rounded-lg p-2.5 space-y-2">
-                    <div className="flex items-center justify-between text-[11px] font-semibold text-slate-300">
-                      <span>KTA Kedinasan</span>
-                      <button
-                        onClick={() => setPreviewImage({ url: selectedRegDetail.fotoKtaUrl, title: `KTA: ${selectedRegDetail.namaLengkap}` })}
-                        className="text-slate-400 hover:text-white"
-                      >
-                        <ZoomIn className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                    <div
-                      onClick={() => setPreviewImage({ url: selectedRegDetail.fotoKtaUrl, title: `KTA: ${selectedRegDetail.namaLengkap}` })}
-                      className="h-20 rounded bg-[#060e1a] overflow-hidden cursor-pointer"
-                    >
-                      <img
-                        src={selectedRegDetail.fotoKtaUrl || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&auto=format&fit=crop&q=80'}
-                        alt="KTA"
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  </div>
-
-                  {/* KTP */}
-                  <div className="bg-[#091426] border border-[#1a2e4c] rounded-lg p-2.5 space-y-2">
-                    <div className="flex items-center justify-between text-[11px] font-semibold text-slate-300">
-                      <span>KTP Sipil</span>
-                      <button
-                        onClick={() => setPreviewImage({ url: selectedRegDetail.fotoKtpUrl, title: `KTP: ${selectedRegDetail.namaLengkap}` })}
-                        className="text-slate-400 hover:text-white"
-                      >
-                        <ZoomIn className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                    <div
-                      onClick={() => setPreviewImage({ url: selectedRegDetail.fotoKtpUrl, title: `KTP: ${selectedRegDetail.namaLengkap}` })}
-                      className="h-20 rounded bg-[#060e1a] overflow-hidden cursor-pointer"
-                    >
-                      <img
-                        src={selectedRegDetail.fotoKtpUrl || 'https://images.unsplash.com/photo-1544717305-2782549b5136?w=600&auto=format&fit=crop&q=80'}
-                        alt="KTP"
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Surat Penunjukan */}
-                  <div className="bg-[#091426] border border-[#1a2e4c] rounded-lg p-2.5 space-y-2 flex flex-col justify-between">
-                    <div className="text-[11px] font-semibold text-slate-300">
-                      Surat Penunjukan
-                    </div>
-                    <div className="text-center py-2">
-                      <FileText className="w-6 h-6 text-slate-400 mx-auto" />
-                      <span className="text-[10px] text-slate-400 truncate block mt-1">
-                        {selectedRegDetail.suratPenunjukanName || 'Surat_Penunjukan.pdf'}
-                      </span>
-                    </div>
-                    <a
-                      href={selectedRegDetail.suratPenunjukanUrl || '#'}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="w-full py-1 bg-[#142642] hover:bg-[#1b3459] text-slate-200 text-center rounded text-[11px] border border-[#234475] flex items-center justify-center space-x-1"
-                    >
-                      <ExternalLink className="w-3 h-3" />
-                      <span>Buka File</span>
-                    </a>
-                  </div>
-                </div>
-              </div>
-
-              {/* Riwayat Validasi */}
-              {(selectedRegDetail.approvedBy || selectedRegDetail.catatanAdmin) && (
-                <div className="bg-[#060e1a] border border-[#1a2e4c] rounded-xl p-3 text-xs space-y-1">
-                  {selectedRegDetail.approvedBy && (
-                    <p className="text-slate-400">
-                      Diverifikasi oleh: <strong className="text-slate-200">{selectedRegDetail.approvedBy}</strong> pada {formatTanggal(selectedRegDetail.approvedAt)}
-                    </p>
-                  )}
-                  {selectedRegDetail.catatanAdmin && (
-                    <p className="text-slate-300">
-                      Catatan: {selectedRegDetail.catatanAdmin}
-                    </p>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* Modal Footer */}
-            <div className="px-5 py-3 bg-[#060e1a] border-t border-[#1a2e4c] flex items-center justify-between shrink-0">
-              <div>
-                {selectedRegDetail.status !== 'pending' && (
-                  <button
-                    onClick={() => handleResetToPending(selectedRegDetail)}
-                    className="px-3 py-1.5 bg-[#142642] hover:bg-[#1b3459] text-slate-300 hover:text-white rounded-lg text-xs border border-[#234475] cursor-pointer flex items-center space-x-1"
-                  >
-                    <RotateCcw className="w-3 h-3" />
-                    <span>Reset ke Pending</span>
-                  </button>
-                )}
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={() => setSelectedRegDetail(null)}
-                  className="px-3.5 py-1.5 bg-[#142642] hover:bg-[#1b3459] text-slate-300 hover:text-white rounded-lg text-xs border border-[#234475] cursor-pointer"
-                >
-                  Tutup
-                </button>
-
-                {selectedRegDetail.status !== 'approved' && (
-                  <button
-                    onClick={() => handleApprove(selectedRegDetail)}
-                    className="px-3.5 py-1.5 bg-[#17382d] hover:bg-[#1e473a] text-emerald-300 hover:text-emerald-200 rounded-lg text-xs font-semibold border border-emerald-700/50 cursor-pointer flex items-center space-x-1"
-                  >
-                    <CheckCircle2 className="w-3.5 h-3.5" />
-                    <span>Setujui Akun</span>
-                  </button>
-                )}
-
-                {selectedRegDetail.status !== 'rejected' && (
-                  <button
-                    onClick={() => handleOpenRejectModal(selectedRegDetail)}
-                    className="px-3.5 py-1.5 bg-[#26161b] hover:bg-[#341b24] text-rose-300 hover:text-rose-200 rounded-lg text-xs font-semibold border border-rose-800/50 cursor-pointer flex items-center space-x-1"
-                  >
-                    <XCircle className="w-3.5 h-3.5" />
-                    <span>Tolak</span>
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* REJECT MODAL */}
+      {/* REJECT / DEACTIVATE MODAL */}
       {rejectModalTarget && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
           <div className="bg-[#091426] border border-[#1a2e4c] rounded-xl w-full max-w-md p-5 space-y-3.5 shadow-2xl">
             <div>
-              <h3 className="text-sm font-bold text-white">Tolak Pendaftaran Akun</h3>
+              <h3 className="text-sm font-bold text-white">
+                {rejectModalTarget.status === 'approved' ? 'Nonaktifkan Akun Pengguna' : 'Tolak Pendaftaran Akun'}
+              </h3>
               <p className="text-xs text-slate-400 mt-0.5">
                 {getFormattedOfficerName(rejectModalTarget.pangkat, rejectModalTarget.namaLengkap)} ({rejectModalTarget.instansi})
               </p>
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs text-slate-300 block">Alasan Penolakan:</label>
+              <label className="text-xs text-slate-300 block">
+                {rejectModalTarget.status === 'approved'
+                  ? 'Alasan Penonaktifan Akun:'
+                  : 'Alasan Penolakan Pendaftaran:'}
+              </label>
               <textarea
                 value={rejectReasonInput}
                 onChange={(e) => setRejectReasonInput(e.target.value)}
-                placeholder="Misal: Dokumen KTA buram, silakan upload ulang."
+                placeholder={
+                  rejectModalTarget.status === 'approved'
+                    ? 'Misal: Mutasi dinas, pencabutan wewenang penyidik, atau permintaan resmi.'
+                    : 'Misal: Dokumen KTA buram, silakan upload ulang.'
+                }
                 rows={3}
                 className="w-full bg-[#060e1a] text-xs text-slate-200 border border-[#1a2e4c] focus:border-[#234475] rounded-lg p-2.5 focus:outline-none"
               />
@@ -903,15 +1129,15 @@ export const VerifikasiAkunView: React.FC<VerifikasiAkunViewProps> = ({
             <div className="flex items-center justify-end space-x-2 pt-1">
               <button
                 onClick={() => setRejectModalTarget(null)}
-                className="px-3 py-1.5 bg-[#142642] text-slate-300 hover:text-white rounded-lg text-xs"
+                className="px-3 py-1.5 bg-[#142642] text-slate-300 hover:text-white rounded-lg text-xs cursor-pointer"
               >
                 Batal
               </button>
               <button
                 onClick={handleConfirmReject}
-                className="px-3 py-1.5 bg-rose-900/80 hover:bg-rose-800 text-rose-200 rounded-lg text-xs font-semibold"
+                className="px-3.5 py-1.5 bg-rose-900/80 hover:bg-rose-800 text-rose-200 rounded-lg text-xs font-semibold cursor-pointer"
               >
-                Konfirmasi Tolak
+                {rejectModalTarget.status === 'approved' ? 'Konfirmasi Nonaktifkan' : 'Konfirmasi Tolak'}
               </button>
             </div>
           </div>

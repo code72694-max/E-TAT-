@@ -96,21 +96,9 @@ export async function sendPengajuanEmailNotification(
                 ${permohonan.terperiksa.tempatLahir}, ${permohonan.terperiksa.tanggalLahir} (${permohonan.terperiksa.usia || 25} Tahun / ${permohonan.terperiksa.jenisKelamin})
               </td>
             </tr>
-            <tr>
-              <td style="padding: 6px 10px; border-bottom: 1px solid #1b3459; color: #94a3b8;">Pekerjaan & Alamat</td>
-              <td style="padding: 6px 10px; border-bottom: 1px solid #1b3459; color: #cbd5e1;">
-                ${permohonan.terperiksa.pekerjaan || '-'} &bull; ${permohonan.terperiksa.alamatDomisili || permohonan.terperiksa.alamatKtp || '-'}
-              </td>
-            </tr>
-            <tr>
-              <td style="padding: 6px 10px; border-bottom: 1px solid #1b3459; color: #94a3b8;">Pendamping / Wali</td>
-              <td style="padding: 6px 10px; border-bottom: 1px solid #1b3459; color: #cbd5e1;">
-                ${permohonan.terperiksa.namaWaliPendamping || '-'} (${permohonan.terperiksa.kontakWali || '-'})
-              </td>
-            </tr>
           </table>
 
-          <!-- Section 2: Detail Perkara & Penyidikan -->
+          <!-- Section 2: Detail Perkara -->
           <h3 style="color: #D4AF37; border-bottom: 1px solid #1b3459; padding-bottom: 8px; font-size: 14px; margin-top: 15px;">
             ⚖️ DETAIL PERKARA & PENYIDIKAN
           </h3>
@@ -124,7 +112,7 @@ export async function sendPengajuanEmailNotification(
             <tr>
               <td style="padding: 6px 10px; border-bottom: 1px solid #1b3459; color: #94a3b8;">Instansi Penyidik</td>
               <td style="padding: 6px 10px; border-bottom: 1px solid #1b3459; color: #ffffff;">
-                ${permohonan.instansiPengaju} (Penyidik: ${permohonan.pengajuNama} / HP: ${permohonan.perkara?.nomorHpPenyidik || '-'})
+                ${permohonan.instansiPengaju} (Penyidik: ${permohonan.pengajuNama})
               </td>
             </tr>
             <tr>
@@ -133,68 +121,19 @@ export async function sendPengajuanEmailNotification(
                 ${permohonan.perkara?.pasalDipersangkakan || '-'}
               </td>
             </tr>
-            <tr>
-              <td style="padding: 6px 10px; border-bottom: 1px solid #1b3459; color: #94a3b8;">TKP & Penangkapan</td>
-              <td style="padding: 6px 10px; border-bottom: 1px solid #1b3459; color: #cbd5e1;">
-                ${permohonan.perkara?.tempatKejadianPerkara || '-'} (${permohonan.perkara?.tanggalWaktuPenangkapan || '-'})
-              </td>
-            </tr>
-            <tr>
-              <td style="padding: 6px 10px; border-bottom: 1px solid #1b3459; color: #94a3b8;">Kronologi Singkat</td>
-              <td style="padding: 6px 10px; border-bottom: 1px solid #1b3459; color: #94a3b8; font-style: italic;">
-                "${permohonan.perkara?.kronologiSingkat || '-'}"
-              </td>
-            </tr>
-          </table>
-
-          <!-- Section 3: Barang Bukti disita -->
-          <h3 style="color: #D4AF37; border-bottom: 1px solid #1b3459; padding-bottom: 8px; font-size: 14px; margin-top: 15px;">
-            📦 BARANG BUKTI DISITA
-          </h3>
-          <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 11px;">
-            <thead>
-              <tr style="background-color: #081224; border-bottom: 1px solid #1b3459; color: #94a3b8; text-align: left;">
-                <th style="padding: 6px 10px;">Jenis Barang Bukti</th>
-                <th style="padding: 6px 10px;">Berat / Jumlah</th>
-                <th style="padding: 6px 10px;">Keterangan</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${bbRows}
-            </tbody>
-          </table>
-
-          <!-- Section 4: Dokumen Lampiran Persyaratan -->
-          <h3 style="color: #D4AF37; border-bottom: 1px solid #1b3459; padding-bottom: 8px; font-size: 14px; margin-top: 15px;">
-            📄 DOKUMEN PERSYARATAN TERLAMPIR
-          </h3>
-          <table style="width: 100%; border-collapse: collapse; margin-bottom: 24px; font-size: 11px;">
-            <thead>
-              <tr style="background-color: #081224; border-bottom: 1px solid #1b3459; color: #94a3b8; text-align: left;">
-                <th style="padding: 6px 10px;">Nama Dokumen Persyaratan</th>
-                <th style="padding: 6px 10px; text-align: center;">Status Verifikasi</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${docRows}
-            </tbody>
           </table>
 
           <!-- Direct Link Action Button -->
           <div style="text-align: center; margin: 30px 0 20px 0;">
-            <a href="${currentUrl}" target="_blank" style="background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%); color: #ffffff; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 14px; border: 1px solid #3b82f6; display: inline-block; box-shadow: 0 4px 15px rgba(29,78,216,0.5);">
+            <a href="${currentUrl}" target="_blank" style="background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%); color: #ffffff; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 14px; border: 1px solid #3b82f6; display: inline-block;">
               🔗 Buka Halaman Detail Pengajuan Langsung
             </a>
           </div>
-          <p style="text-align: center; color: #64748b; font-size: 11px; margin-top: 10px;">
-            URL Sistem E-TAT: <a href="${currentUrl}" style="color: #60a5fa;">${currentUrl}</a>
-          </p>
         </div>
 
         <!-- Footer -->
         <div style="background-color: #030712; padding: 14px 24px; border-top: 1px solid #1b3459; text-align: center; color: #64748b; font-size: 11px;">
           <p style="margin: 0;">Sistem Informasi & Manajemen Tim Asesmen Terpadu (E-TAT) POLRI - BNN RI</p>
-          <p style="margin: 4px 0 0 0;">Email notifikasi ini dikirimkan ke: <strong>${targetEmail}</strong></p>
         </div>
       </div>
     </body>
@@ -217,7 +156,90 @@ export async function sendPengajuanEmailNotification(
     });
 
     const data = await response.json();
+    if (response.ok && data.id) {
+      return { success: true, id: data.id };
+    } else {
+      return { success: false, error: data.message || JSON.stringify(data) };
+    }
+  } catch (error: any) {
+    return { success: false, error: error?.message || 'Gagal terhubung ke layanan Resend API' };
+  }
+}
 
+export async function sendCorrectionEmailNotification(
+  permohonan: PermohonanAsesmen,
+  invalidDocsNotes: string,
+  targetEmail: string = TARGET_EMAIL
+): Promise<SendEmailResult> {
+  const currentUrl = window.location.origin + window.location.pathname + `?permohonanId=${permohonan.id}`;
+
+  const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <title>Notifikasi Perlu Perbaikan Berkas</title>
+    </head>
+    <body style="font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #081224; color: #e2e8f0; margin: 0; padding: 24px;">
+      <div style="max-width: 680px; margin: 0 auto; background-color: #0b172a; border: 1px solid #1b3459; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+        
+        <!-- Header Kop -->
+        <div style="background-color: #030712; padding: 20px 24px; border-bottom: 2px solid #ef4444; text-align: center;">
+          <h2 style="color: #f87171; margin: 0; font-size: 20px; text-transform: uppercase; letter-spacing: 1px;">
+            ⚠️ NOTIFIKASI PERLU PERBAIKAN BERKAS (E-TAT)
+          </h2>
+          <p style="color: #94a3b8; margin: 4px 0 0 0; font-size: 12px;">
+            Sekretariat Tim Asesmen Terpadu POLRI / BNN RI
+          </p>
+        </div>
+
+        <!-- Content -->
+        <div style="padding: 24px;">
+          <div style="background-color: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px; padding: 16px; margin-bottom: 20px;">
+            <p style="margin: 0; color: #f87171; font-weight: bold; font-size: 14px;">
+              Mohon Perbaiki Berkas Permohonan ${permohonan.nomorPermohonan}
+            </p>
+            <p style="margin: 6px 0 0 0; color: #e2e8f0; font-size: 13px;">
+              Permohonan Pengajuan Asesmen atas nama terperiksa <strong>${permohonan.terperiksa.namaLengkap}</strong> (${permohonan.instansiPengaju}) memerlukan tindakan perbaikan / melengkapi berkas dari penyidik pengaju.
+            </p>
+          </div>
+
+          <h4 style="color: #f59e0b; margin-top: 15px; font-size: 13px;">📋 Catatan Koreksi Sekretariat TAT:</h4>
+          <div style="background-color: #081224; border: 1px solid #1b3459; border-radius: 8px; padding: 14px; font-size: 12px; color: #cbd5e1; line-height: 1.6;">
+            ${invalidDocsNotes}
+          </div>
+
+          <div style="text-align: center; margin: 28px 0 15px 0;">
+            <a href="${currentUrl}" target="_blank" style="background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 13px; display: inline-block;">
+              📤 Unggah Perbaikan Berkas Permohonan
+            </a>
+          </div>
+        </div>
+
+        <div style="background-color: #030712; padding: 14px 24px; border-top: 1px solid #1b3459; text-align: center; color: #64748b; font-size: 11px;">
+          <p style="margin: 0;">Sistem Informasi E-TAT POLRI - BNN RI</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  try {
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${RESEND_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        from: 'E-TAT POLRI <onboarding@resend.dev>',
+        to: [targetEmail],
+        subject: `[Perlu Perbaikan Berkas] ${permohonan.nomorPermohonan} - ${permohonan.terperiksa.namaLengkap}`,
+        html: htmlContent
+      })
+    });
+
+    const data = await response.json();
     if (response.ok && data.id) {
       return { success: true, id: data.id };
     } else {

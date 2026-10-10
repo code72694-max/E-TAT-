@@ -113,7 +113,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             { id: 'penugasan', label: 'Jadwal & Sesi', icon: <CalendarCheck className="w-4 h-4" /> },
             { id: 'dokumen', label: 'Surat Rekomendasi', icon: <FileSignature className="w-4 h-4" /> },
             { id: 'tindak_lanjut', label: 'Tindak Lanjut', icon: <Share2 className="w-4 h-4" /> },
-            { id: 'riwayat', label: 'Riwayat Permohonan', icon: <History className="w-4 h-4" /> },
+            { id: 'riwayat', label: 'Riwayat Asesmen', icon: <History className="w-4 h-4" /> },
             { id: 'about', label: 'Bantuan & SOP', icon: <Info className="w-4 h-4" /> }
           ],
           showCreateButton: true,
@@ -130,7 +130,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             { id: 'asesmen_aktif', label: 'Asesmen Aktif', icon: <Zap className="w-4 h-4" /> },
             { id: 'pleno', label: 'Pembahasan (Pleno)', icon: <Users className="w-4 h-4" />, badge: badgeCounts.siapPleno || undefined },
             { id: 'tindak_lanjut', label: 'Tindak Lanjut', icon: <Share2 className="w-4 h-4" />, badge: badgeCounts.tindakLanjutTerhambat || undefined },
-            { id: 'riwayat', label: 'Riwayat & Arsip', icon: <History className="w-4 h-4" /> },
+            { id: 'riwayat', label: 'Riwayat Asesmen', icon: <History className="w-4 h-4" /> },
             { id: 'verifikasi_akun', label: 'Verifikasi Akun', icon: <ShieldCheck className="w-4 h-4" />, badge: badgeCounts.akunPending || undefined },
             { id: 'monitoring', label: 'Laporan & Monitoring', icon: <BarChart3 className="w-4 h-4" /> },
             { id: 'about', label: 'Bantuan & SOP', icon: <Info className="w-4 h-4" /> }

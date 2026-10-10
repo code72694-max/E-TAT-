@@ -31,6 +31,7 @@ import { LoginPage } from './components/LoginPage';
 import { RegisterPage } from './components/RegisterPage';
 import { LacakBerkasPage } from './components/LacakBerkasPage';
 import { MobileBottomNav } from './components/MobileBottomNav';
+import { riwayatPermohonanSeedList } from './data/riwayatSeedData';
 
 const DEFAULT_USER: UserProfile = {
   id: 'user-admin',
@@ -68,7 +69,7 @@ export default function App() {
   const [selectedTindakLanjutId, setSelectedTindakLanjutId] = useState<string | null>(null);
   const [selectedScheduleId, setSelectedScheduleId] = useState<string | null>(null);
   const [selectedScheduleCaseId, setSelectedScheduleCaseId] = useState<string | null>(null);
-  const [permohonanList, setPermohonanList] = useState<PermohonanAsesmen[]>([]);
+  const [permohonanList, setPermohonanList] = useState<PermohonanAsesmen[]>(riwayatPermohonanSeedList);
   const [searchQuery, setSearchQuery] = useState('');
   const [isBackendLoading, setIsBackendLoading] = useState(false);
 
@@ -94,7 +95,14 @@ export default function App() {
       const regRes = results[1];
 
       if (permohonanRes && permohonanRes.status === 'fulfilled' && permohonanRes.value?.data) {
-        setPermohonanList(permohonanRes.value.data);
+        const fetchedData: PermohonanAsesmen[] = permohonanRes.value.data;
+        const combined = [...fetchedData];
+        for (const seedItem of riwayatPermohonanSeedList) {
+          if (!combined.some(p => p.id === seedItem.id || p.nomorPermohonan === seedItem.nomorPermohonan)) {
+            combined.push(seedItem);
+          }
+        }
+        setPermohonanList(combined);
       }
 
       if (regRes && regRes.status === 'fulfilled' && regRes.value?.data) {
@@ -120,6 +128,7 @@ export default function App() {
   // Modals
   const [qrModalPermohonan, setQrModalPermohonan] = useState<PermohonanAsesmen | null>(null);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
+  const [selectedRegistrasiId, setSelectedRegistrasiId] = useState<string | null>(null);
 
   // Sync state from URL path
   useEffect(() => {
@@ -229,6 +238,23 @@ export default function App() {
         } else {
           setSelectedTindakLanjutId(null);
         }
+      } else if (parts[1] === 'verifikasi_akun') {
+        setCurrentTab('verifikasi_akun');
+        setSelectedPermohonanId(null);
+        setSelectedHukumId(null);
+        setSelectedMedisId(null);
+        setSelectedRiwayatMedisId(null);
+        setSelectedRiwayatHukumId(null);
+        setSelectedTindakLanjutId(null);
+        setSelectedScheduleCaseId(null);
+        setSelectedScheduleId(null);
+        if (parts[2] === 'detail' && parts[3]) {
+          setSelectedRegistrasiId(parts[3]);
+        } else if (parts[2] && parts[2] !== 'detail') {
+          setSelectedRegistrasiId(parts[2]);
+        } else {
+          setSelectedRegistrasiId(null);
+        }
       } else if (parts[1]) {
         setCurrentTab(parts[1] as ActiveTab);
         setSelectedPermohonanId(null);
@@ -239,6 +265,7 @@ export default function App() {
         setSelectedTindakLanjutId(null);
         setSelectedScheduleCaseId(null);
         setSelectedScheduleId(null);
+        setSelectedRegistrasiId(null);
       } else {
         setCurrentTab('beranda');
         setSelectedPermohonanId(null);
@@ -249,6 +276,7 @@ export default function App() {
         setSelectedTindakLanjutId(null);
         setSelectedScheduleCaseId(null);
         setSelectedScheduleId(null);
+        setSelectedRegistrasiId(null);
       }
     } else {
       setAppViewMode('landing');
@@ -317,6 +345,7 @@ export default function App() {
     (currentTab === 'riwayat_hukum' && selectedRiwayatHukumId) ||
     (currentTab === 'tindak_lanjut_jadwal' && selectedScheduleCaseId) ||
     (currentTab.startsWith('tindak_lanjut') && selectedTindakLanjutId) ||
+    (currentTab === 'verifikasi_akun' && selectedRegistrasiId) ||
     currentTab === 'riwayat' ||
     currentTab === 'pengajuan_baru'
   );
@@ -498,6 +527,7 @@ export default function App() {
             permohonanList={permohonanList}
             currentUser={currentUser}
             onSelectPermohonan={handleOpenPermohonan}
+            onUpdatePermohonan={handleUpdatePermohonan}
             isDetailOpen={Boolean(selectedAsesmenId)}
             selectedActiveId={selectedAsesmenId}
             onSelectActiveCase={(id) => setSelectedAsesmenId(id)}
@@ -725,6 +755,16 @@ export default function App() {
             onUpdateRegistration={handleUpdateRegistration}
             onApproveRegistration={handleApproveRegistration}
             currentUser={currentUser}
+            permohonanList={permohonanList}
+            selectedRegistrasiId={selectedRegistrasiId}
+            onSelectRegistrasi={(id) => {
+              setSelectedRegistrasiId(id);
+              if (id) {
+                navigate(`/dashboard/verifikasi_akun/detail/${id}`);
+              } else {
+                navigate('/dashboard/verifikasi_akun');
+              }
+            }}
           />
         );
 
@@ -914,14 +954,18 @@ export default function App() {
             setSelectedScheduleId(null);
             navigate('/dashboard/tindak_lanjut_jadwal');
           }
+          if (selectedRegistrasiId) {
+            setSelectedRegistrasiId(null);
+            navigate('/dashboard/verifikasi_akun');
+          }
         }}
         onOpenQrModal={(item) => setQrModalPermohonan(item)}
       />
 
-      {/* Main Workspace Layout - Desktop: Sidebar hidden on Detail Page */}
+      {/* Main Workspace Layout - Desktop: Sidebar hidden when viewing detail page */}
       <div className="flex-1 flex w-full bg-[#071326]">
-        {/* Sidebar at desktop corner - Hidden on Detail View for full focus */}
-        {!isViewingAnyDetail && (
+        {/* Sidebar at desktop corner (Hidden on permohonan detail view) */}
+        {!activeDetailPermohonan && !selectedPermohonan && (
           <Sidebar
             currentTab={currentTab}
             onSelectTab={handleSelectTab}

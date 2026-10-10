@@ -1,5 +1,7 @@
 import React, { useState, useMemo } from "react";
 import { PermohonanAsesmen, UserProfile } from "../types";
+import { ModalInputAsesmen } from "./ModalInputAsesmen";
+import { PermohonanDetail } from "./PermohonanDetail";
 import {
   Activity,
   Stethoscope,
@@ -38,6 +40,7 @@ interface AsesmenAktifViewProps {
   permohonanList: PermohonanAsesmen[];
   currentUser: UserProfile;
   onSelectPermohonan?: (id: string) => void;
+  onUpdatePermohonan?: (updated: PermohonanAsesmen) => void;
   isDetailOpen?: boolean;
   selectedActiveId?: string | null;
   onSelectActiveCase?: (id: string) => void;
@@ -304,12 +307,21 @@ function getStatusBadge(p: PermohonanAsesmen) {
    ------------------------------------------------------------- */
 interface DedicatedAsesmenDetailProps {
   permohonan: PermohonanAsesmen;
+  currentUser: UserProfile;
   onBack: () => void;
   onOpenFullDetail?: (id: string) => void;
+  onUpdatePermohonan?: (updated: PermohonanAsesmen) => void;
 }
 
-function DedicatedAsesmenDetail({ permohonan, onBack, onOpenFullDetail }: DedicatedAsesmenDetailProps) {
+function DedicatedAsesmenDetail({
+  permohonan,
+  currentUser,
+  onBack,
+  onOpenFullDetail,
+  onUpdatePermohonan
+}: DedicatedAsesmenDetailProps) {
   const pipeline = useMemo(() => buildDetailedPipeline(permohonan), [permohonan]);
+  const [modalInputType, setModalInputType] = useState<'medis' | 'hukum' | null>(null);
   
   // Default selected step is the currently active step (or last done step)
   const defaultStepIdx = useMemo(() => {
@@ -325,7 +337,44 @@ function DedicatedAsesmenDetail({ permohonan, onBack, onOpenFullDetail }: Dedica
   const progressPct = Math.round((doneCount / pipeline.length) * 100);
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-200">
+    <div className="space-y-6 animate-in fade-in duration-200 font-roboto">
+      {/* Modal Input Asesmen for Medis / Hukum */}
+      {modalInputType && (
+        <ModalInputAsesmen
+          isOpen={Boolean(modalInputType)}
+          onClose={() => setModalInputType(null)}
+          tipeAsesmen={modalInputType}
+          namaTerperiksa={permohonan.terperiksa?.namaLengkap || 'Terperiksa'}
+          nomorTat={permohonan.nomorPermohonan}
+          onSave={(data, isFinal) => {
+            if (onUpdatePermohonan) {
+              const updated: PermohonanAsesmen = {
+                ...permohonan,
+                ...(modalInputType === 'medis' ? {
+                  asesmenMedis: {
+                    ...permohonan.asesmenMedis,
+                    statusAsesmen: isFinal ? 'selesai' : 'draf',
+                    tanggalPemeriksaan: new Date().toLocaleDateString('id-ID') + ' ' + new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
+                    asesorNama: currentUser.name || 'dr. Asesor Medis',
+                    ...data
+                  }
+                } : {
+                  asesmenHukum: {
+                    ...permohonan.asesmenHukum,
+                    statusTelaah: isFinal ? 'selesai' : 'draf',
+                    tanggalTelaah: new Date().toLocaleDateString('id-ID') + ' ' + new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
+                    asesorNama: currentUser.name || 'Asesor Hukum / Jaksa',
+                    ...data
+                  }
+                })
+              };
+              onUpdatePermohonan(updated);
+            }
+            setModalInputType(null);
+          }}
+        />
+      )}
+
       {/* 1. SIMPLE HEADER BAR: Nomor Permohonan & Tanggal (Identik dengan format Detail Page Verifikasi) */}
       <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm">
         <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 text-xs">
@@ -456,112 +505,161 @@ function DedicatedAsesmenDetail({ permohonan, onBack, onOpenFullDetail }: Dedica
           </div>
         </div>
 
+        {/* Interactive Role-Based Action & Input Card tailored to selected step */}
+        <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl p-4 sm:p-5 shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-4 font-roboto">
+          <div className="space-y-1">
+            <div className="flex items-center space-x-2 flex-wrap gap-1">
+              <span className="text-xs uppercase font-bold tracking-wider text-[#d4af37] bg-[#081224] px-2.5 py-0.5 rounded border border-[#1b3459]">
+                Role Anda: {(currentUser?.role || 'ADMIN').toUpperCase()}
+              </span>
+              <span className="text-xs font-bold text-white">
+                &bull; Aksi Input Tahap {activeStep.stepNumber}: {activeStep.title}
+              </span>
+            </div>
+            <p className="text-xs text-slate-300 leading-relaxed">
+              {activeStep.stepNumber === 1 && "Silakan lakukan pemeriksaan & verifikasi checklist berkas formil persyaratan (SOP BAB 09)."}
+              {activeStep.stepNumber === 2 && "Silakan tetapkan alokasi tim asesor medis & hukum serta atur jadwal sidang koordinasi."}
+              {activeStep.stepNumber === 3 && "Silakan input lembar pemeriksaan medis, hasil tes urin SKHPU, diagnosis ICD-10, dan rekomendasi layanan."}
+              {activeStep.stepNumber === 4 && "Silakan input lembar telaah hukum, analisis gramatur SEMA 04/2010, dan kualifikasi peran tersangka."}
+              {activeStep.stepNumber === 5 && "Silakan catat Berita Acara kesepakatan Sidang Pleno Tim Asesmen Terpadu (TAT)."}
+              {activeStep.stepNumber === 6 && "Silakan lakukan pengesahan tanda tangan digital (TTE) multi-pihak & penerbitan Surat Rekomendasi."}
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+            {activeStep.stepNumber === 3 && (
+              <button
+                onClick={() => setModalInputType('medis')}
+                className="bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-xs px-4 py-2.5 rounded-xl border border-emerald-500/60 shadow-md transition-all cursor-pointer flex items-center space-x-2"
+              >
+                <Stethoscope className="w-4 h-4 text-[#d4af37]" />
+                <span>Input / Edit Asesmen Medis</span>
+              </button>
+            )}
+
+            {activeStep.stepNumber === 4 && (
+              <button
+                onClick={() => setModalInputType('hukum')}
+                className="bg-rose-900 hover:bg-rose-800 text-white font-bold text-xs px-4 py-2.5 rounded-xl border border-rose-700/80 shadow-md transition-all cursor-pointer flex items-center space-x-2"
+              >
+                <Scale className="w-4 h-4 text-[#d4af37]" />
+                <span>Input / Edit Asesmen Hukum</span>
+              </button>
+            )}
+
+            {onOpenFullDetail && (
+              <button
+                onClick={() => onOpenFullDetail(permohonan.id)}
+                className="bg-[#142642] hover:bg-[#1b3459] text-white font-semibold text-xs px-4 py-2.5 rounded-xl border border-[#234475] shadow-sm transition-all cursor-pointer flex items-center space-x-2"
+              >
+                <ExternalLink className="w-4 h-4 text-[#d4af37]" />
+                <span>Kelola Full Detail Step Ini</span>
+              </button>
+            )}
+          </div>
+        </div>
+
         {/* 3 Full-Width Detailed Content Cards: Input, Proses, Output (Uniform clean slate/dark navy theme) */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-          {/* Card 1: 📥 INPUT / BERKAS MASUK */}
-          <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl p-5 shadow-lg flex flex-col justify-between space-y-4">
-            <div className="space-y-3">
-              <div className="flex items-center space-x-2.5 pb-2.5 border-b border-[#1b3459]">
-                <div className="w-7 h-7 rounded-lg bg-[#081224] border border-[#1b3459] flex items-center justify-center text-[#d4af37]">
-                  <Inbox className="w-4 h-4" />
-                </div>
-                <div>
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-200">
-                    Input &amp; Berkas Masuk
-                  </h3>
-                  <p className="text-[10px] text-slate-400">Data dan dokumen yang diterima pada tahap ini</p>
-                </div>
+        {/* 3 Full-Width Detailed Content Sections: Input -> Aktivitas -> Output (Top-to-bottom vertical layout) */}
+        <div className="flex flex-col space-y-4 font-roboto">
+          {/* Section 1: 📥 INPUT / BERKAS MASUK */}
+          <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl p-4 sm:p-5 shadow-lg space-y-3">
+            <div className="flex items-center space-x-2.5 pb-2.5 border-b border-[#1b3459]">
+              <div className="w-7 h-7 rounded-lg bg-[#081224] border border-[#1b3459] flex items-center justify-center text-[#d4af37]">
+                <Inbox className="w-4 h-4" />
               </div>
+              <div>
+                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-200">
+                  Input &amp; Berkas Masuk
+                </h3>
+                <p className="text-[10px] text-slate-400">Data dan dokumen yang diterima pada tahap ini</p>
+              </div>
+            </div>
 
-              <div className="space-y-2">
-                {activeStep.inputList.map((item, i) => (
-                  <div key={i} className="p-3 bg-[#081224] rounded-xl border border-[#1b3459] space-y-0.5">
-                    <span className="text-xs font-bold text-white block leading-snug">
-                      {item.label}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              {activeStep.inputList.map((item, i) => (
+                <div key={i} className="p-3 bg-[#081224] rounded-xl border border-[#1b3459] space-y-0.5 hover:border-[#234475] transition-colors">
+                  <span className="text-xs font-bold text-white block leading-snug">
+                    {item.label}
+                  </span>
+                  {item.detail && (
+                    <span className="text-[11px] text-slate-300 block leading-relaxed">
+                      {item.detail}
                     </span>
-                    {item.detail && (
-                      <span className="text-[11px] text-slate-300 block leading-relaxed">
-                        {item.detail}
-                      </span>
-                    )}
-                  </div>
-                ))}
-              </div>
+                  )}
+                </div>
+              ))}
             </div>
           </div>
 
-          {/* Card 2: ⚙️ PROSES & AKTIVITAS */}
-          <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl p-5 shadow-lg flex flex-col justify-between space-y-4">
-            <div className="space-y-3">
-              <div className="flex items-center space-x-2.5 pb-2.5 border-b border-[#1b3459]">
-                <div className="w-7 h-7 rounded-lg bg-[#081224] border border-[#1b3459] flex items-center justify-center text-slate-200">
-                  <Activity className="w-4 h-4 text-blue-400" />
-                </div>
-                <div>
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-200">
-                    Aktivitas &amp; Telaah
-                  </h3>
-                  <p className="text-[10px] text-slate-400">Tindakan pemeriksaan, telaah hukum &amp; analisis</p>
-                </div>
+          {/* Section 2: ⚙️ PROSES & AKTIVITAS */}
+          <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl p-4 sm:p-5 shadow-lg space-y-3">
+            <div className="flex items-center space-x-2.5 pb-2.5 border-b border-[#1b3459]">
+              <div className="w-7 h-7 rounded-lg bg-[#081224] border border-[#1b3459] flex items-center justify-center text-slate-200">
+                <Activity className="w-4 h-4 text-blue-400" />
               </div>
+              <div>
+                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-200">
+                  Aktivitas &amp; Telaah
+                </h3>
+                <p className="text-[10px] text-slate-400">Tindakan pemeriksaan, telaah hukum &amp; analisis</p>
+              </div>
+            </div>
 
-              <div className="space-y-2">
-                {activeStep.prosesList.map((item, i) => (
-                  <div key={i} className="p-3 bg-[#081224] rounded-xl border border-[#1b3459] space-y-0.5">
-                    <span className="text-xs font-bold text-white block leading-snug">
-                      {item.label}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              {activeStep.prosesList.map((item, i) => (
+                <div key={i} className="p-3 bg-[#081224] rounded-xl border border-[#1b3459] space-y-0.5 hover:border-[#234475] transition-colors">
+                  <span className="text-xs font-bold text-white block leading-snug">
+                    {item.label}
+                  </span>
+                  {item.detail && (
+                    <span className="text-[11px] text-slate-300 block leading-relaxed">
+                      {item.detail}
                     </span>
-                    {item.detail && (
-                      <span className="text-[11px] text-slate-300 block leading-relaxed">
-                        {item.detail}
-                      </span>
-                    )}
-                  </div>
-                ))}
-              </div>
+                  )}
+                </div>
+              ))}
             </div>
           </div>
 
-          {/* Card 3: 📤 OUTPUT & HASIL KEPUTUSAN */}
-          <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl p-5 shadow-lg flex flex-col justify-between space-y-4">
-            <div className="space-y-3">
-              <div className="flex items-center space-x-2.5 pb-2.5 border-b border-[#1b3459]">
-                <div className="w-7 h-7 rounded-lg bg-[#081224] border border-[#1b3459] flex items-center justify-center text-emerald-400">
-                  <SendHorizontal className="w-4 h-4" />
-                </div>
-                <div>
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-200">
-                    Output &amp; Hasil Keputusan
-                  </h3>
-                  <p className="text-[10px] text-slate-400">Rekomendasi resmi &amp; kesimpulan yang diterbitkan</p>
-                </div>
+          {/* Section 3: 📤 OUTPUT & HASIL KEPUTUSAN */}
+          <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl p-4 sm:p-5 shadow-lg space-y-3">
+            <div className="flex items-center space-x-2.5 pb-2.5 border-b border-[#1b3459]">
+              <div className="w-7 h-7 rounded-lg bg-[#081224] border border-[#1b3459] flex items-center justify-center text-emerald-400">
+                <SendHorizontal className="w-4 h-4" />
               </div>
+              <div>
+                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-200">
+                  Output &amp; Hasil Keputusan
+                </h3>
+                <p className="text-[10px] text-slate-400">Rekomendasi resmi &amp; kesimpulan yang diterbitkan</p>
+              </div>
+            </div>
 
-              <div className="space-y-2">
-                {activeStep.outputList.map((item, i) => (
-                  <div
-                    key={i}
-                    className={`p-3 rounded-xl border space-y-0.5 ${
-                      item.isHighlight
-                        ? "bg-[#142642] border-[#2d7ad6]/60 text-white"
-                        : "bg-[#081224] border-[#1b3459] text-slate-200"
-                    }`}
-                  >
-                    <span className="text-xs font-bold block leading-snug">
-                      {item.label}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              {activeStep.outputList.map((item, i) => (
+                <div
+                  key={i}
+                  className={`p-3 rounded-xl border space-y-0.5 hover:border-[#234475] transition-colors ${
+                    item.isHighlight
+                      ? "bg-[#142642] border-[#2d7ad6]/60 text-white"
+                      : "bg-[#081224] border-[#1b3459] text-slate-200"
+                  }`}
+                >
+                  <span className="text-xs font-bold block leading-snug">
+                    {item.label}
+                  </span>
+                  {item.detail && (
+                    <span className="text-[11px] text-slate-300 block leading-relaxed">
+                      {item.detail}
                     </span>
-                    {item.detail && (
-                      <span className="text-[11px] text-slate-300 block leading-relaxed">
-                        {item.detail}
-                      </span>
-                    )}
-                  </div>
-                ))}
-              </div>
+                  )}
+                </div>
+              ))}
             </div>
 
             {activeStep.highlightNote && (
-              <div className="p-3 rounded-xl bg-[#081224] border border-[#1b3459] text-[11px] text-slate-300 flex items-start space-x-2">
+              <div className="mt-2 p-3 rounded-xl bg-[#081224] border border-[#1b3459] text-[11px] text-slate-300 flex items-start space-x-2">
                 <Info className="w-3.5 h-3.5 text-[#d4af37] shrink-0 mt-0.5" />
                 <span className="leading-relaxed">{activeStep.highlightNote}</span>
               </div>
@@ -613,6 +711,7 @@ export const AsesmenAktifView: React.FC<AsesmenAktifViewProps> = ({
   permohonanList,
   currentUser,
   onSelectPermohonan,
+  onUpdatePermohonan,
   isDetailOpen,
   selectedActiveId: propSelectedActiveId,
   onSelectActiveCase,
@@ -695,13 +794,15 @@ export const AsesmenAktifView: React.FC<AsesmenAktifViewProps> = ({
     }
   };
 
-  // JIKA SEDANG MEMILIH SATU PERMOHONAN: TAMPILKAN DEDICATED PIPELINE DENGAN MINIMALIST TABS & FULL-WIDTH DETAIL CONTENT
+  // JIKA SEDANG MEMILIH SATU PERMOHONAN: TAMPILKAN LANGSUNG PERMOHONAN DETAIL DENGAN TAB LENGKAP ROLE
   if (activePermohonan) {
     return (
-      <DedicatedAsesmenDetail
+      <PermohonanDetail
         permohonan={activePermohonan}
+        currentUser={currentUser}
         onBack={handleBackToList}
-        onOpenFullDetail={onSelectPermohonan}
+        onUpdatePermohonan={onUpdatePermohonan || (() => {})}
+        onOpenQrModal={() => {}}
       />
     );
   }

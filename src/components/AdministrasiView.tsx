@@ -680,7 +680,7 @@ export const AdministrasiView: React.FC<AdministrasiViewProps> = ({
                   <div className="bg-emerald-950/40 border border-emerald-800/50 p-3 rounded-xl text-xs space-y-1">
                     <span className="font-bold text-emerald-300 block">Riwayat Persetujuan Admin:</span>
                     <p className="text-slate-300 text-[11px]">
-                      Disetujui oleh: {selectedRegDetail.approvedBy} pada {new Date(selectedRegDetail.approvedAt).toLocaleString('id-ID')}
+                      Disetujui oleh: {typeof selectedRegDetail.approvedBy === 'object' ? `${(selectedRegDetail.approvedBy as any).name || ''} (${((selectedRegDetail.approvedBy as any).role || '').toUpperCase()})` : selectedRegDetail.approvedBy} pada {new Date(selectedRegDetail.approvedAt).toLocaleString('id-ID')}
                     </p>
                     {selectedRegDetail.catatanAdmin && (
                       <p className="text-slate-400 text-[11px]">Catatan: {selectedRegDetail.catatanAdmin}</p>

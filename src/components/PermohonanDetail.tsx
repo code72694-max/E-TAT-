@@ -52,7 +52,109 @@ import { InstrumenKriteriaPlasemenView } from './InstrumenKriteriaPlasemenView';
 import { ModalInputAsesmen } from './ModalInputAsesmen';
 import { BeritaAcaraModal } from './BeritaAcaraModal';
 import { PrasyaratPemeriksaanView } from './PrasyaratPemeriksaanView';
-import { sendPengajuanEmailNotification } from '../services/emailService';
+import { sendPengajuanEmailNotification, sendCorrectionEmailNotification } from '../services/emailService';
+
+const DEFAULT_REQUIRED_DOCUMENTS: DokumenPersyaratan[] = [
+  {
+    id: 'doc-1',
+    nama: 'Surat Permohonan Asesmen TAT dari Penyidik',
+    wajib: true,
+    statusVerifikasi: 'belum_diperiksa',
+    versi: 1,
+    fileName: 'Surat_Permohonan_Asesmen_TAT.pdf',
+    fileSize: '1.4 MB',
+    uploadedAt: '10/10/2026 09:30 WIB',
+    fileUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf'
+  },
+  {
+    id: 'doc-2',
+    nama: 'Laporan Polisi (LP)',
+    wajib: true,
+    statusVerifikasi: 'belum_diperiksa',
+    versi: 1,
+    fileName: 'Laporan_Polisi_LP_2026_Resnarkoba.pdf',
+    fileSize: '2.1 MB',
+    uploadedAt: '10/10/2026 09:31 WIB',
+    fileUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf'
+  },
+  {
+    id: 'doc-3',
+    nama: 'Surat Perintah Penyidikan (Sprindik)',
+    wajib: true,
+    statusVerifikasi: 'belum_diperiksa',
+    versi: 1,
+    fileName: 'Sprindik_Nomor_SP_Idik_88_2026.pdf',
+    fileSize: '980 KB',
+    uploadedAt: '10/10/2026 09:32 WIB',
+    fileUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf'
+  },
+  {
+    id: 'doc-4',
+    nama: 'Surat Perintah Penangkapan & Penahanan',
+    wajib: true,
+    statusVerifikasi: 'belum_diperiksa',
+    versi: 1,
+    fileName: 'Surat_Perintah_Penangkapan_Penahanan.pdf',
+    fileSize: '1.2 MB',
+    uploadedAt: '10/10/2026 09:33 WIB',
+    fileUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf'
+  },
+  {
+    id: 'doc-5',
+    nama: 'Berita Acara Pemeriksaan (BAP) Saksi & Tersangka',
+    wajib: true,
+    statusVerifikasi: 'belum_diperiksa',
+    versi: 1,
+    fileName: 'BAP_Saksi_dan_Tersangka_Lengkap.pdf',
+    fileSize: '3.4 MB',
+    uploadedAt: '10/10/2026 09:35 WIB',
+    fileUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf'
+  },
+  {
+    id: 'doc-6',
+    nama: 'Berita Acara Penimbangan & Penyitaan Barang Bukti',
+    wajib: true,
+    statusVerifikasi: 'belum_diperiksa',
+    versi: 1,
+    fileName: 'Berita_Acara_Penimbangan_BB.pdf',
+    fileSize: '850 KB',
+    uploadedAt: '10/10/2026 09:36 WIB',
+    fileUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf'
+  },
+  {
+    id: 'doc-7',
+    nama: 'Surat Keterangan Hasil Labfor / Uji Urin Awal',
+    wajib: true,
+    statusVerifikasi: 'belum_diperiksa',
+    versi: 1,
+    fileName: 'Surat_Hasil_Uji_Labfor_Puslabfor.pdf',
+    fileSize: '1.1 MB',
+    uploadedAt: '10/10/2026 09:38 WIB',
+    fileUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf'
+  },
+  {
+    id: 'doc-8',
+    nama: 'KTP / Kartu Identitas Terperiksa',
+    wajib: true,
+    statusVerifikasi: 'belum_diperiksa',
+    versi: 1,
+    fileName: 'Scan_KTP_Terperiksa_Elektronik.pdf',
+    fileSize: '650 KB',
+    uploadedAt: '10/10/2026 09:40 WIB',
+    fileUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf'
+  },
+  {
+    id: 'doc-9',
+    nama: 'Surat Persetujuan Keluarga / Kuasa Hukum',
+    wajib: false,
+    statusVerifikasi: 'belum_diperiksa',
+    versi: 1,
+    fileName: 'Surat_Persetujuan_Keluarga_Tersangka.pdf',
+    fileSize: '720 KB',
+    uploadedAt: '10/10/2026 09:42 WIB',
+    fileUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf'
+  }
+];
 
 interface PermohonanDetailProps {
   permohonan: PermohonanAsesmen;
@@ -96,6 +198,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
   const [modalAsesmenType, setModalAsesmenType] = useState<'medis' | 'hukum' | null>(null);
   const [modalJadwalType, setModalJadwalType] = useState<'medis' | 'hukum' | null>(null);
   const [previewImage, setPreviewImage] = useState<{ url: string; title: string } | null>(null);
+  const [previewDocModal, setPreviewDocModal] = useState<DokumenPersyaratan | null>(null);
 
   // Interactive Form State for Asesmen Medis
   const [isEditingMedis, setIsEditingMedis] = useState<boolean>(!permohonan.asesmenMedis || isMedisRole);
@@ -260,10 +363,15 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
       case 'sekretariat':
       case 'SEKRETARIAT': {
         const tabs: { id: DetailTab; label: string; icon: React.ReactNode }[] = [
-          { id: 'ringkasan', label: 'Ringkasan', icon: <User className="w-3.5 h-3.5" /> },
+          { id: 'ringkasan', label: 'Ringkasan Perkara', icon: <User className="w-3.5 h-3.5" /> },
           { id: 'prasyarat', label: 'Prasyarat & Kedatangan', icon: <FileCheck className="w-3.5 h-3.5" /> },
           { id: 'administrasi', label: 'Verifikasi Berkas', icon: <FileText className="w-3.5 h-3.5" /> },
-          { id: 'jadwal', label: 'Penjadwalan', icon: <Calendar className="w-3.5 h-3.5" /> }
+          { id: 'jadwal', label: 'Penjadwalan', icon: <Calendar className="w-3.5 h-3.5" /> },
+          { id: 'medis', label: 'Asesmen Medis', icon: <Stethoscope className="w-3.5 h-3.5" /> },
+          { id: 'hukum', label: 'Telaah Hukum', icon: <Scale className="w-3.5 h-3.5" /> },
+          { id: 'pleno', label: 'Sidang Pleno', icon: <Users className="w-3.5 h-3.5" /> },
+          { id: 'dokumen', label: 'Rekomendasi TTE', icon: <FileSignature className="w-3.5 h-3.5" /> },
+          { id: 'riwayat', label: 'Audit Log & Riwayat', icon: <History className="w-3.5 h-3.5" /> }
         ];
         return tabs;
       }
@@ -517,8 +625,12 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
   };
 
   // Handle Sekretariat verifying a document
-  const handleVerifyDocumentItem = (docId: string, status: 'sesuai' | 'perlu_perbaikan', note?: string) => {
-    const updatedDocs = permohonan.dokumenList.map(doc => {
+  const handleVerifyDocumentItem = async (docId: string, status: 'sesuai' | 'perlu_perbaikan', note?: string) => {
+    const listToUse = (permohonan.dokumenList && permohonan.dokumenList.length > 0)
+      ? permohonan.dokumenList
+      : DEFAULT_REQUIRED_DOCUMENTS;
+
+    const updatedDocs = listToUse.map(doc => {
       if (doc.id === docId) {
         return {
           ...doc,
@@ -532,6 +644,11 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
     const hasErrors = updatedDocs.some(d => d.wajib && d.statusVerifikasi === 'perlu_perbaikan');
     const allApproved = updatedDocs.filter(d => d.wajib).every(d => d.statusVerifikasi === 'sesuai');
 
+    const invalidNotes = updatedDocs
+      .filter(d => d.statusVerifikasi === 'perlu_perbaikan')
+      .map(d => `• ${d.nama}: ${d.catatanKoreksi || 'Belum dilampirkan atau perlu diperbaiki'}`)
+      .join('<br/>');
+
     const updated: PermohonanAsesmen = {
       ...permohonan,
       dokumenList: updatedDocs,
@@ -539,7 +656,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
       statusProsesUtama: hasErrors ? 'perlu_perbaikan' : allApproved ? 'verifikasi_berkas' : 'verifikasi_berkas',
       penanggungJawabBerikutnya: hasErrors ? 'Penyidik Pengaju' : allApproved ? 'Ketua TAT (via Admin)' : 'Sekretariat TAT',
       tindakanBerikutnyaLabel: hasErrors
-        ? 'Daftar perbaikan berkas diterbitkan. Menunggu unggah ulang dari penyidik.'
+        ? `Perlu Perbaikan Berkas Permohonan ${permohonan.nomorPermohonan} pada pengajuan atas nama ${permohonan.terperiksa.namaLengkap}`
         : allApproved
         ? 'Administrasi lengkap & diverifikasi. Menunggu catatan disposisi dari Ketua TAT.'
         : 'Sedang dalam proses verifikasi berkas oleh Sekretariat.',
@@ -549,14 +666,30 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
           timestamp: new Date().toLocaleDateString('id-ID') + ' ' + new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
           actorNama: currentUser.name,
           actorPeran: currentUser.role,
-          aksi: 'Verifikasi Administrasi Berkas',
-          rincian: `Dokumen ${docId} diverifikasi dengan status: ${status}`
+          aksi: status === 'perlu_perbaikan' ? 'Minta Perbaikan Berkas' : 'Verifikasi Berkas Sesuai',
+          rincian: status === 'perlu_perbaikan'
+            ? `Dokumen '${docId}' perlu diperbaiki. Catatan: ${note || '-'}`
+            : `Dokumen '${docId}' dinyatakan sesuai & valid.`
         },
-        ...permohonan.auditLogs
+        ...(permohonan.auditLogs || [])
       ]
     };
 
     onUpdatePermohonan(updated);
+
+    if (status === 'perlu_perbaikan') {
+      try {
+        const res = await sendCorrectionEmailNotification(updated, invalidNotes || note || 'Silakan lengkapi berkas permohonan.');
+        if (res.success) {
+          setEmailBanner({
+            type: 'success',
+            message: `Notifikasi email perlu perbaikan berkas berhasil dikirim ke etatsiappulih@gmail.com! (Resend ID: ${res.id})`
+          });
+        }
+      } catch (err) {
+        console.warn('Error sending correction email:', err);
+      }
+    }
   };
 
   // Handle digital signing by authorized signer
@@ -647,12 +780,13 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
   };
 
   // Helper label for Status Utama
-  const formatStatus = (status: string) => {
-    return status.replace(/_/g, ' ').toUpperCase();
+  const formatStatus = (status?: string | null) => {
+    if (!status) return 'SELESAI';
+    return String(status).replace(/_/g, ' ').toUpperCase();
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 font-roboto">
       {showBeritaAcara && (
         <BeritaAcaraModal
           permohonan={permohonan}
@@ -662,132 +796,40 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
 
       {/* Compact Status & Action Overview */}
 
-      {/* Simple Header Bar: Nomor Permohonan & Tanggal */}
-      <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm">
-        <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 text-xs">
-          <div className="flex items-center space-x-2 bg-[#081224] border border-[#1b3459] px-3 py-1.5 rounded-xl">
-            <span className="text-slate-400 font-medium">No. Permohonan:</span>
-            <span className="font-mono font-bold text-xs sm:text-sm text-[#d4af37]">
-              {permohonan.nomorPermohonan}
-            </span>
-          </div>
+      {/* Simple & Clean Header Bar: Compact Aligned Grid + Tanggal in Top Right */}
+      <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl p-3 sm:p-3.5 relative shadow-sm flex flex-col md:flex-row md:items-start justify-between gap-3">
+        {/* Left: Perfectly Aligned Compact Key-Value Grid */}
+        <div className="grid grid-cols-[110px_8px_1fr] items-center gap-y-1 text-[11px] sm:text-xs">
+          <span className="text-slate-400 font-medium">No. Permohonan</span>
+          <span className="text-slate-500 font-medium">:</span>
+          <span className="font-semibold text-slate-100">
+            {permohonan.nomorPermohonan}
+          </span>
 
-          <div className="flex items-center space-x-2 bg-[#081224] border border-[#1b3459] px-3 py-1.5 rounded-xl">
-            <Calendar className="w-3.5 h-3.5 text-slate-400" />
-            <span className="text-slate-400 font-medium">Tanggal:</span>
+          <span className="text-slate-400 font-medium">Nama Pengaju</span>
+          <span className="text-slate-500 font-medium">:</span>
+          <span className="font-semibold text-slate-100">
+            {permohonan.pengajuNama || permohonan.perkara?.namaPenyidik || 'Ipda Budi Santoso'}
+          </span>
+
+          <span className="text-slate-400 font-medium">Email Pengaju</span>
+          <span className="text-slate-500 font-medium">:</span>
+          <span className="font-semibold text-slate-100">
+            {permohonan.pengajuEmail || 'etatsiappulih@gmail.com'}
+          </span>
+        </div>
+
+        {/* Right: Tanggal in Top Right */}
+        <div className="flex flex-col items-start md:items-end shrink-0">
+          <div className="flex items-center space-x-1.5 text-[11px] sm:text-xs text-slate-400">
+            <Calendar className="w-3 h-3 text-slate-400 shrink-0" />
+            <span className="font-medium">Tanggal Pengajuan:</span>
             <span className="font-semibold text-slate-200">
               {permohonan.tanggalPengajuan}
             </span>
           </div>
         </div>
-
-        {/* Action Buttons */}
-        <div className="flex flex-wrap items-center gap-2 shrink-0">
-          {(permohonan.applicationStatus === 'NEEDS_CORRECTION' || permohonan.statusProsesUtama === 'perlu_perbaikan') && (currentUser.role === 'pengaju' || currentUser.role === 'PENGAJU') && (
-            <button
-              onClick={() => setActiveTab('administrasi')}
-              className="bg-[#142642] hover:bg-[#1b3459] text-white text-xs font-semibold px-3 py-1.5 rounded-xl flex items-center justify-center space-x-1.5 transition-all cursor-pointer border border-[#234475] w-full sm:w-auto"
-            >
-              <Upload className="w-3.5 h-3.5" />
-              <span>Unggah Perbaikan</span>
-            </button>
-          )}
-
-          {(permohonan.applicationStatus === 'SUBMITTED' || permohonan.applicationStatus === 'ADMIN_REVIEW' || permohonan.statusProsesUtama === 'verifikasi_berkas') && (currentUser.role === 'sekretariat' || currentUser.role === 'ADMIN') && (
-            <>
-              <button
-                onClick={() => setActiveTab('administrasi')}
-                className="bg-[#142642] hover:bg-[#1b3459] text-white text-xs font-semibold px-3 py-1.5 rounded-xl flex items-center justify-center space-x-1.5 transition-all cursor-pointer border border-[#234475] w-full sm:w-auto"
-              >
-                <CheckCircle2 className="w-3.5 h-3.5" />
-                <span>Verifikasi Dokumen</span>
-              </button>
-              {permohonan.applicationStatus === 'AWAITING_DISPOSITION' ? (
-                <button
-                  onClick={() => {
-                    const hasil = window.prompt('Masukkan hasil disposisi Ketua TAT (disetujui/ditolak):');
-                    if (hasil && (hasil.toLowerCase() === 'disetujui' || hasil.toLowerCase() === 'ditolak')) {
-                      const isApproved = hasil.toLowerCase() === 'disetujui';
-                      if (onUpdatePermohonan) {
-                        onUpdatePermohonan({
-                          ...permohonan,
-                          applicationStatus: isApproved ? 'APPROVED' : 'REJECTED',
-                          statusProsesUtama: isApproved ? 'penugasan_jadwal' : 'ditolak',
-                          penanggungJawabBerikutnya: isApproved ? 'Sekretariat TAT' : 'Selesai',
-                          tindakanBerikutnyaLabel: isApproved ? 'Menunggu penetapan jadwal dan tim asesor.' : 'Permohonan ditolak oleh Ketua TAT.',
-                          auditLogs: [
-                            {
-                              id: 'aud-' + Date.now(),
-                              timestamp: new Date().toLocaleDateString('id-ID') + ' ' + new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
-                              actorNama: currentUser.name,
-                              actorPeran: currentUser.role,
-                              aksi: 'CATAT_DISPOSISI',
-                              rincian: `Disposisi Ketua TAT: ${isApproved ? 'Disetujui' : 'Ditolak'}`
-                            },
-                            ...(permohonan.auditLogs || [])
-                          ]
-                        });
-                      }
-                    } else if (hasil) {
-                      alert('Mohon masukkan "disetujui" atau "ditolak"');
-                    }
-                  }}
-                  className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-3 py-1.5 rounded-xl flex items-center justify-center space-x-1.5 transition-all cursor-pointer border border-emerald-500 w-full sm:w-auto"
-                >
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                  <span>Catat Disposisi Ketua</span>
-                </button>
-              ) : (
-                <button
-                  onClick={() => {
-                    if (window.confirm('Apakah Anda yakin ingin menyetujui seluruh berkas dan melanjutkan permohonan ini ke tahap Asesmen (Hukum/Medis)?')) {
-                      if (onUpdatePermohonan) {
-                        onUpdatePermohonan({
-                          ...permohonan,
-                          statusProsesUtama: 'asesmen_berlangsung'
-                        });
-                      }
-                    }
-                  }}
-                  className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-3 py-1.5 rounded-xl flex items-center justify-center space-x-1.5 transition-all cursor-pointer border border-emerald-500 w-full sm:w-auto"
-                >
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                  <span>Setujui Semua Berkas</span>
-                </button>
-              )}
-            </>
-          )}
-
-          {(permohonan.applicationStatus === 'AWAITING_SIGNED_OUTPUTS' || permohonan.statusProsesUtama === 'pengesahan_rekomendasi') && userCanSignNow && (
-            <button
-              onClick={handleDigitalSign}
-              className="bg-[#142642] hover:bg-[#1b3459] text-white text-xs font-semibold px-3 py-1.5 rounded-xl flex items-center justify-center space-x-1.5 transition-all cursor-pointer border border-[#234475] w-full sm:w-auto"
-            >
-              <FileSignature className="w-3.5 h-3.5" />
-              <span>Tandatangani Rekomendasi</span>
-            </button>
-          )}
-
-          {currentUser.role === 'rehabilitasi' && permohonan.tindakLanjut && (
-            <button
-              onClick={() => setActiveTab('tindak_lanjut')}
-              className="bg-[#142642] hover:bg-[#1b3459] text-white text-xs font-semibold px-3 py-1.5 rounded-xl flex items-center justify-center space-x-1.5 transition-all cursor-pointer border border-[#234475] w-full sm:w-auto"
-            >
-              <Share2 className="w-3.5 h-3.5" />
-              <span>Konfirmasi Rujukan</span>
-            </button>
-          )}
-
-          {(currentUser.role === 'pengaju' || currentUser.role === 'PENGAJU') && permohonan.rekomendasiResmi && ((permohonan.applicationStatus === 'RESULTS_ISSUED' || permohonan.statusProsesUtama === 'rekomendasi_terbit') || (permohonan.followupStatus === 'VERIFIED_IMPLEMENTED' || permohonan.statusProsesUtama === 'selesai_tindak_lanjut')) && (
-            <button
-              onClick={() => setActiveTab('dokumen')}
-              className="bg-[#142642] hover:bg-[#1b3459] text-white text-xs font-semibold px-3 py-1.5 rounded-xl flex items-center justify-center space-x-1.5 transition-all cursor-pointer border border-[#234475] w-full sm:w-auto"
-            >
-              <Download className="w-3.5 h-3.5" />
-              <span>Rekomendasi Resmi</span>
-            </button>
-          )}
-        </div>
+      </div>
 
         {emailBanner && (
           <div className={`mt-3 p-3 rounded-xl border text-xs flex items-center justify-between ${
@@ -811,33 +853,29 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
             </button>
           </div>
         )}
-      </div>
 
-      {/* Tab Navigation - Pill & Button Style */}
-      <div className="bg-[#0b172a] p-2 rounded-2xl border border-[#1b3459] shadow-md">
-        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
+      {/* Formal Tab Navigation - Executive POLRI/BNN E-TAT Style */}
+      <div className="bg-[#0b172a] p-1.5 rounded-xl border border-[#1b3459] shadow-sm">
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
           {availableTabs.map((tab, idx) => {
             const isActive = activeTab === tab.id;
             return (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center space-x-2.5 px-4 py-2.5 rounded-xl font-bold text-xs transition-all whitespace-nowrap cursor-pointer select-none ${
+                className={`flex items-center space-x-2 px-3.5 py-2 rounded-lg text-xs transition-all whitespace-nowrap cursor-pointer select-none border ${
                   isActive
-                    ? 'bg-gradient-to-r from-[#144782] via-[#17549c] to-[#1c64b8] text-white border border-[#2d7ad6]/70 shadow-lg shadow-[#144782]/40 scale-[1.01]'
-                    : 'bg-[#081224] text-slate-300 hover:text-white hover:bg-[#142642] border border-[#1b3459] hover:border-[#234475]'
+                    ? 'bg-[#17335c] border-[#386bb0] text-white font-bold shadow-sm'
+                    : 'bg-[#0e1d35] border-[#1c3356] text-slate-300 hover:text-white hover:bg-[#142848] font-medium'
                 }`}
               >
-                <div className={`w-5 h-5 rounded-lg flex items-center justify-center text-[10px] font-mono font-bold ${
-                  isActive ? 'bg-white/20 text-[#d4af37]' : 'bg-[#142642] text-slate-400'
+                <div className={`w-4.5 h-4.5 rounded-md flex items-center justify-center text-[10px] font-mono font-bold ${
+                  isActive ? 'bg-[#091426] text-[#d4af37] border border-[#386bb0]/60' : 'bg-[#081224] text-slate-400'
                 }`}>
                   {idx + 1}
                 </div>
                 <span className={isActive ? 'text-[#d4af37]' : 'text-slate-400'}>{tab.icon}</span>
                 <span className="tracking-wide">{tab.label}</span>
-                {isActive && (
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#d4af37] animate-pulse" />
-                )}
               </button>
             );
           })}
@@ -1117,37 +1155,41 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
 
         {/* TAB 2: ADMINISTRASI & VERIFIKASI BERKAS */}
         {activeTab === 'administrasi' && (() => {
-          const validDocsCount = permohonan.dokumenList.filter(d => d.statusVerifikasi === 'sesuai').length;
-          const invalidDocsCount = permohonan.dokumenList.filter(d => d.statusVerifikasi === 'perlu_perbaikan').length;
-          const totalDocsCount = permohonan.dokumenList.length;
+          const effectiveDokumenList = (permohonan.dokumenList && permohonan.dokumenList.length > 0)
+            ? permohonan.dokumenList
+            : DEFAULT_REQUIRED_DOCUMENTS;
+
+          const validDocsCount = effectiveDokumenList.filter(d => d.statusVerifikasi === 'sesuai').length;
+          const invalidDocsCount = effectiveDokumenList.filter(d => d.statusVerifikasi === 'perlu_perbaikan').length;
+          const totalDocsCount = effectiveDokumenList.length;
           const percentComplete = totalDocsCount > 0 ? Math.round((validDocsCount / totalDocsCount) * 100) : 0;
 
           return (
-            <div className="space-y-4">
+            <div className="space-y-4 font-roboto">
               {/* Completeness Summary Banner */}
-              <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 shadow-sm">
                 <div className="space-y-1">
                   <div className="flex items-center space-x-2">
-                    <span className="text-xs font-bold text-white uppercase font-['Cinzel',serif]">Status Kelengkapan Berkas Formil</span>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#0b172a] border border-[#1b3459] text-slate-300">
+                    <span className="text-xs font-bold text-white uppercase tracking-wider">Status Kelengkapan Berkas Formil</span>
+                    <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-[#081224] border border-[#1b3459] text-slate-300">
                       SOP BAB 09
                     </span>
                   </div>
                   <p className="text-xs text-slate-400">
-                    {validDocsCount} dari {totalDocsCount} berkas formil persyaratan dinyatakan valid oleh Sekretariat TAT BNNP Kaltim.
+                    {validDocsCount} dari {totalDocsCount} berkas formil persyaratan dinyatakan valid oleh Sekretariat TAT.
                   </p>
                 </div>
 
                 <div className="flex items-center space-x-4">
                   <div className="text-right">
                     <span className="font-mono text-xl font-extrabold text-[#D4AF37] block">{percentComplete}%</span>
-                    <span className="text-[10px] text-slate-400">
+                    <span className="text-[10px] text-slate-400 font-medium">
                       {validDocsCount} Sesuai &bull; {invalidDocsCount} Koreksi
                     </span>
                   </div>
-                  <div className="w-28 bg-[#0b172a] h-2.5 rounded-full overflow-hidden border border-[#1b3459]">
+                  <div className="w-28 bg-[#081224] h-2.5 rounded-full overflow-hidden border border-[#1b3459]">
                     <div
-                      className={`h-full transition-all duration-300 ${percentComplete === 100 ? 'bg-emerald-400' : percentComplete >= 50 ? 'bg-amber-400' : 'bg-rose-400'}`}
+                      className={`h-full transition-all duration-300 ${percentComplete === 100 ? 'bg-emerald-500' : percentComplete >= 50 ? 'bg-amber-500' : 'bg-rose-500'}`}
                       style={{ width: `${percentComplete}%` }}
                     />
                   </div>
@@ -1155,145 +1197,249 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
               </div>
 
               <div className="flex items-center justify-between pb-3 border-b border-[#1b3459]">
-                <h3 className="text-sm font-bold text-white">Daftar Dokumen Persyaratan Resmi</h3>
-                <span className="text-xs text-slate-400">Role Anda: <strong className="text-[#D4AF37] capitalize">{currentUser.role}</strong></span>
+                <h3 className="text-sm font-bold text-white tracking-wide">Daftar Dokumen Persyaratan Resmi Checklist (SOP TAT)</h3>
+                <span className="text-xs text-slate-400">Role Anda: <strong className="text-[#D4AF37] font-bold uppercase">{currentUser.role}</strong></span>
               </div>
 
-              <div className="space-y-3">
-              {permohonan.dokumenList.map((doc, idx) => (
-                <div
-                  key={doc.id}
-                  className={`border rounded-xl p-4 transition-all ${
-                    doc.statusVerifikasi === 'perlu_perbaikan'
-                      ? 'border-[#1b3459] bg-amber-950/20'
-                      : doc.statusVerifikasi === 'sesuai'
-                      ? 'border-emerald-500/40 bg-emerald-950/20'
-                      : 'border-[#1b3459] bg-[#081224]'
-                  }`}
-                >
-                  <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3">
-                    <div className="space-y-1 flex-1">
-                      <div className="flex items-center space-x-2">
-                        <span className="text-xs font-bold text-slate-500">#{idx + 1}</span>
-                        <span className="text-sm font-bold text-white">{doc.nama}</span>
-                        {doc.wajib && (
-                          <span className="text-[10px] bg-red-900/60 text-red-300 font-semibold px-1.5 py-0.5 rounded border border-red-700/60">
-                            Wajib
-                          </span>
+              <div className="space-y-2.5">
+                {effectiveDokumenList.map((doc, idx) => (
+                  <div
+                    key={doc.id}
+                    className={`border rounded-xl p-3.5 sm:p-4 transition-all ${
+                      doc.statusVerifikasi === 'perlu_perbaikan'
+                        ? 'border-amber-500/40 bg-amber-950/15'
+                        : doc.statusVerifikasi === 'sesuai'
+                        ? 'border-emerald-500/30 bg-emerald-950/15'
+                        : 'border-[#1b3459] bg-[#0b172a]'
+                    }`}
+                  >
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                      <div className="space-y-1.5 flex-1 min-w-0">
+                        <div className="flex items-center space-x-2 flex-wrap gap-y-1">
+                          <span className="text-xs font-mono font-bold text-slate-400">#{idx + 1}</span>
+                          <span className="text-xs sm:text-sm font-bold text-slate-100 tracking-wide">{doc.nama}</span>
+                          {doc.wajib ? (
+                            <span className="text-[10px] bg-rose-950 text-rose-300 font-bold px-2 py-0.5 rounded border border-rose-800/80 uppercase tracking-wider">
+                              Wajib
+                            </span>
+                          ) : (
+                            <span className="text-[10px] bg-slate-800 text-slate-400 font-medium px-2 py-0.5 rounded border border-slate-700">
+                              Opsional
+                            </span>
+                          )}
+                          <span className="text-[10px] text-slate-400 font-medium">Versi {doc.versi}</span>
+                        </div>
+
+                        {doc.fileName ? (
+                          <div className="flex items-center space-x-2.5 text-xs text-slate-400 pt-0.5 flex-wrap">
+                            <span 
+                              className="font-mono text-[#D4AF37] hover:underline cursor-pointer flex items-center space-x-1"
+                              onClick={() => setPreviewDocModal(doc)}
+                            >
+                              <FileText className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
+                              <span className="truncate max-w-[220px] sm:max-w-xs">{doc.fileName}</span>
+                            </span>
+                            <span className="text-slate-500">&bull; {doc.fileSize}</span>
+                            <span className="text-slate-500">&bull; Diunggah: {doc.uploadedAt}</span>
+                            <button
+                              onClick={() => setPreviewDocModal(doc)}
+                              className="bg-[#142642] hover:bg-[#1b3459] text-slate-200 hover:text-white px-2.5 py-1 rounded-md border border-[#234475] flex items-center space-x-1.5 transition-colors cursor-pointer text-[11px] font-medium ml-1"
+                              title="Buka Viewer Dokumen PDF"
+                            >
+                              <Eye className="w-3.5 h-3.5 text-[#D4AF37]" />
+                              <span>Lihat Dokumen PDF</span>
+                            </button>
+                          </div>
+                        ) : (
+                          <p className="text-[11px] text-slate-400 italic pt-0.5">
+                            File fisik/digital belum dilampirkan atau memerlukan pemeriksaan awal.
+                          </p>
                         )}
-                        <span className="text-[10px] text-slate-400">Versi {doc.versi}</span>
+
+                        {/* Targeted Correction Note from Secretariat */}
+                        {doc.catatanKoreksi && (
+                          <div className="mt-2 p-2.5 bg-[#081224] border border-amber-500/30 rounded-lg text-xs text-amber-200">
+                            <div className="font-semibold flex items-center space-x-1.5 text-[#D4AF37] mb-0.5">
+                              <AlertTriangle className="w-3.5 h-3.5 text-[#D4AF37]" />
+                              <span>Catatan Koreksi Sekretariat TAT:</span>
+                            </div>
+                            <p>{doc.catatanKoreksi}</p>
+                          </div>
+                        )}
                       </div>
 
-                      {doc.fileName && (
-                        <div className="flex items-center space-x-3 text-xs text-slate-400 pt-0.5">
-                          <span 
-                            className="font-mono text-[#D4AF37] underline cursor-pointer hover:text-amber-300 transition-colors"
-                            onClick={() => alert(`Membuka dokumen: ${doc.fileName}`)}
-                          >
-                            {doc.fileName}
-                          </span>
-                          <span className="text-slate-500">• {doc.fileSize}</span>
-                          <span className="text-slate-500">• Diunggah: {doc.uploadedAt}</span>
-                          <button
-                            onClick={() => alert(`Preview dokumen: ${doc.fileName}`)}
-                            className="ml-2 bg-[#1b3459] hover:bg-[#234475] text-white px-2 py-1 rounded flex items-center space-x-1.5 transition-colors shadow-sm cursor-pointer"
-                            title="Lihat Dokumen"
-                          >
-                            <ExternalLink className="w-3 h-3" />
-                            <span className="font-medium text-[10px]">Lihat Dokumen</span>
-                          </button>
-                        </div>
-                      )}
-
-                      {/* Targeted Correction Note from Secretariat */}
-                      {doc.catatanKoreksi && (
-                        <div className="mt-2 p-2.5 bg-[#081224] border border-[#1b3459] rounded-lg text-xs text-amber-200">
-                          <div className="font-semibold flex items-center space-x-1.5 text-[#D4AF37] mb-0.5">
-                            <AlertTriangle className="w-3.5 h-3.5 text-[#D4AF37]" />
-                            <span>Catatan Koreksi dari Sekretariat TAT:</span>
+                      {/* Status Badge & Actions */}
+                      <div className="flex flex-wrap items-center gap-2 shrink-0">
+                        {doc.statusVerifikasi === 'sesuai' ? (
+                          <div className="flex items-center space-x-1.5">
+                            <span className="bg-emerald-950/80 text-emerald-300 text-xs font-semibold px-3 py-1.5 rounded-lg border border-emerald-700/60 flex items-center space-x-1.5 shadow-sm">
+                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                              <span>Ada &amp; Sesuai</span>
+                            </span>
+                            {(currentUser.role === 'sekretariat' || currentUser.role === 'ADMIN' || currentUser.role === 'admin' || currentUser.role === 'SEKRETARIAT') && (
+                              <button
+                                onClick={() => handleVerifyDocumentItem(doc.id, 'belum_diperiksa')}
+                                className="text-slate-400 hover:text-amber-300 hover:bg-[#142642] px-2 py-1 rounded text-[11px] font-medium transition-colors cursor-pointer border border-transparent hover:border-[#234475]"
+                                title="Ubah status verifikasi dokumen ini"
+                              >
+                                Ubah
+                              </button>
+                            )}
                           </div>
-                          <p>{doc.catatanKoreksi}</p>
-                        </div>
-                      )}
-                    </div>
+                        ) : doc.statusVerifikasi === 'perlu_perbaikan' ? (
+                          <span className="bg-rose-950/80 text-rose-300 text-xs font-semibold px-3 py-1.5 rounded-lg border border-rose-800/60 flex items-center space-x-1.5">
+                            <AlertTriangle className="w-3.5 h-3.5 text-rose-400" />
+                            <span>Perlu Perbaikan</span>
+                          </span>
+                        ) : (
+                          <span className="bg-slate-800 text-slate-400 text-xs font-medium px-3 py-1.5 rounded-lg border border-slate-700">
+                            Belum Diperiksa
+                          </span>
+                        )}
 
-                    {/* Status Badge & Actions */}
-                    <div className="flex flex-col sm:flex-row items-end md:items-center space-y-2 sm:space-y-0 sm:space-x-2 shrink-0">
-                      {doc.statusVerifikasi === 'sesuai' ? (
-                        <span className="bg-[#0d1f38] text-slate-200 text-xs font-semibold px-3 py-1 rounded-lg border border-[#1b3459] flex items-center space-x-1">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-[#D4AF37]" />
-                          <span>Sesuai</span>
-                        </span>
-                      ) : doc.statusVerifikasi === 'perlu_perbaikan' ? (
-                        <span className="bg-[#0d1f38] text-[#D4AF37] text-xs font-bold px-3 py-1 rounded-lg border border-[#1b3459] flex items-center space-x-1">
-                          <AlertTriangle className="w-3.5 h-3.5 text-[#D4AF37]" />
-                          <span>Perlu Perbaikan</span>
-                        </span>
-                      ) : (
-                        <span className="bg-slate-800 text-slate-400 text-xs font-medium px-3 py-1 rounded-lg border border-slate-700">
-                          Belum Diperiksa
-                        </span>
-                      )}
-
-                      {/* Action for Pengaju: Fix Document */}
-                      {(currentUser.role === 'pengaju' || currentUser.role === 'PENGAJU') && doc.statusVerifikasi === 'perlu_perbaikan' && (
-                        <button
-                          onClick={() => handleFixDocument(doc.id)}
-                          className="bg-[#133863] hover:bg-[#1a4a82] text-white text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center space-x-1.5 border border-amber-500 cursor-pointer transition-all"
-                        >
-                          <Upload className="w-3.5 h-3.5" />
-                          <span>Unggah File Perbaikan</span>
-                        </button>
-                      )}
-
-                      {/* Action for Sekretariat: Verify buttons */}
-                      {(currentUser.role === 'sekretariat' || currentUser.role === 'ADMIN' || currentUser.role === 'admin' || currentUser.role === 'SEKRETARIAT') && (
-                        <div className="flex items-center space-x-1">
+                        {/* Action for Pengaju: Fix Document */}
+                        {(currentUser.role === 'pengaju' || currentUser.role === 'PENGAJU') && doc.statusVerifikasi === 'perlu_perbaikan' && (
                           <button
-                            onClick={() => handleVerifyDocumentItem(doc.id, 'sesuai')}
-                            className="bg-[#133863] hover:bg-[#1a4a82] text-white text-[11px] font-semibold px-2.5 py-1 rounded transition-colors cursor-pointer"
+                            onClick={() => handleFixDocument(doc.id)}
+                            className="bg-[#142642] hover:bg-[#1b3459] text-white text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center space-x-1.5 border border-[#234475] cursor-pointer transition-all shadow-sm"
                           >
-                            Setujui
+                            <Upload className="w-3.5 h-3.5" />
+                            <span>Unggah File Perbaikan</span>
                           </button>
-                          <button
-                            onClick={() => {
-                              const note = prompt('Tuliskan catatan koreksi spesifik untuk dokumen ini:');
-                              if (note) handleVerifyDocumentItem(doc.id, 'perlu_perbaikan', note);
-                            }}
-                            className="bg-[#133863] hover:bg-[#1a4a82] text-white text-[11px] font-semibold px-2.5 py-1 rounded transition-colors cursor-pointer"
-                          >
-                            Minta Koreksi
-                          </button>
-                        </div>
-                      )}
+                        )}
+
+                        {/* Action for Sekretariat / Admin: Verify buttons (only shown if NOT approved yet) */}
+                        {(currentUser.role === 'sekretariat' || currentUser.role === 'ADMIN' || currentUser.role === 'admin' || currentUser.role === 'SEKRETARIAT') && doc.statusVerifikasi !== 'sesuai' && (
+                          <div className="flex items-center space-x-2">
+                            <button
+                              onClick={() => handleVerifyDocumentItem(doc.id, 'sesuai')}
+                              className="bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-bold px-3.5 py-1.5 rounded-lg transition-all cursor-pointer border border-emerald-500/60 flex items-center space-x-1.5 shadow-sm"
+                            >
+                              <Check className="w-3.5 h-3.5" />
+                              <span>Ada / Sesuai</span>
+                            </button>
+                            <button
+                              onClick={() => {
+                                const note = prompt(`Tuliskan catatan koreksi spesifik untuk ${doc.nama}:`, doc.catatanKoreksi || 'Dokumen belum lengkap / perlu diperbaiki.');
+                                if (note !== null) handleVerifyDocumentItem(doc.id, 'perlu_perbaikan', note);
+                              }}
+                              className="bg-rose-900 hover:bg-rose-800 text-rose-100 text-xs font-bold px-3.5 py-1.5 rounded-lg transition-all cursor-pointer border border-rose-700/80 flex items-center space-x-1.5 shadow-sm"
+                            >
+                              <AlertTriangle className="w-3.5 h-3.5 text-rose-300" />
+                              <span>Perlu Perbaikan</span>
+                            </button>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
               
-              {/* FINALIZATION ACTION FOR ADMIN */}
-              {(currentUser.role === 'sekretariat' || currentUser.role === 'ADMIN' || currentUser.role === 'admin' || currentUser.role === 'SEKRETARIAT') && percentComplete === 100 && (
-                <div className="mt-4 pt-4 border-t border-[#1b3459] flex justify-end animate-in fade-in slide-in-from-bottom-2 duration-300">
-                  <button
-                    onClick={() => {
-                       alert('Berkas formil dinyatakan lengkap dan telah disetujui. Meneruskan ke tahap Penjadwalan Asesmen Medis & Hukum...');
-                       onUpdatePermohonan(permohonan.id, {
-                         applicationStatus: 'VERIFIED',
-                         statusProsesUtama: 'penugasan_jadwal'
-                       });
-                       setActiveTab('jadwal');
-                    }}
-                    className="bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white text-xs font-bold px-5 py-2.5 rounded-xl flex items-center space-x-2 shadow-lg shadow-emerald-900/40 transition-all cursor-pointer border border-emerald-400/50"
-                  >
-                    <CheckCircle2 className="w-4 h-4" />
-                    <span>Validasi Selesai & Lanjut ke Penjadwalan</span>
-                  </button>
+              {/* ACTION BUTTONS FOR ADMIN/SEKRETARIAT */}
+              {(currentUser.role === 'sekretariat' || currentUser.role === 'ADMIN' || currentUser.role === 'admin' || currentUser.role === 'SEKRETARIAT') && (
+                <div className="mt-5 pt-4 border-t border-[#1b3459] flex items-center justify-between flex-wrap gap-3">
+                  <div className="text-xs text-slate-400">
+                    {percentComplete === 100 ? (
+                      <span className="text-emerald-400 font-semibold flex items-center space-x-1.5">
+                        <CheckCircle2 className="w-4 h-4" />
+                        <span>Seluruh berkas formil (100%) dinyatakan valid &amp; lengkap.</span>
+                      </span>
+                    ) : (
+                      <span className="text-amber-400 font-semibold flex items-center space-x-1.5">
+                        <AlertTriangle className="w-4 h-4" />
+                        <span>Kelengkapan berkas baru {percentComplete}%. {invalidDocsCount} dokumen memerlukan perbaikan.</span>
+                      </span>
+                    )}
+                  </div>
+
+                  {percentComplete === 100 ? (
+                    <button
+                      onClick={() => {
+                        const updated: PermohonanAsesmen = {
+                          ...permohonan,
+                          applicationStatus: 'AWAITING_DISPOSITION',
+                          statusProsesUtama: 'verifikasi_berkas',
+                          penanggungJawabBerikutnya: 'Ketua TAT (via Admin)',
+                          tindakanBerikutnyaLabel: 'Administrasi lengkap & diverifikasi. Menunggu catatan disposisi dari Ketua TAT.'
+                        };
+                        onUpdatePermohonan(updated);
+                        setActiveTab('jadwal');
+                      }}
+                      className="bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-bold px-4 py-2.5 rounded-lg flex items-center space-x-2 transition-all cursor-pointer border border-emerald-500 shadow-sm"
+                    >
+                      <CheckCircle2 className="w-4 h-4" />
+                      <span>Validasi Selesai (100%) &amp; Lanjut ke Penjadwalan</span>
+                    </button>
+                  ) : (
+                    <button
+                      onClick={async () => {
+                        const invalidDocs = effectiveDokumenList.filter(d => d.statusVerifikasi === 'perlu_perbaikan');
+                        const noteSummary = invalidDocs.length > 0
+                          ? invalidDocs.map(d => `• ${d.nama}: ${d.catatanKoreksi || 'Perlu diperbaiki / dilampirkan'}`).join('<br/>')
+                          : '• Dokumen persyaratan formil belum lengkap, mohon periksa dan unggah perbaikan.';
+
+                        const updatedDocs = effectiveDokumenList.map(d => {
+                          if (d.statusVerifikasi !== 'sesuai') {
+                            return {
+                              ...d,
+                              statusVerifikasi: 'perlu_perbaikan' as const,
+                              catatanKoreksi: d.catatanKoreksi || 'Belum lengkap / perlu perbaikan'
+                            };
+                          }
+                          return d;
+                        });
+
+                        const updated: PermohonanAsesmen = {
+                          ...permohonan,
+                          dokumenList: updatedDocs,
+                          applicationStatus: 'NEEDS_CORRECTION',
+                          statusProsesUtama: 'perlu_perbaikan',
+                          penanggungJawabBerikutnya: 'Penyidik Pengaju',
+                          tindakanBerikutnyaLabel: `Perlu Perbaikan Berkas Permohonan ${permohonan.nomorPermohonan} pada pengajuan atas nama ${permohonan.terperiksa.namaLengkap}`,
+                          auditLogs: [
+                            {
+                              id: 'aud-' + Date.now(),
+                              timestamp: new Date().toLocaleDateString('id-ID') + ' ' + new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
+                              actorNama: currentUser.name,
+                              actorPeran: currentUser.role,
+                              aksi: 'Menerbitkan Perintah Perbaikan Berkas',
+                              rincian: `Meminta perbaikan berkas kepada penyidik pengaju untuk permohonan ${permohonan.nomorPermohonan}.`
+                            },
+                            ...(permohonan.auditLogs || [])
+                          ]
+                        };
+
+                        onUpdatePermohonan(updated);
+
+                        try {
+                          const res = await sendCorrectionEmailNotification(updated, noteSummary);
+                          if (res.success) {
+                            setEmailBanner({
+                              type: 'success',
+                              message: `Perintah perbaikan berkas berhasil dikirimkan ke Penyidik Pengaju & notifikasi email telah dikirim! (Resend ID: ${res.id})`
+                            });
+                          } else {
+                            setEmailBanner({
+                              type: 'success',
+                              message: `Status permohonan diperbarui ke Perlu Perbaikan & Penyidik telah dinotifikasi di sistem.`
+                            });
+                          }
+                        } catch (err) {
+                          console.warn('Error sending email:', err);
+                        }
+                      }}
+                      className="bg-amber-700 hover:bg-amber-600 text-white text-xs font-bold px-4 py-2.5 rounded-lg flex items-center space-x-2 transition-all cursor-pointer border border-amber-500 shadow-sm"
+                    >
+                      <Send className="w-4 h-4" />
+                      <span>Kirimkan Perintah Perbaikan Dokumen ke Pengaju</span>
+                    </button>
+                  )}
                 </div>
               )}
             </div>
-          </div>
-        );
-      })()}
+          );
+        })()}
 
         {/* TAB 3: PENUGASAN & JADWAL */}
         {activeTab === 'jadwal' && (
@@ -1950,12 +2096,23 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
                       <span>Fakta Pendukung yang Terverifikasi:</span>
                     </h4>
                     <ul className="list-disc list-inside space-y-1 text-slate-300">
-                      {permohonan.asesmenHukum.faktaPendukung.map((fp, i) => (
-                        <li key={i}>{fp}</li>
-                      ))}
+                      {Array.isArray(permohonan.asesmenHukum.faktaPendukung) && permohonan.asesmenHukum.faktaPendukung.length > 0 ? (
+                        permohonan.asesmenHukum.faktaPendukung.map((fp, i) => (
+                          <li key={i}>{fp}</li>
+                        ))
+                      ) : (
+                        <li className="list-none text-slate-400 italic">
+                          {typeof permohonan.asesmenHukum.faktaPendukung === 'string'
+                            ? permohonan.asesmenHukum.faktaPendukung
+                            : 'Fakta penyidikan telah tervalidasi oleh tim penyidik & jaksa.'}
+                        </li>
+                      )}
                     </ul>
                     <div className="mt-3 pt-2 border-t border-emerald-800/60 text-slate-400">
-                      <strong className="text-slate-300">Riwayat Residivisme:</strong> {permohonan.asesmenHukum.riwayatResidivisme.keteranganPerkaraLalu}
+                      <strong className="text-slate-300">Riwayat Residivisme:</strong>{' '}
+                      {typeof permohonan.asesmenHukum.riwayatResidivisme === 'object'
+                        ? permohonan.asesmenHukum.riwayatResidivisme?.keteranganPerkaraLalu || 'Belum ada catatan residivisme'
+                        : permohonan.asesmenHukum.riwayatResidivisme || 'Tidak Ada (Bukan Residivis)'}
                     </div>
                   </div>
 
@@ -2057,17 +2214,21 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
                 <div className="border border-[#1b3459] rounded-xl p-4 bg-[#081224] text-xs">
                   <h4 className="font-bold text-white mb-2">Daftar Kehadiran Anggota Tim Pleno:</h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {permohonan.sidangPleno.daftarHadir.map((p, i) => (
-                      <div key={i} className="flex items-center justify-between p-2 rounded bg-[#0b172a] border border-[#1b3459]">
-                        <div>
-                          <p className="font-bold text-white">{p.nama}</p>
-                          <p className="text-[10px] text-slate-400">{p.peran} • {p.instansi}</p>
+                    {Array.isArray(permohonan.sidangPleno?.daftarHadir) && permohonan.sidangPleno.daftarHadir.length > 0 ? (
+                      permohonan.sidangPleno.daftarHadir.map((p, i) => (
+                        <div key={i} className="flex items-center justify-between p-2 rounded bg-[#0b172a] border border-[#1b3459]">
+                          <div>
+                            <p className="font-bold text-white">{p.nama}</p>
+                            <p className="text-[10px] text-slate-400">{p.peran} • {p.instansi}</p>
+                          </div>
+                          <span className="text-[10px] bg-[#0d1f38] text-slate-200 font-bold px-2 py-0.5 rounded border border-[#1b3459]">
+                            Hadir
+                          </span>
                         </div>
-                        <span className="text-[10px] bg-[#0d1f38] text-slate-200 font-bold px-2 py-0.5 rounded border border-[#1b3459]">
-                          Hadir
-                        </span>
-                      </div>
-                    ))}
+                      ))
+                    ) : (
+                      <p className="text-slate-400 text-xs italic">Daftar kehadiran anggota pleno belum dicatat.</p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -2782,33 +2943,58 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
 
         {/* TAB 10: RIWAYAT & AUDIT TRAIL */}
         {activeTab === 'riwayat' && (
-          <div className="space-y-4">
-            <div className="pb-3 border-b border-[#1b3459]">
-              <h3 className="text-sm font-bold text-white flex items-center space-x-2">
-                <History className="w-4 h-4 text-[#D4AF37]" />
-                <span>Catatan Riwayat Aktivitas & Jejak Audit (Audit Trail)</span>
-              </h3>
-              <p className="text-xs text-slate-400">
-                Rekaman perubahan status, aktor yang bertindak, dan waktu kejadian yang tidak dapat diubah (immutable log).
-              </p>
+          <div className="space-y-5">
+            <div className="pb-3 border-b border-[#1b3459] flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <h3 className="text-sm font-bold text-white flex items-center space-x-2">
+                  <History className="w-4 h-4 text-[#D4AF37]" />
+                  <span>Jejak Audit & Riwayat Perubahan Status (Audit Trail)</span>
+                </h3>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Catatan sejarah permohonan dari pendaftaran hingga penyelesaian akhir, mencakup waktu (jam/tanggal), aktor, dan rincian perubahan status.
+                </p>
+              </div>
+              <span className="text-xs font-mono font-bold text-[#d4af37] bg-[#d4af37]/10 border border-[#d4af37]/30 px-3 py-1 rounded-lg shrink-0">
+                {(permohonan.auditLogs || []).length} Perubahan Terrekam
+              </span>
             </div>
 
-            <div className="space-y-3">
-              {(permohonan.auditLogs || []).map((log) => (
-                <div key={log.id} className="p-3 bg-[#081224] border border-[#1b3459] rounded-lg text-xs flex items-start space-x-3">
-                  <div className="w-2 h-2 rounded-full bg-[#D4AF37] mt-1.5 shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between">
-                      <span className="font-bold text-white">{log.aksi}</span>
-                      <span className="text-[10px] text-slate-400">{log.timestamp}</span>
-                    </div>
-                    <p className="text-slate-300 mt-0.5">{log.rincian}</p>
-                    <span className="text-[10px] text-[#D4AF37] font-semibold mt-1 inline-block">
-                      Oleh: {log.actorNama} ({log.actorPeran})
-                    </span>
-                  </div>
+            <div className="space-y-3 relative before:absolute before:left-4 before:top-3 before:bottom-3 before:w-0.5 before:bg-[#1b3459]">
+              {(!permohonan.auditLogs || permohonan.auditLogs.length === 0) ? (
+                <div className="p-8 text-center text-slate-500 text-xs bg-[#081224] border border-[#1b3459] rounded-xl">
+                  Belum ada log perubahan status terrekam.
                 </div>
-              ))}
+              ) : (
+                permohonan.auditLogs.map((log, idx) => (
+                  <div key={log.id || idx} className="relative pl-9 flex items-start space-x-3 text-xs">
+                    <div className="absolute left-2.5 top-2.5 w-3 h-3 rounded-full bg-[#d4af37] border-2 border-[#0b172a] shadow-sm shrink-0" />
+                    
+                    <div className="flex-1 bg-[#081224] border border-[#1b3459] hover:border-[#234475] rounded-xl p-4 space-y-2 transition-colors shadow-sm">
+                      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#1b3459]/60 pb-2">
+                        <span className="font-bold text-white text-xs sm:text-sm flex items-center space-x-2">
+                          <CheckCircle2 className="w-4 h-4 text-[#d4af37]" />
+                          <span>{log.aksi}</span>
+                        </span>
+                        <div className="flex items-center space-x-1.5 font-mono text-[11px] text-slate-400 bg-[#0b172a] px-2.5 py-1 rounded-lg border border-[#1b3459]">
+                          <Clock className="w-3.5 h-3.5 text-slate-400" />
+                          <span>{log.timestamp}</span>
+                        </div>
+                      </div>
+
+                      <p className="text-slate-300 text-xs leading-relaxed">
+                        {log.rincian}
+                      </p>
+
+                      <div className="flex items-center justify-between text-[11px] text-slate-400 pt-1">
+                        <span className="flex items-center space-x-1.5">
+                          <User className="w-3 h-3 text-[#d4af37]" />
+                          <span>Oleh: <strong className="text-slate-200">{log.actorNama}</strong> ({log.actorPeran})</span>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         )}
@@ -2956,6 +3142,165 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
               >
                 Tutup Pratinjau
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Interactive PDF Document Viewer Modal */}
+      {previewDocModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-5 bg-black/85 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="bg-[#091426] border border-[#1a2e4c] rounded-2xl max-w-3xl w-full max-h-[90vh] flex flex-col overflow-hidden shadow-2xl">
+            {/* Modal Top Bar */}
+            <div className="px-5 py-3.5 bg-[#060e1a] border-b border-[#1a2e4c] flex items-center justify-between">
+              <div className="flex items-center space-x-3 min-w-0">
+                <div className="w-8 h-8 rounded-lg bg-rose-950/60 border border-rose-700/50 flex items-center justify-center text-rose-400 shrink-0 font-bold text-xs font-mono">
+                  PDF
+                </div>
+                <div className="min-w-0">
+                  <h3 className="text-sm font-bold text-white truncate">{previewDocModal.nama}</h3>
+                  <p className="text-[11px] text-slate-400 font-mono flex items-center space-x-2">
+                    <span className="text-[#d4af37] font-semibold">{previewDocModal.fileName || `${previewDocModal.nama.replace(/\s+/g, '_')}.pdf`}</span>
+                    <span>•</span>
+                    <span>{previewDocModal.fileSize || '1.4 MB'}</span>
+                    <span>•</span>
+                    <span>Versi {previewDocModal.versi || 1}</span>
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setPreviewDocModal(null)}
+                className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-[#142642] transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Official Letter PDF Reader Canvas View */}
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-slate-950/90 space-y-4 font-sans text-xs">
+              <div className="max-w-2xl mx-auto bg-[#ffffff] text-slate-900 rounded-xl p-6 sm:p-8 shadow-2xl border border-slate-300 space-y-5">
+                {/* Kop Surat Resmi */}
+                <div className="text-center border-b-2 border-slate-900 pb-4 space-y-1">
+                  <h4 className="font-serif font-black text-sm uppercase tracking-wider text-slate-950">
+                    KEPOLISIAN NEGARA REPUBLIK INDONESIA
+                  </h4>
+                  <p className="font-serif text-xs font-bold text-slate-800 uppercase tracking-wide">
+                    DAERAH KALIMANTAN TIMUR &bull; DIREKTORAT RESERSE NARKOTIKA
+                  </p>
+                  <p className="text-[10px] text-slate-600 font-mono">
+                    Jl. Syarifuddin Yoes No.99, Sepinggan, Balikpapan Selatan, Kota Balikpapan
+                  </p>
+                </div>
+
+                {/* Judul & Nomor Surat PDF */}
+                <div className="text-center space-y-0.5">
+                  <h5 className="font-serif font-bold text-xs uppercase underline tracking-wide text-slate-950">
+                    {previewDocModal.nama}
+                  </h5>
+                  <p className="font-mono text-[11px] text-slate-700">
+                    Nomor: {permohonan.nomorPermohonan.replace('TAT', 'DOK')}/X/2026/RESNARKOBA
+                  </p>
+                </div>
+
+                {/* Body Content Surat PDF */}
+                <div className="space-y-3 text-[11px] text-slate-800 leading-relaxed font-serif">
+                  <p>
+                    Bahwa berdasarkan Laporan Polisi Nomor: <strong>{permohonan.perkara?.nomorLaporanPolisi || 'LP/B/241/X/2026/SPKT'}</strong>, bersama ini dilampirkan dokumen resmi formil persyaratan permohonan Asesmen Terpadu (TAT) dengan rincian identitas sebagai berikut:
+                  </p>
+
+                  <table className="w-full text-left text-[11px] my-2 font-serif border-collapse">
+                    <tbody>
+                      <tr>
+                        <td className="py-1 w-36 font-semibold text-slate-700">Nama Terperiksa</td>
+                        <td className="py-1 font-bold text-slate-950">: {permohonan.terperiksa.namaLengkap} ({permohonan.terperiksa.usia} th, {permohonan.terperiksa.jenisKelamin})</td>
+                      </tr>
+                      <tr>
+                        <td className="py-1 font-semibold text-slate-700">No. Registrasi TAT</td>
+                        <td className="py-1 font-mono font-bold text-slate-900">: {permohonan.nomorPermohonan}</td>
+                      </tr>
+                      <tr>
+                        <td className="py-1 font-semibold text-slate-700">Instansi Penyidik</td>
+                        <td className="py-1 text-slate-900">: {permohonan.instansiPengaju} (Penyidik: {permohonan.pengajuNama})</td>
+                      </tr>
+                      <tr>
+                        <td className="py-1 font-semibold text-slate-700">Pasal Sangkaan</td>
+                        <td className="py-1 font-bold text-slate-900">: {permohonan.perkara?.pasalDipersangkakan || 'Pasal 127 ayat (1) UU No. 35/2009'}</td>
+                      </tr>
+                      <tr>
+                        <td className="py-1 font-semibold text-slate-700">Status Dokumen</td>
+                        <td className="py-1 font-bold text-emerald-700">: TERDOKUMENTASI KEDINASAN E-TAT (PDF VERIFIED)</td>
+                      </tr>
+                    </tbody>
+                  </table>
+
+                  <p>
+                    Dokumen formil ini diterbitkan dan diunggah ke portal Sistem Informasi E-TAT Polri/BNN secara elektronik serta memenuhi syarat otentisitas dokumen hukum berkeadilan restoratif.
+                  </p>
+                </div>
+
+                {/* Stempel & Signature Section */}
+                <div className="pt-4 flex justify-between items-end text-[10px] font-serif border-t border-slate-300">
+                  <div className="text-center space-y-1">
+                    <div className="w-14 h-14 mx-auto border-2 border-slate-900 rounded-lg flex items-center justify-center p-1 bg-slate-50">
+                      <QrCode className="w-10 h-10 text-slate-950" />
+                    </div>
+                    <span className="font-mono text-[9px] text-slate-600 block">TTE DIGITAL E-TAT</span>
+                  </div>
+
+                  <div className="text-center space-y-1">
+                    <p className="text-slate-800">Balikpapan, {previewDocModal.uploadedAt || '10 Oktober 2026'}</p>
+                    <p className="font-bold text-slate-950">A.n. KEPALA SATUAN RESNARKOBA</p>
+                    <div className="h-10 flex items-center justify-center italic text-blue-900 font-serif font-bold text-xs">
+                      [Tanda Tangan Digital Terverifikasi]
+                    </div>
+                    <p className="font-bold text-slate-950 underline">{permohonan.pengajuNama}</p>
+                    <p className="text-[9px] font-mono text-slate-700">NRP. {permohonan.perkara?.nomorHpPenyidik ? '79080512' : '82041123'}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom Modal Actions */}
+            <div className="px-5 py-3.5 bg-[#060e1a] border-t border-[#1a2e4c] flex flex-wrap items-center justify-between gap-3">
+              <a
+                href={previewDocModal.fileUrl || '#'}
+                target="_blank"
+                rel="noreferrer"
+                className="px-4 py-2 bg-[#142642] hover:bg-[#1b3459] text-slate-200 hover:text-white rounded-xl text-xs font-semibold border border-[#234475] flex items-center space-x-1.5 transition-colors cursor-pointer"
+              >
+                <Download className="w-4 h-4 text-[#d4af37]" />
+                <span>Unduh File PDF ({previewDocModal.fileSize || '1.4 MB'})</span>
+              </a>
+
+              {(currentUser.role === 'sekretariat' || currentUser.role === 'ADMIN' || currentUser.role === 'admin' || currentUser.role === 'SEKRETARIAT') && (
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={() => {
+                      handleVerifyDocumentItem(previewDocModal.id, 'sesuai');
+                      setPreviewDocModal(null);
+                    }}
+                    className="px-4 py-2 bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-bold rounded-xl border border-emerald-500 cursor-pointer flex items-center space-x-1.5 shadow-sm"
+                  >
+                    <Check className="w-4 h-4" />
+                    <span>Setujui Dokumen Ini</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      const note = prompt(`Catatan koreksi untuk ${previewDocModal.nama}:`, previewDocModal.catatanKoreksi || 'Dokumen belum lengkap.');
+                      if (note !== null) {
+                        handleVerifyDocumentItem(previewDocModal.id, 'perlu_perbaikan', note);
+                        setPreviewDocModal(null);
+                      }
+                    }}
+                    className="px-4 py-2 bg-rose-900/80 hover:bg-rose-800 text-rose-200 text-xs font-bold rounded-xl border border-rose-700 cursor-pointer flex items-center space-x-1.5 shadow-sm"
+                  >
+                    <AlertTriangle className="w-4 h-4" />
+                    <span>Minta Koreksi</span>
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>

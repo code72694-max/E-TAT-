@@ -102,42 +102,29 @@ export const Header: React.FC<HeaderProps> = ({
     return (
       <header className="bg-[#0b172a] text-slate-100 border-b border-[#1b3459] sticky top-0 z-30 shadow-md">
         <div className="w-full px-3 sm:px-6 lg:px-8">
-          <div className="max-w-7xl mx-auto flex items-center justify-between h-14 sm:h-16 gap-3">
-            {/* Left: Back Button & Context Title */}
-            <div className="flex items-center space-x-2.5 sm:space-x-4 min-w-0">
+          <div className="max-w-7xl mx-auto relative flex items-center justify-between h-14 sm:h-16 gap-3">
+            {/* Left: Back Button */}
+            <div className="flex items-center shrink-0 z-10">
               <button
                 type="button"
                 onClick={onBackFromDetail}
-                className="px-3.5 py-1.5 bg-slate-800 border border-slate-700 hover:bg-slate-700/90 rounded-lg text-slate-200 transition-colors cursor-pointer shrink-0 flex items-center space-x-2 text-xs font-medium shadow-sm"
+                className="px-3.5 py-1.5 bg-slate-800 border border-slate-700 hover:bg-slate-700/90 rounded-lg text-slate-200 transition-colors cursor-pointer flex items-center space-x-2 text-xs font-medium shadow-sm"
                 title="Kembali"
               >
                 <ArrowLeft className="w-3.5 h-3.5 text-slate-400" />
                 <span>Kembali</span>
               </button>
-
-              {isPengajuanBaru ? (
-                <div className="flex items-center space-x-2 truncate">
-                  <span className="text-xs sm:text-sm font-bold text-white truncate">
-                    Pengajuan Permohonan Asesmen Terpadu
-                  </span>
-                  <span className="hidden md:inline-block text-[10px] bg-[#D4AF37]/15 text-[#F3E5AB] border border-[#D4AF37]/30 px-2 py-0.5 rounded font-semibold">
-                    FORMULIR ELEKTRONIK
-                  </span>
-                </div>
-              ) : selectedPermohonan ? (
-                <div className="flex items-center space-x-2 truncate">
-                  <span className="text-xs sm:text-sm font-bold text-[#D4AF37] font-mono truncate">
-                    {selectedPermohonan.nomorPermohonan}
-                  </span>
-                  <span className="text-slate-400 text-xs hidden sm:inline truncate">
-                    • {selectedPermohonan.terperiksa.namaLengkap}
-                  </span>
-                </div>
-              ) : null}
             </div>
 
-            {/* Right: Quick QR Button, Notification Bell, User Menu */}
-            <div className="flex items-center space-x-2 sm:space-x-3 shrink-0">
+            {/* Center: Title centered dead-middle */}
+            <div className="absolute inset-x-0 flex items-center justify-center pointer-events-none px-20">
+              <span className="text-xs sm:text-sm font-bold text-slate-100 tracking-wide pointer-events-auto truncate text-center">
+                {isPengajuanBaru ? 'Pengajuan Permohonan Asesmen Terpadu' : 'Detail Permohonan Asesmen TAT'}
+              </span>
+            </div>
+
+            {/* Right: Quick QR Button if available */}
+            <div className="flex items-center space-x-2 sm:space-x-3 shrink-0 z-10">
               {selectedPermohonan?.rekomendasiResmi && onOpenQrModal && (
                 <button
                   type="button"
@@ -148,140 +135,6 @@ export const Header: React.FC<HeaderProps> = ({
                   <span className="hidden sm:inline">QR Verifikasi</span>
                 </button>
               )}
-
-              {/* Notification Bell */}
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={() => setShowNotifications(!showNotifications)}
-                  className="p-2 text-slate-300 hover:text-white hover:bg-[#142642] rounded-xl border border-[#1b3459] relative transition-colors cursor-pointer"
-                  title="Pemberitahuan"
-                >
-                  <Bell className="w-4 h-4" />
-                  {pendingAlertsCount > 0 && (
-                    <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-rose-600 text-white text-[9px] font-bold flex items-center justify-center">
-                      {pendingAlertsCount}
-                    </span>
-                  )}
-                </button>
-
-                {/* Notifications Dropdown */}
-                {showNotifications && (
-                  <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-[#0F172A] rounded-2xl border border-[#2A3F6D] text-slate-200 py-3 z-50 shadow-2xl animate-in fade-in slide-in-from-top-1 duration-150">
-                    <div className="px-4 pb-2.5 border-b border-[#1E2D4A] flex items-center justify-between">
-                      <div>
-                        <span className="text-xs font-bold text-white font-['Cinzel',serif] block">
-                          PEMBERITAHUAN TUGAS DOKET
-                        </span>
-                        <p className="text-[10px] text-slate-400">Atensi berkas yang memerlukan tindakan</p>
-                      </div>
-                      <span className="text-[10px] bg-rose-500/20 text-rose-300 font-bold px-2 py-0.5 rounded border border-rose-500/30">
-                        {pendingAlertsCount} Tertunda
-                      </span>
-                    </div>
-
-                    <div className="max-h-72 overflow-y-auto divide-y divide-[#1E2D4A]">
-                      <div
-                        onClick={() => {
-                          onOpenPermohonan('tat-089');
-                          setShowNotifications(false);
-                        }}
-                        className="p-3 hover:bg-[#14213D] transition-colors cursor-pointer flex items-start space-x-2.5"
-                      >
-                        <AlertTriangle className="w-4 h-4 text-[#D4AF37] shrink-0 mt-0.5" />
-                        <div className="text-xs">
-                          <div className="flex items-center space-x-1.5">
-                            <span className="font-bold text-white">TAT-089 (Rian Hidayat)</span>
-                            <span className="text-[9px] bg-amber-500/20 text-[#D4AF37] px-1 rounded">Perlu Perbaikan</span>
-                          </div>
-                          <p className="text-[11px] text-slate-300 mt-0.5">
-                            Hasil lab urin dan BA Penggeledahan belum diunggah oleh penyidik.
-                          </p>
-                        </div>
-                      </div>
-
-                      <div
-                        onClick={() => {
-                          onOpenPermohonan('tat-074');
-                          setShowNotifications(false);
-                        }}
-                        className="p-3 hover:bg-[#14213D] transition-colors cursor-pointer flex items-start space-x-2.5"
-                      >
-                        <Clock className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
-                        <div className="text-xs">
-                          <div className="flex items-center space-x-1.5">
-                            <span className="font-bold text-white">TAT-074 (Budi Santoso)</span>
-                            <span className="text-[9px] bg-cyan-500/20 text-cyan-300 px-1 rounded">Jadwal Pleno</span>
-                          </div>
-                          <p className="text-[11px] text-slate-300 mt-0.5">
-                            Asesmen medis dan hukum lengkap. Menunggu sidang pleno terpadu.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Minimalist Profile Dropdown */}
-              <div className="relative hidden sm:block">
-                <button
-                  id="btn-role-switcher-detail"
-                  onClick={() => setShowRoleDropdown(!showRoleDropdown)}
-                  className="flex items-center space-x-2 bg-transparent hover:bg-white/5 px-2 py-1 rounded-xl transition-colors text-xs cursor-pointer group"
-                  title={`Profil: ${currentUser.name}`}
-                >
-                  <div className="w-8 h-8 rounded-full bg-[#142642] border border-[#234475] flex items-center justify-center shrink-0 text-[#d4af37] group-hover:border-[#d4af37]/50 transition-colors">
-                    <User className="w-4 h-4" />
-                  </div>
-                  <div className="text-left hidden lg:block max-w-[160px]">
-                    <span className="font-bold text-white group-hover:text-[#d4af37] truncate block text-xs leading-tight transition-colors">
-                      {currentUser.name}
-                    </span>
-                    <span className="text-[10px] text-slate-400 font-medium truncate block leading-tight mt-0.5">
-                      {currentUser.agency}
-                    </span>
-                  </div>
-                  <ChevronDown className="w-3.5 h-3.5 text-slate-400 group-hover:text-white transition-transform duration-150 ml-0.5" />
-                </button>
-
-                {showRoleDropdown && (
-                  <div className="absolute right-0 mt-2 w-72 bg-[#0F172A] rounded-2xl border border-[#2A3F6D] text-slate-200 p-2 z-50 shadow-2xl animate-in fade-in slide-in-from-top-1 duration-150">
-                    <div className="px-3.5 py-3 rounded-xl bg-[#14213D]/70 border border-[#1E2D4A] space-y-1.5 mb-2">
-                      <div className="flex items-center justify-between">
-                        <span className="text-[10px] uppercase font-bold text-slate-400">AKUN JABATAN AKTIF</span>
-                        <span
-                          className={`text-[9px] px-2 py-0.5 rounded font-extrabold border ${
-                            getRoleRankBadge(currentUser.role).color
-                          }`}
-                        >
-                          {getRoleRankBadge(currentUser.role).label}
-                        </span>
-                      </div>
-                      <p className="text-xs font-bold text-white leading-tight">{currentUser.name}</p>
-                      <p className="text-[11px] text-[#F3E5AB] font-medium">{getRoleLabel(currentUser.role)}</p>
-                      <div className="pt-1 border-t border-[#1E2D4A]/80 space-y-0.5 text-[10px] text-slate-400">
-                        <p className="truncate font-medium">{currentUser.agency}</p>
-                        <p className="truncate font-mono text-slate-400">{currentUser.email}</p>
-                      </div>
-                    </div>
-
-                    {onLogout && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setShowRoleDropdown(false);
-                          onLogout();
-                        }}
-                        className="w-full text-left px-3 py-2.5 rounded-xl text-xs font-semibold text-rose-300 hover:text-white hover:bg-rose-950/50 flex items-center space-x-2 transition-colors cursor-pointer"
-                      >
-                        <LogOut className="w-4 h-4 text-rose-400" />
-                        <span>Keluar / Logout</span>
-                      </button>
-                    )}
-                  </div>
-                )}
-              </div>
             </div>
           </div>
         </div>

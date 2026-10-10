@@ -72,7 +72,7 @@ export interface RegistrasiPengguna {
   status: 'pending' | 'approved' | 'rejected';
   catatanAdmin?: string;
   approvedAt?: string;
-  approvedBy?: string;
+  approvedBy?: string | { id?: string; name?: string; role?: string };
 }
 
 // =====================================================================
@@ -806,6 +806,7 @@ export interface PermohonanAsesmen {
   // Pihak & Penanggung Jawab
   pengajuId: string;
   pengajuNama: string;
+  pengajuEmail?: string;
   instansiPengaju: string;
   penanggungJawabBerikutnya: string;
   tindakanBerikutnyaLabel: string;
