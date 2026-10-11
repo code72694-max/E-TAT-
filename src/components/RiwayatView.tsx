@@ -69,7 +69,7 @@ function getOutcomeBadge(p: PermohonanAsesmen) {
       icon: <CheckCircle2 className="w-3.5 h-3.5" />
     };
   }
-  if (s === "REJECTED" || statusProses === "ditolak") {
+  if (s === "REJECTED" || (statusProses as string) === "ditolak") {
     return {
       label: "Ditolak / Gugur",
       cls: "bg-rose-900/60 text-rose-300 border-rose-800/60",
@@ -96,7 +96,7 @@ function getRekomendasiSummary(p: PermohonanAsesmen): string {
   return "Selesai Diproses";
 }
 
-function RiwayatCard({ p, onSelect }: { p: PermohonanAsesmen; onSelect: () => void }) {
+function RiwayatCard({ p, onSelect }: { p: any; onSelect: () => void; key?: any }) {
   const outcome = getOutcomeBadge(p);
   const rekomendasi = getRekomendasiSummary(p);
   const auditLogsCount = p.auditLogs ? p.auditLogs.length : 0;

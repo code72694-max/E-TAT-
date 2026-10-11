@@ -102,59 +102,67 @@ export const PrasyaratPemeriksaanView: React.FC<Props> = ({
   }, [permohonan.id]);
 
   const fetchPrasyaratData = async () => {
+    const applyPrasyaratData = (p: Partial<PrasyaratPemeriksaan> & { petugasPenerima?: any }) => {
+      if (p.waktuKedatangan) {
+        setWaktuKedatangan(new Date(p.waktuKedatangan).toISOString().slice(0, 16));
+      }
+      setKehadiranSubjek(!!p.kehadiranSubjek);
+      setPencocokanIdentitas(!!p.pencocokanIdentitas);
+      setCatatanPencocokanIdentitas(p.catatanPencocokanIdentitas || '');
+
+      setNamaPengantar(p.namaPengantar || permohonan.perkara?.namaPenyidik || '');
+      setInstansiPengantar(p.instansiPengantar || permohonan.perkara?.instansiPenyidik || '');
+      setJabatanPengantar(p.jabatanPengantar || 'Penyidik / Pendamping Pengantar');
+      setKehadiranPengantar(!!p.kehadiranPengantar);
+
+      setKehadiranPendamping(!!p.kehadiranPendamping);
+      setNamaPendamping(p.namaPendamping || permohonan.terperiksa?.namaWaliPendamping || '');
+      setHubunganPendamping(p.hubunganPendamping || 'Orang Tua / Wali Hukum');
+      setDasarKeterlibatan(p.dasarKeterlibatan || 'Pendamping Resmi');
+      setKontakPendamping(p.kontakPendamping || permohonan.terperiksa?.kontakWali || '');
+
+      setMembutuhkanPenerjemah(!!p.membutuhkanPenerjemah);
+      setNamaPenerjemah(p.namaPenerjemah || '');
+      setBahasaPenerjemah(p.bahasaPenerjemah || '');
+      setKehadiranPenerjemah(!!p.kehadiranPenerjemah);
+      setNomorPenugasanPenerjemah(p.nomorPenugasanPenerjemah || '');
+
+      setSudahDisetujui(!!p.sudahDisetujui);
+      setJenisFormPersetujuan(p.jenisFormPersetujuan || 'Informed Consent (Persetujuan Tindakan Dewasa)');
+      if (p.tanggalPersetujuan) {
+        setTanggalPersetujuan(new Date(p.tanggalPersetujuan).toISOString().slice(0, 10));
+      }
+      setPenandatanganPersetujuan(p.penandatanganPersetujuan || permohonan.terperiksa?.namaLengkap || '');
+      setDokumenPersetujuanUrl(p.dokumenPersetujuanUrl || '');
+
+      setPernyataanBebasBiaya(p.pernyataanBebasBiaya ?? true);
+      if (p.tanggalPernyataanBebasBiaya) {
+        setTanggalPernyataanBebasBiaya(new Date(p.tanggalPernyataanBebasBiaya).toISOString().slice(0, 10));
+      }
+      setDokumenBebasBiayaUrl(p.dokumenBebasBiayaUrl || '');
+
+      setKondisiKhususDarurat(!!p.kondisiKhususDarurat);
+      setCatatanKondisiKhusus(p.catatanKondisiKhusus || '');
+      setTindakanDaruratRujukan(p.tindakanDaruratRujukan || '');
+
+      if (p.petugasPenerima) {
+        setPetugasPenerimaInfo(`${p.petugasPenerima.name} (${p.petugasPenerima.role})`);
+      }
+    };
+
     try {
       setLoading(true);
       const res = await prasyaratApi.getByPermohonan(permohonan.id);
       if (res.success && res.data?.prasyarat) {
-        const p = res.data.prasyarat;
-        if (p.waktuKedatangan) {
-          setWaktuKedatangan(new Date(p.waktuKedatangan).toISOString().slice(0, 16));
-        }
-        setKehadiranSubjek(!!p.kehadiranSubjek);
-        setPencocokanIdentitas(!!p.pencocokanIdentitas);
-        setCatatanPencocokanIdentitas(p.catatanPencocokanIdentitas || '');
-
-        setNamaPengantar(p.namaPengantar || permohonan.perkara?.namaPenyidik || '');
-        setInstansiPengantar(p.instansiPengantar || permohonan.perkara?.instansiPenyidik || '');
-        setJabatanPengantar(p.jabatanPengantar || 'Penyidik / Pendamping Pengantar');
-        setKehadiranPengantar(!!p.kehadiranPengantar);
-
-        setKehadiranPendamping(!!p.kehadiranPendamping);
-        setNamaPendamping(p.namaPendamping || permohonan.terperiksa?.namaWaliPendamping || '');
-        setHubunganPendamping(p.hubunganPendamping || 'Orang Tua / Wali Hukum');
-        setDasarKeterlibatan(p.dasarKeterlibatan || 'Pendamping Resmi');
-        setKontakPendamping(p.kontakPendamping || permohonan.terperiksa?.kontakWali || '');
-
-        setMembutuhkanPenerjemah(!!p.membutuhkanPenerjemah);
-        setNamaPenerjemah(p.namaPenerjemah || '');
-        setBahasaPenerjemah(p.bahasaPenerjemah || '');
-        setKehadiranPenerjemah(!!p.kehadiranPenerjemah);
-        setNomorPenugasanPenerjemah(p.nomorPenugasanPenerjemah || '');
-
-        setSudahDisetujui(!!p.sudahDisetujui);
-        setJenisFormPersetujuan(p.jenisFormPersetujuan || 'Informed Consent (Persetujuan Tindakan Dewasa)');
-        if (p.tanggalPersetujuan) {
-          setTanggalPersetujuan(new Date(p.tanggalPersetujuan).toISOString().slice(0, 10));
-        }
-        setPenandatanganPersetujuan(p.penandatanganPersetujuan || permohonan.terperiksa?.namaLengkap || '');
-        setDokumenPersetujuanUrl(p.dokumenPersetujuanUrl || '');
-
-        setPernyataanBebasBiaya(p.pernyataanBebasBiaya ?? true);
-        if (p.tanggalPernyataanBebasBiaya) {
-          setTanggalPernyataanBebasBiaya(new Date(p.tanggalPernyataanBebasBiaya).toISOString().slice(0, 10));
-        }
-        setDokumenBebasBiayaUrl(p.dokumenBebasBiayaUrl || '');
-
-        setKondisiKhususDarurat(!!p.kondisiKhususDarurat);
-        setCatatanKondisiKhusus(p.catatanKondisiKhusus || '');
-        setTindakanDaruratRujukan(p.tindakanDaruratRujukan || '');
-
-        if (p.petugasPenerima) {
-          setPetugasPenerimaInfo(`${p.petugasPenerima.name} (${p.petugasPenerima.role})`);
-        }
+        applyPrasyaratData(res.data.prasyarat);
+      } else if ((permohonan as any).prasyarat) {
+        applyPrasyaratData((permohonan as any).prasyarat);
       }
-    } catch (err: any) {
-      console.warn('Gagal memuat prasyarat (mungkin belum diisi):', err?.message);
+    } catch {
+      // Fallback gracefully from permohonan local object if backend is not initialized
+      if ((permohonan as any).prasyarat) {
+        applyPrasyaratData((permohonan as any).prasyarat);
+      }
     } finally {
       setLoading(false);
     }

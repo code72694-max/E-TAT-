@@ -1,619 +1,435 @@
-import React, { useState } from 'react';
-import { PermohonanAsesmen } from '../types';
-import { permohonanApi } from '../services/api';
+import React, { useState, useMemo, useEffect } from 'react';
+import { PermohonanAsesmen, UserProfile } from '../types';
 import { PublicHeader } from './PublicHeader';
-import { BeritaAcaraModal } from './BeritaAcaraModal';
+import { PermohonanDetail } from './PermohonanDetail';
 import {
   Search,
   CheckCircle2,
   Clock,
   AlertTriangle,
-  FileSignature,
   ArrowRight,
-  Printer,
-  ChevronRight,
-  ShieldCheck,
+  ArrowLeft,
   X,
   FileText,
   User,
   Building2,
   Calendar,
-  ExternalLink,
-  Info,
-  Stethoscope,
-  Scale,
-  Users
+  Sparkles,
+  Shield,
+  Layers,
+  Activity
 } from 'lucide-react';
 
 interface LacakBerkasPageProps {
   permohonanList: PermohonanAsesmen[];
+  currentUser?: UserProfile;
   onGoToLanding: (sectionId?: string) => void;
   onGoToLogin: () => void;
   onGoToRegister?: () => void;
-  onOpenPermohonanDetail: (id: string) => void;
+  onOpenPermohonanDetail?: (id: string) => void;
+  onUpdatePermohonan?: (updated: PermohonanAsesmen) => void;
+}
+
+// Helper: Format status secara aman tanpa resiko undefined.replace()
+function formatStatusBadge(p: PermohonanAsesmen) {
+  const status = p.applicationStatus || p.statusProsesUtama || 'SUBMITTED';
+  const clean = String(status).replace(/_/g, ' ').toUpperCase();
+  switch (status as string) {
+    case 'RESULTS_ISSUED':
+    case 'rekomendasi_terbit':
+    case 'selesai_tindak_lanjut':
+      return { label: 'Rekomendasi Terbit', badgeCls: 'bg-emerald-950/80 text-emerald-300 border-emerald-700/60' };
+    case 'CONFERENCE_HELD':
+    case 'siap_pleno':
+    case 'pembahasan_pleno':
+      return { label: 'Sidang Pleno Selesai', badgeCls: 'bg-indigo-950/80 text-indigo-300 border-indigo-700/60' };
+    case 'ASSESSMENT_ACTIVE':
+    case 'asesmen_berlangsung':
+      return { label: 'Asesmen Medis & Hukum', badgeCls: 'bg-sky-950/80 text-sky-300 border-sky-700/60' };
+    case 'SCHEDULED':
+    case 'penugasan_jadwal':
+      return { label: 'Jadwal Ditugaskan', badgeCls: 'bg-amber-950/80 text-amber-300 border-amber-700/60' };
+    case 'APPROVED':
+    case 'terverifikasi':
+      return { label: 'Berkas Disetujui', badgeCls: 'bg-teal-950/80 text-teal-300 border-teal-700/60' };
+    case 'NEEDS_CORRECTION':
+    case 'perlu_perbaikan':
+      return { label: 'Perlu Koreksi Berkas', badgeCls: 'bg-rose-950/80 text-rose-300 border-rose-700/60' };
+    default:
+      return { label: clean, badgeCls: 'bg-[#142642] text-slate-300 border-[#234475]' };
+  }
+}
+
+// Helper: Hitung kemajuan tahapan asesmen terpadu
+function getStepProgress(p: PermohonanAsesmen) {
+  const appStatus = p.applicationStatus || '';
+  const proses = p.statusProsesUtama || '';
+  let done = 1;
+  let currentTitle = 'Verifikasi Berkas';
+
+  if (p.timAsesmen?.jadwalPemeriksaanMedis || ['SCHEDULED', 'ASSESSMENT_ACTIVE', 'READY_FOR_CONFERENCE', 'CONFERENCE_HELD', 'RESULTS_ISSUED'].includes(appStatus)) {
+    done = 2;
+    currentTitle = 'Penjadwalan & Tim';
+  }
+  if (p.medicalStatus === 'FINAL' || Boolean(p.asesmenMedis?.diagnosisKlinisIcd)) {
+    done = 3;
+    currentTitle = 'Pemeriksaan Medis';
+  }
+  if (p.legalStatus === 'FINAL' || Boolean(p.asesmenHukum?.analisisPeran)) {
+    done = 4;
+    currentTitle = 'Telaah Hukum';
+  }
+  if (Boolean(p.sidangPleno?.nomorBeritaAcara) || ['CONFERENCE_HELD', 'AWAITING_SIGNED_OUTPUTS', 'RESULTS_ISSUED'].includes(appStatus) || proses === 'pengesahan_rekomendasi' || proses === 'rekomendasi_terbit') {
+    done = 5;
+    currentTitle = 'Sidang Pleno Selesai';
+  }
+  if (p.rekomendasiResmi?.isLengkapPengesahan || appStatus === 'RESULTS_ISSUED' || proses === 'rekomendasi_terbit') {
+    done = 6;
+    currentTitle = 'Rekomendasi Terbit';
+  }
+
+  const pct = Math.round((done / 6) * 100);
+  return { done, currentTitle, pct };
 }
 
 export const LacakBerkasPage: React.FC<LacakBerkasPageProps> = ({
   permohonanList,
+  currentUser,
   onGoToLanding,
   onGoToLogin,
   onGoToRegister,
-  onOpenPermohonanDetail
+  onOpenPermohonanDetail,
+  onUpdatePermohonan
 }) => {
-  const [searchQuery, setSearchQuery] = useState('TAT-074');
-  const [searchedPermohonan, setSearchedPermohonan] = useState<PermohonanAsesmen | null>(
-    permohonanList.find(p => p.nomorPermohonan.includes('074')) || permohonanList[0] || null
-  );
-  const [hasSearched, setHasSearched] = useState(true);
-  const [selectedStepModal, setSelectedStepModal] = useState<number | null>(null);
-  const [showBAModal, setShowBAModal] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [hasSearched, setHasSearched] = useState(false);
+  const [selectedPermohonan, setSelectedPermohonan] = useState<PermohonanAsesmen | null>(null);
 
-  const sampleNumbers = ['TAT-074', 'TAT-089', 'TAT-068', 'TAT-055'];
+  // Quick Simulation Samples
+  const sampleNumbers = [
+    { code: '0099', label: 'TAT/0099 (Pleno Selesai)', desc: 'Dedi Kurniawan' },
+    { code: '0103', label: 'TAT/0103 (Asesmen Medis)', desc: 'Fitriani Rahayu' },
+    { code: '0012', label: 'TAT/0012 (Selesai Terbit)', desc: 'Budi Hermawan' },
+    { code: '089', label: 'TAT/089 (Aktif)', desc: 'Rizky Pratama' }
+  ];
 
-  const handleSearch = async (e: React.FormEvent) => {
+  // Sinkronisasi id dari URL params saat pertama kali dimuat
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const idFromUrl = params.get('id');
+    if (idFromUrl) {
+      const found = permohonanList.find(p => p.id === idFromUrl);
+      if (found) {
+        setSelectedPermohonan(found);
+      }
+    }
+  }, [permohonanList]);
+
+  // Search Results Filter
+  const searchResults = useMemo(() => {
+    if (!searchQuery.trim()) {
+      return permohonanList;
+    }
+    const q = searchQuery.trim().toLowerCase();
+    return permohonanList.filter(p => {
+      const noPermohonan = (p.nomorPermohonan || '').toLowerCase();
+      const tracking = (p.trackingNumber || '').toLowerCase();
+      const nama = (p.terperiksa?.namaLengkap || '').toLowerCase();
+      const nik = (p.terperiksa?.nik || '').toLowerCase();
+      const lp = (p.perkara?.nomorLaporanPolisi || '').toLowerCase();
+      const instansi = (p.instansiPengaju || '').toLowerCase();
+
+      return (
+        noPermohonan.includes(q) ||
+        tracking.includes(q) ||
+        nama.includes(q) ||
+        nik.includes(q) ||
+        lp.includes(q) ||
+        instansi.includes(q)
+      );
+    });
+  }, [searchQuery, permohonanList]);
+
+  // Handle Form Submit
+  const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!searchQuery.trim()) return;
-
-    const q = searchQuery.trim();
-    const qLower = q.toLowerCase();
-
-    // 1. Search in memory list first
-    const found = permohonanList.find(
-      p =>
-        p.nomorPermohonan.toLowerCase().includes(qLower) ||
-        p.id.toLowerCase().includes(qLower) ||
-        p.terperiksa?.namaLengkap.toLowerCase().includes(qLower) ||
-        (p.terperiksa?.nik && p.terperiksa.nik.includes(qLower)) ||
-        (p.trackingNumber && p.trackingNumber.toLowerCase().includes(qLower))
-    );
-
-    if (found) {
-      setSearchedPermohonan(found);
-      setHasSearched(true);
-      setSelectedStepModal(null);
-      return;
-    }
-
-    // 2. Query backend tracking endpoint
-    try {
-      const res = await permohonanApi.lacak(q);
-      if (res.data) {
-        setSearchedPermohonan(res.data);
-      } else {
-        setSearchedPermohonan(null);
-      }
-    } catch {
-      setSearchedPermohonan(null);
-    } finally {
-      setHasSearched(true);
-      setSelectedStepModal(null);
-    }
-  };
-
-  const selectSample = (num: string) => {
-    setSearchQuery(num);
-    const found = permohonanList.find(p => p.nomorPermohonan.includes(num.replace('TAT-', '')));
-    setSearchedPermohonan(found || null);
     setHasSearched(true);
-    setSelectedStepModal(null);
+    setSelectedPermohonan(null);
   };
 
-  // Stepper calculations
-  const getStepStatus = (p: PermohonanAsesmen, stepIndex: number) => {
-    const mainStatus = p.statusProsesUtama;
-    const stepOrder = [
-      ['diajukan', 'menunggu_verifikasi'],
-      ['verifikasi_berkas', 'perlu_perbaikan', 'diterima_lengkap'],
-      ['proses_asesmen', 'asesmen_berlangsung', 'medis_selesai', 'hukum_selesai'],
-      ['siap_pleno', 'pembahasan_pleno', 'pleno_selesai'],
-      ['pengesahan_rekomendasi', 'rekomendasi_terbit'],
-      ['selesai_tindak_lanjut']
-    ];
+  const selectSample = (code: string) => {
+    setSearchQuery(code);
+    setHasSearched(true);
+    setSelectedPermohonan(null);
+  };
 
-    const currentStepIndex = stepOrder.findIndex(arr => arr.includes(mainStatus));
-    if (currentStepIndex === -1) {
-      if (mainStatus === 'rekomendasi_terbit' || mainStatus === 'selesai_tindak_lanjut') {
-        return stepIndex <= 4 ? 'completed' : stepIndex === 5 && mainStatus === 'selesai_tindak_lanjut' ? 'completed' : 'current';
-      }
-      return 'pending';
+  // Saat salah satu kartu hasil pencarian diklik -> Buka Detail Page
+  const handleSelectCard = (item: PermohonanAsesmen) => {
+    setSelectedPermohonan(item);
+    if (window.history.pushState) {
+      const url = new URL(window.location.href);
+      url.searchParams.set('id', item.id);
+      window.history.pushState({}, '', url.toString());
     }
-
-    if (stepIndex < currentStepIndex) return 'completed';
-    if (stepIndex === currentStepIndex) return 'current';
-    return 'pending';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Step Detail Checklist Content
-  const getStepDetailData = (stepNumber: number, p: PermohonanAsesmen) => {
-    const st = getStepStatus(p, stepNumber - 1);
-    switch (stepNumber) {
-      case 1:
-        return {
-          title: 'Langkah 1: Registrasi & Pendaftaran Perkara',
-          subtitle: 'Penyerahan Berkas Perkara oleh Penyidik ke Sekretariat TAT',
-          status: st,
-          pj: `${p.instansiPengaju} (Penyidik: ${p.pengajuNama})`,
-          timestamp: p.tanggalPengajuan,
-          items: [
-            { label: 'Surat Permohonan Asesmen Resmi dari Kasat/Kanit Penyidik', checked: true },
-            { label: `Laporan Polisi: ${p.perkara?.nomorLaporanPolisi || '-'}`, checked: true },
-            { label: `Data Pokok Terperiksa: ${p.terperiksa.namaLengkap} (${p.terperiksa.usia} Th / ${p.terperiksa.jenisKelamin})`, checked: true },
-            { label: `Pasal Sangkaan: ${p.perkara?.pasalDipersangkakan || '-'}`, checked: true },
-            { label: `Wali / Pendamping: ${p.terperiksa.namaWaliPendamping || 'Terdaftar'}`, checked: true }
-          ]
-        };
-      case 2:
-        return {
-          title: 'Langkah 2: Verifikasi Administrasi Berkas',
-          subtitle: 'Pemeriksaan Keabsahan 7 Berkas Formil oleh Sekretariat TAT',
-          status: st,
-          pj: 'Sekretariat TAT BNNP Kaltim',
-          timestamp: st === 'completed' ? '8 September 2026 10:00' : 'Sedang Diverifikasi',
-          items: [
-            { label: 'Pemeriksaan Keabsahan LP, Sp.Sidik, Sp.Tangkap & BAP', checked: st === 'completed' || st === 'current' },
-            { label: 'Verifikasi Hasil Skrining Lab Toksikologi Urin Awal', checked: st === 'completed' || st === 'current' },
-            { label: 'Validasi Identitas NIK / KTP Terperiksa', checked: st === 'completed' },
-            { label: 'Penerbitan Surat Perintah Penugasan Tim Asesor', checked: st === 'completed' },
-            { label: 'Penetapan Jadwal Asesmen Terpadu', checked: st === 'completed' }
-          ]
-        };
-      case 3:
-        return {
-          title: 'Langkah 3: Asesmen Spesialis (Medis & Hukum)',
-          subtitle: 'Pemeriksaan Klinis Adiksi & Kualifikasi Yuridis Perkara',
-          status: st,
-          pj: 'Tim Asesor Medis & Tim Asesor Hukum',
-          timestamp: st === 'completed' ? '9 September 2026 14:30' : 'Dalam Proses Asesmen',
-          items: [
-            { label: 'Skrining WHO ASSIST & Evaluasi Psikologi Klinik', checked: st === 'completed' },
-            { label: 'Uji Toksikologi Urin 5 Parameter (Metamfetamina, THC, MDMA, Morphine, Benzodiazepine)', checked: st === 'completed' },
-            { label: 'Analisis Peran Terperiksa (Penyalahguna Murni vs Indikasi Pengedar)', checked: st === 'completed' },
-            { label: 'Verifikasi Batas Gramatur SEMA No. 04 Tahun 2010', checked: st === 'completed' },
-            { label: 'Penyusunan Lembar Hasil Asesmen Medis & Hukum', checked: st === 'completed' }
-          ]
-        };
-      case 4:
-        return {
-          title: 'Langkah 4: Sidang Pleno Musyawarah TAT',
-          subtitle: 'Musyawarah Integrasi Tim Medis, Hukum & Ketua TAT',
-          status: st,
-          pj: 'Ketua Pleno TAT, Dokter Sp.KJ & Jaksa Penuntut',
-          timestamp: st === 'completed' ? '10 September 2026 11:00' : 'Menunggu Sidang Pleno',
-          items: [
-            { label: 'Paparan Diagnosa Medis & Opini Hukum', checked: st === 'completed' },
-            { label: 'Musyawarah Pengambilan Kesepakatan Rekomendasi', checked: st === 'completed' },
-            { label: 'Penetapan Modalitas Layanan (Rawat Inap / Rawat Jalan / Proses Hukum)', checked: st === 'completed' },
-            { label: 'Penyusunan Draf Berita Acara Asesmen Terpadu (BA-TAT)', checked: st === 'completed' },
-            { label: 'Konfirmasi Kesepakatan Seluruh Anggota Panel Pleno', checked: st === 'completed' }
-          ]
-        };
-      case 5:
-        return {
-          title: 'Langkah 5: Pengesahan Rekomendasi & Berita Acara',
-          subtitle: 'Penandatanganan TTE 3-Panel & Barcode Verifikasi QR',
-          status: st,
-          pj: 'Pimpinan BNNP Kaltim & Ditresnarkoba Polda Kaltim',
-          timestamp: st === 'completed' ? '11 September 2026 16:00' : 'Proses Pengesahan TTE',
-          items: [
-            { label: 'Pengesahan TTE Digital Tim Medis', checked: st === 'completed' },
-            { label: 'Pengesahan TTE Digital Tim Hukum', checked: st === 'completed' },
-            { label: 'Pengesahan TTE Digital Ketua Tim TAT', checked: st === 'completed' },
-            { label: 'Penerbitan Surat Rekomendasi Resmi BNN Ber-Barcode QR', checked: st === 'completed' },
-            { label: 'Penerbitan Berita Acara Pelaksanaan Asesmen Terpadu', checked: st === 'completed' }
-          ]
-        };
-      case 6: {
-        // Prepare dynamic checked states and labels based on actual data
-        const isAsamCompleted = !!p.instrumenKriteriaPlasemen && p.instrumenKriteriaPlasemen.statusPengisian === 'divalidasi';
-        const isPengawasanActive = !!p.pengawasanKlien;
-        const totalSesi = p.pengawasanKlien?.totalSesiWajib || 12;
-        const sesiSelesai = p.pengawasanKlien?.sesiTerselesaikan || 0;
-
-        return {
-          title: 'Langkah 6: Pemantauan Pasca Rehabilitasi & SKSP',
-          subtitle: 'Pengawasan Kepatuhan Klien & Penilaian Instrumen Kriteria Penempatan (ASAM)',
-          status: st,
-          pj: 'Konselor Pascarehab & Penyidik Pengawas',
-          timestamp: st === 'completed' ? 'Selesai Dilaksanakan' : isPengawasanActive ? 'Dalam Pengawasan' : 'Menunggu Pelaksanaan',
-          items: [
-            { 
-              label: p.instrumenKriteriaPlasemen 
-                ? `Penilaian Dimensi ASAM Selesai (Rekomendasi Level ${p.instrumenKriteriaPlasemen.hasil?.levelRekomendasiAkhir})` 
-                : 'Penilaian Instrumen Kriteria Penempatan Klien (Adaptasi ASAM)', 
-              checked: isAsamCompleted,
-              details: isAsamCompleted ? (
-                <div className="text-[10px] space-y-1 mt-1 text-slate-300 bg-[#071326] p-2 rounded-lg border border-[#1b3459]">
-                  {p.instrumenKriteriaPlasemen!.penilaianPerDimensi.map(d => (
-                    <div key={d.dimensi} className="flex justify-between items-center border-b border-[#1b3459]/50 last:border-0 pb-1 last:pb-0">
-                      <span className="capitalize">{d.dimensi.replace(/_/g, ' ')}</span>
-                      <span className="font-bold text-[#D4AF37]">Lv {d.levelDipilih}</span>
-                    </div>
-                  ))}
-                  <div className="mt-1 pt-1 border-t border-[#1b3459]/50 text-[#D4AF37] font-semibold">
-                    Ket: {p.instrumenKriteriaPlasemen!.hasil?.justifikasiRekomendasi}
-                  </div>
-                </div>
-              ) : null
-            },
-            { 
-              label: 'Serah Terima Klien ke Balai / Fasilitas Rehabilitasi', 
-              checked: isPengawasanActive,
-              details: isPengawasanActive ? (
-                <div className="text-[10px] mt-1 text-slate-300">
-                  Fasilitas: <strong className="text-white">{p.pengawasanKlien!.instansiPelaksanaRehab}</strong>
-                </div>
-              ) : null
-            },
-            { 
-              label: isPengawasanActive 
-                ? `Pelaksanaan Program Rehabilitasi & Konseling (Selesai ${sesiSelesai} dari ${totalSesi} Sesi Wajib)` 
-                : 'Pelaksanaan Program Rehabilitasi dengan Kepatuhan Penuh', 
-              checked: isPengawasanActive && sesiSelesai > 0,
-              details: isPengawasanActive && p.pengawasanKlien!.jurnalPengawasan.length > 0 ? (
-                <div className="text-[10px] space-y-1 mt-1 text-slate-300 bg-[#071326] p-2 rounded-lg border border-[#1b3459]">
-                  <span className="text-[#D4AF37] font-semibold">Log Jurnal Terakhir:</span>
-                  {p.pengawasanKlien!.jurnalPengawasan.slice(-2).map(j => (
-                    <div key={j.id} className="flex justify-between border-b border-[#1b3459]/50 last:border-0 pb-1 last:pb-0">
-                      <span>{j.tanggal} ({j.jenisKegiatan})</span>
-                      <span className={j.statusKehadiran === 'Hadir' ? 'text-emerald-400' : 'text-rose-400'}>{j.statusKehadiran}</span>
-                    </div>
-                  ))}
-                </div>
-              ) : null
-            },
-            { 
-              label: p.pengawasanKlien?.riwayatTesUrinBerkala?.length 
-                ? `Wajib Lapor & Uji Toksikologi Acak (${p.pengawasanKlien.riwayatTesUrinBerkala.length} Kali Pemeriksaan)` 
-                : 'Wajib Lapor Berkala & Uji Toksikologi Acak', 
-              checked: !!p.pengawasanKlien?.riwayatTesUrinBerkala?.length,
-              details: p.pengawasanKlien?.riwayatTesUrinBerkala?.length ? (
-                <div className="text-[10px] space-y-1 mt-1 text-slate-300 bg-[#071326] p-2 rounded-lg border border-[#1b3459]">
-                  {p.pengawasanKlien.riwayatTesUrinBerkala.map(t => (
-                    <div key={t.id} className="flex justify-between border-b border-[#1b3459]/50 last:border-0 pb-1 last:pb-0">
-                      <span>Tahap {t.tahapKe} - {t.tanggalTes}</span>
-                      <span className={t.hasil === 'Negatif' ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold'}>{t.hasil}</span>
-                    </div>
-                  ))}
-                </div>
-              ) : null
-            },
-            { 
-              label: 'Penerbitan Sertifikat SKSP (Surat Keterangan Selesai Program)', 
-              checked: st === 'completed',
-              details: st === 'completed' && p.pengawasanKlien?.suratKeteranganSelesai ? (
-                <div className="text-[10px] mt-1 text-slate-300 bg-emerald-900/30 p-2 rounded-lg border border-emerald-500/30">
-                  <p>No: {p.pengawasanKlien.suratKeteranganSelesai.nomorSurat}</p>
-                  <p>Predikat: <strong className="text-emerald-400">{p.pengawasanKlien.suratKeteranganSelesai.predikat}</strong></p>
-                </div>
-              ) : null
-            }
-          ]
-        };
-      }
-      default:
-        return null;
+  // Saat tombol "Kembali" pada halaman detail diklik
+  const handleBackToList = () => {
+    setSelectedPermohonan(null);
+    if (window.history.pushState) {
+      const url = new URL(window.location.href);
+      url.searchParams.delete('id');
+      window.history.pushState({}, '', url.pathname);
     }
+    window.scrollTo({ top: 120, behavior: 'smooth' });
   };
 
-  const isBaReady = searchedPermohonan && (
-    searchedPermohonan.statusProsesUtama === 'rekomendasi_terbit' ||
-    searchedPermohonan.statusProsesUtama === 'selesai_tindak_lanjut' ||
-    searchedPermohonan.statusProsesUtama === 'pengesahan_rekomendasi' ||
-    searchedPermohonan.sidangPleno?.kesepakatanRekomendasi ||
-    searchedPermohonan.rekomendasiResmi
-  );
+  // Profil pengguna yang efektif untuk tampilan PermohonanDetail (mode Pengaju read-only)
+  const effectiveUser: UserProfile = useMemo(() => {
+    if (currentUser) {
+      return {
+        ...currentUser,
+        role: 'PENGAJU'
+      };
+    }
+    return {
+      id: selectedPermohonan?.pengajuId || 'user-pengaju-public',
+      name: selectedPermohonan?.pengajuNama || selectedPermohonan?.perkara?.namaPenyidik || 'Ipda Budi Santoso',
+      email: selectedPermohonan?.pengajuEmail || 'etatsiappulih@gmail.com',
+      role: 'PENGAJU',
+      agency: selectedPermohonan?.instansiPengaju || 'Satresnarkoba Polresta Samarinda',
+      avatarUrl: ''
+    };
+  }, [currentUser, selectedPermohonan]);
 
   return (
     <div className="min-h-screen bg-[#071326] text-slate-100 font-sans selection:bg-[#D4AF37] selection:text-slate-950 flex flex-col justify-between">
       {/* Shared Public Header */}
       <PublicHeader
         activePage="lacak"
+        isDetailPage={Boolean(selectedPermohonan)}
+        onBackFromDetail={handleBackToList}
         onGoToLanding={onGoToLanding}
-        onGoToLacak={() => {}}
+        onGoToLacak={() => {
+          handleBackToList();
+          setSearchQuery('');
+          setHasSearched(false);
+        }}
         onGoToLogin={onGoToLogin}
         onGoToRegister={onGoToRegister}
       />
 
-      {/* MAIN TRACKING PAGE CONTENT */}
-      <main className="flex-1 max-w-5xl w-full mx-auto px-3.5 sm:px-6 py-6 sm:py-10 space-y-6 sm:space-y-8">
-        {/* Page Hero Header - Roboto font */}
-        <div className="text-center space-y-2.5 sm:space-y-3">
-          <h1 className="text-xl sm:text-3xl md:text-4xl font-extrabold text-white tracking-tight font-['Roboto',sans-serif] leading-tight">
-            Lacak Berkas Perkara TAT
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-400 max-w-xl mx-auto leading-relaxed px-2">
-            Pantau posisi berkas permohonan asesmen terpadu, tahapan verifikasi formil, pemeriksaan medis/hukum, hingga penerbitan Berita Acara &amp; Rekomendasi Resmi.
-          </p>
-        </div>
-
-        {/* Search Bar Container */}
-        <div className="bg-[#0b172a]/95 border border-[#1b3459] rounded-2xl p-4 sm:p-6 shadow-2xl backdrop-blur-md space-y-3.5 sm:space-y-4">
-          <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-2.5 sm:gap-3">
-            <div className="relative flex-1">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                placeholder="Masukkan Nomor Permohonan (contoh: TAT-074) atau Nama..."
-                className="w-full bg-[#081224] focus:bg-[#0c1c34] text-white pl-10 pr-4 py-3 rounded-xl border border-[#1b3459] focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37]/50 text-xs sm:text-sm outline-none placeholder-slate-500 font-mono transition-all shadow-inner"
-              />
+      {/* TAMPILAN DETAIL PERMOHONAN (PERSIS SEPERTI DETAIL ASESMEN AKTIF DI PENGAJU) */}
+      {selectedPermohonan ? (
+        <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 py-5 sm:py-8 animate-in fade-in duration-200">
+          <PermohonanDetail
+            permohonan={selectedPermohonan}
+            currentUser={effectiveUser}
+            onBack={handleBackToList}
+            onUpdatePermohonan={onUpdatePermohonan || (() => {})}
+            onOpenQrModal={() => {}}
+            isReadonly={true}
+            hideEmailPengaju={true}
+          />
+        </main>
+      ) : (
+        /* MAIN TRACKING SEARCH & CARDS PAGE CONTENT */
+        <main className="flex-1 max-w-5xl w-full mx-auto px-3.5 sm:px-6 py-5 sm:py-8 space-y-6">
+          {/* Page Hero Header */}
+          <div className="text-center space-y-2 sm:space-y-2.5">
+            <div className="inline-flex items-center space-x-2 bg-[#0b172a] border border-[#1b3459] px-3 py-1 rounded-full text-[11px] font-semibold text-[#D4AF37] shadow-sm">
+              <Sparkles className="w-3.5 h-3.5 text-[#D4AF37]" />
+              <span>Portal Pelacakan Publik Transparan E-TAT</span>
             </div>
-            <button
-              type="submit"
-              className="w-full sm:w-auto bg-gradient-to-r from-[#144782] to-[#1c64b8] hover:from-[#175194] hover:to-[#2274d4] text-white font-bold text-xs sm:text-sm px-6 py-3 rounded-xl border border-[#2d7ad6]/70 shadow-md flex items-center justify-center space-x-2 cursor-pointer transition-all shrink-0 active:scale-[0.98]"
-            >
-              <Search className="w-4 h-4 text-[#D4AF37]" />
-              <span>Cari Status Berkas</span>
-            </button>
-          </form>
-
-          {/* Quick Search Chips */}
-          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 pt-2.5 border-t border-[#1b3459]/60 text-xs">
-            <span className="text-slate-400 text-[11px] font-semibold">Simulasi:</span>
-            {sampleNumbers.map(num => (
-              <button
-                key={num}
-                type="button"
-                onClick={() => selectSample(num)}
-                className={`font-mono text-[11px] sm:text-xs px-2.5 sm:px-3 py-1 rounded-lg border transition-all cursor-pointer ${
-                  searchQuery.includes(num)
-                    ? 'bg-[#1b3459] text-[#D4AF37] border-[#D4AF37]/60 font-bold shadow-sm'
-                    : 'bg-[#081224] text-slate-300 border-[#1b3459] hover:border-slate-400'
-                }`}
-              >
-                {num}
-              </button>
-            ))}
+            <h1 className="text-xl sm:text-3xl md:text-4xl font-extrabold text-white tracking-tight leading-tight">
+              Pelacakan Berkas Perkara Asesmen Terpadu
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-400 max-w-xl mx-auto leading-relaxed px-1">
+              Pantau status berkas permohonan asesmen terpadu, tahapan verifikasi, pemeriksaan medis/hukum, musyawarah pleno, hingga pengesahan rekomendasi resmi.
+            </p>
           </div>
-        </div>
 
-        {/* SEARCH RESULT DISPLAY */}
-        {hasSearched && (
-          <div className="space-y-6 animate-in fade-in duration-300">
-            {!searchedPermohonan ? (
-              <div className="bg-[#0b172a]/95 border border-[#1b3459] rounded-2xl p-8 sm:p-12 text-center text-slate-400 space-y-3 shadow-xl">
-                <AlertTriangle className="w-10 h-10 text-amber-400 mx-auto" />
-                <h3 className="text-base font-bold text-white font-['Roboto',sans-serif]">Berkas Perkara Tidak Ditemukan</h3>
-                <p className="text-xs text-slate-400 max-w-md mx-auto leading-relaxed">
-                  Nomor permohonan "<span className="font-mono text-[#D4AF37]">{searchQuery}</span>" belum terdaftar pada sistem E-TAT SIAP PULIH. Pastikan format nomor permohonan sudah sesuai.
+          {/* Search Bar Container */}
+          <div className="bg-[#0b172a]/95 border border-[#1b3459] rounded-2xl p-4 sm:p-5 shadow-2xl backdrop-blur-md space-y-3.5">
+            <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-2.5">
+              <div className="relative flex-1">
+                <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  placeholder="Cari No. Permohonan (misal: 0099, TAT/2026/...), Kode Lacak, atau Nama Terperiksa..."
+                  className="w-full bg-[#081224] focus:bg-[#0c1c34] text-white pl-10 pr-4 py-3 rounded-xl border border-[#1b3459] focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37]/50 text-xs sm:text-sm outline-none placeholder-slate-500 font-mono transition-all shadow-inner"
+                />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSearchQuery('');
+                      setSelectedPermohonan(null);
+                    }}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white p-1 cursor-pointer"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+              <button
+                type="submit"
+                className="w-full sm:w-auto bg-gradient-to-r from-[#144782] to-[#1c64b8] hover:from-[#175194] hover:to-[#2274d4] text-white font-bold text-xs sm:text-sm px-6 py-3 rounded-xl border border-[#2d7ad6]/70 shadow-md flex items-center justify-center space-x-2 cursor-pointer transition-all shrink-0 active:scale-[0.98]"
+              >
+                <Search className="w-4 h-4 text-[#D4AF37]" />
+                <span>Cari Berkas</span>
+              </button>
+            </form>
+
+            {/* Quick Search Chips */}
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 pt-2 border-t border-[#1b3459]/60 text-xs">
+              <span className="text-slate-400 text-[11px] font-semibold flex items-center gap-1">
+                <span>Contoh Cepat:</span>
+              </span>
+              {sampleNumbers.map(sample => (
+                <button
+                  key={sample.code}
+                  type="button"
+                  onClick={() => selectSample(sample.code)}
+                  className="bg-[#0e1d35] hover:bg-[#17335c] text-slate-300 hover:text-white px-2.5 py-1 rounded-lg border border-[#1e3e6b] text-[11px] font-mono transition-all cursor-pointer flex items-center space-x-1 shadow-sm active:scale-95"
+                >
+                  <span className="text-[#D4AF37] font-bold">{sample.code}</span>
+                  <span className="text-slate-400 text-[10px]">({sample.desc})</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* VIEW HASIL PENCARIAN (CARDS LIST) */}
+          <div className="space-y-3.5">
+            <div className="flex items-center justify-between px-1">
+              <div className="flex items-center space-x-2">
+                <Layers className="w-4 h-4 text-[#D4AF37]" />
+                <h2 className="text-sm sm:text-base font-bold text-white tracking-wide">
+                  Daftar Berkas Perkara Ditemukan
+                </h2>
+                <span className="bg-[#142642] border border-[#234475] text-[#D4AF37] text-[11px] font-mono font-bold px-2 py-0.5 rounded-full">
+                  {searchResults.length} Berkas
+                </span>
+              </div>
+              <span className="text-[11px] text-slate-400 hidden sm:inline">
+                Klik kartu perkara untuk membuka rincian lengkap asesmen
+              </span>
+            </div>
+
+            {searchResults.length === 0 ? (
+              <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl p-8 sm:p-12 text-center space-y-3 shadow-xl">
+                <div className="w-12 h-12 mx-auto rounded-full bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400">
+                  <AlertTriangle className="w-6 h-6" />
+                </div>
+                <h3 className="text-base font-bold text-white">Berkas Perkara Tidak Ditemukan</h3>
+                <p className="text-xs sm:text-sm text-slate-400 max-w-md mx-auto">
+                  Tidak ada permohonan yang sesuai dengan kata kunci &quot;<span className="text-amber-400 font-mono">{searchQuery}</span>&quot;. Silakan periksa kembali nomor permohonan, nama lengkap terperiksa, atau gunakan tombol contoh cepat.
                 </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchQuery('');
+                    setHasSearched(false);
+                  }}
+                  className="mt-2 px-4 py-2 bg-[#142642] hover:bg-[#1b3459] text-white text-xs font-semibold rounded-xl border border-[#234475] transition-all cursor-pointer"
+                >
+                  Tampilkan Semua Berkas
+                </button>
               </div>
             ) : (
-              <div className="bg-[#0b172a]/95 border border-[#1b3459] rounded-2xl p-4 sm:p-6 space-y-5 sm:space-y-6 shadow-2xl backdrop-blur-md">
-                {/* Header Information Bar */}
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 sm:gap-4 pb-4 border-b border-[#1b3459]">
-                  <div className="space-y-1.5 min-w-0">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="text-sm sm:text-base font-bold text-white font-mono">{searchedPermohonan.nomorPermohonan}</span>
-                      <span className="text-[10px] sm:text-xs bg-[#071326] text-[#D4AF37] font-bold px-2.5 py-0.5 rounded-full border border-[#1b3459] truncate max-w-full">
-                        {searchedPermohonan.statusProsesUtama.replace(/_/g, ' ').toUpperCase()}
-                      </span>
-                    </div>
-                    <p className="text-xs text-slate-300 leading-snug">
-                      Terperiksa: <strong className="text-white">{searchedPermohonan.terperiksa.namaLengkap}</strong> <span className="text-slate-500">•</span> Instansi: <span className="text-[#D4AF37]">{searchedPermohonan.instansiPengaju}</span>
-                    </p>
-                  </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 sm:gap-4">
+                {searchResults.map(item => {
+                  const statusInfo = formatStatusBadge(item);
+                  const progress = getStepProgress(item);
 
-                  <div className="flex items-center space-x-2 text-xs self-start md:self-auto shrink-0">
-                    <div className="p-2 sm:p-2.5 bg-[#081224] rounded-xl border border-[#1b3459] text-left md:text-right">
-                      <span className="text-[10px] text-slate-400 block uppercase font-semibold">Tgl Pengajuan</span>
-                      <span className="font-mono font-bold text-slate-200 text-[11px] sm:text-xs">{searchedPermohonan.tanggalPengajuan}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Progress Stepper Flow */}
-                <div className="space-y-3">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-                    <h4 className="text-xs font-bold text-white uppercase tracking-wider flex items-center space-x-2 font-['Roboto',sans-serif]">
-                      <Clock className="w-4 h-4 text-[#D4AF37]" />
-                      <span>Tahapan Proses Berkas Perkara</span>
-                    </h4>
-                    <span className="text-[11px] text-[#D4AF37] font-medium">
-                      💡 Ketuk langkah untuk melihat rincian progres
-                    </span>
-                  </div>
-
-                  {/* 6 Clean Monochromatic Interactive Step Cards - Proportional Mobile Grid */}
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-3 pt-1">
-                    {[
-                      { step: 1, label: 'Registrasi', sub: 'Pendaftaran LP/BAP' },
-                      { step: 2, label: 'Verifikasi', sub: 'Administrasi Berkas' },
-                      { step: 3, label: 'Asesmen', sub: 'Medis & Hukum' },
-                      { step: 4, label: 'Sidang Pleno', sub: 'Musyawarah TAT' },
-                      { step: 5, label: 'Rekomendasi', sub: 'Pengesahan TTE' },
-                      { step: 6, label: 'Pemantauan', sub: 'Pasca Rehabilitasi' },
-                    ].map((item, idx) => {
-                      const st = getStepStatus(searchedPermohonan, idx);
-                      return (
-                        <button
-                          key={item.step}
-                          type="button"
-                          onClick={() => setSelectedStepModal(item.step)}
-                          className={`p-3 sm:p-3.5 rounded-xl border text-left flex flex-col justify-between space-y-2 transition-all cursor-pointer relative group ${
-                            st === 'completed'
-                              ? 'bg-[#081224] border-[#1b3459] hover:border-slate-400 hover:bg-[#0d1e38]'
-                              : st === 'current'
-                              ? 'bg-[#0f274a] border-[#D4AF37] hover:bg-[#143360] shadow-md shadow-[#D4AF37]/10'
-                              : 'bg-[#050c18] border-[#1b3459]/60 text-slate-500 opacity-60 hover:opacity-100 hover:border-slate-400'
-                          }`}
-                        >
-                          <div className="flex items-center justify-between text-[10px]">
-                            <span className="font-mono font-bold text-slate-400">Step {item.step}</span>
-                            {st === 'completed' ? (
-                              <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-sm" />
-                            ) : st === 'current' ? (
-                              <span className="w-2 h-2 rounded-full bg-[#D4AF37] animate-pulse" />
-                            ) : (
-                              <span className="w-2 h-2 rounded-full bg-slate-600" />
+                  return (
+                    <div
+                      key={item.id}
+                      onClick={() => handleSelectCard(item)}
+                      className="bg-[#0b172a] hover:bg-[#0f213d] border border-[#1b3459] hover:border-[#D4AF37]/60 rounded-2xl p-4 sm:p-5 transition-all duration-200 cursor-pointer shadow-lg hover:shadow-2xl flex flex-col justify-between space-y-3.5 group hover:scale-[1.01]"
+                    >
+                      {/* Header Kartu: Nomor & Status Badge */}
+                      <div className="space-y-2">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="space-y-0.5">
+                            <span className="font-mono font-bold text-white text-sm sm:text-base group-hover:text-[#D4AF37] transition-colors flex items-center gap-1.5">
+                              <span>{item.nomorPermohonan}</span>
+                            </span>
+                            {item.trackingNumber && (
+                              <span className="text-[10px] text-slate-400 font-mono block">
+                                Lacak: {item.trackingNumber}
+                              </span>
                             )}
                           </div>
+                          <span className={`text-[10px] font-bold px-2.5 py-1 rounded-md border shrink-0 ${statusInfo.badgeCls}`}>
+                            {statusInfo.label}
+                          </span>
+                        </div>
 
-                          <div>
-                            <span className={`text-xs font-bold block font-['Roboto',sans-serif] ${st === 'current' ? 'text-[#D4AF37]' : 'text-white'}`}>
-                              {item.label}
+                        {/* Nama Terperiksa & Instansi */}
+                        <div className="text-xs space-y-1 pt-1">
+                          <div className="flex items-center space-x-2">
+                            <User className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                            <span className="text-white font-semibold truncate text-sm">
+                              {item.terperiksa?.namaLengkap || 'Nama Tidak Tersedia'}
                             </span>
-                            <span className="text-[10px] block text-slate-400 mt-0.5 leading-tight">{item.sub}</span>
+                            {item.terperiksa?.usia && (
+                              <span className="text-slate-400 text-[11px]">({item.terperiksa.usia} th)</span>
+                            )}
                           </div>
+                          <div className="flex items-center space-x-2 text-slate-300">
+                            <Building2 className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                            <span className="truncate">{item.instansiPengaju}</span>
+                          </div>
+                          <div className="flex items-center space-x-2 text-slate-400 text-[11px]">
+                            <Calendar className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                            <span>Tgl Pengajuan: {item.tanggalPengajuan || '-'}</span>
+                          </div>
+                        </div>
+                      </div>
 
-                          <div className="pt-2 border-t border-[#1b3459]/60 text-[10px] font-semibold flex items-center justify-between">
-                            <span className={st === 'completed' ? 'text-emerald-400' : st === 'current' ? 'text-[#D4AF37]' : 'text-slate-500'}>
-                              {st === 'completed' ? '✓ Selesai' : st === 'current' ? '⚡ Aktif' : 'Menunggu'}
-                            </span>
-                            <ChevronRight className="w-3 h-3 text-slate-400 group-hover:text-white transition-colors" />
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
+                      {/* Progress Bar & Tahapan Progres */}
+                      <div className="space-y-2 pt-2 border-t border-[#1b3459]/60 text-xs">
+                        <div className="flex items-center justify-between text-[11px]">
+                          <span className="text-slate-400">
+                            Progres: <strong className="text-white">{progress.done}/6 Tahap Selesai</strong>
+                          </span>
+                          <span className="font-mono font-bold text-[#D4AF37]">{progress.pct}%</span>
+                        </div>
+
+                        {/* Progress Bar Track */}
+                        <div className="w-full h-1.5 bg-[#081224] rounded-full overflow-hidden border border-[#1b3459]/60">
+                          <div
+                            className="h-full bg-gradient-to-r from-[#144782] to-[#D4AF37] transition-all duration-500 rounded-full"
+                            style={{ width: `${progress.pct}%` }}
+                          />
+                        </div>
+
+                        <div className="flex items-center justify-between text-[11px] pt-1">
+                          <span className="text-slate-400 truncate">
+                            Tahap Berjalan: <span className="text-[#D4AF37] font-semibold">{progress.currentTitle}</span>
+                          </span>
+                          <span className="text-[#2d7ad6] group-hover:text-white font-bold flex items-center space-x-1 shrink-0 ml-2">
+                            <span>Buka Detail</span>
+                            <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>
-        )}
-      </main>
-
-      {/* STEP DETAIL MODAL */}
-      {selectedStepModal !== null && searchedPermohonan && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200">
-          <div
-            className="bg-[#0b172a] border border-[#1b3459] w-full max-w-xl sm:max-w-2xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[88vh] animate-in zoom-in-95 duration-200"
-            onClick={e => e.stopPropagation()}
-          >
-            {(() => {
-              const dt = getStepDetailData(selectedStepModal, searchedPermohonan);
-              if (!dt) return null;
-              return (
-                <>
-                  {/* Modal Header */}
-                  <div className="px-4 sm:px-6 py-3.5 sm:py-4 border-b border-[#1b3459] flex items-center justify-between bg-[#081224] shrink-0">
-                    <div className="flex items-center space-x-3 min-w-0">
-                      <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center font-bold text-xs sm:text-sm shrink-0 border ${
-                        dt.status === 'completed'
-                          ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
-                          : dt.status === 'current'
-                          ? 'bg-[#D4AF37]/20 text-[#D4AF37] border-[#D4AF37]/40'
-                          : 'bg-slate-800 text-slate-400 border-slate-700'
-                      }`}>
-                        {selectedStepModal}
-                      </div>
-                      <div className="min-w-0">
-                        <h3 className="text-sm sm:text-base font-bold text-white font-['Roboto',sans-serif] truncate">{dt.title}</h3>
-                        <p className="text-[11px] sm:text-xs text-slate-400 mt-0.5 truncate">{dt.subtitle}</p>
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => setSelectedStepModal(null)}
-                      className="p-1.5 sm:p-2 rounded-xl text-slate-400 hover:text-white hover:bg-[#133863] transition-colors cursor-pointer shrink-0 ml-2"
-                    >
-                      <X className="w-5 h-5" />
-                    </button>
-                  </div>
-
-                  {/* Modal Body */}
-                  <div className="p-4 sm:p-6 overflow-y-auto space-y-4 text-slate-200 custom-scrollbar">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 text-xs bg-[#081224] p-3 sm:p-3.5 rounded-xl border border-[#1b3459]">
-                      <div>
-                        <span className="text-slate-400 text-[10px] uppercase font-semibold block">Penanggung Jawab:</span>
-                        <span className="text-slate-200 font-semibold">{dt.pj}</span>
-                      </div>
-                      <div>
-                        <span className="text-slate-400 text-[10px] uppercase font-semibold block">Waktu / Status Progres:</span>
-                        <span className="font-mono text-[#D4AF37] font-semibold">{dt.timestamp}</span>
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <span className="text-xs font-bold text-slate-300 block uppercase tracking-wider font-['Roboto',sans-serif]">
-                        Rincian Check-list Tahapan ({dt.items.filter(i => i.checked).length}/{dt.items.length} Selesai):
-                      </span>
-                      <div className="space-y-2">
-                        {dt.items.map((item: any, i: number) => (
-                          <div
-                            key={i}
-                            className={`p-3 rounded-xl border text-xs flex flex-col space-y-2 ${
-                              item.checked
-                                ? 'bg-emerald-950/20 border-emerald-500/30 text-slate-200'
-                                : 'bg-[#081224] border-[#1b3459] text-slate-500'
-                            }`}
-                          >
-                            <div className="flex items-start sm:items-center justify-between gap-2">
-                              <div className="flex items-start sm:items-center space-x-2.5 min-w-0">
-                                {item.checked ? (
-                                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5 sm:mt-0" />
-                                ) : (
-                                  <Clock className="w-4 h-4 text-slate-600 shrink-0 mt-0.5 sm:mt-0" />
-                                )}
-                                <span className={`leading-snug ${item.checked ? 'font-medium text-slate-200' : 'text-slate-500'}`}>
-                                  {item.label}
-                                </span>
-                              </div>
-                              <span className={`text-[10px] font-semibold px-2 py-0.5 rounded shrink-0 ${
-                                item.checked
-                                  ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
-                                  : 'bg-slate-800 text-slate-500'
-                              }`}>
-                                {item.checked ? '✓ Terverifikasi' : 'Menunggu'}
-                              </span>
-                            </div>
-                            {item.details && (
-                              <div className="pl-6 pt-1">
-                                {item.details}
-                              </div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Modal Footer */}
-                  <div className="px-4 sm:px-6 py-3 border-t border-[#1b3459] bg-[#081224] flex flex-col sm:flex-row items-center justify-between gap-2.5 shrink-0">
-                    <span className="text-[11px] text-slate-400 font-mono text-center sm:text-left">
-                      Sistem Pelacakan Transparan E-TAT POLRI/BNN
-                    </span>
-                    <div className="flex items-center space-x-2 w-full sm:w-auto justify-end">
-                      {(selectedStepModal === 4 || selectedStepModal === 5 || selectedStepModal === 6) && isBaReady && (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setSelectedStepModal(null);
-                            setShowBAModal(true);
-                          }}
-                          className="flex-1 sm:flex-none bg-[#D4AF37] hover:bg-[#e5bd38] text-slate-950 font-bold text-xs px-3.5 py-2 rounded-xl transition-all cursor-pointer flex items-center justify-center space-x-1.5"
-                        >
-                          <Printer className="w-4 h-4" />
-                          <span>Cetak Berita Acara</span>
-                        </button>
-                      )}
-                      <button
-                        type="button"
-                        onClick={() => setSelectedStepModal(null)}
-                        className="flex-1 sm:flex-none bg-[#133863] hover:bg-[#1a4a82] text-white font-semibold text-xs px-4 py-2 rounded-xl transition-all cursor-pointer border border-[#235594] text-center"
-                      >
-                        Tutup
-                      </button>
-                    </div>
-                  </div>
-                </>
-              );
-            })()}
-          </div>
-        </div>
+        </main>
       )}
 
-      {/* BERITA ACARA TAT PRINT MODAL */}
-      {showBAModal && searchedPermohonan && (
-        <BeritaAcaraModal
-          permohonan={searchedPermohonan}
-          onClose={() => setShowBAModal(false)}
-        />
-      )}
-
-      {/* Clean Footer */}
-      <footer className="bg-[#071325] border-t border-[#1b3459] py-5 sm:py-6 text-center text-xs text-slate-400 space-y-1 px-4">
+      {/* Clean Mobile-Optimized Footer */}
+      <footer className="bg-[#071325] border-t border-[#1b3459] py-4 sm:py-5 text-center text-xs text-slate-400 space-y-1 px-4">
         <p>© 2026 Teknis Pelaksanaan Asesmen Terpadu (TAT) BNNP Kalimantan Timur. All rights reserved.</p>
         <p className="text-[10px] text-slate-500">Sistem Integrasi Asesmen dan Pemantauan Pemulihan.</p>
       </footer>

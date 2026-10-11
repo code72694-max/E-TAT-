@@ -58,7 +58,23 @@ export const PermohonanList: React.FC<PermohonanListProps> = ({
         return false;
       }
 
-      // Role-specific scoping
+      // Role-specific scoping: Untuk role Pengaju, hanya tampilkan berkas yang diajukan oleh akun tsb
+      const isPengajuRole = (role || '').toUpperCase() === 'PENGAJU';
+      if (isPengajuRole) {
+        const isOwner =
+          (currentUser?.id && item.pengajuId === currentUser.id) ||
+          (item.pengajuId === 'user-pengaju') ||
+          (currentUser?.email && item.pengajuEmail && item.pengajuEmail.toLowerCase() === currentUser.email.toLowerCase()) ||
+          (currentUser?.name && item.pengajuNama && item.pengajuNama.toLowerCase().includes(currentUser.name.toLowerCase())) ||
+          (currentUser?.name && item.perkara?.namaPenyidik && item.perkara.namaPenyidik.toLowerCase().includes(currentUser.name.toLowerCase())) ||
+          (currentUser?.agency && item.instansiPengaju && item.instansiPengaju.toLowerCase().includes(currentUser.agency.toLowerCase())) ||
+          (currentUser?.agency && item.perkara?.instansiPenyidik && item.perkara.instansiPenyidik.toLowerCase().includes(currentUser.agency.toLowerCase()));
+
+        if (!isOwner) {
+          return false;
+        }
+      }
+
       if (role === 'rehabilitasi') {
         if (!item.tindakLanjut && item.statusProsesUtama !== 'rekomendasi_terbit' && item.statusProsesUtama !== 'selesai_tindak_lanjut') {
           return false;
@@ -168,8 +184,8 @@ export const PermohonanList: React.FC<PermohonanListProps> = ({
       case 'PENGAJU':
       case 'pengaju':
         return {
-          title: 'Berkas Pengajuan Asesmen Saya',
-          desc: 'Daftar permohonan yang diajukan oleh unit kerja Anda. Lacak progres, penuhi koreksi, dan unduh rekomendasi resmi.',
+          title: 'Permohonan Asesmen Saya',
+          desc: 'Daftar permohonan yang diajukan oleh akun Anda. Lacak progres, penuhi koreksi, dan pantau status berkas.',
           canCreate: true,
           createLabel: 'Pengajuan Asesmen Baru'
         };

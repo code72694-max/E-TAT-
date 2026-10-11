@@ -33,7 +33,10 @@ import {
   Check,
   Info,
   ExternalLink,
-  ChevronRight
+  ChevronRight,
+  Lock,
+  X,
+  AlertTriangle
 } from "lucide-react";
 
 interface AsesmenAktifViewProps {
@@ -332,6 +335,13 @@ function DedicatedAsesmenDetail({
   }, [pipeline]);
 
   const [selectedStepIdx, setSelectedStepIdx] = useState<number>(defaultStepIdx);
+  const [lockedStepModal, setLockedStepModal] = useState<AssessmentPipelineStep | null>(null);
+
+  // Tahap yang sedang aktif saat ini dalam alur
+  const currentActiveStep = useMemo(() => {
+    return pipeline.find(s => s.status === "active") || pipeline.find(s => s.status === "done") || pipeline[0];
+  }, [pipeline]);
+
   const activeStep = pipeline[selectedStepIdx] || pipeline[0];
   const doneCount = pipeline.filter(s => s.status === "done").length;
   const progressPct = Math.round((doneCount / pipeline.length) * 100);
@@ -421,13 +431,24 @@ function DedicatedAsesmenDetail({
             const isSelected = selectedStepIdx === idx;
             const isDone = step.status === "done";
             const isActive = step.status === "active";
+            const isPending = step.status === "pending";
 
             return (
               <button
                 key={step.id}
-                onClick={() => setSelectedStepIdx(idx)}
+                type="button"
+                onClick={() => {
+                  if (isPending) {
+                    setLockedStepModal(step);
+                  } else {
+                    setSelectedStepIdx(idx);
+                  }
+                }}
+                title={isPending ? `Tahap ${step.stepNumber} belum dapat diakses (klik untuk info)` : step.title}
                 className={`flex items-center space-x-2.5 px-4 py-2.5 rounded-xl font-bold text-xs transition-all whitespace-nowrap cursor-pointer select-none shrink-0 ${
-                  isSelected
+                  isPending
+                    ? "bg-[#060e1a]/80 text-slate-500 hover:text-slate-300 hover:bg-[#0c182a] border border-[#14233a] hover:border-amber-500/40 opacity-75"
+                    : isSelected
                     ? "bg-gradient-to-r from-[#144782] via-[#17549c] to-[#1c64b8] text-white border border-[#2d7ad6]/70 shadow-lg shadow-[#144782]/40 scale-[1.01]"
                     : "bg-[#081224] text-slate-300 hover:text-white hover:bg-[#142642] border border-[#1b3459] hover:border-[#234475]"
                 }`}
@@ -439,22 +460,140 @@ function DedicatedAsesmenDetail({
                       ? "bg-white/20 text-[#d4af37]"
                       : isDone
                       ? "bg-[#142642] text-emerald-400"
-                      : "bg-[#142642] text-slate-400"
+                      : isPending
+                      ? "bg-[#0b1626] text-slate-500 border border-[#14263f]"
+                      : "bg-[#142642] text-[#d4af37]"
                   }`}
                 >
-                  {isDone ? <Check className="w-3 h-3 text-emerald-400" /> : step.stepNumber}
+                  {isDone ? (
+                    <Check className="w-3 h-3 text-emerald-400" />
+                  ) : isPending ? (
+                    <Lock className="w-2.5 h-2.5 text-slate-500" />
+                  ) : (
+                    step.stepNumber
+                  )}
                 </div>
 
-                <span className={isSelected ? "text-[#d4af37]" : "text-slate-400"}>{step.icon}</span>
+                <span className={isSelected ? "text-[#d4af37]" : isPending ? "text-slate-500" : "text-slate-400"}>
+                  {step.icon}
+                </span>
                 <span className="tracking-wide">{step.shortTitle}</span>
                 {isActive && (
                   <span className="w-1.5 h-1.5 rounded-full bg-[#d4af37] animate-pulse" />
+                )}
+                {isPending && (
+                  <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#0b1626] text-slate-400 font-semibold border border-[#14263f] flex items-center gap-1">
+                    <Lock className="w-2.5 h-2.5 text-slate-500" />
+                    Terkunci
+                  </span>
                 )}
               </button>
             );
           })}
         </div>
       </div>
+
+      {/* Modal Penjelasan: Tahap Belum Tercapai / Terkunci */}
+      {lockedStepModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="relative w-full max-w-lg bg-[#0b172a] border border-[#1b3459] rounded-2xl shadow-2xl overflow-hidden p-5 sm:p-6 space-y-4 sm:space-y-5 animate-in zoom-in-95 duration-200">
+            {/* Header */}
+            <div className="flex items-start justify-between border-b border-[#1b3459]/80 pb-3.5">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center shrink-0">
+                  <Lock className="w-5 h-5 text-amber-400" />
+                </div>
+                <div>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-amber-400 bg-amber-950/60 border border-amber-800/60 px-2 py-0.5 rounded">
+                      Tahap Belum Tercapai
+                    </span>
+                    <span className="text-[10px] text-slate-400 font-mono">
+                      Tahap #{lockedStepModal.stepNumber}
+                    </span>
+                  </div>
+                  <h3 className="text-base font-bold text-white mt-0.5">
+                    {lockedStepModal.title}
+                  </h3>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setLockedStepModal(null)}
+                className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-[#142642] transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Explanation Content */}
+            <div className="space-y-3.5 text-xs">
+              <div className="bg-[#081224] border border-[#1b3459] rounded-xl p-4 space-y-2">
+                <div className="flex items-center space-x-2 text-slate-200 font-semibold">
+                  <Info className="w-4 h-4 text-sky-400 shrink-0" />
+                  <span>Penjelasan Status Tahapan:</span>
+                </div>
+                <p className="text-slate-300 leading-relaxed text-xs">
+                  {lockedStepModal.stepNumber === 3
+                    ? "Pemeriksaan Medis & Toksikologi Urin baru dapat dilaksanakan setelah penetapan surat perintah penugasan (Sprint) dan jadwal resmi disetujui bersama oleh Sekretariat TAT dan Penyidik."
+                    : lockedStepModal.stepNumber === 4
+                    ? "Telaah Hukum & Analisis Peran Tersangka membutuhkan berkas penyidikan lengkap (LP, BAP, BB) serta penelaah hukum yang telah dijadwalkan."
+                    : lockedStepModal.stepNumber === 5
+                    ? "Sidang Pleno TAT belum dapat diselenggarakan karena memerlukan hasil Asesmen Medis (ICD-10) dan Asesmen Hukum (SEMA 04/2010) yang keduanya telah selesai dan dinyatakan siap dibahas bersama."
+                    : lockedStepModal.stepNumber === 6
+                    ? "Pengesahan TTE dan Penerbitan Dokumen Rekomendasi Resmi baru dapat diproses setelah Sidang Pleno TAT selesai diselenggarakan dan Berita Acara Pleno disepakati secara bulat oleh seluruh unsur tim."
+                    : "Tahap ini masih terkunci dan baru dapat diakses setelah tahapan sebelumnya selesai dilaksanakan."}
+                </p>
+              </div>
+
+              {/* Status Ringkasan Berkas */}
+              <div className="bg-[#0e1d35] border border-[#1e3e6b] rounded-xl p-3.5 space-y-2">
+                <div className="text-[10px] font-bold text-slate-300 uppercase tracking-wider">
+                  Progres Perkara Saat Ini
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-[11px]">
+                  <div>
+                    <span className="text-slate-400 block text-[10px]">Tahap Berjalan:</span>
+                    <span className="font-semibold text-[#d4af37]">
+                      Tahap {currentActiveStep.stepNumber}: {currentActiveStep.shortTitle}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 block text-[10px]">Status:</span>
+                    <span className="font-semibold text-white">
+                      {currentActiveStep.badgeText}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Footer Buttons */}
+            <div className="flex items-center justify-end space-x-2 pt-2 border-t border-[#1b3459]/60">
+              <button
+                type="button"
+                onClick={() => {
+                  const targetIdx = pipeline.findIndex(s => s.status === 'active') !== -1
+                    ? pipeline.findIndex(s => s.status === 'active')
+                    : pipeline.map(s => s.status).lastIndexOf('done');
+                  if (targetIdx !== -1) setSelectedStepIdx(targetIdx);
+                  setLockedStepModal(null);
+                }}
+                className="px-3 py-2 text-xs font-semibold text-slate-300 hover:text-white bg-[#142642] hover:bg-[#1b3459] border border-[#234475] rounded-xl transition-all cursor-pointer"
+              >
+                Ke Tahap Sedang Berjalan
+              </button>
+              <button
+                type="button"
+                onClick={() => setLockedStepModal(null)}
+                className="px-4 py-2 text-xs font-bold text-white bg-gradient-to-r from-[#144782] to-[#1c64b8] hover:from-[#17549c] hover:to-[#2272ce] rounded-xl shadow-md transition-all cursor-pointer border border-[#2d7ad6]/60"
+              >
+                Mengerti
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 3. FULL-WIDTH RICH PAGE CONTENT AREA FOR SELECTED STEP */}
       <div className="space-y-5">
@@ -724,15 +863,17 @@ export const AsesmenAktifView: React.FC<AsesmenAktifViewProps> = ({
 
   const selectedActiveId = propSelectedActiveId !== undefined ? propSelectedActiveId : localSelectedActiveId;
 
-  const isPengajuRole = currentUser?.role?.toUpperCase() === 'PENGAJU';
+  const isPengajuRole = (currentUser?.role || '').toUpperCase() === 'PENGAJU';
   const checkOwner = (p: PermohonanAsesmen) => {
     if (!isPengajuRole) return true;
     return (
-      p.pengajuId === currentUser.id ||
-      (p.pengajuNama && p.pengajuNama.toLowerCase().includes((currentUser.name || '').toLowerCase())) ||
-      (p.perkara?.namaPenyidik && p.perkara.namaPenyidik.toLowerCase().includes((currentUser.name || '').toLowerCase())) ||
-      (p.instansiPengaju && currentUser.agency && p.instansiPengaju.toLowerCase().includes(currentUser.agency.toLowerCase())) ||
-      (p.instansiPengaju && currentUser.instansi && p.instansiPengaju.toLowerCase().includes(currentUser.instansi.toLowerCase()))
+      (currentUser?.id && p.pengajuId === currentUser.id) ||
+      (p.pengajuId === 'user-pengaju') ||
+      (currentUser?.email && p.pengajuEmail && p.pengajuEmail.toLowerCase() === currentUser.email.toLowerCase()) ||
+      (currentUser?.name && p.pengajuNama && p.pengajuNama.toLowerCase().includes(currentUser.name.toLowerCase())) ||
+      (currentUser?.name && p.perkara?.namaPenyidik && p.perkara.namaPenyidik.toLowerCase().includes(currentUser.name.toLowerCase())) ||
+      (currentUser?.agency && p.instansiPengaju && p.instansiPengaju.toLowerCase().includes(currentUser.agency.toLowerCase())) ||
+      (currentUser?.agency && p.perkara?.instansiPenyidik && p.perkara.instansiPenyidik.toLowerCase().includes(currentUser.agency.toLowerCase()))
     );
   };
 
@@ -773,8 +914,9 @@ export const AsesmenAktifView: React.FC<AsesmenAktifViewProps> = ({
   }, [activeList, filterStatus, search]);
 
   const activePermohonan = useMemo(() => {
-    return activeList.find(p => p.id === selectedActiveId) || null;
-  }, [activeList, selectedActiveId]);
+    if (!selectedActiveId) return null;
+    return activeList.find(p => p.id === selectedActiveId) || permohonanList.find(p => p.id === selectedActiveId) || null;
+  }, [activeList, permohonanList, selectedActiveId]);
 
   const handleSelectActiveCase = (id: string) => {
     if (onSelectActiveCase) {
@@ -796,6 +938,7 @@ export const AsesmenAktifView: React.FC<AsesmenAktifViewProps> = ({
 
   // JIKA SEDANG MEMILIH SATU PERMOHONAN: TAMPILKAN LANGSUNG PERMOHONAN DETAIL DENGAN TAB LENGKAP ROLE
   if (activePermohonan) {
+    const isPengajuRole = currentUser.role === 'pengaju' || currentUser.role === 'PENGAJU';
     return (
       <PermohonanDetail
         permohonan={activePermohonan}
@@ -803,6 +946,7 @@ export const AsesmenAktifView: React.FC<AsesmenAktifViewProps> = ({
         onBack={handleBackToList}
         onUpdatePermohonan={onUpdatePermohonan || (() => {})}
         onOpenQrModal={() => {}}
+        isReadonly={isPengajuRole}
       />
     );
   }

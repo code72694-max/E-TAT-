@@ -16,7 +16,8 @@ import {
   Stethoscope,
   Award,
   ChevronRight,
-  Info
+  Info,
+  ArrowLeft
 } from 'lucide-react';
 
 export interface TimTatMember {
@@ -50,6 +51,8 @@ interface PublicHeaderProps {
   onGoToLacak: () => void;
   onGoToLogin: () => void;
   onGoToRegister?: () => void;
+  isDetailPage?: boolean;
+  onBackFromDetail?: () => void;
 }
 
 export const PublicHeader: React.FC<PublicHeaderProps> = ({
@@ -57,7 +60,9 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
   onGoToLanding,
   onGoToLacak,
   onGoToLogin,
-  onGoToRegister
+  onGoToRegister,
+  isDetailPage,
+  onBackFromDetail
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
@@ -86,7 +91,21 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
     <>
       {/* Top Sticky Header */}
       <header className="sticky top-0 z-40 bg-[#071325]/95 backdrop-blur-md border-b border-[#1b3459]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        {/* On Mobile Detail Page: Only Show Borderless Back Button in the left corner */}
+        {isDetailPage && onBackFromDetail ? (
+          <div className="flex md:hidden items-center h-14 w-full px-4">
+            <button
+              type="button"
+              onClick={onBackFromDetail}
+              className="flex items-center space-x-2 text-slate-200 hover:text-white font-medium text-xs sm:text-sm transition-colors cursor-pointer bg-transparent border-0 p-0 focus:outline-none select-none active:opacity-75"
+            >
+              <ArrowLeft className="w-4 h-4 text-[#D4AF37]" />
+              <span>Kembali</span>
+            </button>
+          </div>
+        ) : null}
+
+        <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 ${isDetailPage && onBackFromDetail ? 'hidden md:flex' : 'flex'} items-center justify-between`}>
           {/* Brand Lockup & Interactive Tim TAT Kaltim Button */}
           <div className="flex items-center space-x-2 sm:space-x-2.5">
             <button

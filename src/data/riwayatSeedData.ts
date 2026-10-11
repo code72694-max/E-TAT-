@@ -8,7 +8,7 @@ import { PermohonanAsesmen } from '../types';
  * - REJECTED (Permohonan Ditolak / Terindikasi Jaringan)
  * - OUT_OF_SCOPE_REFERRED (Dirujuk Non-TAT)
  */
-export const riwayatPermohonanSeedList: PermohonanAsesmen[] = [
+export const riwayatPermohonanSeedList: any[] = [
   {
     id: 'riwayat-tat-001',
     nomorPermohonan: 'TAT/2026/08/0012',
@@ -208,9 +208,23 @@ export const riwayatPermohonanSeedList: PermohonanAsesmen[] = [
     sidangPleno: {
       id: 'pleno-001',
       tanggalPleno: '15/08/2026',
+      waktu: '10:00 - 12:30 WIB',
+      tempat: 'Ruang Sidang Pleno Sekretariat TAT BNNP',
+      pimpinanPleno: 'Kompol Arya Wicaksono, S.I.K.',
       nomorBeritaAcara: 'BA-PLENO/TAT/2026/08/0012',
-      jenisRekomendasiFinal: 'Rehabilitasi Medis Rawat Inap 3 Bulan',
+      statusPleno: 'selesai_sepakat',
+      pokokBahasan: 'Sinkronisasi hasil asesmen medis ketergantungan stimulan sedang-berat dengan hasil telaah hukum batas gramatur SEMA No. 4/2010.',
+      kesepakatanRekomendasi: 'Disepakati secara bulat rekomendasi rehabilitasi medis rawat inap.',
+      jenisRekomendasiFinal: 'Rehabilitasi Rawat Inap',
+      durasiRehabBulan: 3,
+      fasilitasRujukanUsulan: 'Balai Rehabilitasi BNN Tanah Merah',
       catatanPleno: 'Disetujui secara mufakat oleh seluruh tim asesor medis, hukum, dan penyidik.',
+      daftarHadir: [
+        { nama: 'Kompol Arya Wicaksono, S.I.K.', peran: 'Pimpinan Sidang / Sekretariat TAT', instansi: 'BNNP Kalimantan Timur', hadir: true },
+        { nama: 'dr. Ratna Sp.KJ', peran: 'Asesor Medis TAT', instansi: 'Tim Medis BNNP', hadir: true },
+        { nama: 'Agus Pratama, S.H., M.H.', peran: 'Asesor Hukum / Jaksa', instansi: 'Kejaksaan Tinggi', hadir: true },
+        { nama: 'Ipda Budi Santoso, S.H.', peran: 'Penyidik Pengaju', instansi: 'Satresnarkoba Polres', hadir: true }
+      ],
       pesertaList: ['Kompol Arya Wicaksono', 'dr. Ratna Sp.KJ', 'Agus Pratama, S.H.', 'Ipda Budi Santoso']
     },
     rekomendasiResmi: {

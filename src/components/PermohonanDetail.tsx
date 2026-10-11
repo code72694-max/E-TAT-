@@ -18,6 +18,7 @@ import {
   User,
   Building2,
   Calendar,
+  MapPin,
   Stethoscope,
   Scale,
   Users,
@@ -46,12 +47,18 @@ import {
   Square,
   Check,
   RotateCcw,
-  Plus
+  Plus,
+  Lock,
+  Info,
+  ChevronDown,
+  Layers
 } from 'lucide-react';
 import { PengawasanPascaTatSection } from './PengawasanPascaTatSection';
 import { InstrumenKriteriaPlasemenView } from './InstrumenKriteriaPlasemenView';
 import { ModalInputAsesmen } from './ModalInputAsesmen';
 import { BeritaAcaraModal } from './BeritaAcaraModal';
+import { DokumenHasilAsesmenModal } from './DokumenHasilAsesmenModal';
+import { SuratJawabanModal } from './SuratJawabanModal';
 import { PrasyaratPemeriksaanView } from './PrasyaratPemeriksaanView';
 import { sendPengajuanEmailNotification, sendCorrectionEmailNotification } from '../services/emailService';
 
@@ -61,99 +68,63 @@ const DEFAULT_REQUIRED_DOCUMENTS: DokumenPersyaratan[] = [
     nama: 'Surat Permohonan Asesmen TAT dari Penyidik',
     wajib: true,
     statusVerifikasi: 'belum_diperiksa',
-    versi: 1,
-    fileName: 'Surat_Permohonan_Asesmen_TAT.pdf',
-    fileSize: '1.4 MB',
-    uploadedAt: '10/10/2026 09:30 WIB',
-    fileUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf'
+    versi: 1
   },
   {
     id: 'doc-2',
     nama: 'Laporan Polisi (LP)',
     wajib: true,
     statusVerifikasi: 'belum_diperiksa',
-    versi: 1,
-    fileName: 'Laporan_Polisi_LP_2026_Resnarkoba.pdf',
-    fileSize: '2.1 MB',
-    uploadedAt: '10/10/2026 09:31 WIB',
-    fileUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf'
+    versi: 1
   },
   {
     id: 'doc-3',
     nama: 'Surat Perintah Penyidikan (Sprindik)',
     wajib: true,
     statusVerifikasi: 'belum_diperiksa',
-    versi: 1,
-    fileName: 'Sprindik_Nomor_SP_Idik_88_2026.pdf',
-    fileSize: '980 KB',
-    uploadedAt: '10/10/2026 09:32 WIB',
-    fileUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf'
+    versi: 1
   },
   {
     id: 'doc-4',
     nama: 'Surat Perintah Penangkapan & Penahanan',
     wajib: true,
     statusVerifikasi: 'belum_diperiksa',
-    versi: 1,
-    fileName: 'Surat_Perintah_Penangkapan_Penahanan.pdf',
-    fileSize: '1.2 MB',
-    uploadedAt: '10/10/2026 09:33 WIB',
-    fileUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf'
+    versi: 1
   },
   {
     id: 'doc-5',
     nama: 'Berita Acara Pemeriksaan (BAP) Saksi & Tersangka',
     wajib: true,
     statusVerifikasi: 'belum_diperiksa',
-    versi: 1,
-    fileName: 'BAP_Saksi_dan_Tersangka_Lengkap.pdf',
-    fileSize: '3.4 MB',
-    uploadedAt: '10/10/2026 09:35 WIB',
-    fileUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf'
+    versi: 1
   },
   {
     id: 'doc-6',
     nama: 'Berita Acara Penimbangan & Penyitaan Barang Bukti',
     wajib: true,
     statusVerifikasi: 'belum_diperiksa',
-    versi: 1,
-    fileName: 'Berita_Acara_Penimbangan_BB.pdf',
-    fileSize: '850 KB',
-    uploadedAt: '10/10/2026 09:36 WIB',
-    fileUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf'
+    versi: 1
   },
   {
     id: 'doc-7',
     nama: 'Surat Keterangan Hasil Labfor / Uji Urin Awal',
     wajib: true,
     statusVerifikasi: 'belum_diperiksa',
-    versi: 1,
-    fileName: 'Surat_Hasil_Uji_Labfor_Puslabfor.pdf',
-    fileSize: '1.1 MB',
-    uploadedAt: '10/10/2026 09:38 WIB',
-    fileUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf'
+    versi: 1
   },
   {
     id: 'doc-8',
     nama: 'KTP / Kartu Identitas Terperiksa',
     wajib: true,
     statusVerifikasi: 'belum_diperiksa',
-    versi: 1,
-    fileName: 'Scan_KTP_Terperiksa_Elektronik.pdf',
-    fileSize: '650 KB',
-    uploadedAt: '10/10/2026 09:40 WIB',
-    fileUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf'
+    versi: 1
   },
   {
     id: 'doc-9',
     nama: 'Surat Persetujuan Keluarga / Kuasa Hukum',
     wajib: false,
     statusVerifikasi: 'belum_diperiksa',
-    versi: 1,
-    fileName: 'Surat_Persetujuan_Keluarga_Tersangka.pdf',
-    fileSize: '720 KB',
-    uploadedAt: '10/10/2026 09:42 WIB',
-    fileUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf'
+    versi: 1
   }
 ];
 
@@ -163,6 +134,8 @@ interface PermohonanDetailProps {
   onBack: () => void;
   onUpdatePermohonan: (updated: PermohonanAsesmen) => void;
   onOpenQrModal: (permohonan: PermohonanAsesmen) => void;
+  isReadonly?: boolean;
+  hideEmailPengaju?: boolean;
 }
 
 export type DetailTab =
@@ -184,10 +157,14 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
   currentUser,
   onBack,
   onUpdatePermohonan,
-  onOpenQrModal
+  onOpenQrModal,
+  isReadonly,
+  hideEmailPengaju
 }) => {
   const isMedisRole = currentUser.role === 'medis' || currentUser.role === 'MEDIS';
   const isHukumRole = currentUser.role === 'hukum' || currentUser.role === 'HUKUM';
+  const isPengajuRole = currentUser.role === 'pengaju' || currentUser.role === 'PENGAJU';
+  const effectiveReadonly = isReadonly !== undefined ? isReadonly : isPengajuRole;
 
   const initialTabByRole: DetailTab = 
     isMedisRole ? 'medis' :
@@ -196,13 +173,16 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
 
   const [activeTab, setActiveTab] = useState<DetailTab>(initialTabByRole);
   const [showBeritaAcara, setShowBeritaAcara] = useState(false);
+  const [showHasilAsesmenModal, setShowHasilAsesmenModal] = useState(false);
+  const [showSuratJawaban, setShowSuratJawaban] = useState(false);
   const [modalAsesmenType, setModalAsesmenType] = useState<'medis' | 'hukum' | null>(null);
   const [modalJadwalType, setModalJadwalType] = useState<'medis' | 'hukum' | null>(null);
   const [previewImage, setPreviewImage] = useState<{ url: string; title: string } | null>(null);
   const [previewDocModal, setPreviewDocModal] = useState<DokumenPersyaratan | null>(null);
+  const [lockedDetailTab, setLockedDetailTab] = useState<{ id: DetailTab; label: string; reason: string } | null>(null);
 
   // Interactive Form State for Asesmen Medis
-  const [isEditingMedis, setIsEditingMedis] = useState<boolean>(!permohonan.asesmenMedis || isMedisRole);
+  const [isEditingMedis, setIsEditingMedis] = useState<boolean>(!effectiveReadonly && (!permohonan.asesmenMedis || isMedisRole));
   const [medisSavedFeedback, setMedisSavedFeedback] = useState<string | null>(null);
 
   const [medisForm, setMedisForm] = useState({
@@ -344,21 +324,39 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
     setModalAsesmenType(null);
   };
 
+  // Deteksi apakah berkas masih dalam tahap Verifikasi Permohonan (belum masuk asesmen aktif)
+  const isTahapPermohonan = useMemo(() => {
+    const appStatus = permohonan.applicationStatus;
+    const prosesStatus = permohonan.statusProsesUtama;
+    return (
+      appStatus === 'SUBMITTED' ||
+      appStatus === 'ADMIN_REVIEW' ||
+      appStatus === 'NEEDS_CORRECTION' ||
+      appStatus === 'DRAFT' ||
+      prosesStatus === 'diajukan' ||
+      prosesStatus === 'verifikasi_berkas' ||
+      prosesStatus === 'perlu_perbaikan' ||
+      prosesStatus === 'draf' ||
+      (!appStatus && !prosesStatus)
+    );
+  }, [permohonan.applicationStatus, permohonan.statusProsesUtama]);
+
   // Role-specific available tabs
   const availableTabs = useMemo(() => {
+    // Jika berkas masih dalam tahap permohonan (menunggu verifikasi / perlu perbaikan):
+    // Hanya tampilkan tab yang relevan (Ringkasan, Verifikasi Berkas, Riwayat)
+    if (isTahapPermohonan) {
+      return [
+        { id: 'ringkasan' as DetailTab, label: 'Ringkasan Perkara', icon: <User className="w-3.5 h-3.5" /> },
+        { id: 'administrasi' as DetailTab, label: 'Verifikasi Berkas', icon: <FileText className="w-3.5 h-3.5" /> },
+        { id: 'riwayat' as DetailTab, label: 'Audit Log & Riwayat', icon: <History className="w-3.5 h-3.5" /> }
+      ];
+    }
+
     const role = currentUser.role;
     switch (role) {
-      case 'pengaju': {
-        const tabs: { id: DetailTab; label: string; icon: React.ReactNode }[] = [
-          { id: 'ringkasan', label: 'Status Perkara', icon: <User className="w-3.5 h-3.5" /> },
-          { id: 'prasyarat', label: 'Prasyarat & Kedatangan', icon: <FileCheck className="w-3.5 h-3.5" /> },
-          { id: 'administrasi', label: 'Berkas (LP/BAP)', icon: <FileText className="w-3.5 h-3.5" /> },
-        ];
-        if (permohonan.rekomendasiResmi && ((permohonan.applicationStatus === 'RESULTS_ISSUED' || permohonan.statusProsesUtama === 'rekomendasi_terbit') || (permohonan.followupStatus === 'VERIFIED_IMPLEMENTED' || permohonan.statusProsesUtama === 'selesai_tindak_lanjut'))) {
-          tabs.push({ id: 'dokumen', label: 'Rekomendasi Terbit', icon: <FileSignature className="w-3.5 h-3.5" /> });
-        }
-        return tabs;
-      }
+      case 'pengaju':
+      case 'PENGAJU':
       case 'admin':
       case 'ADMIN':
       case 'sekretariat':
@@ -419,7 +417,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
           { id: 'ringkasan', label: 'Ringkasan', icon: <User className="w-3.5 h-3.5" /> }
         ];
     }
-  }, [currentUser.role, permohonan]);
+  }, [currentUser.role, permohonan, isTahapPermohonan]);
 
   // Ensure activeTab is always one of the permitted tabs for current role
   useEffect(() => {
@@ -440,6 +438,33 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
       return false;
     });
   }, [permohonan, currentUser]);
+
+  // Info penguncian tab untuk tahapan yang belum selesai
+  const getTabLockInfo = (tabId: DetailTab): { isLocked: boolean; reason: string } => {
+    if (isTahapPermohonan) return { isLocked: false, reason: '' };
+    if (tabId === 'pleno') {
+      const medisDone = permohonan.medicalStatus === 'FINAL' || Boolean(permohonan.asesmenMedis?.diagnosisKlinisIcd);
+      const hukumDone = permohonan.legalStatus === 'FINAL' || Boolean(permohonan.asesmenHukum?.analisisPeran);
+      const hasPleno = Boolean(permohonan.sidangPleno?.nomorBeritaAcara) || ['READY_FOR_CONFERENCE', 'CONFERENCE_HELD', 'AWAITING_SIGNED_OUTPUTS', 'RESULTS_ISSUED'].includes(permohonan.applicationStatus || '');
+      if (!hasPleno && (!medisDone || !hukumDone)) {
+        return {
+          isLocked: true,
+          reason: 'Sidang Pleno TAT belum dapat diselenggarakan karena Asesmen Medis dan Telaah Hukum harus selesai difinalisasi terlebih dahulu.'
+        };
+      }
+    }
+    if (tabId === 'dokumen') {
+      const hasPleno = Boolean(permohonan.sidangPleno?.nomorBeritaAcara) || ['CONFERENCE_HELD', 'AWAITING_SIGNED_OUTPUTS', 'RESULTS_ISSUED'].includes(permohonan.applicationStatus || '');
+      const hasRek = Boolean(permohonan.rekomendasiResmi?.nomorSurat);
+      if (!hasPleno && !hasRek) {
+        return {
+          isLocked: true,
+          reason: 'Rekomendasi Resmi (TTE) belum dapat diakses karena memerlukan Berita Acara Sidang Pleno TAT yang telah disepakati oleh seluruh unsur tim.'
+        };
+      }
+    }
+    return { isLocked: false, reason: '' };
+  };
 
   // Local state for inline clarification message
   const [pertanyaanInput, setPertanyaanInput] = useState('');
@@ -796,43 +821,139 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
           onClose={() => setShowBeritaAcara(false)}
         />
       )}
+      {showHasilAsesmenModal && (
+        <DokumenHasilAsesmenModal
+          permohonan={permohonan}
+          onClose={() => setShowHasilAsesmenModal(false)}
+        />
+      )}
+      {showSuratJawaban && (
+        <SuratJawabanModal
+          permohonan={permohonan}
+          onClose={() => setShowSuratJawaban(false)}
+        />
+      )}
 
       {/* Compact Status & Action Overview */}
 
-      {/* Simple & Clean Header Bar: Compact Aligned Grid + Tanggal in Top Right */}
-      <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl p-3 sm:p-3.5 relative shadow-sm flex flex-col md:flex-row md:items-start justify-between gap-3">
-        {/* Left: Perfectly Aligned Compact Key-Value Grid */}
-        <div className="grid grid-cols-[110px_8px_1fr] items-center gap-y-1 text-[11px] sm:text-xs">
-          <span className="text-slate-400 font-medium">No. Permohonan</span>
-          <span className="text-slate-500 font-medium">:</span>
-          <span className="font-semibold text-slate-100">
-            {permohonan.nomorPermohonan}
-          </span>
+      {/* Simple & Clean Header Bar: Perfectly Aligned Key-Value Grid */}
+      <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl p-3.5 sm:p-4 shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-start gap-3 sm:gap-4">
+          {/* Desktop Back Button (Borderless, hidden on mobile because mobile header has back button) */}
+          <button
+            type="button"
+            onClick={onBack}
+            className="hidden sm:inline-flex items-center space-x-1.5 px-2.5 py-1 text-slate-300 hover:text-white hover:bg-[#142642] rounded-lg text-xs font-semibold transition-all cursor-pointer shrink-0 border-0 bg-transparent select-none self-start"
+            title="Kembali ke daftar"
+          >
+            <ArrowLeft className="w-3.5 h-3.5 text-[#d4af37]" />
+            <span>Kembali</span>
+          </button>
 
-          <span className="text-slate-400 font-medium">Nama Pengaju</span>
-          <span className="text-slate-500 font-medium">:</span>
-          <span className="font-semibold text-slate-100">
-            {permohonan.pengajuNama || permohonan.perkara?.namaPenyidik || 'Ipda Budi Santoso'}
-          </span>
+          {/* Unified Key-Value Grid: 1 Kolom di Mobile, 2 Kolom di Desktop/Tablet */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-1.5 text-[11px] sm:text-xs w-full flex-1">
+            {/* Kolom Kiri: No. Permohonan, Nama Pengaju, Email Pengaju */}
+            <div className="grid grid-cols-[115px_10px_1fr] items-center gap-y-1.5">
+              <span className="text-slate-400 font-medium">No. Permohonan</span>
+              <span className="text-slate-500 font-medium">:</span>
+              <span className="font-semibold text-slate-100 font-mono">
+                {permohonan.nomorPermohonan}
+              </span>
 
-          <span className="text-slate-400 font-medium">Email Pengaju</span>
-          <span className="text-slate-500 font-medium">:</span>
-          <span className="font-semibold text-slate-100">
-            {permohonan.pengajuEmail || 'etatsiappulih@gmail.com'}
-          </span>
-        </div>
+              <span className="text-slate-400 font-medium">Nama Pengaju</span>
+              <span className="text-slate-500 font-medium">:</span>
+              <span className="font-semibold text-slate-100">
+                {permohonan.pengajuNama || permohonan.perkara?.namaPenyidik || 'Ipda Budi Santoso'}
+              </span>
 
-        {/* Right: Tanggal in Top Right */}
-        <div className="flex flex-col items-start md:items-end shrink-0">
-          <div className="flex items-center space-x-1.5 text-[11px] sm:text-xs text-slate-400">
-            <Calendar className="w-3 h-3 text-slate-400 shrink-0" />
-            <span className="font-medium">Tanggal Pengajuan:</span>
-            <span className="font-semibold text-slate-200">
-              {permohonan.tanggalPengajuan}
-            </span>
+              {!hideEmailPengaju && (
+                <>
+                  <span className="text-slate-400 font-medium">Email Pengaju</span>
+                  <span className="text-slate-500 font-medium">:</span>
+                  <span className="font-semibold text-slate-100 truncate">
+                    {permohonan.pengajuEmail || 'etatsiappulih@gmail.com'}
+                  </span>
+                </>
+              )}
+            </div>
+
+            {/* Kolom Kanan: Tanggal Pengajuan, Status -> Sejajar sempurna dengan Kolom Kiri */}
+            <div className="grid grid-cols-[115px_10px_1fr] items-center gap-y-1.5">
+              <span className="text-slate-400 font-medium">Tanggal Pengajuan</span>
+              <span className="text-slate-500 font-medium">:</span>
+              <span className="font-semibold text-slate-200">
+                {permohonan.tanggalPengajuan}
+              </span>
+
+              <span className="text-slate-400 font-medium">Status</span>
+              <span className="text-slate-500 font-medium">:</span>
+              <div className="flex items-center">
+                {isTahapPermohonan ? (
+                  permohonan.applicationStatus === 'NEEDS_CORRECTION' || permohonan.statusProsesUtama === 'perlu_perbaikan' ? (
+                    <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-md text-[11px] font-bold bg-rose-950/80 text-rose-300 border border-rose-700/60 shadow-sm">
+                      <AlertTriangle className="w-3 h-3 text-rose-400 shrink-0" />
+                      <span>Perlu Diperbaiki</span>
+                    </span>
+                  ) : permohonan.applicationStatus === 'APPROVED' ? (
+                    <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-md text-[11px] font-bold bg-emerald-950/80 text-emerald-300 border border-emerald-700/60 shadow-sm">
+                      <CheckCircle2 className="w-3 h-3 text-emerald-400 shrink-0" />
+                      <span>Disetujui</span>
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-md text-[11px] font-bold bg-amber-950/80 text-amber-300 border border-amber-700/60 shadow-sm">
+                      <Clock className="w-3 h-3 text-amber-400 shrink-0" />
+                      <span>Menunggu Verifikasi Sekretariat</span>
+                    </span>
+                  )
+                ) : (
+                  <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-md text-[11px] font-bold bg-sky-950/80 text-sky-300 border border-sky-700/60 shadow-sm">
+                    <Activity className="w-3 h-3 text-sky-400 shrink-0" />
+                    <span>{formatStatus(permohonan.applicationStatus || permohonan.statusProsesUtama)}</span>
+                  </span>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Read-Only Mode Banner for Pengaju (Simple & Compact on Mobile) */}
+      {effectiveReadonly && (
+        <>
+          {/* Mobile View: Super Simple & Compact 1-Line Bar */}
+          <div className="sm:hidden bg-[#0b1d38]/90 border border-[#1e4a87]/80 rounded-lg px-3 py-2 text-xs flex items-center justify-between shadow-sm">
+            <div className="flex items-center space-x-2 min-w-0">
+              <Shield className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
+              <span className="font-semibold text-slate-200 text-[11px] truncate">
+                Mode Pemantauan Perkara
+              </span>
+            </div>
+            <span className="bg-[#122e56] text-[#D4AF37] text-[10px] font-bold px-2 py-0.5 rounded border border-[#23589e] shrink-0 uppercase tracking-wider">
+              Hanya Baca
+            </span>
+          </div>
+
+          {/* Desktop/Tablet View: Full Informative Banner */}
+          <div className="hidden sm:flex bg-[#0b1d38] border border-[#1e4a87] rounded-xl p-3 text-xs items-center justify-between shadow-sm">
+            <div className="flex items-center space-x-2.5">
+              <div className="w-6 h-6 rounded-lg bg-[#122e56] border border-[#23589e] flex items-center justify-center shrink-0">
+                <Shield className="w-3.5 h-3.5 text-[#D4AF37]" />
+              </div>
+              <div>
+                <span className="font-bold text-white">Mode Pemantauan Perkara (Hanya Baca / Read Only)</span>
+                <p className="text-slate-300 text-[11px] mt-0.5">
+                  {isTahapPermohonan
+                    ? 'Sebagai Pemohon Asesmen, Anda dapat memantau proses verifikasi berkas permohonan oleh Sekretariat TAT secara transparan.'
+                    : 'Sebagai Pemohon Asesmen, Anda dapat memantau seluruh proses asesmen (prasyarat, verifikasi berkas, jadwal, medis, telaah hukum, sidang pleno, dan rekomendasi TTE) secara transparan.'}
+                </p>
+              </div>
+            </div>
+            <span className="bg-[#122e56] text-[#D4AF37] text-[10px] font-extrabold px-2.5 py-1 rounded-md border border-[#23589e] uppercase tracking-wider shrink-0 ml-3">
+              Read Only
+            </span>
+          </div>
+        </>
+      )}
 
         {emailBanner && (
           <div className={`mt-3 p-3 rounded-xl border text-xs flex items-center justify-between ${
@@ -857,33 +978,147 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
           </div>
         )}
 
-      {/* Formal Tab Navigation - Executive POLRI/BNN E-TAT Style */}
-      <div className="bg-[#0b172a] p-1.5 rounded-xl border border-[#1b3459] shadow-sm">
-        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+      {/* Mobile Tab Step Dropdown Selector (Clean & Simple for Mobile Screens) */}
+      <div className="sm:hidden bg-[#0b172a] border border-[#1b3459] rounded-xl p-3 shadow-sm space-y-1.5">
+        <div className="flex items-center justify-between text-[11px] text-slate-400 px-0.5">
+          <span className="font-semibold text-slate-300 flex items-center gap-1.5">
+            <Layers className="w-3.5 h-3.5 text-[#d4af37]" />
+            <span>Tahapan Alur Berkas Perkara:</span>
+          </span>
+          <span className="font-mono text-slate-400">
+            {availableTabs.findIndex(t => t.id === activeTab) + 1} / {availableTabs.length}
+          </span>
+        </div>
+        <div className="relative">
+          <select
+            value={activeTab}
+            onChange={(e) => {
+              const selectedId = e.target.value as DetailTab;
+              const lockInfo = getTabLockInfo(selectedId);
+              const selectedTabObj = availableTabs.find(t => t.id === selectedId);
+              if (lockInfo.isLocked) {
+                setLockedDetailTab({ id: selectedId, label: selectedTabObj?.label || 'Tab', reason: lockInfo.reason });
+              } else {
+                setActiveTab(selectedId);
+              }
+            }}
+            className="w-full bg-[#081224] text-white font-bold text-xs py-2.5 pl-3 pr-9 rounded-lg border border-[#1b3459] focus:border-[#d4af37] focus:outline-none appearance-none cursor-pointer shadow-inner"
+          >
+            {availableTabs.map((tab, idx) => {
+              const lockInfo = getTabLockInfo(tab.id);
+              return (
+                <option key={tab.id} value={tab.id} className="bg-[#0b172a] text-slate-100 py-1">
+                  {idx + 1}. {tab.label} {lockInfo.isLocked ? '🔒 (Terkunci)' : ''}
+                </option>
+              );
+            })}
+          </select>
+          <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
+            <ChevronDown className="w-4 h-4 text-[#d4af37]" />
+          </div>
+        </div>
+      </div>
+
+      {/* Desktop/Tablet Horizontal Tab Navigation - Executive POLRI/BNN E-TAT Style */}
+      <div className="hidden sm:block bg-[#0b172a] p-1.5 rounded-xl border border-[#1b3459] shadow-sm">
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar touch-pan-x px-0.5 py-0.5">
           {availableTabs.map((tab, idx) => {
             const isActive = activeTab === tab.id;
+            const lockInfo = getTabLockInfo(tab.id);
+
             return (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center space-x-2 px-3.5 py-2 rounded-lg text-xs transition-all whitespace-nowrap cursor-pointer select-none border ${
-                  isActive
+                type="button"
+                onClick={() => {
+                  if (lockInfo.isLocked) {
+                    setLockedDetailTab({ id: tab.id, label: tab.label, reason: lockInfo.reason });
+                  } else {
+                    setActiveTab(tab.id);
+                  }
+                }}
+                className={`flex items-center space-x-1.5 sm:space-x-2 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-lg text-[11px] sm:text-xs transition-all whitespace-nowrap cursor-pointer select-none border shrink-0 ${
+                  lockInfo.isLocked
+                    ? 'bg-[#07101e]/80 border-[#142642] text-slate-500 hover:text-slate-300 hover:bg-[#0c182c] opacity-80'
+                    : isActive
                     ? 'bg-[#17335c] border-[#386bb0] text-white font-bold shadow-sm'
                     : 'bg-[#0e1d35] border-[#1c3356] text-slate-300 hover:text-white hover:bg-[#142848] font-medium'
                 }`}
               >
                 <div className={`w-4.5 h-4.5 rounded-md flex items-center justify-center text-[10px] font-mono font-bold ${
-                  isActive ? 'bg-[#091426] text-[#d4af37] border border-[#386bb0]/60' : 'bg-[#081224] text-slate-400'
+                  lockInfo.isLocked
+                    ? 'bg-[#081224] text-slate-500 border border-[#142642]'
+                    : isActive
+                    ? 'bg-[#091426] text-[#d4af37] border border-[#386bb0]/60'
+                    : 'bg-[#081224] text-slate-400'
                 }`}>
-                  {idx + 1}
+                  {lockInfo.isLocked ? <Lock className="w-2.5 h-2.5 text-slate-500" /> : idx + 1}
                 </div>
-                <span className={isActive ? 'text-[#d4af37]' : 'text-slate-400'}>{tab.icon}</span>
+                <span className={isActive ? 'text-[#d4af37]' : lockInfo.isLocked ? 'text-slate-500' : 'text-slate-400'}>
+                  {tab.icon}
+                </span>
                 <span className="tracking-wide">{tab.label}</span>
+                {lockInfo.isLocked && (
+                  <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#091426] text-slate-400 font-semibold border border-[#142642] flex items-center gap-1">
+                    <Lock className="w-2.5 h-2.5 text-slate-500" />
+                    Terkunci
+                  </span>
+                )}
               </button>
             );
           })}
         </div>
       </div>
+
+      {/* Modal Penjelasan Tab Terkunci */}
+      {lockedDetailTab && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="relative w-full max-w-lg bg-[#0b172a] border border-[#1b3459] rounded-2xl shadow-2xl overflow-hidden p-5 sm:p-6 space-y-4 animate-in zoom-in-95 duration-200">
+            <div className="flex items-start justify-between border-b border-[#1b3459]/80 pb-3">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center shrink-0">
+                  <Lock className="w-5 h-5 text-amber-400" />
+                </div>
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-amber-400 bg-amber-950/60 border border-amber-800/60 px-2 py-0.5 rounded">
+                    Tahap Belum Dapat Diakses
+                  </span>
+                  <h3 className="text-base font-bold text-white mt-1">
+                    {lockedDetailTab.label}
+                  </h3>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setLockedDetailTab(null)}
+                className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-[#142642] transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="bg-[#081224] border border-[#1b3459] rounded-xl p-4 space-y-2 text-xs">
+              <div className="flex items-center space-x-2 text-slate-200 font-semibold">
+                <Info className="w-4 h-4 text-sky-400 shrink-0" />
+                <span>Alasan Tab Masih Terkunci:</span>
+              </div>
+              <p className="text-slate-300 leading-relaxed">
+                {lockedDetailTab.reason}
+              </p>
+            </div>
+
+            <div className="flex items-center justify-end space-x-2 pt-2 border-t border-[#1b3459]/60">
+              <button
+                type="button"
+                onClick={() => setLockedDetailTab(null)}
+                className="px-4 py-2 text-xs font-bold text-white bg-gradient-to-r from-[#144782] to-[#1c64b8] hover:from-[#17549c] hover:to-[#2272ce] rounded-xl shadow-md transition-all cursor-pointer border border-[#2d7ad6]/60"
+              >
+                Mengerti
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* TAB CONTENT AREA */}
       <div className="space-y-6 min-h-[420px] pt-3">
@@ -893,7 +1128,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
             permohonan={permohonan}
             currentUser={currentUser}
             onUpdatePermohonan={onUpdatePermohonan}
-            isReadonly={currentUser.role === 'pengaju' || currentUser.role === 'PENGAJU'}
+            isReadonly={effectiveReadonly}
           />
         )}
 
@@ -934,7 +1169,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-0.5 sm:gap-1 py-1 border-b border-[#1b3459]/40">
                     <span className="text-slate-400 font-medium">Tempat, Tgl Lahir</span>
-                    <span className="sm:col-span-2 text-slate-300 break-words">{permohonan.terperiksa.tempatLahir}, {permohonan.terperiksa.tanggalLahir} ({permohonan.terperiksa.usia} Tahun)</span>
+                    <span className="sm:col-span-2 text-slate-300 break-words">{permohonan.terperiksa.tempatLahir}, {permohonan.terperiksa.tanggalLahir} {permohonan.terperiksa.usia ? `(${permohonan.terperiksa.usia} Tahun)` : ''}</span>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-0.5 sm:gap-1 py-1 border-b border-[#1b3459]/40">
                     <span className="text-slate-400 font-medium">Jenis Kelamin</span>
@@ -950,7 +1185,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-0.5 sm:gap-1 py-1 border-b border-[#1b3459]/40">
                     <span className="text-slate-400 font-medium">Wali / Pendamping</span>
-                    <span className="sm:col-span-2 text-slate-300 break-words">{permohonan.terperiksa.namaWaliPendamping} ({permohonan.terperiksa.kontakWali})</span>
+                    <span className="sm:col-span-2 text-slate-300 break-words">{permohonan.terperiksa.namaWaliPendamping ? `${permohonan.terperiksa.namaWaliPendamping} (${permohonan.terperiksa.kontakWali || '-'})` : '-'}</span>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-0.5 sm:gap-1 py-1">
                     <span className="text-slate-400 font-medium flex items-center space-x-1">
@@ -1028,15 +1263,85 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
             </div>
 
             {/* Barang Bukti & Uji Lab Sub-Section */}
-            <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl p-4 sm:p-5 space-y-3">
+            <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl p-3.5 sm:p-5 space-y-3">
               <div className="flex items-center justify-between">
                 <h3 className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center space-x-2">
                   <Shield className="w-4 h-4 text-[#d4af37]" />
                   <span>Barang Bukti &amp; Uji Laboratorium Puslabfor</span>
                 </h3>
-                <span className="text-[11px] text-slate-400">Total {permohonan.perkara.barangBuktiList.length} Barang Bukti</span>
+                <span className="text-[10px] sm:text-[11px] text-slate-400">Total {permohonan.perkara.barangBuktiList.length} Barang Bukti</span>
               </div>
-              <div className="overflow-x-auto no-scrollbar -mx-1 px-1">
+
+              {/* Mobile Card List for Barang Bukti (Proportional & Touch-Friendly on Phone Screens) */}
+              <div className="sm:hidden space-y-2.5">
+                {permohonan.perkara.barangBuktiList.map(bb => {
+                  const fotoBb = bb.fotoBarangBuktiUrl || 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=600&auto=format&fit=crop&q=80';
+                  const fotoLab = bb.fotoUjiLabUrl || 'https://images.unsplash.com/photo-1582719471384-894fbb16e074?w=600&auto=format&fit=crop&q=80';
+
+                  return (
+                    <div key={bb.id} className="bg-[#081224] border border-[#1b3459] rounded-xl p-3 space-y-2 text-xs">
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <div className="flex items-center space-x-1.5">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#d4af37]" />
+                            <span className="font-bold text-white text-xs sm:text-sm">{bb.jenisZat}</span>
+                          </div>
+                          <span className="text-[#d4af37] font-semibold font-mono text-[11px] block mt-0.5">
+                            {bb.beratBersihGram} Gram (Netto)
+                          </span>
+                        </div>
+                        {bb.statusUjiLab === 'positif' ? (
+                          <span className="bg-emerald-950/80 text-emerald-300 text-[10px] font-bold px-2 py-0.5 rounded border border-emerald-700">
+                            Positif Lab
+                          </span>
+                        ) : bb.statusUjiLab === 'proses_lab' ? (
+                          <span className="bg-[#142642] text-[#d4af37] text-[10px] font-bold px-2 py-0.5 rounded border border-[#d4af37]/30">
+                            Proses Lab
+                          </span>
+                        ) : (
+                          <span className="bg-[#142642] text-slate-400 text-[10px] font-bold px-2 py-0.5 rounded border border-[#234475]">
+                            Belum Uji
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="grid grid-cols-[105px_8px_1fr] text-[11px] gap-y-1 pt-1.5 border-t border-[#1b3459]/50 text-slate-300">
+                        <span className="text-slate-400">Nomor Surat Lab</span>
+                        <span className="text-slate-500">:</span>
+                        <span className="font-mono text-slate-200 truncate">{bb.nomorSuratLab || 'Menunggu Puslabfor'}</span>
+
+                        <span className="text-slate-400">Evaluasi SEMA</span>
+                        <span className="text-slate-500">:</span>
+                        <span className="text-amber-300">{bb.keterangan || 'Di bawah batas SEMA'}</span>
+                      </div>
+
+                      <div className="flex items-center gap-2 pt-2 border-t border-[#1b3459]/40">
+                        <button
+                          type="button"
+                          onClick={() => setPreviewImage({ url: fotoBb, title: `Foto Fisik Barang Bukti: ${bb.jenisZat}` })}
+                          className="flex-1 py-1.5 bg-[#142642] hover:bg-[#1b3459] text-slate-200 hover:text-white rounded-lg border border-[#234475] flex items-center justify-center space-x-1.5 text-xs font-semibold transition-all cursor-pointer"
+                        >
+                          <Camera className="w-3.5 h-3.5 text-[#d4af37]" />
+                          <span>Foto BB</span>
+                        </button>
+                        {bb.statusUjiLab !== 'belum_uji' && (
+                          <button
+                            type="button"
+                            onClick={() => setPreviewImage({ url: fotoLab, title: `Hasil Uji Lab: ${bb.nomorSuratLab || bb.jenisZat}` })}
+                            className="flex-1 py-1.5 bg-[#142642] hover:bg-[#1b3459] text-slate-200 hover:text-white rounded-lg border border-teal-800/80 flex items-center justify-center space-x-1.5 text-xs font-semibold transition-all cursor-pointer"
+                          >
+                            <FileText className="w-3.5 h-3.5 text-teal-400" />
+                            <span>Hasil Lab</span>
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Desktop/Tablet Wide Table */}
+              <div className="hidden sm:block overflow-x-auto no-scrollbar -mx-1 px-1">
                 <table className="w-full text-left text-xs border border-[#1b3459] rounded-lg overflow-hidden min-w-[760px]">
                   <thead className="bg-[#081224] text-slate-300 uppercase text-[10px] font-semibold border-b border-[#1b3459]">
                     <tr>
@@ -1208,137 +1513,147 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
                 {effectiveDokumenList.map((doc, idx) => (
                   <div
                     key={doc.id}
-                    className={`border rounded-xl p-3.5 sm:p-4 transition-all ${
-                      doc.statusVerifikasi === 'perlu_perbaikan'
-                        ? 'border-amber-500/40 bg-amber-950/15'
-                        : doc.statusVerifikasi === 'sesuai'
-                        ? 'border-emerald-500/30 bg-emerald-950/15'
-                        : 'border-[#1b3459] bg-[#0b172a]'
-                    }`}
+                    className="border border-[#1b3459] hover:border-[#244577] bg-[#0b172a] hover:bg-[#0e1f38] rounded-xl p-3.5 sm:p-4 transition-all shadow-sm space-y-2.5"
                   >
-                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-                      <div className="space-y-1.5 flex-1 min-w-0">
-                        <div className="flex items-center space-x-2 flex-wrap gap-y-1">
-                          <span className="text-xs font-mono font-bold text-slate-400">#{idx + 1}</span>
-                          <span className="text-xs sm:text-sm font-bold text-slate-100 tracking-wide">{doc.nama}</span>
-                          {doc.wajib ? (
-                            <span className="text-[10px] bg-rose-950 text-rose-300 font-bold px-2 py-0.5 rounded border border-rose-800/80 uppercase tracking-wider">
-                              Wajib
-                            </span>
-                          ) : (
-                            <span className="text-[10px] bg-slate-800 text-slate-400 font-medium px-2 py-0.5 rounded border border-slate-700">
-                              Opsional
-                            </span>
-                          )}
-                          <span className="text-[10px] text-slate-400 font-medium">Versi {doc.versi}</span>
-                        </div>
-
-                        {doc.fileName ? (
-                          <div className="flex items-center space-x-2.5 text-xs text-slate-400 pt-0.5 flex-wrap">
-                            <span 
-                              className="font-mono text-[#D4AF37] hover:underline cursor-pointer flex items-center space-x-1"
-                              onClick={() => setPreviewDocModal(doc)}
-                            >
-                              <FileText className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
-                              <span className="truncate max-w-[220px] sm:max-w-xs">{doc.fileName}</span>
-                            </span>
-                            <span className="text-slate-500">&bull; {doc.fileSize}</span>
-                            <span className="text-slate-500">&bull; Diunggah: {doc.uploadedAt}</span>
-                            <button
-                              onClick={() => setPreviewDocModal(doc)}
-                              className="bg-[#142642] hover:bg-[#1b3459] text-slate-200 hover:text-white px-2.5 py-1 rounded-md border border-[#234475] flex items-center space-x-1.5 transition-colors cursor-pointer text-[11px] font-medium ml-1"
-                              title="Buka Viewer Dokumen PDF"
-                            >
-                              <Eye className="w-3.5 h-3.5 text-[#D4AF37]" />
-                              <span>Lihat Dokumen PDF</span>
-                            </button>
-                          </div>
+                    {/* Header Bar: Nomor, Nama Dokumen, Badges, Status */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-1.5 border-b border-[#1b3459]/50">
+                      <div className="flex items-center space-x-2 flex-wrap gap-y-1 min-w-0">
+                        <span className="text-xs font-mono font-bold text-slate-400">#{idx + 1}</span>
+                        <span className="text-xs sm:text-sm font-bold text-slate-100 tracking-wide break-words">{doc.nama}</span>
+                        {doc.wajib ? (
+                          <span className="text-[10px] bg-rose-500/10 text-rose-300 font-bold px-2 py-0.5 rounded border border-rose-500/30 uppercase tracking-wider">
+                            Wajib
+                          </span>
                         ) : (
-                          <p className="text-[11px] text-slate-400 italic pt-0.5">
-                            File fisik/digital belum dilampirkan atau memerlukan pemeriksaan awal.
-                          </p>
+                          <span className="text-[10px] bg-slate-800/60 text-slate-400 font-medium px-2 py-0.5 rounded border border-slate-700/60">
+                            Opsional
+                          </span>
                         )}
-
-                        {/* Targeted Correction Note from Secretariat */}
-                        {doc.catatanKoreksi && (
-                          <div className="mt-2 p-2.5 bg-[#081224] border border-amber-500/30 rounded-lg text-xs text-amber-200">
-                            <div className="font-semibold flex items-center space-x-1.5 text-[#D4AF37] mb-0.5">
-                              <AlertTriangle className="w-3.5 h-3.5 text-[#D4AF37]" />
-                              <span>Catatan Koreksi Sekretariat TAT:</span>
-                            </div>
-                            <p>{doc.catatanKoreksi}</p>
-                          </div>
-                        )}
+                        <span className="text-[10px] text-slate-400 font-medium">Versi {doc.versi}</span>
                       </div>
 
                       {/* Status Badge & Actions */}
-                      <div className="flex flex-wrap items-center gap-2 shrink-0">
+                      <div className="flex items-center space-x-1.5 self-start sm:self-auto shrink-0">
                         {doc.statusVerifikasi === 'sesuai' ? (
-                          <div className="flex items-center space-x-1.5">
-                            <span className="bg-emerald-950/80 text-emerald-300 text-xs font-semibold px-3 py-1.5 rounded-lg border border-emerald-700/60 flex items-center space-x-1.5 shadow-sm">
-                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                              <span>Ada &amp; Sesuai</span>
-                            </span>
-                            {(currentUser.role === 'sekretariat' || currentUser.role === 'ADMIN' || currentUser.role === 'admin' || currentUser.role === 'SEKRETARIAT') && (
-                              <button
-                                onClick={() => handleVerifyDocumentItem(doc.id, 'belum_diperiksa')}
-                                className="text-slate-400 hover:text-amber-300 hover:bg-[#142642] px-2 py-1 rounded text-[11px] font-medium transition-colors cursor-pointer border border-transparent hover:border-[#234475]"
-                                title="Ubah status verifikasi dokumen ini"
-                              >
-                                Ubah
-                              </button>
-                            )}
-                          </div>
+                          <span className="bg-emerald-500/10 text-emerald-300 text-[11px] font-semibold px-2.5 py-0.5 rounded-full border border-emerald-500/30 inline-flex items-center space-x-1 shadow-sm">
+                            <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                            <span>Ada &amp; Sesuai</span>
+                          </span>
                         ) : doc.statusVerifikasi === 'perlu_perbaikan' ? (
-                          <span className="bg-rose-950/80 text-rose-300 text-xs font-semibold px-3 py-1.5 rounded-lg border border-rose-800/60 flex items-center space-x-1.5">
-                            <AlertTriangle className="w-3.5 h-3.5 text-rose-400" />
+                          <span className="bg-amber-500/10 text-amber-300 text-[11px] font-semibold px-2.5 py-0.5 rounded-full border border-amber-500/30 inline-flex items-center space-x-1">
+                            <AlertTriangle className="w-3 h-3 text-amber-400" />
                             <span>Perlu Perbaikan</span>
                           </span>
                         ) : (
-                          <span className="bg-slate-800 text-slate-400 text-xs font-medium px-3 py-1.5 rounded-lg border border-slate-700">
+                          <span className="bg-slate-800/60 text-slate-400 text-[11px] font-medium px-2.5 py-0.5 rounded-full border border-slate-700/60">
                             Belum Diperiksa
                           </span>
                         )}
 
-                        {/* Action for Pengaju: Fix Document */}
-                        {(currentUser.role === 'pengaju' || currentUser.role === 'PENGAJU') && doc.statusVerifikasi === 'perlu_perbaikan' && (
+                        {(currentUser.role === 'sekretariat' || currentUser.role === 'ADMIN' || currentUser.role === 'admin' || currentUser.role === 'SEKRETARIAT') && (
                           <button
-                            onClick={() => handleFixDocument(doc.id)}
-                            className="bg-[#142642] hover:bg-[#1b3459] text-white text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center space-x-1.5 border border-[#234475] cursor-pointer transition-all shadow-sm"
+                            onClick={() => handleVerifyDocumentItem(doc.id, 'belum_diperiksa')}
+                            className="text-slate-400 hover:text-amber-300 hover:bg-[#142642] px-2 py-0.5 rounded text-[10px] font-medium transition-colors cursor-pointer border border-transparent hover:border-[#234475]"
+                            title="Ubah status verifikasi dokumen ini"
                           >
-                            <Upload className="w-3.5 h-3.5" />
-                            <span>Unggah File Perbaikan</span>
+                            Ubah
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* File Attachment & Actions */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+                      {doc.fileName ? (
+                        <div className="flex items-center space-x-2 text-slate-300 flex-wrap gap-y-1 min-w-0">
+                          <span 
+                            className="font-mono text-[#D4AF37] hover:underline cursor-pointer flex items-center space-x-1 truncate max-w-[220px] sm:max-w-xs"
+                            onClick={() => setPreviewDocModal(doc)}
+                          >
+                            <FileText className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
+                            <span className="truncate">{doc.fileName}</span>
+                          </span>
+                          <span className="text-slate-500 text-[11px]">&bull; {doc.fileSize}</span>
+                          <span className="text-slate-500 text-[11px]">&bull; Diunggah: {doc.uploadedAt}</span>
+                        </div>
+                      ) : (
+                        <p className="text-[11px] text-slate-400 italic">
+                          File fisik/digital belum dilampirkan atau memerlukan pemeriksaan awal.
+                        </p>
+                      )}
+
+                      {/* Action Buttons */}
+                      <div className="flex items-center space-x-2 shrink-0 self-start sm:self-auto">
+                        {doc.fileName && (
+                          <button
+                            onClick={() => setPreviewDocModal(doc)}
+                            className="bg-[#142642]/60 hover:bg-[#1b3459] text-slate-200 hover:text-white px-2.5 py-1 rounded-lg border border-[#234475] flex items-center space-x-1.5 transition-colors cursor-pointer text-[11px] font-medium"
+                            title="Buka Viewer Dokumen PDF"
+                          >
+                            <Eye className="w-3.5 h-3.5 text-[#D4AF37]" />
+                            <span>Lihat PDF</span>
                           </button>
                         )}
 
-                        {/* Action for Sekretariat / Admin: Verify buttons (only shown if NOT approved yet) */}
+                        {!effectiveReadonly && (currentUser.role === 'pengaju' || currentUser.role === 'PENGAJU') && doc.statusVerifikasi === 'perlu_perbaikan' && (
+                          <button
+                            onClick={() => handleFixDocument(doc.id)}
+                            className="bg-[#142642] hover:bg-[#1b3459] text-white text-xs font-semibold px-2.5 py-1 rounded-lg flex items-center space-x-1.5 border border-[#234475] cursor-pointer transition-all shadow-sm"
+                          >
+                            <Upload className="w-3.5 h-3.5 text-[#D4AF37]" />
+                            <span>Unggah Perbaikan</span>
+                          </button>
+                        )}
+
                         {(currentUser.role === 'sekretariat' || currentUser.role === 'ADMIN' || currentUser.role === 'admin' || currentUser.role === 'SEKRETARIAT') && doc.statusVerifikasi !== 'sesuai' && (
                           <div className="flex items-center space-x-2">
                             <button
                               onClick={() => handleVerifyDocumentItem(doc.id, 'sesuai')}
-                              className="bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-bold px-3.5 py-1.5 rounded-lg transition-all cursor-pointer border border-emerald-500/60 flex items-center space-x-1.5 shadow-sm"
+                              className="bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-bold px-3 py-1 rounded-lg transition-all cursor-pointer border border-emerald-500/60 flex items-center space-x-1 shadow-sm"
                             >
                               <Check className="w-3.5 h-3.5" />
-                              <span>Ada / Sesuai</span>
+                              <span>Sesuai</span>
                             </button>
                             <button
                               onClick={() => {
                                 const note = prompt(`Tuliskan catatan koreksi spesifik untuk ${doc.nama}:`, doc.catatanKoreksi || 'Dokumen belum lengkap / perlu diperbaiki.');
                                 if (note !== null) handleVerifyDocumentItem(doc.id, 'perlu_perbaikan', note);
                               }}
-                              className="bg-rose-900 hover:bg-rose-800 text-rose-100 text-xs font-bold px-3.5 py-1.5 rounded-lg transition-all cursor-pointer border border-rose-700/80 flex items-center space-x-1.5 shadow-sm"
+                              className="bg-rose-900 hover:bg-rose-800 text-rose-100 text-xs font-bold px-3 py-1 rounded-lg transition-all cursor-pointer border border-rose-700/80 flex items-center space-x-1 shadow-sm"
                             >
                               <AlertTriangle className="w-3.5 h-3.5 text-rose-300" />
-                              <span>Perlu Perbaikan</span>
+                              <span>Koreksi</span>
                             </button>
                           </div>
                         )}
                       </div>
                     </div>
+
+                    {/* Catatan Koreksi (Hanya muncul jika Perlu Perbaikan) */}
+                    {doc.catatanKoreksi && doc.statusVerifikasi === 'perlu_perbaikan' && (
+                      <div className="p-2.5 bg-amber-500/10 border border-amber-500/25 rounded-lg text-xs text-amber-200 space-y-0.5">
+                        <div className="font-semibold flex items-center space-x-1.5 text-[#D4AF37]">
+                          <AlertTriangle className="w-3.5 h-3.5 text-[#D4AF37]" />
+                          <span>Catatan Koreksi Sekretariat TAT:</span>
+                        </div>
+                        <p className="text-amber-100/90 pl-5">{doc.catatanKoreksi}</p>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
               
+              {/* SURAT JAWABAN BUTTON — visible for all roles viewing this tab */}
+              <div className="mt-4 pt-3 border-t border-[#1b3459]">
+                <button
+                  onClick={() => setShowSuratJawaban(true)}
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold bg-[#0d2444] hover:bg-[#132d54] border border-[#234475] text-[#d4af37] hover:text-white transition-all cursor-pointer shadow-sm"
+                >
+                  <span className="text-base">📨</span>
+                  <span>Lihat / Cetak Surat Jawaban Permohonan TAT</span>
+                </button>
+              </div>
+
               {/* ACTION BUTTONS FOR ADMIN/SEKRETARIAT */}
               {(currentUser.role === 'sekretariat' || currentUser.role === 'ADMIN' || currentUser.role === 'admin' || currentUser.role === 'SEKRETARIAT') && (
                 <div className="mt-5 pt-4 border-t border-[#1b3459] flex items-center justify-between flex-wrap gap-3">
@@ -1553,14 +1868,16 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
                     Asesor: {permohonan.asesmenMedis.asesorNama}
                   </span>
                 )}
-                <button
-                  type="button"
-                  onClick={() => setIsEditingMedis(!isEditingMedis)}
-                  className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#142642] hover:bg-[#1b3459] text-white border border-[#234475] flex items-center space-x-1.5 transition-colors cursor-pointer"
-                >
-                  <Edit3 className="w-3.5 h-3.5 text-[#d4af37]" />
-                  <span>{isEditingMedis ? 'Tutup Edit Form' : 'Edit / Input Data Medis'}</span>
-                </button>
+                {!effectiveReadonly && (isMedisRole || currentUser.role === 'admin' || currentUser.role === 'ADMIN' || currentUser.role === 'sekretariat') && (
+                  <button
+                    type="button"
+                    onClick={() => setIsEditingMedis(!isEditingMedis)}
+                    className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#142642] hover:bg-[#1b3459] text-white border border-[#234475] flex items-center space-x-1.5 transition-colors cursor-pointer"
+                  >
+                    <Edit3 className="w-3.5 h-3.5 text-[#d4af37]" />
+                    <span>{isEditingMedis ? 'Tutup Edit Form' : 'Edit / Input Data Medis'}</span>
+                  </button>
+                )}
               </div>
             </div>
 
@@ -2014,16 +2331,18 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
                 </div>
 
                 {/* Edit Action Button in Summary */}
-                <div className="pt-2 flex justify-end">
-                  <button
-                    type="button"
-                    onClick={() => setIsEditingMedis(true)}
-                    className="px-4 py-2 bg-[#142642] hover:bg-[#1b3459] text-white border border-[#234475] rounded-xl text-xs font-bold flex items-center space-x-2 transition-colors cursor-pointer"
-                  >
-                    <Edit3 className="w-4 h-4 text-[#d4af37]" />
-                    <span>Ubah / Lengkapi Lembar Asesmen Medis</span>
-                  </button>
-                </div>
+                {!effectiveReadonly && (isMedisRole || currentUser.role === 'admin' || currentUser.role === 'ADMIN' || currentUser.role === 'sekretariat') && (
+                  <div className="pt-2 flex justify-end">
+                    <button
+                      type="button"
+                      onClick={() => setIsEditingMedis(true)}
+                      className="px-4 py-2 bg-[#142642] hover:bg-[#1b3459] text-white border border-[#234475] rounded-xl text-xs font-bold flex items-center space-x-2 transition-colors cursor-pointer"
+                    >
+                      <Edit3 className="w-4 h-4 text-[#d4af37]" />
+                      <span>Ubah / Lengkapi Lembar Asesmen Medis</span>
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -2032,18 +2351,18 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
         {/* TAB 5: ASESMEN HUKUM */}
         {activeTab === 'hukum' && (
           <div className="space-y-6">
-            <div className="flex items-center justify-between pb-3 border-b border-[#1b3459]">
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2.5 pb-3 border-b border-[#1b3459]">
               <div>
                 <h3 className="text-sm font-bold text-white flex items-center space-x-2">
                   <Scale className="w-4 h-4 text-[#D4AF37]" />
                   <span>Telaah Yuridis & Analisis Peran Terperiksa</span>
                 </h3>
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-slate-400 mt-1 leading-relaxed">
                   Pemisahan antara fakta terverifikasi vs dugaan, telaah barang bukti (SEMA 04/2010), dan simpulan hukum.
                 </p>
               </div>
               {permohonan.asesmenHukum && (
-                <span className="text-xs bg-[#0d1f38] text-slate-200 font-semibold px-2.5 py-1 rounded-lg border border-[#1b3459]">
+                <span className="text-xs bg-[#0d1f38] text-slate-200 font-semibold px-2.5 py-1 rounded-lg border border-[#1b3459] self-start sm:self-auto shrink-0">
                   Asesor: {permohonan.asesmenHukum.asesorNama}
                 </span>
               )}
@@ -2137,28 +2456,29 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
           </div>
         )}
 
-        {/* TAB 6: SIDANG PLENO TAT */}
+        {/* TAB 7: SIDANG PLENO TAT */}
         {activeTab === 'pleno' && (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between pb-3 border-b border-[#1b3459]">
+          <div className="space-y-4">
+            {/* Header Tab */}
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 pb-3 border-b border-[#1b3459]">
               <div>
                 <h3 className="text-sm font-bold text-white flex items-center space-x-2">
                   <Users className="w-4 h-4 text-[#D4AF37]" />
                   <span>Musyawarah Sidang Pleno Tim Asesmen Terpadu</span>
                 </h3>
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-slate-400 mt-1 leading-relaxed">
                   Forum sinkronisasi kesimpulan medis dan hukum, pencatatan dissenting opinion, dan perumusan rekomendasi bersama.
                 </p>
               </div>
-              <div className="flex items-center gap-2">
-                {permohonan.sidangPleno && (
+              <div className="flex items-center gap-2 flex-wrap sm:justify-end">
+                {permohonan.sidangPleno?.nomorBeritaAcara && (
                   <span className="text-xs bg-[#17375e] text-[#D4AF37] font-semibold px-2.5 py-1 rounded-lg border border-[#234b7d]">
                     No. BA: {permohonan.sidangPleno.nomorBeritaAcara}
                   </span>
                 )}
                 <button
                   onClick={() => setShowBeritaAcara(true)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-[#d4af37] text-[#0b172a] hover:bg-[#e8c84a] transition-colors"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-[#d4af37] text-[#0b172a] hover:bg-[#e8c84a] transition-colors cursor-pointer"
                 >
                   <FileText className="w-3.5 h-3.5" />
                   Berita Acara
@@ -2167,70 +2487,144 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
             </div>
 
             {!permohonan.sidangPleno ? (
-              <div className="text-center py-12 text-slate-400">
+              <div className="text-center py-12 text-slate-400 bg-[#081224] border border-[#1b3459] rounded-xl">
                 <Users className="w-8 h-8 text-slate-500 mx-auto mb-2" />
-                <p className="text-sm font-semibold">Sidang Pleno belum diagendakan.</p>
+                <p className="text-sm font-semibold text-slate-300">Sidang Pleno belum diagendakan.</p>
                 <p className="text-xs text-slate-500 mt-1">Pleno diselenggarakan setelah hasil medis & telaah hukum dinyatakan siap dibahas.</p>
               </div>
             ) : (
-              <div className="space-y-4">
-                {/* Pleno Meta */}
-                <div className="bg-[#081224] border border-[#1b3459] rounded-xl p-4 text-xs space-y-2">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <span className="font-bold text-white text-sm">{permohonan.sidangPleno.pimpinanPleno}</span>
-                    <span className="bg-[#17375e] text-[#D4AF37] px-2.5 py-0.5 rounded font-bold border border-[#234b7d]">
-                      {formatStatus(permohonan.sidangPleno.statusPleno)}
-                    </span>
+              <div className="space-y-3.5">
+                {/* Pleno Meta Card */}
+                <div className="bg-[#081224] border border-[#1b3459] rounded-xl p-4 text-xs space-y-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#1b3459]/60 pb-2.5">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-lg bg-[#17375e]/70 border border-[#234b7d] flex items-center justify-center shrink-0">
+                        <Users className="w-4 h-4 text-[#D4AF37]" />
+                      </div>
+                      <div>
+                        <span className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold block">Pimpinan Sidang Pleno</span>
+                        <span className="font-bold text-white text-xs sm:text-sm">
+                          {permohonan.sidangPleno.pimpinanPleno || 'Ketua Tim Sekretariat TAT BNN'}
+                        </span>
+                      </div>
+                    </div>
+                    <div>
+                      <span className="inline-flex items-center text-[11px] bg-emerald-500/10 text-emerald-400 px-2.5 py-1 rounded-md font-bold border border-emerald-500/30">
+                        {formatStatus(permohonan.sidangPleno.statusPleno || 'selesai_sepakat')}
+                      </span>
+                    </div>
                   </div>
-                  <p className="text-slate-400">Waktu & Tempat: {permohonan.sidangPleno.tanggalPleno} ({permohonan.sidangPleno.waktu}) • {permohonan.sidangPleno.tempat}</p>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-slate-300">
+                    <div className="flex items-center gap-2 bg-[#0b172a]/70 px-2.5 py-2 rounded-lg border border-[#1b3459]/50">
+                      <Calendar className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
+                      <span>
+                        <strong className="text-slate-400 font-normal">Waktu:</strong>{' '}
+                        {permohonan.sidangPleno.tanggalPleno}
+                        {permohonan.sidangPleno.waktu ? ` (${permohonan.sidangPleno.waktu})` : ''}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 bg-[#0b172a]/70 px-2.5 py-2 rounded-lg border border-[#1b3459]/50">
+                      <MapPin className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
+                      <span className="truncate">
+                        <strong className="text-slate-400 font-normal">Tempat:</strong>{' '}
+                        {permohonan.sidangPleno.tempat || 'Ruang Rapat Utama Sekretariat TAT'}
+                      </span>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Pokok Bahasan & Kesepakatan Rekomendasi */}
-                <div className="border border-[#1b3459] rounded-xl p-4 bg-[#081224] text-xs space-y-3">
+                <div className="border border-[#1b3459] rounded-xl p-4 bg-[#081224] text-xs space-y-3.5">
                   <div>
-                    <h4 className="font-bold text-white mb-1">Pokok Bahasan Sidang Pleno:</h4>
-                    <p className="text-slate-300">{permohonan.sidangPleno.pokokBahasan}</p>
+                    <h4 className="font-bold text-white mb-1.5 flex items-center gap-1.5">
+                      <FileCheck className="w-3.5 h-3.5 text-[#D4AF37]" />
+                      <span>Pokok Bahasan Sidang Pleno:</span>
+                    </h4>
+                    <p className="text-slate-300 leading-relaxed bg-[#0b172a]/70 p-2.5 rounded-lg border border-[#1b3459]/40">
+                      {permohonan.sidangPleno.pokokBahasan ||
+                        'Sinkronisasi hasil asesmen medis ketergantungan zat dengan hasil telaah hukum batas gramatur SEMA No. 4/2010 guna perumusan rekomendasi bersama.'}
+                    </p>
                   </div>
 
-                  <div className="p-3 bg-[#0d213d] border border-[#234b7d] rounded-lg">
-                    <h4 className="font-bold text-white mb-1">Kesepakatan Rekomendasi Final:</h4>
-                    <p className="text-[#D4AF37] font-medium">{permohonan.sidangPleno.kesepakatanRekomendasi}</p>
-                    <div className="flex items-center space-x-3 mt-2 text-[11px] text-slate-300">
-                      <span>Jenis: <strong className="text-white">{permohonan.sidangPleno.jenisRekomendasiFinal}</strong></span>
+                  <div className="p-3.5 bg-gradient-to-br from-[#0d213d] to-[#08172c] border border-[#234b7d] rounded-xl space-y-2">
+                    <h4 className="font-bold text-white flex items-center justify-between">
+                      <span className="flex items-center gap-1.5">
+                        <CheckCircle2 className="w-4 h-4 text-[#D4AF37]" />
+                        <span>Kesepakatan Rekomendasi Final:</span>
+                      </span>
+                    </h4>
+                    <p className="text-[#D4AF37] font-semibold text-xs leading-relaxed">
+                      {permohonan.sidangPleno.kesepakatanRekomendasi ||
+                        permohonan.sidangPleno.catatanPleno ||
+                        'Disetujui secara mufakat oleh seluruh anggota Tim Asesmen Terpadu.'}
+                    </p>
+                    <div className="flex flex-wrap items-center gap-2 pt-1 text-[11px] text-slate-300">
+                      <span className="bg-[#17375e]/60 px-2 py-0.5 rounded border border-[#234b7d]/60">
+                        Jenis: <strong className="text-white">{permohonan.sidangPleno.jenisRekomendasiFinal || 'Rehabilitasi Medis Rawat Inap'}</strong>
+                      </span>
                       {permohonan.sidangPleno.durasiRehabBulan && (
-                        <span>• Durasi: <strong className="text-white">{permohonan.sidangPleno.durasiRehabBulan} Bulan</strong></span>
+                        <span className="bg-[#17375e]/60 px-2 py-0.5 rounded border border-[#234b7d]/60">
+                          Durasi: <strong className="text-white">{permohonan.sidangPleno.durasiRehabBulan} Bulan</strong>
+                        </span>
                       )}
                       {permohonan.sidangPleno.fasilitasRujukanUsulan && (
-                        <span>• Usulan Rujukan: <strong className="text-white">{permohonan.sidangPleno.fasilitasRujukanUsulan}</strong></span>
+                        <span className="bg-[#17375e]/60 px-2 py-0.5 rounded border border-[#234b7d]/60">
+                          Usulan: <strong className="text-white">{permohonan.sidangPleno.fasilitasRujukanUsulan}</strong>
+                        </span>
                       )}
                     </div>
                   </div>
 
                   {permohonan.sidangPleno.catatanPerbedaanPendapat && (
-                    <div className="p-3 bg-[#081224] border border-[#1b3459] rounded-lg text-amber-200">
-                      <strong>Catatan Perbedaan Pendapat (Dissenting Opinions):</strong> {permohonan.sidangPleno.catatanPerbedaanPendapat}
+                    <div className="p-3 bg-amber-950/20 border border-amber-800/40 rounded-lg text-amber-200">
+                      <strong className="text-amber-400">Catatan Perbedaan Pendapat (Dissenting Opinions):</strong> {permohonan.sidangPleno.catatanPerbedaanPendapat}
                     </div>
                   )}
                 </div>
 
                 {/* Daftar Hadir Peserta Pleno */}
                 <div className="border border-[#1b3459] rounded-xl p-4 bg-[#081224] text-xs">
-                  <h4 className="font-bold text-white mb-2">Daftar Kehadiran Anggota Tim Pleno:</h4>
+                  <div className="flex items-center justify-between mb-2.5">
+                    <h4 className="font-bold text-white flex items-center gap-1.5">
+                      <Users className="w-3.5 h-3.5 text-[#D4AF37]" />
+                      <span>Daftar Kehadiran Anggota Tim Pleno:</span>
+                    </h4>
+                    <span className="text-[10px] text-slate-400">
+                      {Array.isArray(permohonan.sidangPleno?.daftarHadir) && permohonan.sidangPleno.daftarHadir.length > 0
+                        ? `${permohonan.sidangPleno.daftarHadir.length} Anggota`
+                        : Array.isArray(permohonan.sidangPleno?.pesertaList) && permohonan.sidangPleno.pesertaList.length > 0
+                        ? `${permohonan.sidangPleno.pesertaList.length} Anggota`
+                        : ''}
+                    </span>
+                  </div>
+
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     {Array.isArray(permohonan.sidangPleno?.daftarHadir) && permohonan.sidangPleno.daftarHadir.length > 0 ? (
                       permohonan.sidangPleno.daftarHadir.map((p, i) => (
-                        <div key={i} className="flex items-center justify-between p-2 rounded bg-[#0b172a] border border-[#1b3459]">
-                          <div>
-                            <p className="font-bold text-white">{p.nama}</p>
-                            <p className="text-[10px] text-slate-400">{p.peran} • {p.instansi}</p>
+                        <div key={i} className="flex items-center justify-between p-2.5 rounded-lg bg-[#0b172a] border border-[#1b3459]">
+                          <div className="min-w-0 pr-2">
+                            <p className="font-bold text-white text-xs truncate">{p.nama}</p>
+                            <p className="text-[10px] text-slate-400 truncate">{p.peran} {p.instansi ? `• ${p.instansi}` : ''}</p>
                           </div>
-                          <span className="text-[10px] bg-[#0d1f38] text-slate-200 font-bold px-2 py-0.5 rounded border border-[#1b3459]">
+                          <span className="shrink-0 text-[10px] bg-emerald-500/10 text-emerald-400 font-bold px-2 py-0.5 rounded border border-emerald-500/30">
+                            {p.hadir !== false ? 'Hadir' : 'Tidak Hadir'}
+                          </span>
+                        </div>
+                      ))
+                    ) : Array.isArray(permohonan.sidangPleno?.pesertaList) && permohonan.sidangPleno.pesertaList.length > 0 ? (
+                      permohonan.sidangPleno.pesertaList.map((p, i) => (
+                        <div key={i} className="flex items-center justify-between p-2.5 rounded-lg bg-[#0b172a] border border-[#1b3459]">
+                          <p className="font-bold text-white text-xs truncate">{p}</p>
+                          <span className="shrink-0 text-[10px] bg-emerald-500/10 text-emerald-400 font-bold px-2 py-0.5 rounded border border-emerald-500/30">
                             Hadir
                           </span>
                         </div>
                       ))
                     ) : (
-                      <p className="text-slate-400 text-xs italic">Daftar kehadiran anggota pleno belum dicatat.</p>
+                      <div className="p-3 rounded-lg bg-[#0b172a]/60 border border-[#1b3459]/40 col-span-full text-center">
+                        <p className="text-slate-400 text-xs italic">Daftar kehadiran anggota pleno belum dicatat.</p>
+                      </div>
                     )}
                   </div>
                 </div>
@@ -2242,20 +2636,20 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
         {/* TAB 7: REKOMENDASI & PENGESAHAN DOKUMEN RESMI (ACUAN VISUAL 8 - 3 PANEL) */}
         {activeTab === 'dokumen' && (
           <div className="space-y-6">
-            <div className="flex items-center justify-between pb-3 border-b border-[#1b3459]">
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 pb-3 border-b border-[#1b3459]">
               <div>
                 <h3 className="text-sm font-bold text-white flex items-center space-x-2">
                   <FileSignature className="w-4 h-4 text-[#D4AF37]" />
-                  <span>Hasil Asesmen Terpadu & Pengesahan Dokumen (Acuan Visual 8)</span>
+                  <span>Hasil Asesmen Terpadu & Pengesahan Dokumen</span>
                 </h3>
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-slate-400 mt-1 leading-relaxed">
                   Ringkasan keputusan rekomendasi, preview PDF hasil asesmen resmi, dan jaminan keamanan audit trail.
                 </p>
               </div>
               {permohonan.rekomendasiResmi && (
                 <button
                   onClick={() => onOpenQrModal(permohonan)}
-                  className="bg-[#0f274a] hover:bg-[#163a69] text-white text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center space-x-1.5 border border-[#234b7d] cursor-pointer transition-colors"
+                  className="bg-[#0f274a] hover:bg-[#163a69] text-white text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center space-x-1.5 border border-[#234b7d] cursor-pointer transition-colors self-start sm:self-auto"
                 >
                   <QrCode className="w-3.5 h-3.5 text-[#D4AF37]" />
                   <span>Cek QR Verifikasi</span>
@@ -2361,11 +2755,11 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
                         <div className="p-3 bg-[#071326] border border-[#1b3459] rounded-lg text-center font-sans space-y-1">
                           <div className="py-1">
                             <span className="font-serif italic text-lg text-[#D4AF37] tracking-widest block font-bold" style={{ fontFamily: 'Dancing Script, cursive, serif' }}>
-                              Andi Pratama
+                              {permohonan.sidangPleno?.pimpinanPleno?.split(' ')?.[1] || 'Arya Wicaksono'}
                             </span>
                           </div>
-                          <span className="text-xs font-bold text-white block">
-                            KOMBES POL. ANDI PRATAMA, S.I.K., M.H.
+                          <span className="text-xs font-bold text-white block uppercase">
+                            {permohonan.sidangPleno?.pimpinanPleno || 'KOMPOL ARYA WICAKSONO, S.I.K.'}
                           </span>
                           <span className="text-[10px] text-slate-400 block">
                             Ketua Tim Asesmen Terpadu
@@ -2379,13 +2773,23 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
                     </div>
 
                     {/* Action Button: Proses TTE & Finalisasi */}
-                    <button
-                      onClick={() => onOpenQrModal(permohonan)}
-                      className="w-full bg-gradient-to-r from-[#144782] via-[#17549c] to-[#1c64b8] hover:from-[#175194] hover:via-[#1c60b0] hover:to-[#2274d4] text-white font-bold text-xs py-2.5 px-4 rounded-xl border border-[#2d7ad6]/70 shadow-lg shadow-sky-950/40 flex items-center justify-center space-x-2 cursor-pointer transition-all mt-2"
-                    >
-                      <FileSignature className="w-4 h-4 text-[#D4AF37]" />
-                      <span>Proses TTE & Finalisasi</span>
-                    </button>
+                    {!effectiveReadonly ? (
+                      <button
+                        onClick={() => onOpenQrModal(permohonan)}
+                        className="w-full bg-gradient-to-r from-[#144782] via-[#17549c] to-[#1c64b8] hover:from-[#175194] hover:via-[#1c60b0] hover:to-[#2274d4] text-white font-bold text-xs py-2.5 px-4 rounded-xl border border-[#2d7ad6]/70 shadow-lg shadow-sky-950/40 flex items-center justify-center space-x-2 cursor-pointer transition-all mt-2"
+                      >
+                        <FileSignature className="w-4 h-4 text-[#D4AF37]" />
+                        <span>Proses TTE & Finalisasi</span>
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => onOpenQrModal(permohonan)}
+                        className="w-full bg-[#132c54] hover:bg-[#1a3a6b] text-slate-200 font-semibold text-xs py-2.5 px-4 rounded-xl border border-[#235399] flex items-center justify-center space-x-2 cursor-pointer transition-all mt-2"
+                      >
+                        <QrCode className="w-3.5 h-3.5 text-[#D4AF37]" />
+                        <span>Lihat QR Verifikasi TTE</span>
+                      </button>
+                    )}
                   </div>
 
                   {/* PANEL 2 (CENTER): PREVIEW DOKUMEN HASIL ASESMEN (PDF PAPER VIEW) */}
@@ -2398,9 +2802,17 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
                       </span>
                       <div className="flex items-center space-x-1.5">
                         <button
-                          onClick={() => alert(`Mengunduh dokumen PDF Hasil Asesmen untuk: ${permohonan.tersangkaNama}`)}
+                          onClick={() => setShowHasilAsesmenModal(true)}
+                          className="px-2.5 py-1 bg-[#132d54] hover:bg-[#1a3a6b] text-sky-300 hover:text-white rounded border border-[#245399] text-[11px] font-semibold flex items-center space-x-1 transition-colors cursor-pointer"
+                          title="Buka Dokumen Lengkap (Detail & Cetak PDF)"
+                        >
+                          <Eye className="w-3.5 h-3.5" />
+                          <span>Buka Detail</span>
+                        </button>
+                        <button
+                          onClick={() => setShowHasilAsesmenModal(true)}
                           className="p-1.5 hover:bg-[#163a69] text-slate-300 rounded border border-[#234b7d] transition-colors cursor-pointer"
-                          title="Unduh PDF Hasil Asesmen"
+                          title="Unduh / Cetak PDF Hasil Asesmen"
                         >
                           <Download className="w-3.5 h-3.5 text-[#D4AF37]" />
                         </button>
@@ -2415,82 +2827,164 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
                     </div>
 
                     {/* PDF Document Paper Container */}
-                    <div className="bg-white text-slate-900 rounded-lg p-5 shadow-2xl space-y-4 font-serif text-[11px] leading-relaxed flex-1 flex flex-col justify-between border border-slate-300">
-                      <div>
+                    <div 
+                      onClick={() => setShowHasilAsesmenModal(true)}
+                      className="bg-white text-slate-900 rounded-lg p-5 shadow-2xl space-y-3 font-serif text-[11px] leading-relaxed flex-1 flex flex-col justify-between border border-slate-300 hover:border-sky-500 transition-all cursor-pointer group relative"
+                      title="Klik untuk membuka dokumen lengkap dan mencetak PDF"
+                    >
+                      <div className="space-y-3">
                         {/* Kop Surat Header */}
-                        <div className="text-center pb-3 border-b-2 border-slate-900 space-y-0.5 font-sans">
-                          <p className="text-[10px] font-extrabold uppercase tracking-wider text-slate-900">
-                            KEPOLISIAN NEGARA REPUBLIK INDONESIA
+                        <div className="text-center pb-2.5 border-b-2 border-slate-900 space-y-0.5 font-sans">
+                          <p className="text-[9px] font-extrabold uppercase tracking-wider text-slate-900">
+                            KEPOLISIAN NEGARA REPUBLIK INDONESIA &bull; BNN RI
                           </p>
-                          <p className="text-xs font-black uppercase text-slate-900 mt-1">
-                            HASIL ASESMEN TERPADU
+                          <p className="text-xs font-black uppercase text-slate-900 mt-0.5">
+                            LEMBAR REKOMENDASI HASIL ASESMEN TERPADU
                           </p>
                           <p className="text-[10px] font-mono font-bold text-slate-700">
-                            Nomor: {permohonan.rekomendasiResmi.nomorSurat}
+                            Nomor: {permohonan.rekomendasiResmi?.nomorSurat || `TAT/REK/${permohonan.nomorPermohonan}`}
                           </p>
                         </div>
 
-                        {/* Document Section Outline (EXACT MATCH FOR ACUAN VISUAL 8) */}
-                        <div className="mt-4 space-y-1.5 font-sans text-[10px] text-slate-800 font-bold uppercase tracking-wide">
-                          <div className="flex justify-between border-b border-slate-200 pb-0.5">
-                            <span>I. IDENTITAS PEMOHON</span>
+                        {/* Interactive Document Section Outline with Rich Data */}
+                        <div className="space-y-2 font-sans text-[10px] text-slate-800">
+                          {/* I */}
+                          <div className="border-b border-slate-200 pb-1">
+                            <div className="flex justify-between font-bold text-slate-950 uppercase">
+                              <span>I. IDENTITAS PEMOHON / TERPERIKSA</span>
+                              <span className="text-sky-700 font-mono text-[9px]">LENGKAP</span>
+                            </div>
+                            <p className="text-[9.5px] text-slate-600 font-serif mt-0.5">
+                              {permohonan.terperiksa?.namaLengkap || permohonan.tersangkaNama} &bull; NIK: {permohonan.terperiksa?.nik || '3171012345670001'} &bull; Usia: {permohonan.terperiksa?.usia ? `${permohonan.terperiksa.usia} Thn` : '32 Thn'} &bull; Pekerjaan: {permohonan.terperiksa?.pekerjaan || 'Wiraswasta'}
+                            </p>
                           </div>
-                          <div className="flex justify-between border-b border-slate-200 pb-0.5">
-                            <span>II. DASAR ASESMEN</span>
+
+                          {/* II */}
+                          <div className="border-b border-slate-200 pb-1">
+                            <div className="flex justify-between font-bold text-slate-950 uppercase">
+                              <span>II. DASAR ASESMEN</span>
+                              <span className="text-slate-500 text-[9px]">YURIDIS</span>
+                            </div>
+                            <p className="text-[9.5px] text-slate-600 font-serif mt-0.5">
+                              Pasal 54 & 103 UU No. 35/2009, PP No. 25/2011, Perber 7 K/L 2014 & Surat Permohonan Penyidik No. {permohonan.perkara?.nomorLp || permohonan.nomorPermohonan}
+                            </p>
                           </div>
-                          <div className="flex justify-between border-b border-slate-200 pb-0.5">
-                            <span>III. RUANG LINGKUP ASESMEN</span>
+
+                          {/* III */}
+                          <div className="border-b border-slate-200 pb-1">
+                            <div className="flex justify-between font-bold text-slate-950 uppercase">
+                              <span>III. RUANG LINGKUP ASESMEN</span>
+                            </div>
+                            <p className="text-[9.5px] text-slate-600 font-serif mt-0.5">
+                              Pemeriksaan Medis Psikiatris, Telaah Hukum & Barang Bukti, Musyawarah Pleno TAT
+                            </p>
                           </div>
-                          <div className="flex justify-between border-b border-slate-200 pb-0.5">
-                            <span>IV. METODOLOGI ASESMEN</span>
+
+                          {/* IV */}
+                          <div className="border-b border-slate-200 pb-1">
+                            <div className="flex justify-between font-bold text-slate-950 uppercase">
+                              <span>IV. METODOLOGI ASESMEN</span>
+                              <span className="text-emerald-700 font-mono text-[9px]">SKOR {permohonan.asesmenMedis?.skorInstrumen || 28}</span>
+                            </div>
+                            <p className="text-[9.5px] text-slate-600 font-serif mt-0.5">
+                              Wawancara ASSIST / ASI, Uji Toksikologi Urin 6 Parameter & Forensik BAP Penyidikan
+                            </p>
                           </div>
-                          <div className="flex justify-between border-b border-slate-200 pb-0.5">
-                            <span>V. HASIL ASESMEN PER BIDANG</span>
+
+                          {/* V */}
+                          <div className="border-b border-slate-200 pb-1">
+                            <div className="flex justify-between font-bold text-slate-950 uppercase">
+                              <span>V. HASIL ASESMEN PER BIDANG</span>
+                            </div>
+                            <div className="text-[9.5px] text-slate-600 font-serif mt-0.5 space-y-0.5">
+                              <p><strong>Medis:</strong> {permohonan.asesmenMedis?.diagnosisKlinisIcd || 'F15.2'} &bull; Usulan: {permohonan.asesmenMedis?.kebutuhanRawat || 'Rehabilitasi Rawat Jalan'} ({permohonan.asesmenMedis?.durasiUsulanBulan || 3} bln)</p>
+                              <p><strong>Hukum:</strong> {permohonan.asesmenHukum?.analisisPeran || 'Penyalahguna Murni'} &bull; Jaringan: {permohonan.asesmenHukum?.jaringanPengedarIndikasi || 'Tidak terindikasi sindikat'}</p>
+                            </div>
                           </div>
-                          <div className="flex justify-between border-b border-slate-200 pb-0.5">
-                            <span>VI. TEMUAN & CATATAN</span>
+
+                          {/* VI */}
+                          <div className="border-b border-slate-200 pb-1">
+                            <div className="flex justify-between font-bold text-slate-950 uppercase">
+                              <span>VI. TEMUAN & CATATAN</span>
+                            </div>
+                            <p className="text-[9.5px] text-slate-600 font-serif mt-0.5">
+                              Tersangka kooperatif, barang bukti di bawah batas SEMA 04/2010, keluarga menjamin ketaatan program.
+                            </p>
                           </div>
-                          <div className="flex justify-between border-b border-slate-200 pb-0.5 text-slate-900 font-black">
-                            <span>VII. REKOMENDASI TIM ASESMEN TERPADU</span>
+
+                          {/* VII */}
+                          <div className="border-b border-slate-300 pb-1 bg-amber-50/70 p-1.5 rounded">
+                            <div className="flex justify-between font-black text-slate-950 uppercase">
+                              <span>VII. REKOMENDASI RESMI TIM ASESMEN TERPADU</span>
+                              <span className="text-amber-800 font-bold text-[9px]">FINAL</span>
+                            </div>
+                            <p className="text-[10px] text-slate-900 font-sans font-bold mt-0.5">
+                              {permohonan.rekomendasiResmi?.hasilRekomendasi || 'REHABILITASI RAWAT JALAN'}
+                            </p>
+                            <p className="text-[9px] text-slate-700 font-serif">
+                              Rujukan: {permohonan.rekomendasiResmi?.tempatRehabRujukan || 'Balai Rehabilitasi BNN Tanah Merah / Klinik Pratama BNN'} &bull; Wajib lapor penyidik
+                            </p>
                           </div>
-                          <div className="flex justify-between border-b border-slate-200 pb-0.5">
-                            <span>VIII. KEPUTUSAN</span>
+
+                          {/* VIII */}
+                          <div className="border-b border-slate-200 pb-1">
+                            <div className="flex justify-between font-bold text-slate-950 uppercase">
+                              <span>VIII. KEPUTUSAN</span>
+                            </div>
+                            <p className="text-[9.5px] text-slate-600 font-serif mt-0.5">
+                              Proses hukum dilanjutkan dengan penempatan rehabilitasi sesuai Pasal 54 jo 103 UU 35/2009.
+                            </p>
                           </div>
-                          <div className="flex justify-between border-b border-slate-200 pb-0.5">
-                            <span>IX. PENUTUP</span>
+
+                          {/* IX */}
+                          <div className="pb-0.5">
+                            <div className="flex justify-between font-bold text-slate-950 uppercase">
+                              <span>IX. PENUTUP & TTE PEJABAT</span>
+                              <span className="text-emerald-700 font-mono text-[9px]">TERVERIFIKASI</span>
+                            </div>
+                            <p className="text-[9.5px] text-slate-600 font-serif mt-0.5">
+                              Ditetapkan dan disahkan bersama oleh Tim Medis, Tim Hukum, dan Ketua TAT.
+                            </p>
                           </div>
+                        </div>
+
+                        {/* Click to open badge button inside paper */}
+                        <div className="text-center pt-1">
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-full font-sans font-bold text-[9px] border border-slate-300 group-hover:border-sky-500 transition-colors">
+                            <Eye className="w-3 h-3 text-sky-600" />
+                            <span>Klik Lembar Ini Untuk Melihat Tampilan Lengkap & Cetak PDF</span>
+                          </span>
                         </div>
                       </div>
 
                       {/* PDF Bottom Signature & QR Verification Section */}
-                      <div className="pt-4 border-t border-slate-300 font-sans grid grid-cols-12 gap-3 items-end">
+                      <div className="pt-3 border-t border-slate-300 font-sans grid grid-cols-12 gap-3 items-end">
                         {/* QR Code Verification Box (Left) */}
                         <div className="col-span-5 bg-slate-50 border border-slate-300 rounded p-2 text-center space-y-1">
-                          <div className="w-14 h-14 bg-white border border-slate-900 mx-auto flex items-center justify-center p-1 rounded">
-                            <QrCode className="w-12 h-12 text-slate-900" />
+                          <div className="w-12 h-12 bg-white border border-slate-900 mx-auto flex items-center justify-center p-1 rounded">
+                            <QrCode className="w-10 h-10 text-slate-900" />
                           </div>
                           <span className="text-[8px] font-black uppercase text-slate-900 block leading-tight">
-                            SCAN UNTUK VERIFIKASI DOKUMEN
+                            SCAN VERIFIKASI DOKUMEN
                           </span>
                           <p className="text-[7px] text-slate-600 leading-tight">
-                            Pastikan dokumen asli dengan memindai QR Code atau kunjungi{' '}
-                            <span className="text-slate-900 font-mono font-bold underline">https://e-tat.polri.go.id/verify</span>
+                            ID: <span className="font-mono font-bold text-slate-800">{permohonan.trackingNumber || permohonan.id?.slice(0, 8)}</span>
                           </p>
                         </div>
 
                         {/* Ketua Tim Signature (Right) */}
-                        <div className="col-span-7 text-center font-sans space-y-1">
-                          <p className="text-[9px] text-slate-700">Samarinda, {permohonan.rekomendasiResmi.tanggalTerbit}</p>
-                          <p className="text-[9px] font-bold text-slate-900 uppercase">Ketua Tim Asesmen Terpadu</p>
-                          <div className="py-1">
-                            <span className="font-serif italic text-base text-slate-900 block font-bold" style={{ fontFamily: 'Dancing Script, cursive, serif' }}>
-                              Andi Pratama
+                        <div className="col-span-7 text-center font-sans space-y-0.5">
+                          <p className="text-[8.5px] text-slate-700">Samarinda, {permohonan.rekomendasiResmi?.tanggalTerbit || '10 Oktober 2026'}</p>
+                          <p className="text-[8.5px] font-bold text-slate-900 uppercase">Ketua Tim Asesmen Terpadu</p>
+                          <div className="py-0.5">
+                            <span className="font-serif italic text-sm text-slate-900 block font-bold" style={{ fontFamily: 'Dancing Script, cursive, serif' }}>
+                              Arya Wicaksono
                             </span>
                           </div>
-                          <p className="text-[9px] font-extrabold text-slate-900 underline">
-                            KOMBES POL. ANDI PRATAMA, S.I.K., M.H.
+                          <p className="text-[8.5px] font-extrabold text-slate-900 underline">
+                            KOMPOL ARYA WICAKSONO, S.I.K.
                           </p>
-                          <p className="text-[8px] font-mono text-slate-700">NRP 73060660</p>
+                          <p className="text-[7.5px] font-mono text-slate-700">NRP 79080512</p>
                         </div>
                       </div>
                     </div>
@@ -2655,7 +3149,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
                       {permohonan.rekomendasiResmi.buktiPenerimaanPengaju.nomorTandaTerima}
                     </span>
                   </div>
-                ) : (currentUser.role === 'pengaju' || currentUser.role === 'PENGAJU') && ((permohonan.applicationStatus === 'RESULTS_ISSUED' || permohonan.statusProsesUtama === 'rekomendasi_terbit') || (permohonan.followupStatus === 'VERIFIED_IMPLEMENTED' || permohonan.statusProsesUtama === 'selesai_tindak_lanjut')) ? (
+                ) : !effectiveReadonly && (currentUser.role === 'pengaju' || currentUser.role === 'PENGAJU') && ((permohonan.applicationStatus === 'RESULTS_ISSUED' || permohonan.statusProsesUtama === 'rekomendasi_terbit') || (permohonan.followupStatus === 'VERIFIED_IMPLEMENTED' || permohonan.statusProsesUtama === 'selesai_tindak_lanjut')) ? (
                   <div className="p-4 bg-[#0d213d] border border-[#234b7d] rounded-xl text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div>
                       <span className="font-bold text-white block">Konfirmasi Tanda Terima Berkas Resmi:</span>

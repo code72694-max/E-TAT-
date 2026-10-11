@@ -57,7 +57,7 @@ export const tokenStorage = {
 // Generic HTTP fetch wrapper
 async function request<T = any>(
   endpoint: string,
-  options: RequestInit = {}
+  options: RequestInit & { _isRetry?: boolean } = {}
 ): Promise<ApiResponse<T>> {
   const token = tokenStorage.getAccessToken();
   const headers: Record<string, string> = {
@@ -82,6 +82,30 @@ async function request<T = any>(
     const data = isJson ? await response.json() : null;
 
     if (!response.ok) {
+      if (response.status === 401 && !options._isRetry) {
+        const refreshToken = tokenStorage.getRefreshToken();
+        if (refreshToken) {
+          try {
+            const refreshRes = await fetch(`${API_BASE}/auth/refresh`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ refreshToken }),
+            });
+            if (refreshRes.ok) {
+              const refreshData = await refreshRes.json();
+              if (refreshData?.data?.accessToken) {
+                tokenStorage.setAccessToken(refreshData.data.accessToken);
+                if (refreshData.data.refreshToken) {
+                  tokenStorage.setRefreshToken(refreshData.data.refreshToken);
+                }
+                return request<T>(endpoint, { ...options, _isRetry: true });
+              }
+            }
+          } catch {
+            // refresh failed
+          }
+        }
+      }
       const errorMessage = data?.message || data?.error || `HTTP ${response.status}: ${response.statusText}`;
       throw new ApiError(errorMessage, response.status, data);
     }

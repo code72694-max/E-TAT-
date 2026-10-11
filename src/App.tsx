@@ -33,16 +33,57 @@ import { LacakBerkasPage } from './components/LacakBerkasPage';
 import { MobileBottomNav } from './components/MobileBottomNav';
 import { riwayatPermohonanSeedList } from './data/riwayatSeedData';
 
-const DEFAULT_USER: UserProfile = {
-  id: 'user-admin',
-  name: 'Kompol Arya Wicaksono, S.I.K.',
-  nip: '79080512',
-  role: 'ADMIN',
-  agency: 'Sekretariat TAT Polda Metro Jaya',
-  email: 'sekretariat@polri.go.id',
-  phone: '081234567890',
-  position: 'Ketua Tim Sekretariat TAT',
+export const getRolePath = (role?: UserRole | string): string => {
+  if (!role) return 'admin';
+  const r = role.toLowerCase();
+  if (r === 'sekretariat') return 'admin';
+  return r;
 };
+
+export const DEFAULT_USERS: UserProfile[] = [
+  {
+    id: 'user-admin',
+    name: 'Kompol Arya Wicaksono, S.I.K.',
+    nip: '79080512',
+    role: 'ADMIN',
+    agency: 'Sekretariat TAT Polda Metro Jaya',
+    email: 'etatsiappulih@gmail.com',
+    phone: '081234567890',
+    position: 'Ketua Tim Sekretariat TAT',
+  },
+  {
+    id: 'user-pengaju',
+    name: 'Ipda Budi Santoso, S.H.',
+    nip: '85010234',
+    role: 'PENGAJU',
+    agency: 'Satresnarkoba Polres Metro Jakarta Pusat',
+    email: 'code72694@gmail.com',
+    phone: '081298765432',
+    position: 'Penyidik Pembantu Unit I',
+  },
+  {
+    id: 'user-medis',
+    name: 'dr. Ratna Sp.KJ',
+    nip: '198205122008012001',
+    role: 'MEDIS',
+    agency: 'BNNP DKI Jakarta / RS Pengayoman',
+    email: 'k300gamers@gmail.com',
+    phone: '081311223344',
+    position: 'Dokter Asesor Medis TAT',
+  },
+  {
+    id: 'user-hukum',
+    name: 'Agus Pratama, S.H., M.H.',
+    nip: '197903152003121002',
+    role: 'HUKUM',
+    agency: 'Kejaksaan Tinggi DKI Jakarta',
+    email: 'harykurniawan155@gmail.com',
+    phone: '081399887766',
+    position: 'Jaksa Pratama / Asesor Hukum TAT',
+  },
+];
+
+const DEFAULT_USER: UserProfile = DEFAULT_USERS[0];
 
 export default function App() {
   const navigate = useNavigate();
@@ -52,7 +93,7 @@ export default function App() {
   const [appViewMode, setAppViewMode] = useState<'landing' | 'lacak' | 'login' | 'register' | 'dashboard'>('landing');
 
   // Active Users list
-  const [users, setUsers] = useState<UserProfile[]>([DEFAULT_USER]);
+  const [users, setUsers] = useState<UserProfile[]>(DEFAULT_USERS);
 
   // Registrations list
   const [registrations, setRegistrations] = useState<RegistrasiPengguna[]>([]);
@@ -130,84 +171,189 @@ export default function App() {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [selectedRegistrasiId, setSelectedRegistrasiId] = useState<string | null>(null);
 
+  const navigateToDashboard = useCallback((subPath: string = '') => {
+    const roleSlug = getRolePath(currentUser.role);
+    const cleanSub = subPath ? (subPath.startsWith('/') ? subPath : `/${subPath}`) : '';
+    navigate(`/${roleSlug}/dashboard${cleanSub}`);
+  }, [currentUser.role, navigate]);
+
   // Sync state from URL path
   useEffect(() => {
     const path = location.pathname;
     if (path === '/lacak') {
       setAppViewMode('lacak');
-    } else if (path === '/login') {
+      return;
+    }
+    if (path === '/login') {
       setAppViewMode('login');
-    } else if (path === '/register') {
+      return;
+    }
+    if (path === '/register') {
       setAppViewMode('register');
-    } else if (path.startsWith('/dashboard')) {
+      return;
+    }
+    if (path === '/' || path === '') {
+      setAppViewMode('landing');
+      return;
+    }
+
+    const parts = path.split('/').filter(Boolean);
+    const dashboardIndex = parts.indexOf('dashboard');
+
+    // Handle root role paths like /pengaju, /admin, /medis, /hukum (redirecting to /:role/dashboard)
+    const KNOWN_ROLES = ['pengaju', 'admin', 'sekretariat', 'medis', 'hukum', 'koordinator', 'rehabilitasi', 'pimpinan'];
+    const isKnownRole = parts.length > 0 && (
+      KNOWN_ROLES.includes(parts[0].toLowerCase()) ||
+      users.some(u => getRolePath(u.role) === parts[0].toLowerCase())
+    );
+
+    if (isKnownRole && dashboardIndex === -1) {
+      const roleSlug = parts[0].toLowerCase();
+      const matchingUser = users.find(u => getRolePath(u.role) === roleSlug);
+      if (matchingUser && getRolePath(currentUser.role) !== roleSlug) {
+        setCurrentUser(matchingUser);
+        tokenStorage.setUser(matchingUser);
+      }
+      const rest = parts.slice(1).join('/');
+      const target = rest ? `/${roleSlug}/dashboard/${rest}` : `/${roleSlug}/dashboard`;
+      navigate(target, { replace: true });
+      return;
+    }
+
+    if (dashboardIndex !== -1) {
       setAppViewMode('dashboard');
-      const parts = path.split('/').filter(Boolean);
-      if (parts[1] === 'pengajuan_baru' || parts[1] === 'pengajuan-baru' || (parts[1] === 'pengajuan' && parts[2] === 'baru')) {
+
+      // Check if URL has role prefix before 'dashboard'
+      // Example without role: /dashboard/... (parts = ['dashboard', ...])
+      if (dashboardIndex === 0) {
+        // Redirect legacy /dashboard/... to /:role/dashboard/...
+        const roleSlug = getRolePath(currentUser.role);
+        navigate(`/${roleSlug}${path}`, { replace: true });
+        return;
+      }
+
+      // Role exists before 'dashboard': /:role/dashboard/...
+      const roleInPath = parts[dashboardIndex - 1].toLowerCase();
+      if (getRolePath(currentUser.role) !== roleInPath) {
+        const matchingUser = users.find(u => getRolePath(u.role) === roleInPath);
+        if (matchingUser) {
+          setCurrentUser(matchingUser);
+        }
+      }
+
+      const subParts = parts.slice(dashboardIndex + 1);
+      const tabParam = subParts[0];
+
+      if (tabParam === 'pengajuan_baru' || tabParam === 'pengajuan-baru' || (tabParam === 'pengajuan' && subParts[1] === 'baru')) {
         setCurrentTab('pengajuan_baru');
         setSelectedPermohonanId(null);
         setSelectedHukumId(null);
         setSelectedMedisId(null);
+        setSelectedRiwayatMedisId(null);
         setSelectedRiwayatHukumId(null);
         setSelectedTindakLanjutId(null);
-      } else if (parts[1] === 'detail' && parts[2]) {
-        setSelectedPermohonanId(parts[2]);
+        setSelectedScheduleCaseId(null);
+        setSelectedScheduleId(null);
+        setSelectedRegistrasiId(null);
+      } else if (tabParam === 'detail' && subParts[1]) {
+        setSelectedPermohonanId(subParts[1]);
         setSelectedHukumId(null);
         setSelectedMedisId(null);
+        setSelectedRiwayatMedisId(null);
         setSelectedRiwayatHukumId(null);
-      } else if (parts[1] === 'hukum') {
+        setSelectedTindakLanjutId(null);
+        setSelectedScheduleCaseId(null);
+        setSelectedScheduleId(null);
+        setSelectedRegistrasiId(null);
+      } else if (tabParam === 'asesmen_aktif') {
+        setCurrentTab('asesmen_aktif');
+        setSelectedPermohonanId(null);
+        setSelectedHukumId(null);
+        setSelectedMedisId(null);
+        setSelectedRiwayatMedisId(null);
+        setSelectedRiwayatHukumId(null);
+        setSelectedTindakLanjutId(null);
+        setSelectedScheduleCaseId(null);
+        setSelectedScheduleId(null);
+        setSelectedRegistrasiId(null);
+        if (subParts[1] === 'detail' && subParts[2]) {
+          setSelectedAsesmenId(subParts[2]);
+        } else if (subParts[1] && subParts[1] !== 'detail') {
+          setSelectedAsesmenId(subParts[1]);
+        } else {
+          setSelectedAsesmenId(null);
+        }
+      } else if (tabParam === 'hukum') {
         setCurrentTab('hukum');
         setSelectedPermohonanId(null);
         setSelectedMedisId(null);
+        setSelectedRiwayatMedisId(null);
         setSelectedRiwayatHukumId(null);
-        if (parts[2] === 'detail' && parts[3]) {
-          setSelectedHukumId(parts[3]);
-        } else if (parts[2] && parts[2] !== 'detail') {
-          setSelectedHukumId(parts[2]);
+        setSelectedTindakLanjutId(null);
+        setSelectedScheduleCaseId(null);
+        setSelectedScheduleId(null);
+        setSelectedRegistrasiId(null);
+        if (subParts[1] === 'detail' && subParts[2]) {
+          setSelectedHukumId(subParts[2]);
+        } else if (subParts[1] && subParts[1] !== 'detail') {
+          setSelectedHukumId(subParts[1]);
         } else {
           setSelectedHukumId(null);
         }
-      } else if (parts[1] === 'medis') {
+      } else if (tabParam === 'medis') {
         setCurrentTab('medis');
         setSelectedPermohonanId(null);
         setSelectedHukumId(null);
         setSelectedRiwayatMedisId(null);
         setSelectedRiwayatHukumId(null);
-        if (parts[2] === 'detail' && parts[3]) {
-          setSelectedMedisId(parts[3]);
-        } else if (parts[2] && parts[2] !== 'detail') {
-          setSelectedMedisId(parts[2]);
+        setSelectedTindakLanjutId(null);
+        setSelectedScheduleCaseId(null);
+        setSelectedScheduleId(null);
+        setSelectedRegistrasiId(null);
+        if (subParts[1] === 'detail' && subParts[2]) {
+          setSelectedMedisId(subParts[2]);
+        } else if (subParts[1] && subParts[1] !== 'detail') {
+          setSelectedMedisId(subParts[1]);
         } else {
           setSelectedMedisId(null);
         }
-      } else if (parts[1] === 'riwayat_medis') {
+      } else if (tabParam === 'riwayat_medis') {
         setCurrentTab('riwayat_medis');
         setSelectedPermohonanId(null);
         setSelectedHukumId(null);
         setSelectedMedisId(null);
+        setSelectedRiwayatMedisId(null);
         setSelectedRiwayatHukumId(null);
         setSelectedTindakLanjutId(null);
-        if (parts[2] === 'detail' && parts[3]) {
-          setSelectedRiwayatMedisId(parts[3]);
-        } else if (parts[2] && parts[2] !== 'detail') {
-          setSelectedRiwayatMedisId(parts[2]);
+        setSelectedScheduleCaseId(null);
+        setSelectedScheduleId(null);
+        setSelectedRegistrasiId(null);
+        if (subParts[1] === 'detail' && subParts[2]) {
+          setSelectedRiwayatMedisId(subParts[2]);
+        } else if (subParts[1] && subParts[1] !== 'detail') {
+          setSelectedRiwayatMedisId(subParts[1]);
         } else {
           setSelectedRiwayatMedisId(null);
         }
-      } else if (parts[1] === 'riwayat_hukum') {
+      } else if (tabParam === 'riwayat_hukum') {
         setCurrentTab('riwayat_hukum');
         setSelectedPermohonanId(null);
         setSelectedHukumId(null);
         setSelectedMedisId(null);
         setSelectedRiwayatMedisId(null);
+        setSelectedRiwayatHukumId(null);
         setSelectedTindakLanjutId(null);
-        if (parts[2] === 'detail' && parts[3]) {
-          setSelectedRiwayatHukumId(parts[3]);
-        } else if (parts[2] && parts[2] !== 'detail') {
-          setSelectedRiwayatHukumId(parts[2]);
+        setSelectedScheduleCaseId(null);
+        setSelectedScheduleId(null);
+        setSelectedRegistrasiId(null);
+        if (subParts[1] === 'detail' && subParts[2]) {
+          setSelectedRiwayatHukumId(subParts[2]);
+        } else if (subParts[1] && subParts[1] !== 'detail') {
+          setSelectedRiwayatHukumId(subParts[1]);
         } else {
           setSelectedRiwayatHukumId(null);
         }
-      } else if (parts[1] === 'tindak_lanjut_jadwal') {
+      } else if (tabParam === 'tindak_lanjut_jadwal') {
         setCurrentTab('tindak_lanjut_jadwal');
         setSelectedPermohonanId(null);
         setSelectedHukumId(null);
@@ -215,15 +361,16 @@ export default function App() {
         setSelectedRiwayatMedisId(null);
         setSelectedRiwayatHukumId(null);
         setSelectedTindakLanjutId(null);
-        if (parts[2] === 'detail' && parts[3]) {
-          setSelectedScheduleCaseId(parts[3]);
-          setSelectedScheduleId(parts[4] || null);
+        setSelectedRegistrasiId(null);
+        if (subParts[1] === 'detail' && subParts[2]) {
+          setSelectedScheduleCaseId(subParts[2]);
+          setSelectedScheduleId(subParts[3] || null);
         } else {
           setSelectedScheduleCaseId(null);
           setSelectedScheduleId(null);
         }
-      } else if (parts[1] && parts[1].startsWith('tindak_lanjut')) {
-        setCurrentTab(parts[1] as ActiveTab);
+      } else if (tabParam && tabParam.startsWith('tindak_lanjut')) {
+        setCurrentTab(tabParam as ActiveTab);
         setSelectedPermohonanId(null);
         setSelectedHukumId(null);
         setSelectedMedisId(null);
@@ -231,14 +378,15 @@ export default function App() {
         setSelectedRiwayatHukumId(null);
         setSelectedScheduleCaseId(null);
         setSelectedScheduleId(null);
-        if (parts[2] === 'detail' && parts[3]) {
-          setSelectedTindakLanjutId(parts[3]);
-        } else if (parts[2] && parts[2] !== 'detail') {
-          setSelectedTindakLanjutId(parts[2]);
+        setSelectedRegistrasiId(null);
+        if (subParts[1] === 'detail' && subParts[2]) {
+          setSelectedTindakLanjutId(subParts[2]);
+        } else if (subParts[1] && subParts[1] !== 'detail') {
+          setSelectedTindakLanjutId(subParts[1]);
         } else {
           setSelectedTindakLanjutId(null);
         }
-      } else if (parts[1] === 'verifikasi_akun') {
+      } else if (tabParam === 'verifikasi_akun') {
         setCurrentTab('verifikasi_akun');
         setSelectedPermohonanId(null);
         setSelectedHukumId(null);
@@ -248,15 +396,15 @@ export default function App() {
         setSelectedTindakLanjutId(null);
         setSelectedScheduleCaseId(null);
         setSelectedScheduleId(null);
-        if (parts[2] === 'detail' && parts[3]) {
-          setSelectedRegistrasiId(parts[3]);
-        } else if (parts[2] && parts[2] !== 'detail') {
-          setSelectedRegistrasiId(parts[2]);
+        if (subParts[1] === 'detail' && subParts[2]) {
+          setSelectedRegistrasiId(subParts[2]);
+        } else if (subParts[1] && subParts[1] !== 'detail') {
+          setSelectedRegistrasiId(subParts[1]);
         } else {
           setSelectedRegistrasiId(null);
         }
-      } else if (parts[1]) {
-        setCurrentTab(parts[1] as ActiveTab);
+      } else if (tabParam) {
+        setCurrentTab(tabParam as ActiveTab);
         setSelectedPermohonanId(null);
         setSelectedHukumId(null);
         setSelectedMedisId(null);
@@ -281,8 +429,7 @@ export default function App() {
     } else {
       setAppViewMode('landing');
     }
-  }, [location.pathname]);
-
+  }, [location.pathname, currentUser.role, users, navigate]);
 
   const changeAppViewMode = (mode: 'landing' | 'lacak' | 'login' | 'register' | 'dashboard') => {
     setAppViewMode(mode);
@@ -290,16 +437,16 @@ export default function App() {
     else if (mode === 'lacak') navigate('/lacak');
     else if (mode === 'login') navigate('/login');
     else if (mode === 'register') navigate('/register');
-    else if (mode === 'dashboard') navigate(`/dashboard/${currentTab}`);
+    else if (mode === 'dashboard') navigateToDashboard(`/${currentTab}`);
   };
 
   // Selected permohonan object
   const selectedPermohonan = useMemo(() => {
-    return permohonanList.find(p => p.id === selectedPermohonanId) || null;
+    return permohonanList.find(p => p.id === selectedPermohonanId) || riwayatPermohonanSeedList.find(p => p.id === selectedPermohonanId) || null;
   }, [permohonanList, selectedPermohonanId]);
 
   const selectedAsesmenPermohonan = useMemo(() => {
-    return permohonanList.find(p => p.id === selectedAsesmenId) || null;
+    return permohonanList.find(p => p.id === selectedAsesmenId) || riwayatPermohonanSeedList.find(p => p.id === selectedAsesmenId) || null;
   }, [permohonanList, selectedAsesmenId]);
 
   const selectedHukumPermohonan = useMemo(() => {
@@ -427,7 +574,7 @@ export default function App() {
   // Open a specific application from anywhere
   const handleOpenPermohonan = (id: string) => {
     setSelectedPermohonanId(id);
-    navigate(`/dashboard/detail/${id}`);
+    navigateToDashboard(`/detail/${id}`);
   };
 
   // Switch tab and clear active detail view if user clicks navigation
@@ -439,12 +586,16 @@ export default function App() {
     setSelectedMedisId(null);
     setSelectedRiwayatHukumId(null);
     setSelectedTindakLanjutId(null);
-    navigate(`/dashboard/${tab}`);
+    navigateToDashboard(`/${tab}`);
   };
 
   // Switch role / user with strict tab and detail view validation
   const handleSelectUser = (user: UserProfile) => {
     setCurrentUser(user);
+    tokenStorage.setUser(user);
+    if (user.email) {
+      authApi.login(user.email, 'password123').catch(() => {});
+    }
     setSelectedPermohonanId(null);
     setSelectedAsesmenId(null);
     setSelectedHukumId(null);
@@ -453,12 +604,12 @@ export default function App() {
     setSelectedTindakLanjutId(null);
     // 4 role kanonis + backward compat untuk role lama
     const roleAllowedTabs: Record<string, ActiveTab[]> = {
-      PENGAJU: ['beranda', 'permohonan', 'pengajuan_baru', 'asesmen_aktif', 'penugasan', 'dokumen', 'tindak_lanjut', 'tindak_lanjut_jadwal', 'riwayat', 'about', 'profile'],
+      PENGAJU: ['beranda', 'permohonan', 'pengajuan_baru', 'asesmen_aktif', 'dokumen', 'tindak_lanjut', 'tindak_lanjut_jadwal', 'riwayat', 'about', 'profile'],
       ADMIN: ['beranda', 'permohonan', 'pengajuan_baru', 'asesmen_aktif', 'riwayat', 'verifikasi', 'penugasan', 'pleno', 'tindak_lanjut', 'tindak_lanjut_jadwal', 'verifikasi_akun', 'monitoring', 'about', 'profile'],
       MEDIS: ['beranda', 'medis', 'riwayat_medis', 'tindak_lanjut', 'pleno', 'about', 'profile'],
       HUKUM: ['beranda', 'hukum', 'pleno', 'riwayat_hukum', 'about', 'profile'],
       // Backward compat
-      pengaju: ['beranda', 'permohonan', 'pengajuan_baru', 'asesmen_aktif', 'verifikasi', 'penugasan', 'dokumen', 'riwayat', 'about', 'profile'],
+      pengaju: ['beranda', 'permohonan', 'pengajuan_baru', 'asesmen_aktif', 'verifikasi', 'dokumen', 'riwayat', 'about', 'profile'],
       sekretariat: ['beranda', 'permohonan', 'pengajuan_baru', 'verifikasi', 'penugasan', 'pleno', 'tindak_lanjut', 'tindak_lanjut_jadwal', 'riwayat', 'verifikasi_akun', 'about', 'profile'],
       medis: ['beranda', 'medis', 'riwayat_medis', 'tindak_lanjut', 'pleno', 'about', 'profile'],
       hukum: ['beranda', 'hukum', 'pleno', 'riwayat_hukum', 'about', 'profile'],
@@ -469,9 +620,10 @@ export default function App() {
     };
     const allowed = roleAllowedTabs[user.role] || ['beranda'];
     const isTabAllowed = allowed.includes(currentTab) || (currentTab.startsWith('tindak_lanjut') && allowed.includes('tindak_lanjut'));
-    if (!isTabAllowed) {
-      setCurrentTab('beranda');
-    }
+    const nextTab = isTabAllowed ? currentTab : 'beranda';
+    setCurrentTab(nextTab);
+    const newRoleSlug = getRolePath(user.role);
+    navigate(`/${newRoleSlug}/dashboard/${nextTab}`);
   };
 
   // Render view
@@ -481,9 +633,13 @@ export default function App() {
         <PermohonanDetail
           permohonan={selectedPermohonan}
           currentUser={currentUser}
-          onBack={() => setSelectedPermohonanId(null)}
+          onBack={() => {
+            setSelectedPermohonanId(null);
+            navigateToDashboard('/permohonan');
+          }}
           onUpdatePermohonan={handleUpdatePermohonan}
           onOpenQrModal={(item) => setQrModalPermohonan(item)}
+          isReadonly={currentUser.role === 'pengaju' || currentUser.role === 'PENGAJU'}
         />
       );
     }
@@ -530,8 +686,18 @@ export default function App() {
             onUpdatePermohonan={handleUpdatePermohonan}
             isDetailOpen={Boolean(selectedAsesmenId)}
             selectedActiveId={selectedAsesmenId}
-            onSelectActiveCase={(id) => setSelectedAsesmenId(id)}
-            onBackFromActiveCase={() => setSelectedAsesmenId(null)}
+            onSelectActiveCase={(id) => {
+              setSelectedAsesmenId(id);
+              if (id) {
+                navigateToDashboard(`/asesmen_aktif/detail/${id}`);
+              } else {
+                navigateToDashboard('/asesmen_aktif');
+              }
+            }}
+            onBackFromActiveCase={() => {
+              setSelectedAsesmenId(null);
+              navigateToDashboard('/asesmen_aktif');
+            }}
           />
         );
 
@@ -575,9 +741,9 @@ export default function App() {
             onSelectCase={(id) => {
               setSelectedMedisId(id);
               if (id) {
-                navigate(`/dashboard/medis/detail/${id}`);
+                navigateToDashboard(`/medis/detail/${id}`);
               } else {
-                navigate('/dashboard/medis');
+                navigateToDashboard('/medis');
               }
             }}
           />
@@ -595,9 +761,9 @@ export default function App() {
             onSelectCase={(id) => {
               setSelectedRiwayatMedisId(id);
               if (id) {
-                navigate(`/dashboard/riwayat_medis/detail/${id}`);
+                navigateToDashboard(`/riwayat_medis/detail/${id}`);
               } else {
-                navigate('/dashboard/riwayat_medis');
+                navigateToDashboard('/riwayat_medis');
               }
             }}
           />
@@ -615,9 +781,9 @@ export default function App() {
             onSelectCase={(id) => {
               setSelectedHukumId(id);
               if (id) {
-                navigate(`/dashboard/hukum/detail/${id}`);
+                navigateToDashboard(`/hukum/detail/${id}`);
               } else {
-                navigate('/dashboard/hukum');
+                navigateToDashboard('/hukum');
               }
             }}
           />
@@ -635,9 +801,9 @@ export default function App() {
             onSelectCase={(id) => {
               setSelectedRiwayatHukumId(id);
               if (id) {
-                navigate(`/dashboard/riwayat_hukum/detail/${id}`);
+                navigateToDashboard(`/riwayat_hukum/detail/${id}`);
               } else {
-                navigate('/dashboard/riwayat_hukum');
+                navigateToDashboard('/riwayat_hukum');
               }
             }}
           />
@@ -683,9 +849,9 @@ export default function App() {
               setSelectedScheduleCaseId(caseId);
               setSelectedScheduleId(schedId);
               if (caseId && schedId) {
-                navigate(`/dashboard/tindak_lanjut_jadwal/detail/${caseId}/${schedId}`);
+                navigateToDashboard(`/tindak_lanjut_jadwal/detail/${caseId}/${schedId}`);
               } else {
-                navigate('/dashboard/tindak_lanjut_jadwal');
+                navigateToDashboard('/tindak_lanjut_jadwal');
               }
             }}
           />
@@ -703,9 +869,9 @@ export default function App() {
               onSelectCase={(id) => {
                 setSelectedTindakLanjutId(id);
                 if (id) {
-                  navigate(`/dashboard/tindak_lanjut/detail/${id}`);
+                  navigateToDashboard(`/tindak_lanjut/detail/${id}`);
                 } else {
-                  navigate('/dashboard/tindak_lanjut');
+                  navigateToDashboard('/tindak_lanjut');
                 }
               }}
             />
@@ -719,11 +885,11 @@ export default function App() {
             onNavigateToMonitoring={(caseId) => {
               setSelectedTindakLanjutId(caseId);
               setCurrentTab('tindak_lanjut_monitoring');
-              navigate(`/dashboard/tindak_lanjut/detail/${caseId}`);
+              navigateToDashboard(`/tindak_lanjut/detail/${caseId}`);
             }}
             onBack={() => {
               setCurrentTab('tindak_lanjut');
-              navigate('/dashboard/tindak_lanjut');
+              navigateToDashboard('/tindak_lanjut');
             }}
           />
         );
@@ -740,9 +906,9 @@ export default function App() {
             onSelectCase={(id) => {
               setSelectedTindakLanjutId(id);
               if (id) {
-                navigate(`/dashboard/tindak_lanjut/detail/${id}`);
+                navigateToDashboard(`/tindak_lanjut/detail/${id}`);
               } else {
-                navigate('/dashboard/tindak_lanjut');
+                navigateToDashboard('/tindak_lanjut');
               }
             }}
           />
@@ -760,9 +926,9 @@ export default function App() {
             onSelectRegistrasi={(id) => {
               setSelectedRegistrasiId(id);
               if (id) {
-                navigate(`/dashboard/verifikasi_akun/detail/${id}`);
+                navigateToDashboard(`/verifikasi_akun/detail/${id}`);
               } else {
-                navigate('/dashboard/verifikasi_akun');
+                navigateToDashboard('/verifikasi_akun');
               }
             }}
           />
@@ -839,7 +1005,7 @@ export default function App() {
         permohonanList={permohonanList}
         onOpenPermohonanDetail={(id) => {
           setSelectedPermohonanId(id);
-          changeAppViewMode('dashboard');
+          navigateToDashboard(`/detail/${id}`);
         }}
       />
     );
@@ -861,6 +1027,8 @@ export default function App() {
     return (
       <LacakBerkasPage
         permohonanList={permohonanList}
+        currentUser={currentUser}
+        onUpdatePermohonan={handleUpdatePermohonan}
         onGoToLanding={(sectionId) => {
           changeAppViewMode('landing');
           if (sectionId) {
@@ -874,7 +1042,7 @@ export default function App() {
         onGoToRegister={() => changeAppViewMode('register')}
         onOpenPermohonanDetail={(id) => {
           setSelectedPermohonanId(id);
-          changeAppViewMode('dashboard');
+          navigateToDashboard(`/detail/${id}`);
         }}
       />
     );
@@ -890,7 +1058,6 @@ export default function App() {
           handleSelectUser(user);
           tokenStorage.setUser(user);
           fetchBackendData();
-          changeAppViewMode('dashboard');
         }}
         onBackToLanding={() => changeAppViewMode('landing')}
         onGoToRegister={() => changeAppViewMode('register')}
@@ -923,49 +1090,49 @@ export default function App() {
           }
           if (selectedPermohonanId) {
             setSelectedPermohonanId(null);
-            navigate(`/dashboard/${currentTab}`);
+            navigateToDashboard(`/${currentTab}`);
           }
           if (selectedAsesmenId) {
             setSelectedAsesmenId(null);
-            navigate('/dashboard/asesmen_aktif');
+            navigateToDashboard('/asesmen_aktif');
           }
           if (selectedHukumId) {
             setSelectedHukumId(null);
-            navigate('/dashboard/hukum');
+            navigateToDashboard('/hukum');
           }
           if (selectedMedisId) {
             setSelectedMedisId(null);
-            navigate('/dashboard/medis');
+            navigateToDashboard('/medis');
           }
           if (selectedRiwayatMedisId) {
             setSelectedRiwayatMedisId(null);
-            navigate('/dashboard/riwayat_medis');
+            navigateToDashboard('/riwayat_medis');
           }
           if (selectedRiwayatHukumId) {
             setSelectedRiwayatHukumId(null);
-            navigate('/dashboard/riwayat_hukum');
+            navigateToDashboard('/riwayat_hukum');
           }
           if (selectedTindakLanjutId) {
             setSelectedTindakLanjutId(null);
-            navigate('/dashboard/tindak_lanjut');
+            navigateToDashboard('/tindak_lanjut');
           }
           if (selectedScheduleCaseId) {
             setSelectedScheduleCaseId(null);
             setSelectedScheduleId(null);
-            navigate('/dashboard/tindak_lanjut_jadwal');
+            navigateToDashboard('/tindak_lanjut_jadwal');
           }
           if (selectedRegistrasiId) {
             setSelectedRegistrasiId(null);
-            navigate('/dashboard/verifikasi_akun');
+            navigateToDashboard('/verifikasi_akun');
           }
         }}
         onOpenQrModal={(item) => setQrModalPermohonan(item)}
       />
 
-      {/* Main Workspace Layout - Desktop: Sidebar hidden when viewing detail page */}
+      {/* Main Workspace Layout - Desktop: Sidebar hidden when viewing detail page or pengajuan_baru */}
       <div className="flex-1 flex w-full bg-[#071326]">
-        {/* Sidebar at desktop corner (Hidden on permohonan detail view) */}
-        {!activeDetailPermohonan && !selectedPermohonan && (
+        {/* Sidebar at desktop corner (Hidden on permohonan detail view and pengajuan_baru) */}
+        {!activeDetailPermohonan && !selectedPermohonan && currentTab !== 'pengajuan_baru' && (
           <Sidebar
             currentTab={currentTab}
             onSelectTab={handleSelectTab}

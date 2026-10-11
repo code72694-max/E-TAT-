@@ -102,15 +102,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
     buttonLabel: string;
     roleLabel: string;
   } => {
-    switch (userRole) {
+    const roleKey = (userRole || '').toUpperCase();
+    switch (roleKey) {
       // === PENGAJU: Penyidik Polri / BNN / Jaksa (Pemohon) ===
       case 'PENGAJU':
         return {
           items: [
             { id: 'beranda', label: 'Dashboard', icon: <LayoutDashboard className="w-4 h-4" /> },
-            { id: 'permohonan', label: 'Permohonan Masuk', icon: <FileSpreadsheet className="w-4 h-4" />, badge: badgeCounts.perluPerbaikan || undefined },
+            { id: 'permohonan', label: 'Permohonan', icon: <FileSpreadsheet className="w-4 h-4" />, badge: badgeCounts.perluPerbaikan || undefined },
             { id: 'asesmen_aktif', label: 'Asesmen Aktif', icon: <Zap className="w-4 h-4" /> },
-            { id: 'penugasan', label: 'Jadwal & Sesi', icon: <CalendarCheck className="w-4 h-4" /> },
             { id: 'dokumen', label: 'Surat Rekomendasi', icon: <FileSignature className="w-4 h-4" /> },
             { id: 'tindak_lanjut', label: 'Tindak Lanjut', icon: <Share2 className="w-4 h-4" /> },
             { id: 'riwayat', label: 'Riwayat Asesmen', icon: <History className="w-4 h-4" /> },
