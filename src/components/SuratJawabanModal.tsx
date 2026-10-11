@@ -50,7 +50,7 @@ export const SuratJawabanModal: React.FC<SuratJawabanModalProps> = ({ permohonan
     const win = window.open('', '_blank', 'width=900,height=1200');
     if (!win || !printRef.current) return;
     const printContents = printRef.current.innerHTML;
-    win.document.write(`<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8"/><title></title>
+    win.document.write(`<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8"/><title>&#8203;</title>
       <style>
         @page {
           size: A4;

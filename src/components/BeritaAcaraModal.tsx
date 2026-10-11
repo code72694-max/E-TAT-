@@ -127,7 +127,7 @@ export const BeritaAcaraModal: React.FC<BeritaAcaraModalProps> = ({ permohonan, 
     if (!printContents) return;
     const win = window.open('', '_blank', 'width=950,height=750');
     if (!win) return;
-    win.document.write(`<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8"/><title></title>
+    win.document.write(`<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8"/><title>&#8203;</title>
       <style>
         @page {
           size: A4;
