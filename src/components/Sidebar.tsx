@@ -306,19 +306,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 {/* Sub-menu Dropdown List */}
                 {isTindakLanjutDropdownOpen && (
                   <div className="ml-5 pl-2.5 border-l border-[#1e3a5f] space-y-1.5 pt-1 pb-1">
-                    {userRole !== 'MEDIS' && (
-                      <button
-                        onClick={() => handleItemClick('tindak_lanjut_input_jadwal')}
-                        className={`w-full text-left px-2.5 py-1.5 text-[11px] font-medium rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer ${
-                          currentTab === 'tindak_lanjut_input_jadwal'
-                            ? 'bg-[#142642] text-[#38bdf8] font-bold border border-[#234475]'
-                            : 'text-slate-300 hover:text-white hover:bg-[#142642]/60'
-                        }`}
-                      >
-                        <Plus className="w-3.5 h-3.5 text-blue-400" />
-                        <span>Input Jadwal Kontrol & Lapor</span>
-                      </button>
-                    )}
+                    <button
+                      onClick={() => handleItemClick('tindak_lanjut_input_jadwal')}
+                      className={`w-full text-left px-2.5 py-1.5 text-[11px] font-medium rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer ${
+                        currentTab === 'tindak_lanjut_input_jadwal'
+                          ? 'bg-[#142642] text-[#38bdf8] font-bold border border-[#234475]'
+                          : 'text-slate-300 hover:text-white hover:bg-[#142642]/60'
+                      }`}
+                    >
+                      <Plus className="w-3.5 h-3.5 text-blue-400" />
+                      <span>Input Jadwal Kontrol & Lapor</span>
+                    </button>
                     <button
                       onClick={() => handleItemClick('tindak_lanjut_jadwal')}
                       className={`w-full text-left px-2.5 py-1.5 text-[11px] font-medium rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer ${

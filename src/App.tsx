@@ -858,25 +858,6 @@ export default function App() {
         );
 
       case 'tindak_lanjut_input_jadwal':
-        if (currentUser.role === 'MEDIS') {
-          return (
-            <RujukanTindakLanjutView
-              permohonanList={permohonanList}
-              currentUser={currentUser}
-              onSelectPermohonan={handleOpenPermohonan}
-              onUpdatePermohonan={handleUpdatePermohonan}
-              selectedCaseId={selectedTindakLanjutId}
-              onSelectCase={(id) => {
-                setSelectedTindakLanjutId(id);
-                if (id) {
-                  navigateToDashboard(`/tindak_lanjut/detail/${id}`);
-                } else {
-                  navigateToDashboard('/tindak_lanjut');
-                }
-              }}
-            />
-          );
-        }
         return (
           <InputJadwalKontrolView
             permohonanList={permohonanList}

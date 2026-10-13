@@ -6,6 +6,7 @@ import type {
   BuktiWajibLapor,
   MonitoringTindakLanjut
 } from '../types';
+import { isSuspectExaminedByMedis } from '../utils/medisAuth';
 import {
   Calendar,
   UserCheck,
@@ -41,17 +42,27 @@ export const InputJadwalKontrolView: React.FC<InputJadwalKontrolViewProps> = ({
   onNavigateToMonitoring,
   onBack
 }) => {
-  // Filter: Hanya permohonan resmi e-TAT yang SUDAH SELESAI SIDANG PLENO TAT & milik akun Pengaju jika login sebagai PENGAJU
-  const completedSidangList = permohonanList.filter(p => {
-    const isPengajuRole = currentUser.role?.toUpperCase() === 'PENGAJU';
-    const isOwner = !isPengajuRole ||
-      p.pengajuId === currentUser.id ||
-      (p.pengajuNama && p.pengajuNama.toLowerCase().includes((currentUser.name || '').toLowerCase())) ||
-      (p.perkara?.namaPenyidik && p.perkara.namaPenyidik.toLowerCase().includes((currentUser.name || '').toLowerCase())) ||
-      (p.instansiPengaju && currentUser.agency && p.instansiPengaju.toLowerCase().includes(currentUser.agency.toLowerCase())) ||
-      (p.instansiPengaju && currentUser.instansi && p.instansiPengaju.toLowerCase().includes(currentUser.instansi.toLowerCase()));
+  const isPengajuRole = currentUser.role?.toUpperCase() === 'PENGAJU';
+  const isMedisRole = currentUser.role?.toUpperCase() === 'MEDIS';
 
-    if (!isOwner) return false;
+  // Filter: Hanya permohonan resmi e-TAT yang SUDAH SELESAI SIDANG PLENO TAT
+  // - Jika PENGAJU: hanya milik akun Pengaju
+  // - Jika MEDIS: hanya tersangka yang memang diperiksa oleh bagian medis yang dituju
+  const completedSidangList = permohonanList.filter(p => {
+    if (isPengajuRole) {
+      const isOwner =
+        p.pengajuId === currentUser.id ||
+        (p.pengajuNama && p.pengajuNama.toLowerCase().includes((currentUser.name || '').toLowerCase())) ||
+        (p.perkara?.namaPenyidik && p.perkara.namaPenyidik.toLowerCase().includes((currentUser.name || '').toLowerCase())) ||
+        (p.instansiPengaju && currentUser.agency && p.instansiPengaju.toLowerCase().includes(currentUser.agency.toLowerCase())) ||
+        (p.instansiPengaju && currentUser.instansi && p.instansiPengaju.toLowerCase().includes(currentUser.instansi.toLowerCase()));
+
+      if (!isOwner) return false;
+    }
+
+    if (isMedisRole) {
+      if (!isSuspectExaminedByMedis(p, currentUser)) return false;
+    }
 
     const isSubmitted = p.applicationStatus !== 'DRAFT';
     const isSidangBeres = p.plenoAssesmen?.statusPleno === 'SELESAI' ||
@@ -78,7 +89,9 @@ export const InputJadwalKontrolView: React.FC<InputJadwalKontrolViewProps> = ({
   const [fasilitasTujuan, setFasilitasTujuan] = useState('Balai Rehabilitasi BNN Tanah Merah');
   const [tanggalMulai, setTanggalMulai] = useState(new Date().toISOString().slice(0, 10));
   const [frekuensiKontrol, setFrekuensiKontrol] = useState('Seminggu 2x (Selasa & Jumat)');
-  const [namaDpjp, setNamaDpjp] = useState('dr. Rina Lestari, Sp.KJ');
+  const [namaDpjp, setNamaDpjp] = useState(
+    isMedisRole ? (currentUser.name || 'Dokter Asesor Medis') : 'dr. Rina Lestari, Sp.KJ'
+  );
   
   // Wajib lapor penyidik
   const [tanggalWajibLapor, setTanggalWajibLapor] = useState(new Date().toISOString().slice(0, 10));
@@ -238,6 +251,20 @@ export const InputJadwalKontrolView: React.FC<InputJadwalKontrolViewProps> = ({
           <ShieldCheck className="w-3.5 h-3.5" /> Validasi Sidang Pleno
         </span>
       </div>
+
+      {isMedisRole && (
+        <div className="bg-emerald-950/40 border border-emerald-500/30 rounded-2xl p-4 flex items-start gap-3 text-xs text-emerald-200 shadow-md">
+          <div className="p-2 bg-emerald-500/20 border border-emerald-500/40 rounded-xl text-emerald-400 shrink-0">
+            <Stethoscope className="w-4 h-4" />
+          </div>
+          <div>
+            <h4 className="font-bold text-emerald-300 text-xs">Akses Otoritas Medis Aktif: {currentUser.name}</h4>
+            <p className="text-slate-300 text-[11px] mt-0.5 leading-relaxed">
+              Anda berwenang menginput penjadwalan kontrol rehabilitasi medis untuk tersangka yang telah selesai asesmen dan berada di bawah penugasan pemeriksaan Anda. Tersangka yang diperiksa oleh dokter/bagian medis lain tidak akan muncul dalam daftar pilihan.
+            </p>
+          </div>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-5">
         {/* CARD 1: SELEKSI KLIEN DENGAN MODAL SHOPEE-LIKE PICKER */}
@@ -596,6 +623,8 @@ export const InputJadwalKontrolView: React.FC<InputJadwalKontrolViewProps> = ({
                   <p className="text-xs text-slate-400 max-w-sm mx-auto leading-relaxed">
                     {clientSearchQuery
                       ? `Tidak ada data klien yang cocok dengan kata kunci "${clientSearchQuery}". Coba gunakan nama lain atau NIK.`
+                      : isMedisRole
+                      ? `Belum ada tersangka di bawah penugasan pemeriksaan Anda (${currentUser.name}) yang telah selesai sidang pleno dan siap dijadwalkan kontrol.`
                       : 'Belum ada data permohonan yang telah menyelesaikan sidang pleno TAT.'}
                   </p>
                 </div>

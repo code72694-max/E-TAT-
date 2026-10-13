@@ -828,7 +828,9 @@ export interface PermohonanAsesmen {
   // Tim & Penugasan
   timAsesmen?: {
     sekretariatNama: string;
+    asesorMedisId?: string;
     asesorMedisNama?: string;
+    asesorHukumId?: string;
     asesorHukumNama?: string;
     jadwalPemeriksaanMedis?: string;
     jadwalPemeriksaanHukum?: string;

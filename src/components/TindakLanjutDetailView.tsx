@@ -13,6 +13,7 @@ import type {
   JurnalPengawasan,
   SuratPeringatanKlien,
 } from '../types';
+import { isSuspectExaminedByMedis } from '../utils/medisAuth';
 import {
   ArrowLeft,
   Building2,
@@ -248,11 +249,12 @@ const FieldGroup: React.FC<{ label: string; required?: boolean; hint?: string; c
 const PelaksanaanRehabSection: React.FC<{
   monitoring: MonitoringTindakLanjut;
   userRole: UserRole;
+  readOnly?: boolean;
   onUpdate: (updated: MonitoringTindakLanjut) => void;
-}> = ({ monitoring, userRole, onUpdate }) => {
+}> = ({ monitoring, userRole, readOnly, onUpdate }) => {
   const existing = monitoring.pelaksanaanRehab;
-  const [mode, setMode] = useState<'view' | 'edit' | 'new'>(!existing ? 'new' : 'view');
-  const canEdit = ['PENGAJU', 'ADMIN', 'MEDIS'].includes(userRole);
+  const [mode, setMode] = useState<'view' | 'edit' | 'new'>(!existing && !readOnly ? 'new' : 'view');
+  const canEdit = !readOnly && ['PENGAJU', 'ADMIN', 'MEDIS'].includes(userRole);
 
   const [form, setForm] = useState<Partial<PelaksanaanRehab>>(existing ?? {
     adaKendala: false,
@@ -411,8 +413,9 @@ const PelaksanaanRehabSection: React.FC<{
 const EvaluasiKlinisSection: React.FC<{
   monitoring: MonitoringTindakLanjut;
   userRole: UserRole;
+  readOnly?: boolean;
   onUpdate: (updated: MonitoringTindakLanjut) => void;
-}> = ({ monitoring, userRole, onUpdate }) => {
+}> = ({ monitoring, userRole, readOnly, onUpdate }) => {
   const [showUrineModal, setShowUrineModal] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
 
@@ -490,23 +493,25 @@ const EvaluasiKlinisSection: React.FC<{
       />
 
       {/* Action Input Buttons */}
-      <div className="flex flex-wrap gap-2.5">
-        <button
-          onClick={() => setShowUrineModal(true)}
-          className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700/80 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
-        >
-          <Syringe className="w-3.5 h-3.5 text-slate-400" />
-          <span>+ Input Hasil Tes Urin</span>
-        </button>
+      {!readOnly && (
+        <div className="flex flex-wrap gap-2.5">
+          <button
+            onClick={() => setShowUrineModal(true)}
+            className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700/80 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
+          >
+            <Syringe className="w-3.5 h-3.5 text-slate-400" />
+            <span>+ Input Hasil Tes Urin</span>
+          </button>
 
-        <button
-          onClick={() => setShowReportModal(true)}
-          className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700/80 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
-        >
-          <FilePlus className="w-3.5 h-3.5 text-slate-400" />
-          <span>+ Input Evaluasi Klinis Medis</span>
-        </button>
-      </div>
+          <button
+            onClick={() => setShowReportModal(true)}
+            className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700/80 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
+          >
+            <FilePlus className="w-3.5 h-3.5 text-slate-400" />
+            <span>+ Input Evaluasi Klinis Medis</span>
+          </button>
+        </div>
+      )}
 
       {/* Modal Input Urin */}
       {showUrineModal && (
@@ -590,8 +595,9 @@ const EvaluasiKlinisSection: React.FC<{
 const WajibLaporSection: React.FC<{
   monitoring: MonitoringTindakLanjut;
   userRole: UserRole;
+  readOnly?: boolean;
   onUpdate: (updated: MonitoringTindakLanjut) => void;
-}> = ({ monitoring, userRole, onUpdate }) => {
+}> = ({ monitoring, userRole, readOnly, onUpdate }) => {
   const [showForm, setShowForm] = useState(false);
   const [formMode, setFormMode] = useState<'aktual' | 'rencana'>('aktual');
   const [showSpModal, setShowSpModal] = useState(false);
@@ -716,31 +722,33 @@ const WajibLaporSection: React.FC<{
         </ul>
       </div>
 
-      <div className="flex flex-wrap gap-2.5">
-        <button
-          onClick={() => { setShowForm(true); setFormMode('aktual'); }}
-          className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700/80 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
-        >
-          <Plus className="w-3.5 h-3.5 text-slate-400" />
-          <span>+ Catat Pelaporan Aktual</span>
-        </button>
+      {!readOnly && (
+        <div className="flex flex-wrap gap-2.5">
+          <button
+            onClick={() => { setShowForm(true); setFormMode('aktual'); }}
+            className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700/80 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
+          >
+            <Plus className="w-3.5 h-3.5 text-slate-400" />
+            <span>+ Catat Pelaporan Aktual</span>
+          </button>
 
-        <button
-          onClick={() => { setShowForm(true); setFormMode('rencana'); }}
-          className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700/80 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
-        >
-          <Calendar className="w-3.5 h-3.5 text-slate-400" />
-          <span>+ Buat Rencana Wajib Lapor</span>
-        </button>
+          <button
+            onClick={() => { setShowForm(true); setFormMode('rencana'); }}
+            className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700/80 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
+          >
+            <Calendar className="w-3.5 h-3.5 text-slate-400" />
+            <span>+ Buat Rencana Wajib Lapor</span>
+          </button>
 
-        <button
-          onClick={() => setShowSpModal(true)}
-          className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-rose-400 hover:text-rose-300 border border-rose-500/30 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer ml-auto"
-        >
-          <BadgeAlert className="w-3.5 h-3.5 text-rose-400" />
-          <span>Terbitkan SP</span>
-        </button>
-      </div>
+          <button
+            onClick={() => setShowSpModal(true)}
+            className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-rose-400 hover:text-rose-300 border border-rose-500/30 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer ml-auto"
+          >
+            <BadgeAlert className="w-3.5 h-3.5 text-rose-400" />
+            <span>Terbitkan SP</span>
+          </button>
+        </div>
+      )}
 
       {showSpModal && (
         <form onSubmit={handleIssueSp} className="p-4 bg-slate-950/80 border border-rose-900/40 rounded-xl space-y-3 shadow-sm">
@@ -996,8 +1004,9 @@ const AkhirLayananSection: React.FC<{
   monitoring: MonitoringTindakLanjut;
   permohonan: PermohonanAsesmen;
   userRole: UserRole;
+  readOnly?: boolean;
   onUpdate: (updated: MonitoringTindakLanjut) => void;
-}> = ({ monitoring, permohonan, userRole, onUpdate }) => {
+}> = ({ monitoring, permohonan, userRole, readOnly, onUpdate }) => {
   const existing = monitoring.akhirLayanan;
   const [showCertPreview, setShowCertPreview] = useState(false);
 
@@ -1121,14 +1130,16 @@ const AkhirLayananSection: React.FC<{
         )}
 
         {/* Input Form for Output Generation */}
-        <div className="space-y-3 pt-1">
-          <FieldGroup label="Ringkasan Hasil Evaluasi Selesai Rehabilitasi" required>
-            <textarea className="w-full bg-slate-900 border border-slate-800 rounded-lg p-3 text-xs text-slate-100 focus:border-slate-600 outline-none" rows={3} value={form.hasilSesuaiDokumenFasilitas ?? ''} onChange={e => setF('hasilSesuaiDokumenFasilitas', e.target.value)} />
-          </FieldGroup>
-          <button className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-emerald-400 hover:text-emerald-300 border border-emerald-500/40 rounded-lg text-xs font-medium flex items-center gap-1.5 cursor-pointer shadow-sm transition-all" onClick={handleSave}>
-            <Check className="w-3.5 h-3.5" /> Simpan &amp; Finalkan Output Surat SKSR
-          </button>
-        </div>
+        {!readOnly && (
+          <div className="space-y-3 pt-1">
+            <FieldGroup label="Ringkasan Hasil Evaluasi Selesai Rehabilitasi" required>
+              <textarea className="w-full bg-slate-900 border border-slate-800 rounded-lg p-3 text-xs text-slate-100 focus:border-slate-600 outline-none" rows={3} value={form.hasilSesuaiDokumenFasilitas ?? ''} onChange={e => setF('hasilSesuaiDokumenFasilitas', e.target.value)} />
+            </FieldGroup>
+            <button className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-emerald-400 hover:text-emerald-300 border border-emerald-500/40 rounded-lg text-xs font-medium flex items-center gap-1.5 cursor-pointer shadow-sm transition-all" onClick={handleSave}>
+              <Check className="w-3.5 h-3.5" /> Simpan &amp; Finalkan Output Surat SKSR
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -1193,6 +1204,14 @@ export const TindakLanjutDetailView: React.FC<Props> = ({
     akhir: !!monitoring.akhirLayanan,
   };
 
+  const isMedisRole = currentUser.role?.toUpperCase() === 'MEDIS';
+  const isMedisAuthorized = isMedisRole ? isSuspectExaminedByMedis(permohonan, currentUser) : true;
+  const doctorName =
+    permohonan.timAsesmen?.asesorMedisNama ||
+    permohonan.asesmenMedis?.asesorNama ||
+    (permohonan.asesmenMedis as any)?.dokterPemeriksa ||
+    'Dokter Asesor Medis Lain';
+
   return (
     <div className="space-y-4 text-slate-100 font-sans">
       {/* Integrated Header Row */}
@@ -1214,6 +1233,25 @@ export const TindakLanjutDetailView: React.FC<Props> = ({
           </div>
         </div>
       </div>
+
+      {/* Role-Specific Medical Authorization Banner */}
+      {isMedisRole && (
+        isMedisAuthorized ? (
+          <div className="bg-emerald-950/40 border border-emerald-500/30 rounded-xl p-3 flex items-center gap-3 text-xs text-emerald-300 shadow-sm">
+            <Stethoscope className="w-4 h-4 text-emerald-400 shrink-0" />
+            <span>
+              <strong>Hak Akses Medis Valid:</strong> Anda ({currentUser.name}) adalah dokter pemeriksa yang ditugaskan untuk tersangka ini. Anda memiliki wewenang penuh untuk menginput evaluasi klinis, tes urin, dan jadwal kontrol.
+            </span>
+          </div>
+        ) : (
+          <div className="bg-amber-950/40 border border-amber-500/30 rounded-xl p-3 flex items-center gap-3 text-xs text-amber-200 shadow-sm">
+            <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
+            <span>
+              <strong>Akses Medis Terbatas (Mode Baca):</strong> Tersangka ini diperiksa oleh pemeriksa medis <strong>{doctorName}</strong>. Akun Anda ({currentUser.name}) tidak memiliki otorisasi untuk menambah atau mengubah jadwal kontrol &amp; evaluasi rekam medis pasien ini.
+            </span>
+          </div>
+        )
+      )}
 
       {/* Summary Live Dashboard Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -1273,16 +1311,16 @@ export const TindakLanjutDetailView: React.FC<Props> = ({
       {/* Active Sub View */}
       <div className="pt-1">
         {activeTab === 'pelaksanaan' && (
-          <PelaksanaanRehabSection monitoring={monitoring} userRole={currentUser.role} onUpdate={handleMonitoringUpdate} />
+          <PelaksanaanRehabSection monitoring={monitoring} userRole={currentUser.role} readOnly={!isMedisAuthorized} onUpdate={handleMonitoringUpdate} />
         )}
         {activeTab === 'laporan' && (
-          <EvaluasiKlinisSection monitoring={monitoring} userRole={currentUser.role} onUpdate={handleMonitoringUpdate} />
+          <EvaluasiKlinisSection monitoring={monitoring} userRole={currentUser.role} readOnly={!isMedisAuthorized} onUpdate={handleMonitoringUpdate} />
         )}
         {activeTab === 'wajib_lapor' && (
-          <WajibLaporSection monitoring={monitoring} userRole={currentUser.role} onUpdate={handleMonitoringUpdate} />
+          <WajibLaporSection monitoring={monitoring} userRole={currentUser.role} readOnly={!isMedisAuthorized} onUpdate={handleMonitoringUpdate} />
         )}
         {activeTab === 'akhir' && (
-          <AkhirLayananSection monitoring={monitoring} permohonan={permohonan} userRole={currentUser.role} onUpdate={handleMonitoringUpdate} />
+          <AkhirLayananSection monitoring={monitoring} permohonan={permohonan} userRole={currentUser.role} readOnly={!isMedisAuthorized} onUpdate={handleMonitoringUpdate} />
         )}
       </div>
     </div>
