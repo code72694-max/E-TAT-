@@ -177,7 +177,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                     setEmailInput(e.target.value);
                     setLoginNotice(null);
                   }}
-                  placeholder="nama@polri.go.id / satwil"
+                  placeholder="admin@gmail.com / pengaju@gmail.com"
                   className="w-full bg-[#081224] focus:bg-[#0c1c34] text-slate-100 focus:text-white pl-10 pr-3.5 py-3 rounded-xl border border-[#1b3459] focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37]/50 text-xs sm:text-[13px] outline-none placeholder-slate-500 transition-all shadow-inner"
                 />
               </div>
@@ -232,6 +232,43 @@ export const LoginPage: React.FC<LoginPageProps> = ({
               >
                 Lupa sandi?
               </button>
+            </div>
+
+            {/* Quick Fill Role Accounts */}
+            <div className="pt-1">
+              <div className="flex items-center justify-between text-[11px] text-slate-400 mb-2">
+                <span>Pilih Akun Role Cepat:</span>
+                <span className="text-slate-500 font-mono text-[10px]">Pass: password123</span>
+              </div>
+              <div className="grid grid-cols-2 gap-1.5">
+                {[
+                  { role: 'Admin', email: 'admin@gmail.com', desc: 'Sekretariat' },
+                  { role: 'Pengaju', email: 'pengaju@gmail.com', desc: 'Penyidik' },
+                  { role: 'Medis', email: 'medis@gmail.com', desc: 'Dokter / Psikolog' },
+                  { role: 'Hukum', email: 'hukum@gmail.com', desc: 'Jaksa / Penelaah' },
+                ].map(item => (
+                  <button
+                    key={item.email}
+                    type="button"
+                    onClick={() => {
+                      setEmailInput(item.email);
+                      setPasswordInput('password123');
+                      setLoginNotice(null);
+                    }}
+                    className={`px-2.5 py-1.5 rounded-lg border text-left transition-all text-xs flex flex-col justify-center cursor-pointer ${
+                      emailInput === item.email
+                        ? 'bg-[#D4AF37]/20 border-[#D4AF37] text-amber-200'
+                        : 'bg-[#081224]/80 border-[#1b3459] text-slate-300 hover:border-slate-500 hover:bg-[#0e1e36]'
+                    }`}
+                  >
+                    <span className="font-semibold text-[11px] leading-tight text-white flex items-center justify-between">
+                      {item.role}
+                      <span className="text-[10px] text-[#D4AF37] font-normal">{item.desc}</span>
+                    </span>
+                    <span className="text-[10px] text-slate-400 font-mono truncate">{item.email}</span>
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Login Button */}
