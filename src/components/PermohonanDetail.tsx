@@ -5,7 +5,6 @@ import {
   UserRole
 } from '../types';
 import {
-  ArrowLeft,
   Clock,
   AlertTriangle,
   CheckCircle2,
@@ -333,20 +332,9 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
 
       {/* Header Bar: Key-Value Grid Identitas Berkas */}
       <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl p-3.5 sm:p-4 shadow-sm">
-        <div className="flex flex-col sm:flex-row sm:items-start gap-3 sm:gap-4">
-          <button
-            type="button"
-            onClick={onBack}
-            className="hidden sm:inline-flex items-center space-x-1.5 px-2.5 py-1 text-slate-300 hover:text-white hover:bg-[#142642] rounded-lg text-xs font-semibold transition-all cursor-pointer shrink-0 border-0 bg-transparent select-none self-start"
-            title="Kembali ke daftar"
-          >
-            <ArrowLeft className="w-3.5 h-3.5 text-[#d4af37]" />
-            <span>Kembali</span>
-          </button>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-1.5 text-[11px] sm:text-xs w-full flex-1">
-            <div className="grid grid-cols-[115px_10px_1fr] items-center gap-y-1.5">
-              <span className="text-slate-400 font-medium">No. Permohonan</span>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-1.5 text-[11px] sm:text-xs w-full">
+          <div className="grid grid-cols-[115px_10px_1fr] items-center gap-y-1.5">
+            <span className="text-slate-400 font-medium">No. Permohonan</span>
               <span className="text-slate-500 font-medium">:</span>
               <span className="font-semibold text-slate-100 font-mono">
                 {currentPermohonan.nomorPermohonan}
@@ -406,7 +394,6 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
             </div>
           </div>
         </div>
-      </div>
 
       {/* Read-Only Mode Banner */}
       {effectiveReadonly && (
