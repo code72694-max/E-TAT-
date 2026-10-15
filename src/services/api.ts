@@ -254,7 +254,9 @@ export const permohonanApi = {
 
   tugaskan: async (id: string, payload: {
     asesorMedisId?: string;
+    asesorMedisNama?: string;
     asesorHukumId?: string;
+    asesorHukumNama?: string;
     jadwalPemeriksaanMedis?: string;
     jadwalPemeriksaanHukum?: string;
     lokasiPemeriksaan?: string;
@@ -437,6 +439,27 @@ export const rekomendasiApi = {
   verifikasiQr: async (qrCode: string) => {
     return request<any>(`/rekomendasi/verifikasi/${encodeURIComponent(qrCode)}`);
   },
+
+  getPdfUrl: (permohonanId: string) => {
+    return `${API_BASE}/rekomendasi/${permohonanId}/pdf`;
+  },
+
+  downloadPdf: async (permohonanId: string, filename?: string) => {
+    const token = tokenStorage.getAccessToken();
+    const res = await fetch(`${API_BASE}/rekomendasi/${permohonanId}/pdf`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
+    if (!res.ok) throw new Error('Gagal mengunduh dokumen rekomendasi PDF dari server.');
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename || `REKOMENDASI-TAT-${permohonanId}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+  },
 };
 
 // =====================================================================
@@ -478,13 +501,22 @@ export const klarifikasiApi = {
   },
 
   create: async (permohonanId: string, payload: {
-    judul: string;
     pertanyaan: string;
+    kepadaPeran?: string;
+    judul?: string;
     targetRole?: string;
+    lampiran?: string;
   }) => {
+    const rawRole = (payload.kepadaPeran || payload.targetRole || 'PENGAJU').toUpperCase();
+    const mappedRole = ['ADMIN', 'PENGAJU', 'MEDIS', 'HUKUM'].includes(rawRole) ? rawRole : 'PENGAJU';
+
     return request<any>(`/klarifikasi/${permohonanId}`, {
       method: 'POST',
-      body: JSON.stringify(payload),
+      body: JSON.stringify({
+        pertanyaan: payload.pertanyaan,
+        kepadaPeran: mappedRole,
+        lampiran: payload.lampiran,
+      }),
     });
   },
 

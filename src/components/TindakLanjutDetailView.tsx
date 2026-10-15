@@ -14,6 +14,7 @@ import type {
   SuratPeringatanKlien,
 } from '../types';
 import { isSuspectExaminedByMedis } from '../utils/medisAuth';
+import { tindakLanjutApi } from '../services/api';
 import {
   ArrowLeft,
   Building2,
@@ -1180,6 +1181,27 @@ export const TindakLanjutDetailView: React.FC<Props> = ({
   const handleMonitoringUpdate = (updated: MonitoringTindakLanjut) => {
     setMonitoring(updated);
     onUpdatePermohonan({ ...permohonan, monitoringTindakLanjut: updated });
+
+    if (permohonan.id && updated.pelaksanaanRehab) {
+      const pel = updated.pelaksanaanRehab;
+      tindakLanjutApi.updatePelaksanaan(permohonan.id, {
+        namaFasilitasTujuan: pel.namaFasilitasTujuan,
+        alamatFasilitas: pel.alamatFasilitas,
+        kontakPenanggungJawabFasilitas: pel.kontakPenanggungJawabFasilitas,
+        namaPenanggungJawabFasilitas: pel.namaPenanggungJawabFasilitas,
+        tanggalKoordinasiPenerimaan: pel.tanggalKoordinasiPenerimaan ? new Date(pel.tanggalKoordinasiPenerimaan).toISOString() : undefined,
+        hasilKoordinasiPenerimaan: pel.hasilKoordinasiPenerimaan,
+        catatanKoordinasi: pel.catatanKoordinasi,
+        tanggalSerahTerimaAktual: pel.tanggalSerahTerimaAktual ? new Date(pel.tanggalSerahTerimaAktual).toISOString() : undefined,
+        identitasPihakMenyerahkan: pel.identitasPihakMenyerahkan,
+        identitasPihakMenerima: pel.identitasPihakMenerima,
+        tanggalMasukLayananTerkonfirmasi: pel.tanggalMasukLayananTerkonfirmasi ? new Date(pel.tanggalMasukLayananTerkonfirmasi).toISOString() : undefined,
+        adaKendala: pel.adaKendala ?? false,
+        kendala: pel.kendala,
+        perbedaanDariRekomendasi: pel.perbedaanDariRekomendasi,
+        statusPelaksanaan: pel.statusPelaksanaan ?? 'serah_terima_selesai',
+      }).catch(err => console.warn('Backend tindakLanjutApi.updatePelaksanaan notice:', err));
+    }
   };
 
   const statusMonitoringColors: Record<MonitoringTindakLanjut['statusMonitoring'], 'slate' | 'blue' | 'green' | 'amber' | 'red'> = {

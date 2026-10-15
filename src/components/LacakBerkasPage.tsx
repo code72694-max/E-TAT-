@@ -195,8 +195,8 @@ export const LacakBerkasPage: React.FC<LacakBerkasPageProps> = ({
     }
     return {
       id: selectedPermohonan?.pengajuId || 'user-pengaju-public',
-      name: selectedPermohonan?.pengajuNama || selectedPermohonan?.perkara?.namaPenyidik || 'Ipda Budi Santoso',
-      email: selectedPermohonan?.pengajuEmail || 'etatsiappulih@gmail.com',
+      name: selectedPermohonan?.pengajuNama || selectedPermohonan?.perkara?.namaPenyidik || '[TEST] Penyidik Pengaju Satresnarkoba',
+      email: selectedPermohonan?.pengajuEmail || 'pengaju@gmail.com',
       role: 'PENGAJU',
       agency: selectedPermohonan?.instansiPengaju || 'Satresnarkoba Polresta Samarinda',
       avatarUrl: ''

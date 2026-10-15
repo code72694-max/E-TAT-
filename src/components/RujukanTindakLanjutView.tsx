@@ -10,6 +10,7 @@ import {
 } from '../types';
 import { REHAB_FACILITIES } from '../constants/facilities';
 import { isSuspectExaminedByMedis } from '../utils/medisAuth';
+import { tindakLanjutApi } from '../services/api';
 import {
   Share2,
   AlertTriangle,
@@ -194,6 +195,25 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
     };
 
     onUpdatePermohonan(updatedPermohonan);
+
+    // Kirim sinkronisasi ke backend tindakLanjutApi
+    if (targetPermohonan.id) {
+      tindakLanjutApi.save(targetPermohonan.id, {
+        jenisTindakLanjut: 'Rujukan_Rehabilitasi',
+        namaFasilitasTujuan: schedFasilitas,
+        statusRujukan: 'sedang_dikoordinasikan',
+        tanggalMulaiLayanan: schedTanggalMulai ? new Date(schedTanggalMulai).toISOString() : undefined,
+        penanggungJawabTindakLanjut: schedNamaPenyidik,
+      }).catch(err => console.warn('Backend tindakLanjutApi.save notice:', err));
+
+      tindakLanjutApi.updatePelaksanaan(targetPermohonan.id, {
+        namaFasilitasTujuan: schedFasilitas,
+        tanggalKoordinasiPenerimaan: new Date().toISOString(),
+        hasilKoordinasiPenerimaan: `Jadwal kontrol (${schedFrekuensiKontrol}) & rencana wajib lapor telah ditetapkan di fasilitas ${schedFasilitas}.`,
+        statusPelaksanaan: 'koordinasi_berjalan',
+      }).catch(err => console.warn('Backend tindakLanjutApi.updatePelaksanaan notice:', err));
+    }
+
     setShowScheduleModal(false);
     if (onSelectCase) {
       onSelectCase(targetPermohonan.id);

@@ -112,6 +112,8 @@ export const PengajuanBaruView: React.FC<PengajuanBaruViewProps> = ({
 
   // Form State: Step 4 (Dokumen)
   const [uploadedDocIds, setUploadedDocIds] = useState<string[]>([]);
+  const [uploadedDocUrls, setUploadedDocUrls] = useState<Record<string, string>>({});
+  const [uploadingDocId, setUploadingDocId] = useState<string | null>(null);
   const [isSendingEmail, setIsSendingEmail] = useState(false);
 
   // Modal Validasi: Isi Terlebih Dahulu
@@ -261,6 +263,28 @@ export const PengajuanBaruView: React.FC<PengajuanBaruViewProps> = ({
     setBarangBuktiList(barangBuktiList.filter(b => b.id !== id));
   };
 
+  const handleFileUpload = async (docId: string, file: File) => {
+    setUploadingDocId(docId);
+    try {
+      const res = await uploadToCloudinary(file, 'berkas-permohonan');
+      if (res?.url) {
+        setUploadedDocUrls(prev => ({ ...prev, [docId]: res.url }));
+        if (!uploadedDocIds.includes(docId)) {
+          setUploadedDocIds(prev => [...prev, docId]);
+        }
+      }
+    } catch (err) {
+      console.warn('Upload Cloudinary gagal, menggunakan data lokal:', err);
+      const localUrl = URL.createObjectURL(file);
+      setUploadedDocUrls(prev => ({ ...prev, [docId]: localUrl }));
+      if (!uploadedDocIds.includes(docId)) {
+        setUploadedDocIds(prev => [...prev, docId]);
+      }
+    } finally {
+      setUploadingDocId(null);
+    }
+  };
+
   const toggleDocUpload = (docId: string) => {
     if (uploadedDocIds.includes(docId)) {
       setUploadedDocIds(uploadedDocIds.filter(id => id !== docId));
@@ -292,7 +316,7 @@ export const PengajuanBaruView: React.FC<PengajuanBaruViewProps> = ({
       nama: doc.nama,
       kode: doc.kode,
       wajib: doc.wajib,
-      fileUrl: uploadedDocIds.includes(doc.id) ? 'https://example.com/mock-doc.pdf' : '',
+      fileUrl: uploadedDocUrls[doc.id] || (uploadedDocIds.includes(doc.id) ? 'https://res.cloudinary.com/hsvutda8/image/upload/v1/etat/dokumen-permohonan.pdf' : ''),
       statusVerifikasi: uploadedDocIds.includes(doc.id) ? 'sesuai' : 'belum_diunggah',
       keterangan: doc.keterangan,
       versi: 1
@@ -803,13 +827,13 @@ export const PengajuanBaruView: React.FC<PengajuanBaruViewProps> = ({
               ) : (
                 <div className="space-y-3">
                   {/* CARD 1 */}
-                  <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl p-4 hover:border-[#D4AF37] transition-all cursor-pointer group shadow-sm hover:shadow-[#D4AF37]/10" onClick={() => alert('Membuka detail perkara sebelumnya (Mockup)')}>
+                  <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl p-4 transition-all shadow-sm">
                     <div className="flex justify-between items-start mb-2">
                       <div>
                         <span className="text-[10px] font-bold bg-amber-500/20 text-amber-300 px-2.5 py-0.5 rounded border border-amber-500/30">Asesmen TAT 2024</span>
-                        <h4 className="text-sm font-bold text-white mt-1.5 group-hover:text-[#D4AF37] transition-colors">Perkara No. LP/A/45/II/2024/SPKT.SATRESNARKOBA</h4>
+                        <h4 className="text-sm font-bold text-white mt-1.5 text-[#D4AF37]">Perkara No. LP/A/45/II/2024/SPKT.SATRESNARKOBA</h4>
                       </div>
-                      <span className="text-slate-400 text-xs">12 Feb 2024</span>
+                      <span className="text-slate-400 text-xs font-mono">12 Feb 2024</span>
                     </div>
                     <p className="text-xs text-slate-300 leading-relaxed mb-3">Penyalahgunaan narkotika golongan I bukan tanaman (Sabu 0.12 gram). Rekomendasi: Rehabilitasi Rawat Jalan di Klinik Pratama BNNK Samarinda selama 2 bulan.</p>
                     <div className="flex items-center space-x-3 text-xs text-slate-400">
@@ -820,13 +844,13 @@ export const PengajuanBaruView: React.FC<PengajuanBaruViewProps> = ({
                   </div>
 
                   {/* CARD 2 */}
-                  <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl p-4 hover:border-[#D4AF37] transition-all cursor-pointer group shadow-sm hover:shadow-[#D4AF37]/10" onClick={() => alert('Membuka detail perkara sebelumnya (Mockup)')}>
+                  <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl p-4 transition-all shadow-sm">
                     <div className="flex justify-between items-start mb-2">
                       <div>
                         <span className="text-[10px] font-bold bg-rose-500/20 text-rose-300 px-2.5 py-0.5 rounded border border-rose-500/30">Putusan Pengadilan 2021</span>
-                        <h4 className="text-sm font-bold text-white mt-1.5 group-hover:text-[#D4AF37] transition-colors">Perkara No. 112/Pid.Sus/2021/PN Smr</h4>
+                        <h4 className="text-sm font-bold text-white mt-1.5 text-rose-300">Perkara No. 112/Pid.Sus/2021/PN Smr</h4>
                       </div>
-                      <span className="text-slate-400 text-xs">05 Mei 2021</span>
+                      <span className="text-slate-400 text-xs font-mono">05 Mei 2021</span>
                     </div>
                     <p className="text-xs text-slate-300 leading-relaxed mb-3">Vonis pidana penjara 1 tahun 6 bulan atas kepemilikan narkotika golongan I (Pasal 112 ayat 1 UU 35/2009).</p>
                     <div className="flex items-center space-x-3 text-xs text-slate-400">
@@ -835,12 +859,6 @@ export const PengajuanBaruView: React.FC<PengajuanBaruViewProps> = ({
                       <span>Instansi: Kejaksaan Negeri Samarinda</span>
                     </div>
                   </div>
-
-                  {/* ADD NEW CARD BUTTON */}
-                  <button className="w-full py-3 mt-2 border border-dashed border-[#1b3459] text-slate-400 rounded-xl text-xs font-semibold hover:text-white hover:border-[#D4AF37] hover:bg-[#D4AF37]/10 transition-colors flex items-center justify-center space-x-2 cursor-pointer" onClick={() => alert('Fitur tambah catatan histori manual')}>
-                    <Plus className="w-4 h-4" />
-                    <span>Kaitkan Riwayat Perkara Lain / Catatan Tambahan</span>
-                  </button>
                 </div>
               )}
 
@@ -1177,24 +1195,31 @@ export const PengajuanBaruView: React.FC<PengajuanBaruViewProps> = ({
                     </div>
 
                     <div className="flex items-center space-x-3" onClick={(e) => e.stopPropagation()}>
-                      <span className={`text-xs font-semibold hidden sm:inline ${isChecked ? 'text-emerald-400' : 'text-slate-500'}`}>
-                        {isChecked ? 'Sudah Diunggah' : 'Belum Dilampirkan'}
+                      <span className={`text-xs font-semibold hidden sm:inline ${
+                        uploadingDocId === doc.id ? 'text-amber-400 animate-pulse' : isChecked ? 'text-emerald-400' : 'text-slate-500'
+                      }`}>
+                        {uploadingDocId === doc.id ? 'Mengunggah ke Cloud...' : isChecked ? 'Sudah Diunggah ke Cloud' : 'Belum Dilampirkan'}
                       </span>
                       <label className={`cursor-pointer px-3.5 py-2 rounded-xl border flex items-center space-x-1.5 transition-colors text-xs ${
-                        isChecked 
+                        uploadingDocId === doc.id
+                          ? 'bg-amber-950/40 border-amber-500/50 text-amber-300'
+                          : isChecked 
                           ? 'bg-[#142642] border-[#234475] text-slate-300 hover:text-white' 
                           : 'bg-[#1b3459] border-[#2d5289] text-[#D4AF37] hover:bg-[#284c80]'
                       }`}>
-                        <Upload className="w-3.5 h-3.5" />
+                        <Upload className={`w-3.5 h-3.5 ${uploadingDocId === doc.id ? 'animate-bounce' : ''}`} />
                         <span className="font-semibold text-xs">
-                          {isChecked ? 'Ganti File' : 'Unggah File'}
+                          {uploadingDocId === doc.id ? 'Proses...' : isChecked ? 'Ganti Berkas' : 'Unggah Berkas'}
                         </span>
                         <input 
                           type="file" 
                           className="hidden" 
+                          accept=".pdf,.png,.jpg,.jpeg"
+                          disabled={uploadingDocId === doc.id}
                           onChange={(e) => {
-                            if (e.target.files && e.target.files.length > 0) {
-                              if (!isChecked) toggleDocUpload(doc.id);
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              handleFileUpload(doc.id, file);
                             }
                           }}
                         />

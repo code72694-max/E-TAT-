@@ -40,7 +40,7 @@ export const SuratJawabanModal: React.FC<SuratJawabanModalProps> = ({ permohonan
 
   const statusBerkas = p.applicationStatus === 'NEEDS_CORRECTION' ? 'perlu_perbaikan' : 'diterima';
 
-  const ketuaNama = p.sidangPleno?.pimpinanPleno || p.timAsesmen?.sekretariatNama || 'Kompol Arya Wicaksono, S.I.K.';
+  const ketuaNama = p.sidangPleno?.pimpinanPleno || p.timAsesmen?.sekretariatNama || '[TEST] Ketua Tim Asesmen Terpadu';
   const ketuaNip = '198001122003121001';
   const ketuaJabatan = 'Sekretariat Tim Asesmen Terpadu (TAT)';
   const instansiBNNP = 'Kalimantan Timur';

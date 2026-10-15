@@ -25,6 +25,7 @@ import {
   Package
 } from 'lucide-react';
 import { ModalLihatDokumenBb } from './ModalLihatDokumenBb';
+import { asesmenHukumApi } from '../services/api';
 
 interface AsesmenHukumViewProps {
   permohonanList: PermohonanAsesmen[];
@@ -167,7 +168,7 @@ export const AsesmenHukumView: React.FC<AsesmenHukumViewProps> = ({
     }
   };
 
-  const handleSaveLegalForm = (isFinal: boolean) => {
+  const handleSaveLegalForm = async (isFinal: boolean) => {
     if (!selectedCase || isReadOnlyView) return;
 
     let updated: PermohonanAsesmen = { ...selectedCase };
@@ -220,6 +221,29 @@ export const AsesmenHukumView: React.FC<AsesmenHukumViewProps> = ({
           : `Draf telaah yuridis disimpan oleh ${currentUser.name}.`
       }
     ];
+
+    // Persist to backend database via API
+    try {
+      await asesmenHukumApi.saveDraft(selectedCase.id, {
+        pernahDitangkap: formData.pernahDitangkap,
+        keteranganPerkaraLalu: formData.keteranganPerkaraLalu,
+        terverifikasiDatabase: formData.terverifikasiDatabase,
+        analisisPeran: formData.analisisPeran,
+        argumentasiPeran: formData.argumentasiPeran,
+        faktaPendukung: checkedFakta,
+        catatanBelumTerverifikasi: formData.catatanBelumTerverifikasi,
+        analisisBarangBukti: formData.analisisBarangBukti,
+        kesimpulanHukum: formData.kesimpulanHukum,
+        rekomendasiHukum: formData.rekomendasiHukum,
+        catatanKlarifikasi: formData.catatanKlarifikasi,
+      });
+
+      if (isFinal) {
+        await asesmenHukumApi.finalisasi(selectedCase.id);
+      }
+    } catch (err) {
+      console.warn('Backend API save asesmen hukum warning, keeping local state:', err);
+    }
 
     if (onUpdatePermohonan) {
       onUpdatePermohonan(updated);

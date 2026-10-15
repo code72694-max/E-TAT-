@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
-import { X, Printer, QrCode } from 'lucide-react';
+import { X, Printer, QrCode, Download } from 'lucide-react';
 import { PermohonanAsesmen } from '../types';
+import { rekomendasiApi } from '../services/api';
 
 interface DokumenHasilAsesmenModalProps {
   permohonan: PermohonanAsesmen;
@@ -42,10 +43,10 @@ export const DokumenHasilAsesmenModal: React.FC<DokumenHasilAsesmenModalProps> =
   const pasalDisangkakan = pk?.pasalDisangkakan || (pk as any)?.pasalDipersangkakan || 'Pasal 127 ayat (1) huruf a UU RI No. 35 Tahun 2009 tentang Narkotika';
 
   // Resolving Processing Accounts / Officers Data
-  const medisAsesor1Nama = medis?.asesorNama || p.timAsesmen?.asesorMedisNama || 'dr. Ratna Sp.KJ';
-  const hukumAsesor1Nama = hukum?.asesorNama || p.timAsesmen?.asesorHukumNama || 'Agus Pratama, S.H., M.H.';
-  const penyidikKasusNama = pk?.namaPenyidik || p.pengajuNama || 'Ipda Budi Santoso, S.H.';
-  const ketuaNama = pleno?.pimpinanPleno || p.timAsesmen?.sekretariatNama || 'Kompol Arya Wicaksono, S.I.K.';
+  const medisAsesor1Nama = medis?.asesorNama || p.timAsesmen?.asesorMedisNama || '[TEST] Dokter Asesor Medis TAT';
+  const hukumAsesor1Nama = hukum?.asesorNama || p.timAsesmen?.asesorHukumNama || '[TEST] Jaksa Asesor Hukum TAT';
+  const penyidikKasusNama = pk?.namaPenyidik || p.pengajuNama || '[TEST] Penyidik Pengaju Satresnarkoba';
+  const ketuaNama = pleno?.pimpinanPleno || p.timAsesmen?.sekretariatNama || '[TEST] Ketua Tim Asesmen Terpadu';
 
   const daftarHadir = Array.isArray(pleno?.daftarHadir) ? pleno.daftarHadir : [];
   const timMedisDaftar = daftarHadir.filter(m =>
@@ -162,11 +163,24 @@ export const DokumenHasilAsesmenModal: React.FC<DokumenHasilAsesmenModalProps> =
           </div>
           <div className="flex items-center gap-2">
             <button
+              onClick={() => {
+                rekomendasiApi.downloadPdf(p.id, `SURAT-REKOMENDASI-TAT-${namaTersangka.replace(/\s+/g, '_')}.pdf`).catch(err => {
+                  console.warn('Gagal unduh server PDF, fallback cetak browser:', err);
+                  handlePrint();
+                });
+              }}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-[#13345e] hover:bg-[#1a4478] text-sky-200 border border-sky-500/40 transition-colors cursor-pointer shadow"
+              title="Unduh Berkas PDF Asli Resmi dari Server (Server-Side Generated)"
+            >
+              <Download className="w-3.5 h-3.5 text-sky-400" />
+              <span>Unduh PDF Server</span>
+            </button>
+            <button
               onClick={handlePrint}
               className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-[#d4af37] text-[#0b172a] hover:bg-[#e8c84a] transition-colors cursor-pointer shadow"
             >
               <Printer className="w-3.5 h-3.5" />
-              Cetak / Unduh PDF
+              <span>Cetak Dokumen</span>
             </button>
             <button
               onClick={onClose}

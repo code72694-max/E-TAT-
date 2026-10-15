@@ -242,10 +242,10 @@ export const LoginPage: React.FC<LoginPageProps> = ({
               </div>
               <div className="grid grid-cols-2 gap-1.5">
                 {[
-                  { role: 'Admin', email: 'admin@gmail.com', desc: 'Sekretariat' },
-                  { role: 'Pengaju', email: 'pengaju@gmail.com', desc: 'Penyidik' },
-                  { role: 'Medis', email: 'medis@gmail.com', desc: 'Dokter / Psikolog' },
-                  { role: 'Hukum', email: 'hukum@gmail.com', desc: 'Jaksa / Penelaah' },
+                  { role: '[TEST] Admin', email: 'admin@gmail.com', desc: 'Sekretariat TAT' },
+                  { role: '[TEST] Pengaju', email: 'pengaju@gmail.com', desc: 'Penyidik Pemohon' },
+                  { role: '[TEST] Medis', email: 'medis@gmail.com', desc: 'Asesor Medis' },
+                  { role: '[TEST] Hukum', email: 'hukum@gmail.com', desc: 'Asesor Hukum' },
                 ].map(item => (
                   <button
                     key={item.email}

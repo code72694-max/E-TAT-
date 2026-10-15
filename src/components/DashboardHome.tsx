@@ -38,11 +38,39 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({
   const normalizedRole = (role || '').toLowerCase();
   const [selectedPeriod, setSelectedPeriod] = React.useState<'semua' | 'bulan_ini' | 'triwulan' | 'tahun'>('semua');
 
-  // Filter based on selected period
+  // Filter based on selected period secara dinamis
   const filteredByPeriod = permohonanList.filter(p => {
-    if (selectedPeriod === 'bulan_ini') return p.tanggalPengajuan.startsWith('2026-09');
-    if (selectedPeriod === 'triwulan') return p.tanggalPengajuan.startsWith('2026-07') || p.tanggalPengajuan.startsWith('2026-08') || p.tanggalPengajuan.startsWith('2026-09');
-    if (selectedPeriod === 'tahun') return p.tanggalPengajuan.startsWith('2026');
+    if (selectedPeriod === 'semua') return true;
+    if (!p.tanggalPengajuan) return true;
+
+    const pengajuanDate = new Date(p.tanggalPengajuan);
+    const now = new Date();
+
+    if (isNaN(pengajuanDate.getTime())) {
+      // Fallback jika format string bukan ISO standar
+      const currentYm = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+      if (selectedPeriod === 'bulan_ini') return p.tanggalPengajuan.startsWith(currentYm);
+      if (selectedPeriod === 'tahun') return p.tanggalPengajuan.startsWith(`${now.getFullYear()}`);
+      return true;
+    }
+
+    if (selectedPeriod === 'bulan_ini') {
+      return (
+        pengajuanDate.getFullYear() === now.getFullYear() &&
+        pengajuanDate.getMonth() === now.getMonth()
+      );
+    }
+    if (selectedPeriod === 'triwulan') {
+      const currentQuarter = Math.floor(now.getMonth() / 3);
+      const targetQuarter = Math.floor(pengajuanDate.getMonth() / 3);
+      return (
+        pengajuanDate.getFullYear() === now.getFullYear() &&
+        currentQuarter === targetQuarter
+      );
+    }
+    if (selectedPeriod === 'tahun') {
+      return pengajuanDate.getFullYear() === now.getFullYear();
+    }
     return true;
   });
 

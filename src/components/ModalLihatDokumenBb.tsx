@@ -107,8 +107,10 @@ export const ModalLihatDokumenBb: React.FC<ModalLihatDokumenBbProps> = ({
     }
   ];
 
-  const docs = permohonan.dokumenList && permohonan.dokumenList.length > 0 ? permohonan.dokumenList : defaultMockDocs;
-  const barangBuktiList = permohonan.perkara.barangBuktiList || [];
+  const docs = permohonan.dokumenList && permohonan.dokumenList.length > 0 ? permohonan.dokumenList : [];
+  const barangBuktiList = permohonan.perkara?.barangBuktiList || [];
+
+  const verifiedCount = docs.filter(d => d.statusVerifikasi === 'sesuai').length;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-3 sm:p-5 animate-in fade-in duration-200">
@@ -176,8 +178,12 @@ export const ModalLihatDokumenBb: React.FC<ModalLihatDokumenBbProps> = ({
                 <span className="text-xs text-slate-400">
                   Daftar dokumen resmi yang dilampirkan oleh penyidik pengaju untuk penelaahan TAT:
                 </span>
-                <span className="text-[10px] font-bold text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/40">
-                  Semua Berkas Terverifikasi
+                <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${
+                  verifiedCount === docs.length && docs.length > 0
+                    ? 'text-emerald-400 bg-emerald-950/60 border-emerald-500/40'
+                    : 'text-amber-400 bg-amber-950/60 border-amber-500/40'
+                }`}>
+                  {docs.length === 0 ? 'Belum Ada Berkas' : `${verifiedCount} / ${docs.length} Terverifikasi`}
                 </span>
               </div>
 

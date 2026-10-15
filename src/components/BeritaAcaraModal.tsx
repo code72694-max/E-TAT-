@@ -55,10 +55,10 @@ export const BeritaAcaraModal: React.FC<BeritaAcaraModalProps> = ({ permohonan, 
   const pasalDisangkakan = pk?.pasalDisangkakan || (pk as any)?.pasalDipersangkakan || 'Pasal 127 ayat (1) huruf a UU RI No. 35 Tahun 2009 tentang Narkotika';
 
   // Resolving Officers data dynamically
-  const medisAsesor1Nama = medis?.asesorNama || p.timAsesmen?.asesorMedisNama || 'dr. Ratna Sp.KJ';
-  const hukumAsesor1Nama = hukum?.asesorNama || p.timAsesmen?.asesorHukumNama || 'Agus Pratama, S.H., M.H.';
-  const penyidikKasusNama = pk?.namaPenyidik || p.pengajuNama || 'Ipda Budi Santoso, S.H.';
-  const ketuaNama = pleno?.pimpinanPleno || p.timAsesmen?.sekretariatNama || 'Kompol Arya Wicaksono, S.I.K.';
+  const medisAsesor1Nama = medis?.asesorNama || p.timAsesmen?.asesorMedisNama || '[TEST] Dokter Asesor Medis TAT';
+  const hukumAsesor1Nama = hukum?.asesorNama || p.timAsesmen?.asesorHukumNama || '[TEST] Jaksa Asesor Hukum TAT';
+  const penyidikKasusNama = pk?.namaPenyidik || p.pengajuNama || '[TEST] Penyidik Pengaju Satresnarkoba';
+  const ketuaNama = pleno?.pimpinanPleno || p.timAsesmen?.sekretariatNama || '[TEST] Ketua Tim Asesmen Terpadu';
 
   const daftarHadir = Array.isArray(pleno?.daftarHadir) ? pleno.daftarHadir : [];
   const timMedisDaftar = daftarHadir.filter(m =>
