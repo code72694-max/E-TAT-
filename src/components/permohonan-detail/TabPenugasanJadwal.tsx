@@ -335,7 +335,7 @@ export const TabPenugasanJadwal: React.FC<TabPenugasanJadwalProps> = ({
                         ))}
                         <option value="dr. Haryono (BNNK Samarinda)">dr. Haryono (BNNK Samarinda)</option>
                         <option value="dr. Siti Aminah, Sp.KJ (RSJD Atma Husada)">dr. Siti Aminah, Sp.KJ (RSJD Atma Husada)</option>
-                        <option value="[TEST] Dokter Asesor Medis TAT (RS Bhayangkara)">[TEST] Dokter Asesor Medis TAT (RS Bhayangkara)</option>
+                        <option value="dr. Sarah Amelia, Sp.KJ (RSUD AW Sjahranie)">dr. Sarah Amelia, Sp.KJ (RSUD AW Sjahranie)</option>
                       </>
                     ) : (
                       <>
@@ -344,7 +344,7 @@ export const TabPenugasanJadwal: React.FC<TabPenugasanJadwalProps> = ({
                             {u.name} — {u.agency || 'Kejaksaan / BNNP'}
                           </option>
                         ))}
-                        <option value="[TEST] Jaksa Asesor Hukum TAT (Kejaksaan Tinggi)">[TEST] Jaksa Asesor Hukum TAT (Kejaksaan Tinggi)</option>
+                        <option value="Ahmad Fauzi, S.H., M.H. (Kejaksaan Tinggi Kaltim)">Ahmad Fauzi, S.H., M.H. (Kejaksaan Tinggi Kaltim)</option>
                         <option value="Tim Penelaah Hukum BNNP Kaltim">Tim Penelaah Hukum BNNP Kaltim</option>
                         <option value="Penyidik Pembantu Satresnarkoba">Penyidik Pembantu Satresnarkoba</option>
                       </>

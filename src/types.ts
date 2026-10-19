@@ -27,16 +27,27 @@ export type UserRole =
   | 'rehabilitasi';
 
 
+export interface PetugasLainnyaItem {
+  nama: string;
+  tipeIdentitas?: 'NIP' | 'NRP' | 'NIP/NRP' | string;
+  nomorIdentitas?: string;
+  pangkat?: string;
+  jabatan?: string;
+}
+
 export interface UserProfile {
   id: string;
   name: string;
   nip: string;
+  tipeIdentitas?: 'NIP' | 'NRP' | 'NIP/NRP' | string;
   role: UserRole;
   agency: string; // e.g., 'Polresta Samarinda', 'BNN Provinsi Kalimantan Timur', 'Balai Rehabilitasi Tanah Merah'
   avatar?: string;
   email: string;
   phone: string;
   position?: string;
+  pangkat?: string;
+  petugasLainnya?: (string | PetugasLainnyaItem)[]; // Nama & NIP/NRP petugas/rekan pemeriksa lainnya (maksimal 2 nama tambahan -> total maks 3 di hukum dan medis)
 }
 
 export interface RegistrasiPengguna {
@@ -48,6 +59,8 @@ export interface RegistrasiPengguna {
   nrp: string; // NRP atau NIP
   jabatan: string; // e.g. 'Kapolres', 'Wakapolres', 'Kasat Resnarkoba', 'Kanit Idik', 'Penyidik Pembantu', 'Kepala BNNK'
   instansi: string; // e.g. 'Polresta Samarinda', 'Polres Kutai Kartanegara', 'BNNK Samarinda'
+  unitFungsi?: string; // e.g. 'Satresnarkoba', 'Ditresnarkoba Subdit 2', 'Seksi Pemberantasan BNNK'
+  nomorSprint?: string; // e.g. 'Sprin/142/X/HUK.6.6/2026'
   kategoriInstansi: 'Polres / Polresta' | 'Polda' | 'Polsek' | 'BNNK / BNNP' | 'Kejaksaan' | 'Lainnya';
   wilayahHukum: string; // Samarinda, Balikpapan, Kukar, dll
   alamatKantor: string;

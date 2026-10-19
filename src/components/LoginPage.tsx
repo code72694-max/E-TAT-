@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { UserProfile, RegistrasiPengguna } from '../types';
-import { authApi } from '../services/api';
+import { authApi, registrasiApi } from '../services/api';
 import {
   ArrowLeft,
   LogIn,
@@ -70,16 +70,61 @@ export const LoginPage: React.FC<LoginPageProps> = ({
         throw new Error(response.message || 'Login gagal.');
       }
     } catch (err: any) {
-      const matchedReg = registrations.find(
+      // 1. Cek dari daftar registrations props
+      let matchedReg = registrations.find(
         r => r.email.toLowerCase() === inputClean || r.nrp.toLowerCase() === inputClean
       );
 
+      // 2. Jika tidak ada di props, cek dari localStorage
+      if (!matchedReg) {
+        try {
+          const savedStr = localStorage.getItem('etat_last_registration');
+          if (savedStr) {
+            const parsed = JSON.parse(savedStr);
+            if (
+              parsed?.email?.toLowerCase() === inputClean ||
+              parsed?.nrp?.toLowerCase() === inputClean
+            ) {
+              matchedReg = parsed;
+            }
+          }
+        } catch {
+          // ignore
+        }
+      }
+
+      // 3. Jika belum ditemukan, periksa langsung ke backend status registrasi
+      if (!matchedReg) {
+        try {
+          const checkRes = await registrasiApi.checkStatus(inputClean);
+          if (checkRes && checkRes.data) {
+            matchedReg = checkRes.data;
+          }
+        } catch {
+          // ignore
+        }
+      }
+
       if (matchedReg && matchedReg.status === 'pending') {
+        // Simpan ke localStorage agar RegisterPage langsung menampilkan data tiket & status menunggu verifikasi
+        try {
+          localStorage.setItem('etat_last_registration', JSON.stringify(matchedReg));
+        } catch {
+          // ignore
+        }
+
         setLoginNotice({
           type: 'pending',
           title: 'Akun Menunggu Persetujuan Admin',
-          message: `Permohonan akun untuk ${matchedReg.pangkat || ''} ${matchedReg.namaLengkap} (${matchedReg.instansi}) masih dalam proses verifikasi oleh Admin Sekretariat TAT.`
+          message: `Permohonan akun untuk ${matchedReg.pangkat || ''} ${matchedReg.namaLengkap} (${matchedReg.instansi}) masih dalam proses verifikasi oleh Admin Sekretariat TAT. Mengalihkan ke bukti pendaftaran...`
         });
+
+        // Alihkan otomatis setelah jeda singkat (1.2 detik) ke halaman pendaftaran/tiket
+        setTimeout(() => {
+          if (onGoToRegister) {
+            onGoToRegister();
+          }
+        }, 1200);
       } else if (matchedReg && matchedReg.status === 'rejected') {
         setLoginNotice({
           type: 'rejected',
@@ -154,6 +199,15 @@ export const LoginPage: React.FC<LoginPageProps> = ({
               <span>{loginNotice.title}</span>
             </div>
             <p className="text-slate-300 leading-relaxed text-[11px]">{loginNotice.message}</p>
+            {loginNotice.type === 'pending' && onGoToRegister && (
+              <button
+                type="button"
+                onClick={onGoToRegister}
+                className="mt-2 w-full py-2 px-3 bg-[#D4AF37] hover:bg-[#c59e2b] text-slate-950 font-bold rounded-xl text-xs transition-colors flex items-center justify-center space-x-1.5 cursor-pointer shadow"
+              >
+                <span>Buka Bukti & Keterangan Pendaftaran Sekarang</span>
+              </button>
+            )}
           </div>
         )}
 
@@ -242,10 +296,10 @@ export const LoginPage: React.FC<LoginPageProps> = ({
               </div>
               <div className="grid grid-cols-2 gap-1.5">
                 {[
-                  { role: '[TEST] Admin', email: 'admin@gmail.com', desc: 'Sekretariat TAT' },
-                  { role: '[TEST] Pengaju', email: 'pengaju@gmail.com', desc: 'Penyidik Pemohon' },
-                  { role: '[TEST] Medis', email: 'medis@gmail.com', desc: 'Asesor Medis' },
-                  { role: '[TEST] Hukum', email: 'hukum@gmail.com', desc: 'Asesor Hukum' },
+                  { role: 'Admin', email: 'admin@gmail.com', desc: 'Sekretariat TAT' },
+                  { role: 'Pengaju', email: 'pengaju@gmail.com', desc: 'Penyidik Pemohon' },
+                  { role: 'Medis', email: 'medis@gmail.com', desc: 'Asesor Medis' },
+                  { role: 'Hukum', email: 'hukum@gmail.com', desc: 'Asesor Hukum' },
                 ].map(item => (
                   <button
                     key={item.email}

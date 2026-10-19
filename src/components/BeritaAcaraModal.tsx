@@ -1,20 +1,26 @@
 import React, { useRef } from 'react';
-import { X, Printer, QrCode } from 'lucide-react';
-import { PermohonanAsesmen } from '../types';
+import { X, Printer } from 'lucide-react';
+import { PermohonanAsesmen, UserProfile } from '../types';
+import { QrCodeImg, buildLacakVerificationUrl } from './QrCodeComponent';
 
 interface BeritaAcaraModalProps {
   permohonan: PermohonanAsesmen;
   onClose: () => void;
+  currentUser?: UserProfile;
 }
 
 interface OfficerInfo {
   nama: string;
   pangkat: string;
+  tipeIdentitas: string;
   nip: string;
   jabatan: string;
 }
 
-export const BeritaAcaraModal: React.FC<BeritaAcaraModalProps> = ({ permohonan, onClose }) => {
+// Helper: membersihkan prefix [TEST] atau (Akun Uji) dari nama akun
+const cleanStr = (s?: string) => (s ? s.replace(/\[TEST\]\s*/gi, '').replace(/\(Akun Uji\)/gi, '').trim() : '');
+
+export const BeritaAcaraModal: React.FC<BeritaAcaraModalProps> = ({ permohonan, onClose, currentUser }) => {
   const printRef = useRef<HTMLDivElement>(null);
 
   const p = permohonan;
@@ -44,65 +50,170 @@ export const BeritaAcaraModal: React.FC<BeritaAcaraModalProps> = ({ permohonan, 
   const tanggalSuratPenyidik = isNaN(datePenyidik.getTime())
     ? '01 Oktober 2026'
     : datePenyidik.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-  const instansiPenyidik = pk?.instansiPenyidik || p.instansiPengaju || 'Satresnarkoba Polres Metro / BNNP';
+  const instansiPenyidik = pk?.instansiPenyidik || p.instansiPengaju || 'Satresnarkoba Polresta Samarinda';
 
   // Resolving Terperiksa Info
-  const namaTersangka = tr?.namaLengkap || p.tersangkaNama || 'Rian Saputra';
+  const namaTersangka = cleanStr(tr?.namaLengkap || p.tersangkaNama) || 'Rian Saputra';
   const usiaText = tr?.usia ? `${tr.usia} Tahun` : '32 Tahun';
   const jenisKelamin = tr?.jenisKelamin || 'Laki-laki';
   const pekerjaan = tr?.pekerjaan || 'Wiraswasta / Swasta';
   const alamatLengkap = tr?.alamatDomisili || tr?.alamatKtp || 'Jl. Pahlawan No. 12, Samarinda, Kalimantan Timur';
   const pasalDisangkakan = pk?.pasalDisangkakan || (pk as any)?.pasalDipersangkakan || 'Pasal 127 ayat (1) huruf a UU RI No. 35 Tahun 2009 tentang Narkotika';
 
-  // Resolving Officers data dynamically
-  const medisAsesor1Nama = medis?.asesorNama || p.timAsesmen?.asesorMedisNama || '[TEST] Dokter Asesor Medis TAT';
-  const hukumAsesor1Nama = hukum?.asesorNama || p.timAsesmen?.asesorHukumNama || '[TEST] Jaksa Asesor Hukum TAT';
-  const penyidikKasusNama = pk?.namaPenyidik || p.pengajuNama || '[TEST] Penyidik Pengaju Satresnarkoba';
-  const ketuaNama = pleno?.pimpinanPleno || p.timAsesmen?.sekretariatNama || '[TEST] Ketua Tim Asesmen Terpadu';
+  // Resolving Officers data dynamically from current logged-in user profile, assessments & pleno records
+  const isMedisLoggedIn = currentUser?.role?.toUpperCase() === 'MEDIS';
+  const isHukumLoggedIn = currentUser?.role?.toUpperCase() === 'HUKUM';
+  const isPengajuLoggedIn = currentUser?.role?.toUpperCase() === 'PENGAJU';
+  const isAdminLoggedIn = currentUser?.role?.toUpperCase() === 'ADMIN' || currentUser?.role?.toUpperCase() === 'SEKRETARIAT';
 
-  const daftarHadir = Array.isArray(pleno?.daftarHadir) ? pleno.daftarHadir : [];
-  const timMedisDaftar = daftarHadir.filter(m =>
-    m?.peran?.toLowerCase().includes('medis') || m?.peran?.toLowerCase().includes('dokter')
+  // Helper to load customized accounts from localStorage if user is viewing from different role
+  const getCustomStoredUser = (role: string): UserProfile | null => {
+    try {
+      const raw = localStorage.getItem('etat_custom_users');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          const match = parsed.find(u => (u.role || '').toLowerCase() === role.toLowerCase());
+          if (match) return match;
+        }
+      }
+    } catch {}
+    return null;
+  };
+
+  const storedMedisUser = getCustomStoredUser('medis');
+  const storedHukumUser = getCustomStoredUser('hukum');
+
+  // Resolving Tim Medis:
+  const activeMedisUser = isMedisLoggedIn ? currentUser : storedMedisUser;
+  const medisAsesor1Nama = cleanStr(
+    activeMedisUser?.name ||
+    medis?.asesorNama ||
+    p.timAsesmen?.asesorMedisNama ||
+    'dr. Sarah Amelia, Sp.KJ'
   );
-  const timHukumDaftar = daftarHadir.filter(m =>
-    m?.peran?.toLowerCase().includes('hukum') || m?.peran?.toLowerCase().includes('jaksa') || m?.peran?.toLowerCase().includes('penyidik')
-  );
+  const medisAsesor1Pangkat = activeMedisUser?.pangkat || 'Pembina / Penata Tk. I (IV/b)';
+  const medisAsesor1Nip = activeMedisUser?.nip || '198205122008012001';
+  const medisAsesor1Jabatan = activeMedisUser?.position || 'Dokter Spesialis Kedokteran Jiwa / Asesor Medis TAT';
+
+  const medisPetugasConfig = Array.isArray(activeMedisUser?.petugasLainnya) && activeMedisUser.petugasLainnya.length > 0
+    ? activeMedisUser.petugasLainnya
+    : ['dr. Farhan Hidayat, M.Kes.'];
+
+  // Helper untuk resolve detail officer jika berbentuk string atau objek PetugasLainnyaItem
+  const getOfficerDetail = (item: any, fallbackNama: string, fallbackTipe: string, fallbackNip: string): { nama: string; tipeIdentitas: string; nip: string } => {
+    if (!item) return { nama: fallbackNama, tipeIdentitas: fallbackTipe, nip: fallbackNip };
+    if (typeof item === 'string') {
+      const isPolice = item.includes('Pol') || item.includes('Kombes') || item.includes('Ipda') || item.includes('Kompol');
+      return {
+        nama: cleanStr(item),
+        tipeIdentitas: isPolice ? 'NRP' : fallbackTipe,
+        nip: item.includes('Andi Pratama') ? '76090412' : item.includes('Budi Santoso') ? '85010234' : item.includes('Farhan') ? '198603152012011002' : fallbackNip
+      };
+    }
+    return {
+      nama: cleanStr(item.nama) || fallbackNama,
+      tipeIdentitas: item.tipeIdentitas || fallbackTipe,
+      nip: item.nomorIdentitas || fallbackNip
+    };
+  };
 
   const timMedisFinal: OfficerInfo[] = [
     {
-      nama: timMedisDaftar[0]?.nama || medisAsesor1Nama,
-      pangkat: (timMedisDaftar[0] as any)?.pangkat || 'Pembina / Penata Tk. I (IV/b)',
-      nip: (timMedisDaftar[0] as any)?.nip || (timMedisDaftar[0] as any)?.nipNrp || '198205122008012001',
-      jabatan: timMedisDaftar[0]?.peran || 'Dokter Spesialis Kedokteran Jiwa / Asesor Medis TAT'
-    },
-    {
-      nama: timMedisDaftar[1]?.nama || 'dr. Farhan Hidayat, M.Kes.',
-      pangkat: (timMedisDaftar[1] as any)?.pangkat || 'Penata (III/c)',
-      nip: (timMedisDaftar[1] as any)?.nip || (timMedisDaftar[1] as any)?.nipNrp || '198603152012011002',
-      jabatan: timMedisDaftar[1]?.peran || 'Dokter Pemeriksa Klinis / Konselor Adiksi Medis TAT'
+      nama: medisAsesor1Nama,
+      pangkat: medisAsesor1Pangkat,
+      tipeIdentitas: activeMedisUser?.tipeIdentitas || 'NIP',
+      nip: medisAsesor1Nip,
+      jabatan: medisAsesor1Jabatan
     }
   ];
 
+  const m2 = getOfficerDetail(medisPetugasConfig[0], 'dr. Farhan Hidayat, M.Kes.', 'NIP', '198603152012011002');
+  timMedisFinal.push({
+    nama: m2.nama,
+    pangkat: 'Penata (III/c)',
+    tipeIdentitas: m2.tipeIdentitas,
+    nip: m2.nip,
+    jabatan: 'Dokter Pemeriksa Klinis / Konselor Adiksi Medis TAT'
+  });
+
+  if (medisPetugasConfig[1]) {
+    const m3 = getOfficerDetail(medisPetugasConfig[1], 'dr. Linda Wijaya, Sp.PK', 'NIP', '198807212015031003');
+    timMedisFinal.push({
+      nama: m3.nama,
+      pangkat: 'Penata Tk. I (III/d)',
+      tipeIdentitas: m3.tipeIdentitas,
+      nip: m3.nip,
+      jabatan: 'Psikolog Klinis / Konselor Adiksi Medis TAT'
+    });
+  }
+
+  // Resolving Tim Hukum:
+  const activeHukumUser = isHukumLoggedIn ? currentUser : storedHukumUser;
+  const hukumAsesor1Nama = cleanStr(
+    activeHukumUser?.name ||
+    hukum?.asesorNama ||
+    p.timAsesmen?.asesorHukumNama ||
+    'Ahmad Fauzi, S.H., M.H.'
+  );
+  const hukumAsesor1Pangkat = activeHukumUser?.pangkat || 'Jaksa Muda / Penata Tk. I (III/d)';
+  const hukumAsesor1Nip = activeHukumUser?.nip || '197903152003121002';
+  const hukumAsesor1Jabatan = activeHukumUser?.position || 'Jaksa Penuntut Umum / Tim Asesor Hukum TAT';
+
+  const hukumPetugasConfig = Array.isArray(activeHukumUser?.petugasLainnya) && activeHukumUser.petugasLainnya.length > 0
+    ? activeHukumUser.petugasLainnya
+    : ['Kombes Pol. Andi Pratama, S.I.K., M.H.', 'Ipda Budi Santoso, S.H.'];
+
+  const penyidikKasusNama = cleanStr(
+    (isPengajuLoggedIn ? currentUser.name : null) ||
+    pk?.namaPenyidik ||
+    p.pengajuNama ||
+    'Ipda Budi Santoso, S.H.'
+  );
+
+  const h2 = getOfficerDetail(hukumPetugasConfig[0], 'Kombes Pol. Andi Pratama, S.I.K., M.H.', 'NRP', '76090412');
+  const h3Raw = getOfficerDetail(hukumPetugasConfig[1], penyidikKasusNama, 'NRP', '85010234');
+  const h3Nama = (h3Raw.nama === h2.nama || h3Raw.nama === hukumAsesor1Nama) ? (penyidikKasusNama !== h2.nama ? penyidikKasusNama : 'Ipda Budi Santoso, S.H.') : h3Raw.nama;
+
   const timHukumFinal: OfficerInfo[] = [
     {
-      nama: timHukumDaftar[0]?.nama || hukumAsesor1Nama,
-      pangkat: (timHukumDaftar[0] as any)?.pangkat || 'Jaksa Muda / Penata Tk. I (III/d)',
-      nip: (timHukumDaftar[0] as any)?.nip || (timHukumDaftar[0] as any)?.nipNrp || '197808202003121002',
-      jabatan: timHukumDaftar[0]?.peran || 'Jaksa Penuntut Umum / Asesor Hukum TAT Kejaksaan'
+      nama: hukumAsesor1Nama,
+      pangkat: hukumAsesor1Pangkat,
+      tipeIdentitas: activeHukumUser?.tipeIdentitas || 'NIP',
+      nip: hukumAsesor1Nip,
+      jabatan: hukumAsesor1Jabatan
     },
     {
-      nama: timHukumDaftar[1]?.nama || 'Kombes Pol. Andi Pratama, S.I.K., M.H.',
-      pangkat: (timHukumDaftar[1] as any)?.pangkat || 'Komisaris Besar Polisi (Kombes Pol)',
-      nip: (timHukumDaftar[1] as any)?.nip || (timHukumDaftar[1] as any)?.nipNrp || '76090412',
-      jabatan: timHukumDaftar[1]?.peran || 'Penyidik Ahli Madya BNN RI / Asesor Hukum TAT'
+      nama: h2.nama,
+      pangkat: h2.nama.includes('Kombes') ? 'Komisaris Besar Polisi (Kombes Pol)' : 'Pamen Polri / Asesor Hukum TAT',
+      tipeIdentitas: h2.tipeIdentitas,
+      nip: h2.nip,
+      jabatan: 'Penyidik Ahli Madya BNN RI / Asesor Hukum TAT'
     },
     {
-      nama: timHukumDaftar[2]?.nama || penyidikKasusNama,
-      pangkat: (timHukumDaftar[2] as any)?.pangkat || 'Inspektur Polisi Dua (Ipda)',
-      nip: (timHukumDaftar[2] as any)?.nip || (timHukumDaftar[2] as any)?.nipNrp || '85010234',
-      jabatan: pk?.instansiPenyidik ? `Penyidik Pembantu (${pk.instansiPenyidik})` : 'Penyidik Pembantu Unit Resnarkoba'
+      nama: h3Nama,
+      pangkat: h3Nama.includes('Ipda') ? 'Inspektur Polisi Dua (Ipda)' : 'Penyidik / Penelaah Hukum TAT',
+      tipeIdentitas: h3Raw.tipeIdentitas,
+      nip: h3Raw.nip || (h3Nama === 'Ipda Budi Santoso, S.H.' ? '85010234' : '83051120'),
+      jabatan: 'Penyidik Pembantu / Asesor Hukum TAT'
     }
   ];
+
+  // Pimpinan / Ketua Tim TAT
+  const ketuaNama = cleanStr(
+    (isAdminLoggedIn ? currentUser.name : null) ||
+    pleno?.pimpinanPleno ||
+    p.timAsesmen?.sekretariatNama ||
+    'Kompol Hendra Kusuma, S.I.K., M.Si.'
+  );
+  const ketuaNrp = (isAdminLoggedIn ? currentUser.nip : null) ||
+    (pleno as any)?.nrpPimpinan ||
+    '79080512';
+  const ketuaJabatan = (isAdminLoggedIn ? currentUser.position : null) ||
+    'KOMISARIS POLISI / KETUA TIM';
+
+  // URL verifikasi resmi e-TAT untuk barcode dan scan publik
+  const verificationUrl = buildLacakVerificationUrl(p, 'pleno');
 
   // Evidence & Substance
   const bb = Array.isArray(pk?.barangBuktiList) ? pk.barangBuktiList : [];
@@ -149,6 +260,7 @@ export const BeritaAcaraModal: React.FC<BeritaAcaraModalProps> = ({ permohonan, 
         .ba-container { width: 100%; max-width: 800px; margin: 0 auto; position: relative; }
         p { text-align: justify; margin-bottom: 7px; }
         table { border-collapse: collapse; width: 100%; }
+        .ttd-section, .ttd-table, .ttd-block { page-break-inside: avoid !important; break-inside: avoid !important; }
         ol, ul { margin-left: 24px; margin-bottom: 7px; }
         li { text-align: justify; margin-bottom: 4px; }
       </style></head><body><div class="ba-container">${printContents}</div></body></html>`);
@@ -284,7 +396,7 @@ export const BeritaAcaraModal: React.FC<BeritaAcaraModalProps> = ({ permohonan, 
 
             {/* ===== PEMBUKA HARI & TANGGAL ===== */}
             <p style={{ textAlign: 'justify', marginBottom: '12px' }}>
-              Pada hari ini <strong>{hariPleno}</strong>, tanggal <strong>{tanggalPlenoFormat}</strong> sekira jam <strong>{waktuPleno}</strong> bertempat di <strong>{tempatPleno}</strong>, yang dipimpin oleh <strong>{ketuaNama}</strong> dengan NRP <strong>79080512</strong>, selaku Ketua Tim Asesmen Terpadu (TAT) Tingkat Provinsi Kalimantan Timur, dan anggota Tim Asesmen Terpadu terdiri dari:
+              Pada hari ini <strong>{hariPleno}</strong>, tanggal <strong>{tanggalPlenoFormat}</strong> sekira jam <strong>{waktuPleno}</strong> bertempat di <strong>{tempatPleno}</strong>, yang dipimpin oleh <strong>{ketuaNama}</strong> dengan NRP <strong>{ketuaNrp}</strong>, selaku Ketua Tim Asesmen Terpadu (TAT) Tingkat Provinsi Kalimantan Timur, dan anggota Tim Asesmen Terpadu terdiri dari:
             </p>
             <hr style={{ border: 'none', borderBottom: '1px solid #000', margin: '0 0 10px 0' }} />
 
@@ -534,89 +646,163 @@ export const BeritaAcaraModal: React.FC<BeritaAcaraModalProps> = ({ permohonan, 
             </p>
 
             {/* ===== TANDA TANGAN TIM HUKUM ===== */}
-            <div style={{ marginTop: '20px', borderTop: '1px solid #000', paddingTop: '10px' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '8px' }}>
+            <div className="ttd-section" style={{ marginTop: '24px', borderTop: '1px solid #000', paddingTop: '14px', pageBreakInside: 'avoid', breakInside: 'avoid' }}>
+              <table className="ttd-table" style={{ width: '100%', borderCollapse: 'collapse', marginTop: '8px', pageBreakInside: 'avoid', breakInside: 'avoid' }}>
                 <tbody>
                   <tr>
-                    <td colSpan={3} style={{ textAlign: 'center', fontWeight: 'bold', fontSize: '11pt', paddingBottom: '4px' }}>
+                    <td colSpan={timHukumFinal.length} style={{ textAlign: 'center', fontWeight: 'bold', fontSize: '11pt', paddingBottom: '6px' }}>
                       TIM ASESOR HUKUM TAT
                     </td>
                   </tr>
                   <tr>
-                    {timHukumFinal.map((m, i) => (
-                      <td key={i} style={{ width: '33.3%', textAlign: 'center', verticalAlign: 'top', padding: '0 6px' }}>
-                        <div style={{ height: '65px' }}></div>
-                        <div style={{ borderTop: '1px solid #000', display: 'inline-block', minWidth: '150px', paddingTop: '2px', fontWeight: 'bold', fontSize: '10pt' }}>
-                          {m.nama}
-                        </div>
-                        <div style={{ fontSize: '9pt', color: '#222' }}>{m.pangkat}</div>
-                        <div style={{ fontSize: '9pt' }}>NIP/NRP. {m.nip}</div>
-                      </td>
-                    ))}
+                    {timHukumFinal.map((m, i) => {
+                      const isAsesorHukum1 = i === 0;
+                      let localTtd: string | null = null;
+                      try {
+                        localTtd = typeof window !== 'undefined' ? (localStorage.getItem(`etat_ttd_hukum_${p.id}`) || localStorage.getItem(`etat_ttd_hukum_${p.nomorPermohonan}`)) : null;
+                      } catch {}
+
+                      const rawSigned = (pleno as any)?.ttdHukumUrl || pleno?.fileBeritaAcaraSigned || localTtd;
+                      const isNotPdf = rawSigned && typeof rawSigned === 'string' && !rawSigned.toLowerCase().endsWith('.pdf');
+                      const signatureImg = isAsesorHukum1 && isNotPdf ? rawSigned : null;
+
+                      return (
+                        <td
+                          key={i}
+                          style={{
+                            width: timHukumFinal.length === 2 ? '50%' : '33.3%',
+                            textAlign: 'center',
+                            verticalAlign: 'top',
+                            padding: '0 6px'
+                          }}
+                        >
+                          <div style={{ height: '150px', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', paddingBottom: '6px' }}>
+                            {signatureImg ? (
+                              <img 
+                                src={signatureImg} 
+                                alt="Tanda Tangan Asesor Hukum" 
+                                style={{ maxHeight: '135px', maxWidth: '180px', objectFit: 'contain', display: 'block', margin: '0 auto' }}
+                              />
+                            ) : (
+                              <div style={{ height: '135px' }}></div>
+                            )}
+                          </div>
+                          <div style={{ borderTop: '1px solid #000', display: 'inline-block', minWidth: '150px', paddingTop: '3px', fontWeight: 'bold', fontSize: '10pt' }}>
+                            {m.nama}
+                          </div>
+                          <div style={{ fontSize: '9pt', color: '#222' }}>{m.pangkat}</div>
+                          <div style={{ fontSize: '9pt' }}>{m.tipeIdentitas || 'NRP'}. {m.nip}</div>
+                        </td>
+                      );
+                    })}
                   </tr>
                 </tbody>
               </table>
 
               {/* ===== TANDA TANGAN TIM MEDIS ===== */}
-              <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '18px' }}>
+              <table className="ttd-table" style={{ width: '100%', borderCollapse: 'collapse', marginTop: '24px', pageBreakInside: 'avoid', breakInside: 'avoid' }}>
                 <tbody>
                   <tr>
-                    <td colSpan={2} style={{ textAlign: 'center', fontWeight: 'bold', fontSize: '11pt', paddingBottom: '4px' }}>
+                    <td colSpan={timMedisFinal.length} style={{ textAlign: 'center', fontWeight: 'bold', fontSize: '11pt', paddingBottom: '6px' }}>
                       TIM ASESOR MEDIS TAT
                     </td>
                   </tr>
                   <tr>
-                    {timMedisFinal.map((m, i) => (
-                      <td key={i} style={{ width: '50%', textAlign: 'center', verticalAlign: 'top', padding: '0 8px' }}>
-                        <div style={{ height: '65px' }}></div>
-                        <div style={{ borderTop: '1px solid #000', display: 'inline-block', minWidth: '170px', paddingTop: '2px', fontWeight: 'bold', fontSize: '10.5pt' }}>
-                          {m.nama}
-                        </div>
-                        <div style={{ fontSize: '9.5pt', color: '#222' }}>{m.pangkat}</div>
-                        <div style={{ fontSize: '9.5pt' }}>NIP. {m.nip}</div>
-                      </td>
-                    ))}
+                    {timMedisFinal.map((m, i) => {
+                      const isAsesorMedis1 = i === 0;
+                      const signatureImg = isAsesorMedis1 ? ((pleno as any)?.ttdMedisUrl) : null;
+
+                      return (
+                        <td
+                          key={i}
+                          style={{
+                            width: timMedisFinal.length === 3 ? '33.3%' : '50%',
+                            textAlign: 'center',
+                            verticalAlign: 'top',
+                            padding: '0 8px'
+                          }}
+                        >
+                          <div style={{ height: '150px', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', paddingBottom: '6px' }}>
+                            {signatureImg ? (
+                              <img 
+                                src={signatureImg} 
+                                alt="Tanda Tangan Asesor Medis" 
+                                style={{ maxHeight: '135px', maxWidth: '180px', objectFit: 'contain', display: 'block', margin: '0 auto' }}
+                              />
+                            ) : (
+                              <div style={{ height: '135px' }}></div>
+                            )}
+                          </div>
+                          <div style={{ borderTop: '1px solid #000', display: 'inline-block', minWidth: '170px', paddingTop: '3px', fontWeight: 'bold', fontSize: '10.5pt' }}>
+                            {m.nama}
+                          </div>
+                          <div style={{ fontSize: '9.5pt', color: '#222' }}>{m.pangkat}</div>
+                          <div style={{ fontSize: '9.5pt' }}>{m.tipeIdentitas || 'NIP'}. {m.nip}</div>
+                        </td>
+                      );
+                    })}
                   </tr>
                 </tbody>
               </table>
 
               {/* ===== PENGESAHAN KETUA TAT & BARCODE ===== */}
-              <div style={{ borderTop: '2px solid #000', paddingTop: '12px', marginTop: '18px' }}>
+              <div className="ttd-block" style={{ borderTop: '2px solid #000', paddingTop: '16px', marginTop: '24px', pageBreakInside: 'avoid', breakInside: 'avoid' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                   <tbody>
                     <tr>
                       {/* Kolom QR Code Digital Signature */}
                       <td style={{ width: '35%', verticalAlign: 'middle', textAlign: 'center', padding: '4px' }}>
-                        <div style={{ display: 'inline-block', border: '1px solid #999', padding: '6px 10px', borderRadius: '4px', background: '#fafafa', textAlign: 'center' }}>
-                          <div style={{ width: '70px', height: '70px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff', border: '1px solid #000' }}>
-                            <QrCode style={{ width: '60px', height: '60px', color: '#000' }} />
-                          </div>
-                          <div style={{ fontSize: '7.5pt', fontWeight: 'bold', marginTop: '4px', textTransform: 'uppercase' }}>
-                            VERIFIKASI TTE TAT
-                          </div>
-                          <div style={{ fontSize: '7pt', color: '#555', fontFamily: 'monospace' }}>
-                            ID: {p.trackingNumber || p.id?.slice(0, 10)}
-                          </div>
+                        <div style={{ display: 'inline-block', border: '1px solid #999', padding: '8px 10px', borderRadius: '6px', background: '#fafafa', textAlign: 'center', maxWidth: '140px' }}>
+                          <a
+                            href={verificationUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            title="Klik atau Scan untuk verifikasi resmi & tracking berkas perkara"
+                            style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}
+                          >
+                            <div style={{ width: '78px', height: '78px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff', border: '1px solid #000', padding: '2px' }}>
+                              <QrCodeImg value={verificationUrl} size={74} alt={`QR Verifikasi ${nomorBA}`} />
+                            </div>
+                            <div style={{ fontSize: '7.5pt', fontWeight: 'bold', marginTop: '4px', textTransform: 'uppercase', color: '#0b172a', letterSpacing: '0.3px' }}>
+                              VERIFIKASI TTE TAT
+                            </div>
+                            <div style={{ fontSize: '6.5pt', color: '#475569', fontFamily: 'monospace', wordBreak: 'break-all' }}>
+                              ID: {p.trackingNumber || p.id?.slice(0, 10)}
+                            </div>
+                            <div style={{ fontSize: '6.5pt', color: '#0369a1', fontWeight: 'bold', marginTop: '1px' }}>
+                              Scan / Klik Lacak &rarr;
+                            </div>
+                          </a>
                         </div>
                       </td>
 
                       {/* Kolom Ketua Tim Asesmen Terpadu */}
                       <td style={{ width: '65%', verticalAlign: 'top', textAlign: 'center', padding: '4px' }}>
                         <div style={{ fontSize: '11pt', fontWeight: 'bold' }}>
-                          MENGETAHUI & MENGESAHKAN,
+                          MENGETAHUI &amp; MENGESAHKAN,
                         </div>
                         <div style={{ fontSize: '11pt', fontWeight: 'bold' }}>
                           KETUA TIM ASESMEN TERPADU TINGKAT PROVINSI KALIMANTAN TIMUR
                         </div>
-                        <div style={{ height: '65px' }}></div>
-                        <div style={{ borderTop: '1px solid #000', display: 'inline-block', minWidth: '220px', paddingTop: '2px', fontWeight: 'bold', fontSize: '11pt' }}>
+                        <div style={{ height: '150px', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', paddingBottom: '6px' }}>
+                          {(pleno as any)?.ttdKetuaUrl ? (
+                            <img 
+                              src={(pleno as any)?.ttdKetuaUrl} 
+                              alt="Tanda Tangan Ketua TAT" 
+                              style={{ maxHeight: '135px', maxWidth: '190px', objectFit: 'contain', display: 'block', margin: '0 auto' }}
+                            />
+                          ) : (
+                            <div style={{ height: '135px' }}></div>
+                          )}
+                        </div>
+                        <div style={{ borderTop: '1px solid #000', display: 'inline-block', minWidth: '220px', paddingTop: '3px', fontWeight: 'bold', fontSize: '11pt' }}>
                           {ketuaNama}
                         </div>
                         <div style={{ fontSize: '9.5pt', fontWeight: 'bold', letterSpacing: '0.5px' }}>
-                          KOMISARIS POLISI / KETUA TIM
+                          {ketuaJabatan}
                         </div>
                         <div style={{ fontSize: '9pt' }}>
-                          NRP. 79080512
+                          {(isAdminLoggedIn ? currentUser?.tipeIdentitas : null) || 'NRP'}. {ketuaNrp}
                         </div>
                       </td>
                     </tr>

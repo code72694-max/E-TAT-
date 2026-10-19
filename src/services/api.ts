@@ -205,6 +205,30 @@ export const permohonanApi = {
     return request<PermohonanAsesmen>(`/permohonan/${id}`);
   },
 
+  checkNik: async (nik: string) => {
+    return request<{
+      nik: string;
+      adaRiwayat: boolean;
+      totalKasus: number;
+      statusResidivis: 'bukan_residivis' | 'residivis_1x' | 'residivis_berulang';
+      riwayat: Array<{
+        id: string;
+        nomorPermohonan: string;
+        nomorLp: string;
+        tanggalLp: string;
+        tanggalPengajuan: string;
+        instansiPengaju: string;
+        pasal: string;
+        status: string;
+        kronologi: string;
+        barangBuktiSummary: string;
+        rekomendasiFinal: string | null;
+        rekomendasiNomor: string | null;
+        fasilitasRehab: string | null;
+      }>;
+    }>(`/permohonan/cek-nik/${encodeURIComponent(nik.trim())}`);
+  },
+
   create: async (payload: {
     satuanKerjaTujuan?: string;
     jenisPengajuan?: string;
@@ -304,6 +328,10 @@ export const registrasiApi = {
       method: 'PATCH',
       body: JSON.stringify({ catatanAdmin }),
     });
+  },
+
+  checkStatus: async (identifier: string) => {
+    return request<RegistrasiPengguna>(`/registrasi/status/${encodeURIComponent(identifier)}`);
   },
 };
 

@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { PermohonanAsesmen, UserProfile } from '../../types';
 import { rekomendasiApi } from '../../services/api';
+import { QrCodeImg, buildLacakVerificationUrl } from '../QrCodeComponent';
 
 interface TabDokumenPengesahanProps {
   permohonan: PermohonanAsesmen;
@@ -199,7 +200,7 @@ export const TabDokumenPengesahan: React.FC<TabDokumenPengesahanProps> = ({
                       </span>
                     </div>
                     <span className="text-xs font-bold text-white block uppercase">
-                      {permohonan.sidangPleno?.pimpinanPleno || '[TEST] KETUA TIM ASESMEN TERPADU'}
+                      {(permohonan.sidangPleno?.pimpinanPleno || 'Kompol Hendra Kusuma, S.I.K., M.Si.').replace(/\[TEST\]\s*/gi, '')}
                     </span>
                     <span className="text-[10px] text-slate-400 block">
                       Ketua Tim Asesmen Terpadu
@@ -389,16 +390,28 @@ export const TabDokumenPengesahan: React.FC<TabDokumenPengesahanProps> = ({
 
                 {/* PDF Bottom Signature & QR Verification Section */}
                 <div className="pt-3 border-t border-slate-300 font-sans grid grid-cols-12 gap-3 items-end">
-                  <div className="col-span-5 bg-slate-50 border border-slate-300 rounded p-2 text-center space-y-1">
-                    <div className="w-12 h-12 bg-white border border-slate-900 mx-auto flex items-center justify-center p-1 rounded">
-                      <QrCode className="w-10 h-10 text-slate-900" />
-                    </div>
-                    <span className="text-[8px] font-black uppercase text-slate-900 block leading-tight">
-                      SCAN VERIFIKASI DOKUMEN
-                    </span>
-                    <p className="text-[7px] text-slate-600 leading-tight">
-                      ID: <span className="font-mono font-bold text-slate-800">{permohonan.trackingNumber || permohonan.id?.slice(0, 8)}</span>
-                    </p>
+                  <div className="col-span-5 bg-slate-50 border border-slate-300 rounded p-1.5 text-center space-y-1">
+                    <a
+                      href={buildLacakVerificationUrl(permohonan, 'dokumen')}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      title="Klik untuk verifikasi publik dokumen rekomendasi resmi"
+                      className="block group"
+                    >
+                      <div className="w-14 h-14 bg-white border border-slate-900 mx-auto flex items-center justify-center p-0.5 rounded shadow-xs group-hover:border-blue-600 transition-colors">
+                        <QrCodeImg
+                          value={buildLacakVerificationUrl(permohonan, 'dokumen')}
+                          size={52}
+                          alt="QR Verifikasi Dokumen Rekomendasi"
+                        />
+                      </div>
+                      <span className="text-[7.5px] font-black uppercase text-slate-900 block leading-tight mt-1 group-hover:text-blue-700">
+                        SCAN VERIFIKASI DOKUMEN
+                      </span>
+                      <p className="text-[6.5px] text-slate-600 leading-tight">
+                        ID: <span className="font-mono font-bold text-slate-800">{permohonan.trackingNumber || permohonan.id?.slice(0, 8)}</span>
+                      </p>
+                    </a>
                   </div>
 
                   <div className="col-span-7 text-center font-sans space-y-0.5">
@@ -406,13 +419,13 @@ export const TabDokumenPengesahan: React.FC<TabDokumenPengesahanProps> = ({
                     <p className="text-[8.5px] font-bold text-slate-900 uppercase">Ketua Tim Asesmen Terpadu</p>
                     <div className="py-0.5">
                       <span className="font-serif italic text-sm text-slate-900 block font-bold" style={{ fontFamily: 'Dancing Script, cursive, serif' }}>
-                        {permohonan.sidangPleno?.pimpinanPleno || 'Ketua TAT'}
+                        {(permohonan.sidangPleno?.pimpinanPleno || 'Kompol Hendra Kusuma, S.I.K., M.Si.').replace(/\[TEST\]\s*/gi, '')}
                       </span>
                     </div>
                     <p className="text-[8.5px] font-extrabold text-slate-900 underline">
-                      {permohonan.sidangPleno?.pimpinanPleno || '[TEST] KETUA TIM ASESMEN TERPADU'}
+                      {(permohonan.sidangPleno?.pimpinanPleno || 'Kompol Hendra Kusuma, S.I.K., M.Si.').replace(/\[TEST\]\s*/gi, '')}
                     </p>
-                    <p className="text-[7.5px] font-mono text-slate-700">NIP/NRP 79080512 (Akun Uji)</p>
+                    <p className="text-[7.5px] font-mono text-slate-700">KOMPOL / NRP 79080512</p>
                   </div>
                 </div>
               </div>

@@ -89,19 +89,19 @@ export const ModalInputAsesmen: React.FC<ModalInputAsesmenProps> = ({
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div>
                       <label className="text-slate-300 font-semibold mb-1 block">Tekanan Darah (mmHg)</label>
-                      <input type="text" placeholder="120/80" className="w-full bg-[#0b172a] border border-[#1b3459] text-white p-2 rounded-lg outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500" />
+                      <input type="text" maxLength={7} placeholder="120/80" className="w-full bg-[#0b172a] border border-[#1b3459] text-white p-2 rounded-lg outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 font-mono" />
                     </div>
                     <div>
                       <label className="text-slate-300 font-semibold mb-1 block">Denyut Nadi (x/mnt)</label>
-                      <input type="number" placeholder="85" className="w-full bg-[#0b172a] border border-[#1b3459] text-white p-2 rounded-lg outline-none focus:border-emerald-500" />
+                      <input type="number" min={30} max={250} placeholder="85" className="w-full bg-[#0b172a] border border-[#1b3459] text-white p-2 rounded-lg outline-none focus:border-emerald-500 font-mono" />
                     </div>
                     <div>
                       <label className="text-slate-300 font-semibold mb-1 block">Pernapasan (x/mnt)</label>
-                      <input type="number" placeholder="18" className="w-full bg-[#0b172a] border border-[#1b3459] text-white p-2 rounded-lg outline-none focus:border-emerald-500" />
+                      <input type="number" min={8} max={60} placeholder="18" className="w-full bg-[#0b172a] border border-[#1b3459] text-white p-2 rounded-lg outline-none focus:border-emerald-500 font-mono" />
                     </div>
                     <div>
                       <label className="text-slate-300 font-semibold mb-1 block">Suhu Tubuh (°C)</label>
-                      <input type="number" placeholder="36.5" className="w-full bg-[#0b172a] border border-[#1b3459] text-white p-2 rounded-lg outline-none focus:border-emerald-500" />
+                      <input type="number" step="0.1" min={30} max={45} placeholder="36.5" className="w-full bg-[#0b172a] border border-[#1b3459] text-white p-2 rounded-lg outline-none focus:border-emerald-500 font-mono" />
                     </div>
                   </div>
 

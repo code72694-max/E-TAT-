@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { UserProfile, PermohonanAsesmen, UserRole, RegistrasiPengguna } from './types';
+import { UserProfile, PermohonanAsesmen, UserRole, RegistrasiPengguna, PetugasLainnyaItem } from './types';
 import { authApi, permohonanApi, registrasiApi, tokenStorage } from './services/api';
 import { Header } from './components/Header';
 import { Sidebar, ActiveTab } from './components/Sidebar';
@@ -40,46 +40,122 @@ export const getRolePath = (role?: UserRole | string): string => {
   return r;
 };
 
+export const sanitizeUserProfile = (user: UserProfile | null): UserProfile | null => {
+  if (!user) return null;
+  const r = user.role?.toUpperCase();
+  let defaultPetugas: PetugasLainnyaItem[] = [];
+  if (r === 'HUKUM') {
+    defaultPetugas = [
+      { nama: 'Kombes Pol. Andi Pratama, S.I.K., M.H.', tipeIdentitas: 'NRP', nomorIdentitas: '76090412' },
+      { nama: 'Ipda Budi Santoso, S.H.', tipeIdentitas: 'NRP', nomorIdentitas: '85010234' }
+    ];
+  } else if (r === 'MEDIS') {
+    defaultPetugas = [
+      { nama: 'dr. Farhan Hidayat, M.Kes.', tipeIdentitas: 'NIP', nomorIdentitas: '198603152012011002' }
+    ];
+  }
+
+  let cleanName = user.name ? user.name.replace(/\[TEST\]\s*/gi, '').replace(/\(Akun Uji\)/gi, '').trim() : '';
+  if (!cleanName || cleanName === 'Dokter Asesor Medis TAT' || cleanName.toLowerCase().includes('dokter asesor medis')) {
+    cleanName = 'dr. Sarah Amelia, Sp.KJ';
+  } else if (!cleanName || cleanName === 'Jaksa Asesor Hukum TAT' || cleanName.toLowerCase().includes('jaksa asesor hukum')) {
+    cleanName = 'Ahmad Fauzi, S.H., M.H.';
+  } else if (!cleanName || cleanName === 'Admin Sekretariat TAT' || cleanName.toLowerCase().includes('admin sekretariat')) {
+    cleanName = 'Kompol Hendra Kusuma, S.I.K., M.Si.';
+  } else if (!cleanName || cleanName === 'Penyidik Pengaju Satresnarkoba' || cleanName.toLowerCase().includes('penyidik pengaju')) {
+    cleanName = 'Ipda Budi Santoso, S.H.';
+  }
+
+  const rawList = Array.isArray(user.petugasLainnya) ? user.petugasLainnya : defaultPetugas;
+  const resolvedPetugas: PetugasLainnyaItem[] = rawList.slice(0, 2).map(item => {
+    if (typeof item === 'string') {
+      const isPolice = item.includes('Pol') || item.includes('Kombes') || item.includes('Ipda') || item.includes('Kompol');
+      return {
+        nama: item,
+        tipeIdentitas: isPolice ? 'NRP' : 'NIP',
+        nomorIdentitas: item.includes('Andi Pratama') ? '76090412' : item.includes('Budi Santoso') ? '85010234' : item.includes('Farhan') ? '198603152012011002' : ''
+      };
+    }
+    return item;
+  });
+
+  const defaultTipeIdentitas = r === 'PENGAJU' || cleanName.includes('Pol') ? 'NRP' : 'NIP';
+
+  return {
+    ...user,
+    name: cleanName,
+    tipeIdentitas: user.tipeIdentitas || defaultTipeIdentitas,
+    position: user.position ? user.position.replace(/\(Akun Uji\)/gi, '').replace(/\[TEST\]\s*/gi, '').trim() : (
+      r === 'HUKUM' ? 'Jaksa Penuntut Umum / Tim Asesor Hukum TAT' :
+      r === 'MEDIS' ? 'Dokter Spesialis Kedokteran Jiwa / Asesor Medis TAT' :
+      r === 'PENGAJU' ? 'Kanit Idik Satresnarkoba / Penyidik Pengaju' :
+      'Ketua Tim Sekretariat TAT BNNP Kalimantan Timur'
+    ),
+    pangkat: user.pangkat || (
+      r === 'HUKUM' ? 'Jaksa Muda / Penata Tk. I (III/d)' :
+      r === 'MEDIS' ? 'Pembina / Penata Tk. I (IV/b)' :
+      r === 'PENGAJU' ? 'Inspektur Polisi Dua (Ipda)' :
+      'Komisaris Polisi (Kompol)'
+    ),
+    petugasLainnya: resolvedPetugas,
+  };
+};
+
 export const DEFAULT_USERS: UserProfile[] = [
   {
     id: 'user-admin',
-    name: '[TEST] Admin Sekretariat TAT',
+    name: 'Kompol Hendra Kusuma, S.I.K., M.Si.',
     nip: '79080512',
+    tipeIdentitas: 'NRP',
     role: 'ADMIN',
-    agency: 'Sekretariat TAT Polda Metro Jaya',
-    email: 'admin@gmail.com',
+    agency: 'Sekretariat TAT BNNP Kalimantan Timur',
+    email: 'admin@tat.polri.go.id',
     phone: '081234567890',
-    position: 'Petugas Verifikasi & Sekretariat TAT (Akun Uji)',
+    position: 'Ketua Tim Sekretariat TAT BNNP Kalimantan Timur',
+    pangkat: 'Komisaris Polisi (Kompol)',
   },
   {
     id: 'user-pengaju',
-    name: '[TEST] Penyidik Pengaju Satresnarkoba',
+    name: 'Ipda Budi Santoso, S.H.',
     nip: '85010234',
+    tipeIdentitas: 'NRP',
     role: 'PENGAJU',
-    agency: 'Satresnarkoba Polres Metro Jakarta Pusat',
-    email: 'pengaju@gmail.com',
+    agency: 'Satresnarkoba Polresta Samarinda',
+    email: 'penyidik.samarinda@polri.go.id',
     phone: '081298765432',
-    position: 'Penyidik Pemohon Asesmen TAT (Akun Uji)',
+    position: 'Kanit Idik Satresnarkoba / Penyidik Pengaju',
+    pangkat: 'Inspektur Polisi Dua (Ipda)',
   },
   {
     id: 'user-medis',
-    name: '[TEST] Dokter Asesor Medis TAT',
+    name: 'dr. Sarah Amelia, Sp.KJ',
     nip: '198205122008012001',
+    tipeIdentitas: 'NIP',
     role: 'MEDIS',
-    agency: 'BNNP DKI Jakarta / RS Pengayoman',
-    email: 'medis@gmail.com',
+    agency: 'BNNP Kalimantan Timur / RSUD AW Sjahranie',
+    email: 'medis.sarah@tat.bnn.go.id',
     phone: '081311223344',
-    position: 'Dokter Pemeriksa Medis TAT (Akun Uji)',
+    position: 'Dokter Spesialis Kedokteran Jiwa / Asesor Medis TAT',
+    pangkat: 'Pembina / Penata Tk. I (IV/b)',
+    petugasLainnya: [
+      { nama: 'dr. Farhan Hidayat, M.Kes.', tipeIdentitas: 'NIP', nomorIdentitas: '198603152012011002' }
+    ],
   },
   {
     id: 'user-hukum',
-    name: '[TEST] Jaksa Asesor Hukum TAT',
+    name: 'Ahmad Fauzi, S.H., M.H.',
     nip: '197903152003121002',
+    tipeIdentitas: 'NIP',
     role: 'HUKUM',
-    agency: 'Kejaksaan Tinggi DKI Jakarta',
-    email: 'hukum@gmail.com',
+    agency: 'Kejaksaan Tinggi Kalimantan Timur',
+    email: 'hukum.fauzi@kejaksaan.go.id',
     phone: '081399887766',
-    position: 'Jaksa / Penelaah Hukum TAT (Akun Uji)',
+    position: 'Jaksa Penuntut Umum / Tim Asesor Hukum TAT',
+    pangkat: 'Jaksa Muda / Penata Tk. I (III/d)',
+    petugasLainnya: [
+      { nama: 'Kombes Pol. Andi Pratama, S.I.K., M.H.', tipeIdentitas: 'NRP', nomorIdentitas: '76090412' },
+      { nama: 'Ipda Budi Santoso, S.H.', tipeIdentitas: 'NRP', nomorIdentitas: '85010234' }
+    ],
   },
 ];
 
@@ -92,14 +168,42 @@ export default function App() {
   // Navigation / Auth mode: 'landing' (public), 'lacak' (public tracking), 'login' (role selection), 'register' (Satwil registration), or 'dashboard' (authenticated)
   const [appViewMode, setAppViewMode] = useState<'landing' | 'lacak' | 'login' | 'register' | 'dashboard'>('landing');
 
-  // Active Users list
-  const [users, setUsers] = useState<UserProfile[]>(DEFAULT_USERS);
+  // Active Users list (persisted with any custom profile edits)
+  const [users, setUsers] = useState<UserProfile[]>(() => {
+    try {
+      const saved = localStorage.getItem('etat_custom_users');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed.map(u => sanitizeUserProfile(u)!);
+        }
+      }
+    } catch {}
+    return DEFAULT_USERS.map(u => sanitizeUserProfile(u)!);
+  });
 
   // Registrations list
   const [registrations, setRegistrations] = useState<RegistrasiPengguna[]>([]);
 
   // Current logged in user (restored from localStorage if available)
-  const [currentUser, setCurrentUser] = useState<UserProfile>(() => tokenStorage.getUser() || DEFAULT_USER);
+  const [currentUser, setCurrentUser] = useState<UserProfile>(() => sanitizeUserProfile(tokenStorage.getUser()) || DEFAULT_USER);
+
+  // Update current user handler (for profile edits and additional officers configuration)
+  const handleUpdateCurrentUser = useCallback((updatedUser: UserProfile) => {
+    const sanitized = sanitizeUserProfile(updatedUser) || updatedUser;
+    setCurrentUser(sanitized);
+    tokenStorage.setUser(sanitized);
+    setUsers(prev => {
+      const exists = prev.some(u => u.id === sanitized.id || u.role?.toLowerCase() === sanitized.role?.toLowerCase());
+      const next = exists
+        ? prev.map(u => (u.id === sanitized.id || u.role?.toLowerCase() === sanitized.role?.toLowerCase() ? sanitized : u))
+        : [sanitized, ...prev];
+      try {
+        localStorage.setItem('etat_custom_users', JSON.stringify(next));
+      } catch {}
+      return next;
+    });
+  }, []);
   const [currentTab, setCurrentTab] = useState<ActiveTab>('beranda');
   const [selectedPermohonanId, setSelectedPermohonanId] = useState<string | null>(null);
   const [selectedAsesmenId, setSelectedAsesmenId] = useState<string | null>(null);
@@ -180,7 +284,7 @@ export default function App() {
   // Sync state from URL path
   useEffect(() => {
     const path = location.pathname;
-    if (path === '/lacak') {
+    if (path === '/lacak' || path.startsWith('/lacak') || path === '/verifikasi' || path.startsWith('/verifikasi')) {
       setAppViewMode('lacak');
       return;
     }
@@ -529,8 +633,10 @@ export default function App() {
   }, [permohonanList, registrations]);
 
   // Handle updates to an application dossier
-  const handleUpdatePermohonan = (updated: PermohonanAsesmen) => {
-    setPermohonanList(prev => prev.map(p => p.id === updated.id ? updated : p));
+  const handleUpdatePermohonan = (arg1: any, arg2?: any) => {
+    const updated = arg2 ? { ...arg2, id: arg1 } : arg1;
+    if (!updated || !updated.id) return;
+    setPermohonanList(prev => prev.map(p => p.id === updated.id ? { ...p, ...updated } : p));
   };
 
   // Handle creating a new application
@@ -949,6 +1055,7 @@ export default function App() {
             onSelectUser={handleSelectUser}
             onGoToLogin={() => changeAppViewMode('login')}
             onGoToLanding={() => changeAppViewMode('landing')}
+            onUpdateUser={handleUpdateCurrentUser}
           />
         );
 

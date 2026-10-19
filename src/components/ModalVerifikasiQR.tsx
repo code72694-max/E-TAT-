@@ -92,7 +92,7 @@ export const ModalVerifikasiQR: React.FC<ModalVerifikasiQRProps> = ({
             <div className="grid grid-cols-2 gap-2 text-[10px]">
               {rek.daftarPengesah.map((s, idx) => (
                 <div key={idx} className="p-2 bg-[#081224] rounded-lg border border-[#1b3459]">
-                  <span className="font-semibold block text-white truncate">{s.nama}</span>
+                  <span className="font-semibold block text-white truncate">{s.nama.replace(/\[TEST\]\s*/gi, '')}</span>
                   <span className="text-slate-400 block truncate">{s.jabatan}</span>
                   <span className="text-[#D4AF37] font-bold block mt-0.5">✓ TTD Sah Terverifikasi</span>
                 </div>
@@ -101,8 +101,15 @@ export const ModalVerifikasiQR: React.FC<ModalVerifikasiQRProps> = ({
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="bg-[#081224] px-6 py-3 border-t border-[#1b3459] flex justify-end">
+        {/* Footer with link to full Tracking Page */}
+        <div className="bg-[#081224] px-6 py-3 border-t border-[#1b3459] flex items-center justify-between">
+          <a
+            href={`/lacak?id=${encodeURIComponent(permohonan.id)}&nomor=${encodeURIComponent(permohonan.nomorPermohonan || '')}&track=${encodeURIComponent(permohonan.trackingNumber || '')}&tab=dokumen`}
+            className="text-xs text-[#D4AF37] hover:text-amber-300 font-semibold flex items-center space-x-1.5 transition-colors"
+          >
+            <span>Lihat Detail Perkara &amp; Riwayat</span>
+            <ExternalLink className="w-3.5 h-3.5" />
+          </a>
           <button
             onClick={onClose}
             className="bg-[#1b3459] hover:bg-[#284c80] text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors cursor-pointer border border-[#2d5289]"

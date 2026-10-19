@@ -213,15 +213,32 @@ export const ModalLihatDokumenBb: React.FC<ModalLihatDokumenBbProps> = ({
                     </div>
 
                     <div className="flex items-center space-x-2 self-end sm:self-auto shrink-0">
+                      {((doc as any).fileUrl || doc.fileName) && (
+                        <a
+                          href={(doc as any).fileUrl || `https://mvaempwaprqjqdpmwrpf.supabase.co/storage/v1/object/public/dokumen/sample/contoh-dokumen.pdf`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-2.5 py-1.5 bg-[#142642] hover:bg-[#1b3459] text-sky-400 hover:text-sky-300 rounded-lg text-xs font-semibold flex items-center space-x-1 border border-[#234475] transition-colors cursor-pointer"
+                          title="Buka Dokumen PDF di Tab Baru"
+                        >
+                          <ExternalLink className="w-3.5 h-3.5" />
+                          <span>Tab Baru</span>
+                        </a>
+                      )}
                       <button
                         type="button"
-                        onClick={() => setPreviewFile({ title: doc.nama, type: 'pdf', url: doc.fileName })}
+                        onClick={() => setPreviewFile({
+                          title: doc.nama,
+                          type: 'pdf',
+                          url: (doc as any).fileUrl || `https://mvaempwaprqjqdpmwrpf.supabase.co/storage/v1/object/public/dokumen/sample/contoh-dokumen.pdf`
+                        })}
                         className="px-3 py-1.5 bg-[#142642] hover:bg-[#1b3459] text-slate-200 hover:text-white rounded-lg text-xs font-semibold flex items-center space-x-1.5 border border-[#234475] transition-colors cursor-pointer"
                       >
                         <Eye className="w-3.5 h-3.5 text-[#d4af37]" />
                         <span>Lihat Dokumen</span>
                       </button>
                     </div>
+
                   </div>
                 ))}
               </div>
@@ -397,15 +414,48 @@ export const ModalLihatDokumenBb: React.FC<ModalLihatDokumenBbProps> = ({
                   </div>
                 )
               ) : (
-                <div className="space-y-3">
-                  <FileText className="w-12 h-12 text-[#d4af37] mx-auto" />
-                  <p className="text-xs text-slate-300 font-semibold">Pratinjau Berkas Dokumen Resmi Tersertifikasi</p>
-                  <p className="text-[11px] text-slate-500 font-mono">Format PDF Digital • Ditandatangani Elektronik (BSrE)</p>
-                </div>
+                previewFile.url && previewFile.url.startsWith('http') ? (
+                  <div className="w-full space-y-3">
+                    <iframe
+                      src={previewFile.url}
+                      className="w-full h-80 rounded-xl border border-[#1b3459] bg-white/5"
+                      title={previewFile.title}
+                    />
+                    <div className="flex items-center justify-between text-xs text-slate-300 px-1">
+                      <span className="font-semibold text-white truncate max-w-[70%]">{previewFile.title}</span>
+                      <a
+                        href={previewFile.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-cyan-400 hover:text-cyan-300 hover:underline flex items-center gap-1 font-mono text-[11px] shrink-0"
+                      >
+                        <span>Buka PDF di Tab Baru</span>
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <FileText className="w-12 h-12 text-[#d4af37] mx-auto" />
+                    <p className="text-xs text-slate-300 font-semibold">{previewFile.title}</p>
+                    <p className="text-[11px] text-slate-500 font-mono">Format PDF Digital • Tersimpan di Supabase Storage</p>
+                  </div>
+                )
               )}
             </div>
 
             <div className="flex justify-end space-x-2 pt-2">
+              {previewFile.url && (
+                <a
+                  href={previewFile.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-4 py-2 bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white rounded-xl text-xs font-bold flex items-center space-x-2 shadow-lg shadow-sky-950/50 cursor-pointer"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  <span>Buka di Tab Baru</span>
+                </a>
+              )}
               <button
                 type="button"
                 onClick={() => {
@@ -418,7 +468,7 @@ export const ModalLihatDokumenBb: React.FC<ModalLihatDokumenBbProps> = ({
                 className="px-4 py-2 bg-[#142642] hover:bg-[#1b3459] text-white rounded-xl text-xs font-bold flex items-center space-x-2 border border-[#234475] cursor-pointer"
               >
                 <Download className="w-3.5 h-3.5 text-[#d4af37]" />
-                <span>Unduh / Buka Berkas</span>
+                <span>Unduh Berkas</span>
               </button>
               <button
                 type="button"

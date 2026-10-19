@@ -29,10 +29,14 @@ export interface UploadResponse {
   bytes?: number;
   width?: number;
   height?: number;
+  storage?: 'supabase' | 'cloudinary';
+  bucket?: string;
 }
 
 /**
- * Upload a File, Blob, or base64 string to Cloudinary via backend API endpoint
+ * Upload a File, Blob, or base64 string via backend API endpoint.
+ * - Files with PDF type automatically go to Supabase Storage Bucket 'dokumen'.
+ * - Image files go to Cloudinary.
  */
 export const uploadToCloudinary = async (
   fileOrBase64: File | Blob | string,
@@ -50,7 +54,7 @@ export const uploadToCloudinary = async (
 
     const json = await res.json();
     if (!res.ok || !json.success) {
-      throw new Error(json.message || 'Gagal mengunggah foto ke Cloudinary.');
+      throw new Error(json.message || 'Gagal mengunggah berkas.');
     }
     return json.data;
   } else {
@@ -66,8 +70,14 @@ export const uploadToCloudinary = async (
 
     const json = await res.json();
     if (!res.ok || !json.success) {
-      throw new Error(json.message || 'Gagal mengunggah berkas ke Cloudinary.');
+      throw new Error(json.message || 'Gagal mengunggah berkas.');
     }
     return json.data;
   }
 };
+
+/**
+ * Helper khusus upload dokumen (PDF) ke Supabase Storage
+ */
+export const uploadDocument = uploadToCloudinary;
+

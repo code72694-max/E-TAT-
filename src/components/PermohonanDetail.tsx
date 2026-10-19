@@ -87,10 +87,14 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
   const isPengajuRole = currentUser.role?.toLowerCase() === 'pengaju';
   const effectiveReadonly = isReadonly !== undefined ? isReadonly : isPengajuRole;
 
+  // Jika ada query param ?tab=pleno atau ?tab=riwayat (misal dari scan QR Berita Acara), utamakan tab tersebut
+  const urlTab = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('tab') as DetailTab | null : null;
   const initialTabByRole: DetailTab = 
-    isMedisRole ? 'medis' :
-    isHukumRole ? 'hukum' :
-    'ringkasan';
+    urlTab && ['ringkasan', 'administrasi', 'jadwal', 'medis', 'hukum', 'pleno', 'dokumen', 'tindak_lanjut', 'pengawasan', 'klarifikasi', 'riwayat'].includes(urlTab)
+      ? urlTab
+      : isMedisRole ? 'medis'
+      : isHukumRole ? 'hukum'
+      : 'ringkasan';
 
   const [activeTab, setActiveTab] = useState<DetailTab>(initialTabByRole);
   const [showBeritaAcara, setShowBeritaAcara] = useState(false);
@@ -103,9 +107,9 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
     setCurrentPermohonan(initialPermohonan);
   }, [initialPermohonan]);
 
-  // Muat data riil terkini dari backend API saat komponen dipasang
+  // Muat data riil terkini dari backend API saat komponen dipasang (lewati untuk seed mock riwayat-*)
   useEffect(() => {
-    if (!initialPermohonan.id) return;
+    if (!initialPermohonan.id || initialPermohonan.id.startsWith('riwayat-')) return;
 
     let isMounted = true;
     const fetchLatestData = async () => {
@@ -314,6 +318,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
       {showBeritaAcara && (
         <BeritaAcaraModal
           permohonan={currentPermohonan}
+          currentUser={currentUser}
           onClose={() => setShowBeritaAcara(false)}
         />
       )}

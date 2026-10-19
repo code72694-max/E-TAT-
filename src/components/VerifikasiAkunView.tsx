@@ -481,6 +481,18 @@ export const VerifikasiAkunView: React.FC<VerifikasiAkunViewProps> = ({
                     <span className="text-[10px] text-slate-500 uppercase">Kategori & Wilayah Hukum:</span>
                     <p className="text-slate-200">{selectedRegDetail.kategoriInstansi || 'Polres / Polresta'} • {selectedRegDetail.wilayahHukum}</p>
                   </div>
+                  {selectedRegDetail.unitFungsi && (
+                    <div>
+                      <span className="text-[10px] text-slate-500 uppercase">Unit / Satuan Fungsi:</span>
+                      <p className="text-slate-200 font-medium">{selectedRegDetail.unitFungsi}</p>
+                    </div>
+                  )}
+                  {selectedRegDetail.nomorSprint && (
+                    <div>
+                      <span className="text-[10px] text-slate-500 uppercase">No. Surat Perintah (Sprint):</span>
+                      <p className="text-[#d4af37] font-mono text-xs font-semibold">{selectedRegDetail.nomorSprint}</p>
+                    </div>
+                  )}
                   <div>
                     <span className="text-[10px] text-slate-500 uppercase">Alamat Kantor:</span>
                     <p className="text-slate-300 leading-relaxed">{selectedRegDetail.alamatKantor || '-'}</p>

@@ -222,7 +222,7 @@ export const Header: React.FC<HeaderProps> = ({
                       <Clock className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
                       <div className="text-xs">
                         <div className="flex items-center space-x-1.5">
-                          <span className="font-bold text-white">TAT-099 ([TEST] Tersangka 4)</span>
+                          <span className="font-bold text-white">TAT-099 (Dedi Kurniawan)</span>
                           <span className="text-[9px] bg-cyan-500/20 text-cyan-300 px-1 rounded">Jadwal Pleno</span>
                         </div>
                         <p className="text-[11px] text-slate-300 mt-0.5">

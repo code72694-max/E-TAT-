@@ -428,7 +428,7 @@ export const TabAdministrasi: React.FC<TabAdministrasiProps> = ({
               {previewDocModal.fileUrl ? (
                 <div className="pt-2">
                   <a href={previewDocModal.fileUrl} target="_blank" rel="noreferrer" className="text-sky-400 hover:underline flex items-center gap-1 font-mono">
-                    <ExternalLink className="w-3.5 h-3.5" /> Buka Berkas Asli di Cloudinary
+                    <ExternalLink className="w-3.5 h-3.5" /> Buka Dokumen PDF di Tab Baru
                   </a>
                 </div>
               ) : (

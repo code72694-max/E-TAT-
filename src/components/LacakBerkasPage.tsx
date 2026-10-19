@@ -113,15 +113,47 @@ export const LacakBerkasPage: React.FC<LacakBerkasPageProps> = ({
     { code: '089', label: 'TAT/089 (Aktif)', desc: 'Rizky Pratama' }
   ];
 
-  // Sinkronisasi id dari URL params saat pertama kali dimuat
+  // Sinkronisasi id / nomor / tracking dari URL params (misal saat scan QR Code TTE)
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const idFromUrl = params.get('id');
-    if (idFromUrl) {
-      const found = permohonanList.find(p => p.id === idFromUrl);
-      if (found) {
-        setSelectedPermohonan(found);
-      }
+    const nomorFromUrl = params.get('nomor') || params.get('no');
+    const trackFromUrl = params.get('track') || params.get('tracking');
+    const baFromUrl = params.get('ba');
+
+    const searchTarget = (idFromUrl || nomorFromUrl || trackFromUrl || baFromUrl || '').trim().toLowerCase();
+    if (!searchTarget) return;
+
+    // 1. Cari di local permohonanList
+    const found = permohonanList.find(p => {
+      const matchId = p.id && p.id.toLowerCase() === searchTarget;
+      const matchNo = p.nomorPermohonan && (p.nomorPermohonan.toLowerCase() === searchTarget || p.nomorPermohonan.toLowerCase().includes(searchTarget));
+      const matchTrack = p.trackingNumber && (p.trackingNumber.toLowerCase() === searchTarget || p.trackingNumber.toLowerCase().includes(searchTarget));
+      const matchBa = p.sidangPleno?.nomorBeritaAcara && p.sidangPleno.nomorBeritaAcara.toLowerCase().includes(searchTarget);
+      return matchId || matchNo || matchTrack || matchBa;
+    });
+
+    if (found) {
+      setSelectedPermohonan(found);
+      return;
+    }
+
+    // 2. Jika ada id spesifik dan belum ada di memory, coba ambil dari API backend
+    if (idFromUrl && !idFromUrl.startsWith('riwayat-')) {
+      import('../services/api').then(({ permohonanApi }) => {
+        permohonanApi.getById(idFromUrl).then(res => {
+          if (res && res.data) {
+            setSelectedPermohonan(res.data);
+          }
+        }).catch(() => {
+          // Fallback masukkan ke query pencarian
+          setSearchQuery(idFromUrl || nomorFromUrl || trackFromUrl || '');
+          setHasSearched(true);
+        });
+      });
+    } else {
+      setSearchQuery(nomorFromUrl || trackFromUrl || idFromUrl || '');
+      setHasSearched(true);
     }
   }, [permohonanList]);
 
@@ -190,16 +222,20 @@ export const LacakBerkasPage: React.FC<LacakBerkasPageProps> = ({
     if (currentUser) {
       return {
         ...currentUser,
+        name: currentUser.name ? currentUser.name.replace(/\[TEST\]\s*/gi, '').trim() : currentUser.name,
         role: 'PENGAJU'
       };
     }
+    const rawName = selectedPermohonan?.pengajuNama || selectedPermohonan?.perkara?.namaPenyidik || 'Ipda Budi Santoso, S.H.';
     return {
       id: selectedPermohonan?.pengajuId || 'user-pengaju-public',
-      name: selectedPermohonan?.pengajuNama || selectedPermohonan?.perkara?.namaPenyidik || '[TEST] Penyidik Pengaju Satresnarkoba',
-      email: selectedPermohonan?.pengajuEmail || 'pengaju@gmail.com',
+      name: rawName.replace(/\[TEST\]\s*/gi, '').trim(),
+      email: selectedPermohonan?.pengajuEmail || 'penyidik.samarinda@polri.go.id',
       role: 'PENGAJU',
       agency: selectedPermohonan?.instansiPengaju || 'Satresnarkoba Polresta Samarinda',
-      avatarUrl: ''
+      position: 'Penyidik Pembantu / Kanit Resnarkoba',
+      nip: '85010234',
+      phone: '081298765432'
     };
   }, [currentUser, selectedPermohonan]);
 
