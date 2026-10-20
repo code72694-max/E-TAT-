@@ -31,7 +31,6 @@ import { LoginPage } from './components/LoginPage';
 import { RegisterPage } from './components/RegisterPage';
 import { LacakBerkasPage } from './components/LacakBerkasPage';
 import { MobileBottomNav } from './components/MobileBottomNav';
-import { riwayatPermohonanSeedList } from './data/riwayatSeedData';
 
 export const getRolePath = (role?: UserRole | string): string => {
   if (!role) return 'admin';
@@ -212,7 +211,7 @@ export default function App() {
   const [selectedTindakLanjutId, setSelectedTindakLanjutId] = useState<string | null>(null);
   const [selectedScheduleId, setSelectedScheduleId] = useState<string | null>(null);
   const [selectedScheduleCaseId, setSelectedScheduleCaseId] = useState<string | null>(null);
-  const [permohonanList, setPermohonanList] = useState<PermohonanAsesmen[]>(riwayatPermohonanSeedList);
+  const [permohonanList, setPermohonanList] = useState<PermohonanAsesmen[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isBackendLoading, setIsBackendLoading] = useState(false);
 
@@ -239,13 +238,7 @@ export default function App() {
 
       if (permohonanRes && permohonanRes.status === 'fulfilled' && permohonanRes.value?.data) {
         const fetchedData: PermohonanAsesmen[] = permohonanRes.value.data;
-        const combined = [...fetchedData];
-        for (const seedItem of riwayatPermohonanSeedList) {
-          if (!combined.some(p => p.id === seedItem.id || p.nomorPermohonan === seedItem.nomorPermohonan)) {
-            combined.push(seedItem);
-          }
-        }
-        setPermohonanList(combined);
+        setPermohonanList(fetchedData);
       }
 
       if (regRes && regRes.status === 'fulfilled' && regRes.value?.data) {
@@ -544,11 +537,11 @@ export default function App() {
 
   // Selected permohonan object
   const selectedPermohonan = useMemo(() => {
-    return permohonanList.find(p => p.id === selectedPermohonanId) || riwayatPermohonanSeedList.find(p => p.id === selectedPermohonanId) || null;
+    return permohonanList.find(p => p.id === selectedPermohonanId) || null;
   }, [permohonanList, selectedPermohonanId]);
 
   const selectedAsesmenPermohonan = useMemo(() => {
-    return permohonanList.find(p => p.id === selectedAsesmenId) || riwayatPermohonanSeedList.find(p => p.id === selectedAsesmenId) || null;
+    return permohonanList.find(p => p.id === selectedAsesmenId) || null;
   }, [permohonanList, selectedAsesmenId]);
 
   const selectedHukumPermohonan = useMemo(() => {
