@@ -31,7 +31,7 @@ export const SuratPengantarTersangkaModal: React.FC<SuratPengantarTersangkaModal
   const alamat = t?.alamatDomisili || t?.alamatKtp || 'Samarinda, Kalimantan Timur';
   const noLp = p.perkara?.nomorLaporanPolisi || p.perkara?.nomorLp || 'LP/A/155/IX/2026/SPKT';
   const instansiPenyidik = p.instansiPengaju || p.perkara?.instansiPenyidik || 'Satresnarkoba Polresta Samarinda';
-  const namaPenyidik = p.perkara?.namaPenyidik || 'Bripka Heru Susanto';
+  const namaPenyidik = p.perkara?.namaPenyidik || '[TEST] Penyidik Pengaju Satresnarkoba';
 
   // Kode Lacak & Nomor Surat Rujukan
   const kodeLacak = (p as any).kodeLacakRehab || tl?.kodeLacakRehab || `RHB-${p.id.slice(-6).toUpperCase()}`;

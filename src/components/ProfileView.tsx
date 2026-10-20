@@ -40,7 +40,7 @@ const normalizePetugas = (list?: (string | PetugasLainnyaItem)[]): PetugasLainny
       return {
         nama: item,
         tipeIdentitas: isPol ? 'NRP' : 'NIP',
-        nomorIdentitas: item.includes('Andi Pratama') ? '76090412' : item.includes('Budi Santoso') ? '85010234' : item.includes('Farhan') ? '198603152012011002' : ''
+        nomorIdentitas: item.includes('Polri') || item.includes('Andi') ? '76090412' : item.includes('Penyidik') || item.includes('Budi') ? '85010234' : '198603152012011002'
       };
     }
     return {
@@ -698,8 +698,8 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                         onChange={(e) => setNewPetugasNama(e.target.value)}
                         placeholder={
                           roleUpper === 'HUKUM'
-                            ? 'Nama & Gelar (Kombes Pol. Andi Pratama, S.I.K., M.H.)'
-                            : 'Nama & Gelar (dr. Farhan Hidayat, M.Kes.)'
+                            ? 'Contoh: Nama & Gelar Asesor Hukum'
+                            : 'Contoh: Nama & Gelar Asesor Medis'
                         }
                         className="w-full bg-[#081224] border border-[#1c355e] focus:border-[#d4af37] text-white text-xs px-3.5 py-2.5 rounded-xl outline-none transition-colors"
                       />
@@ -893,7 +893,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                   required
                   value={profileForm.name}
                   onChange={(e) => setProfileForm({ ...profileForm, name: e.target.value })}
-                  placeholder="Contoh: dr. Sarah Amelia, Sp.KJ atau Ahmad Fauzi, S.H., M.H."
+                  placeholder="Contoh: Nama Lengkap & Gelar Resmi"
                   className="w-full bg-[#081224] border border-[#1c355e] focus:border-[#d4af37] text-white px-3.5 py-2.5 rounded-xl outline-none"
                 />
               </div>

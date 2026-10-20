@@ -164,8 +164,8 @@ function buildDetailedPipeline(p: PermohonanAsesmen): AssessmentPipelineStep[] {
         { label: "Sinkronisasi Ruang Pemeriksaan & Laboratorium", detail: "Persiapan kit tes urine dan lembar instrumen klinis." }
       ],
       outputList: [
-        { label: `Asesor Medis: ${p.timAsesmen?.asesorMedisNama || "dr. Haryono (BNNK Samarinda)"}`, detail: "Dokter Pemeriksa & Konselor Adiksi", isHighlight: true },
-        { label: `Asesor Hukum: ${p.timAsesmen?.asesorHukumNama || "Tim Hukum Kejaksaan / BNNP"}`, detail: "Jaksa Penuntut Umum / Penelaah Perkara", isHighlight: true },
+        { label: `Asesor Medis: ${p.timAsesmen?.asesorMedisNama || "[TEST] Dokter Asesor Medis TAT"}`, detail: "Dokter Pemeriksa & Konselor Adiksi", isHighlight: true },
+        { label: `Asesor Hukum: ${p.timAsesmen?.asesorHukumNama || "[TEST] Jaksa Asesor Hukum TAT"}`, detail: "Jaksa Penuntut Umum / Penelaah Perkara", isHighlight: true },
         { label: `Jadwal & Lokasi Sesi`, detail: `${p.timAsesmen?.jadwalPemeriksaanMedis || "2026-09-09 09:30 WIB"} @ ${p.timAsesmen?.lokasiPemeriksaan || "Klinik Pratama BNNK"}` }
       ],
       highlightNote: "Jadwal pemeriksaan telah disetujui bersama oleh Penyidik Pengaju dan Tim Asesor.",
@@ -180,7 +180,7 @@ function buildDetailedPipeline(p: PermohonanAsesmen): AssessmentPipelineStep[] {
       icon: <Stethoscope className="w-4 h-4" />,
       status: medisDone ? "done" : medisActive ? "active" : "pending",
       timestamp: p.asesmenMedis?.tanggalPemeriksaan || p.timAsesmen?.jadwalPemeriksaanMedis || "2026-09-09 10:00 WIB",
-      pic: p.asesmenMedis?.asesorNama || p.timAsesmen?.asesorMedisNama || "dr. Haryono (Sp.KJ)",
+      pic: p.asesmenMedis?.asesorNama || p.timAsesmen?.asesorMedisNama || "[TEST] Dokter Asesor Medis TAT",
       picRole: "Asesor Medis & Psikiater",
       inputList: [
         { label: "Hasil Uji Toksikologi Urine (SKHPU)", detail: p.asesmenMedis?.hasilUrin?.map(u => `${u.parameter}: ${u.hasil}`).join(", ") || "MET: Positif, THC: Negatif" },

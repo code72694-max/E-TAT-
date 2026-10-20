@@ -50,7 +50,7 @@ export const PlenoTATView: React.FC<PlenoTATViewProps> = ({
           jenisTindakLanjut: 'Rujukan Rehabilitasi',
           statusRujukan: 'sedang_dikoordinasikan',
           namaFasilitasTujuan: faskes,
-          penanggungJawabTindakLanjut: item.perkara?.namaPenyidik || 'Bripka Heru Susanto',
+          penanggungJawabTindakLanjut: item.perkara?.namaPenyidik || '[TEST] Penyidik Pengaju Satresnarkoba',
           terakhirDiperbarui: new Date().toISOString()
         }),
         nomorSuratRujukan: noSuratRujukan,

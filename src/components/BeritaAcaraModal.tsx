@@ -90,15 +90,15 @@ export const BeritaAcaraModal: React.FC<BeritaAcaraModalProps> = ({ permohonan, 
     activeMedisUser?.name ||
     medis?.asesorNama ||
     p.timAsesmen?.asesorMedisNama ||
-    'dr. Sarah Amelia, Sp.KJ'
+    '[TEST] Dokter Asesor Medis TAT'
   );
   const medisAsesor1Pangkat = activeMedisUser?.pangkat || 'Pembina / Penata Tk. I (IV/b)';
   const medisAsesor1Nip = activeMedisUser?.nip || '198205122008012001';
-  const medisAsesor1Jabatan = activeMedisUser?.position || 'Dokter Spesialis Kedokteran Jiwa / Asesor Medis TAT';
+  const medisAsesor1Jabatan = activeMedisUser?.position || 'Dokter Pemeriksa Medis TAT (Akun Uji)';
 
   const medisPetugasConfig = Array.isArray(activeMedisUser?.petugasLainnya) && activeMedisUser.petugasLainnya.length > 0
     ? activeMedisUser.petugasLainnya
-    : ['dr. Farhan Hidayat, M.Kes.'];
+    : ['[TEST] Dokter Asesor Medis 2'];
 
   // Helper untuk resolve detail officer jika berbentuk string atau objek PetugasLainnyaItem
   const getOfficerDetail = (item: any, fallbackNama: string, fallbackTipe: string, fallbackNip: string): { nama: string; tipeIdentitas: string; nip: string } => {
@@ -108,7 +108,7 @@ export const BeritaAcaraModal: React.FC<BeritaAcaraModalProps> = ({ permohonan, 
       return {
         nama: cleanStr(item),
         tipeIdentitas: isPolice ? 'NRP' : fallbackTipe,
-        nip: item.includes('Andi Pratama') ? '76090412' : item.includes('Budi Santoso') ? '85010234' : item.includes('Farhan') ? '198603152012011002' : fallbackNip
+        nip: item.includes('Polri') ? '76090412' : item.includes('Penyidik') ? '85010234' : item.includes('Farhan') ? '198603152012011002' : fallbackNip
       };
     }
     return {
@@ -128,7 +128,7 @@ export const BeritaAcaraModal: React.FC<BeritaAcaraModalProps> = ({ permohonan, 
     }
   ];
 
-  const m2 = getOfficerDetail(medisPetugasConfig[0], 'dr. Farhan Hidayat, M.Kes.', 'NIP', '198603152012011002');
+  const m2 = getOfficerDetail(medisPetugasConfig[0], '[TEST] Dokter Asesor Medis 2', 'NIP', '198603152012011002');
   timMedisFinal.push({
     nama: m2.nama,
     pangkat: 'Penata (III/c)',
@@ -138,7 +138,7 @@ export const BeritaAcaraModal: React.FC<BeritaAcaraModalProps> = ({ permohonan, 
   });
 
   if (medisPetugasConfig[1]) {
-    const m3 = getOfficerDetail(medisPetugasConfig[1], 'dr. Linda Wijaya, Sp.PK', 'NIP', '198807212015031003');
+    const m3 = getOfficerDetail(medisPetugasConfig[1], '[TEST] Dokter Asesor Medis 3', 'NIP', '198807212015031003');
     timMedisFinal.push({
       nama: m3.nama,
       pangkat: 'Penata Tk. I (III/d)',
@@ -154,26 +154,26 @@ export const BeritaAcaraModal: React.FC<BeritaAcaraModalProps> = ({ permohonan, 
     activeHukumUser?.name ||
     hukum?.asesorNama ||
     p.timAsesmen?.asesorHukumNama ||
-    'Ahmad Fauzi, S.H., M.H.'
+    '[TEST] Jaksa Asesor Hukum TAT'
   );
   const hukumAsesor1Pangkat = activeHukumUser?.pangkat || 'Jaksa Muda / Penata Tk. I (III/d)';
   const hukumAsesor1Nip = activeHukumUser?.nip || '197903152003121002';
-  const hukumAsesor1Jabatan = activeHukumUser?.position || 'Jaksa Penuntut Umum / Tim Asesor Hukum TAT';
+  const hukumAsesor1Jabatan = activeHukumUser?.position || 'Jaksa Penuntut Umum / Tim Asesor Hukum TAT (Akun Uji)';
 
   const hukumPetugasConfig = Array.isArray(activeHukumUser?.petugasLainnya) && activeHukumUser.petugasLainnya.length > 0
     ? activeHukumUser.petugasLainnya
-    : ['Kombes Pol. Andi Pratama, S.I.K., M.H.', 'Ipda Budi Santoso, S.H.'];
+    : ['[TEST] Asesor Hukum Polri TAT', '[TEST] Penyidik Pengaju Satresnarkoba'];
 
   const penyidikKasusNama = cleanStr(
     (isPengajuLoggedIn ? currentUser.name : null) ||
     pk?.namaPenyidik ||
     p.pengajuNama ||
-    'Ipda Budi Santoso, S.H.'
+    '[TEST] Penyidik Pengaju Satresnarkoba'
   );
 
-  const h2 = getOfficerDetail(hukumPetugasConfig[0], 'Kombes Pol. Andi Pratama, S.I.K., M.H.', 'NRP', '76090412');
+  const h2 = getOfficerDetail(hukumPetugasConfig[0], '[TEST] Asesor Hukum Polri TAT', 'NRP', '76090412');
   const h3Raw = getOfficerDetail(hukumPetugasConfig[1], penyidikKasusNama, 'NRP', '85010234');
-  const h3Nama = (h3Raw.nama === h2.nama || h3Raw.nama === hukumAsesor1Nama) ? (penyidikKasusNama !== h2.nama ? penyidikKasusNama : 'Ipda Budi Santoso, S.H.') : h3Raw.nama;
+  const h3Nama = (h3Raw.nama === h2.nama || h3Raw.nama === hukumAsesor1Nama) ? (penyidikKasusNama !== h2.nama ? penyidikKasusNama : '[TEST] Penyidik Pengaju Satresnarkoba') : h3Raw.nama;
 
   const timHukumFinal: OfficerInfo[] = [
     {

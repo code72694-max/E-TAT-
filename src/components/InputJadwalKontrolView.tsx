@@ -93,12 +93,12 @@ export const InputJadwalKontrolView: React.FC<InputJadwalKontrolViewProps> = ({
   const [tanggalMulai, setTanggalMulai] = useState(new Date().toISOString().slice(0, 10));
   const [frekuensiKontrol, setFrekuensiKontrol] = useState('Seminggu 2x (Selasa & Jumat)');
   const [namaDpjp, setNamaDpjp] = useState(
-    isMedisRole ? (currentUser.name || 'Dokter Asesor Medis') : 'dr. Rina Lestari, Sp.KJ'
+    isMedisRole ? (currentUser.name || '[TEST] Dokter Asesor Medis TAT') : '[TEST] Dokter DPJP Fasilitas'
   );
   
   // Wajib lapor penyidik
   const [tanggalWajibLapor, setTanggalWajibLapor] = useState(new Date().toISOString().slice(0, 10));
-  const [namaPenyidik, setNamaPenyidik] = useState('Bripka Heru Susanto');
+  const [namaPenyidik, setNamaPenyidik] = useState('[TEST] Penyidik Pengaju Satresnarkoba');
   const [instansiPenyidik, setInstansiPenyidik] = useState('Satresnarkoba Polresta Samarinda');
   const [kanalPelaporan, setKanalPelaporan] = useState<'langsung' | 'digital' | 'surat'>('langsung');
   const [catatanKhusus, setCatatanKhusus] = useState('Klien bersedia mematuhi seluruh jadwal kontrol medis dan absensi wajib lapor.');

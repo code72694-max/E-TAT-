@@ -536,9 +536,9 @@ export const TabDokumenPengesahan: React.FC<TabDokumenPengesahanProps> = ({
               const signers = Array.isArray(permohonan.rekomendasiResmi?.daftarPengesah) && permohonan.rekomendasiResmi.daftarPengesah.length > 0
                 ? permohonan.rekomendasiResmi.daftarPengesah
                 : [
-                    { id: 'p1', nama: 'Kombes Pol. Drs. Hendra Kusuma, M.Si.', jabatan: 'Ketua Tim Asesmen Terpadu', instansi: 'BNNP / Polda Kaltim', status: 'disahkan' as const, tandaTanganDigitalHash: 'SHA256:7B8F9A...' },
-                    { id: 'p2', nama: permohonan.asesmenMedis?.asesorNama || 'dr. Sarah Amelia, Sp.KJ', jabatan: 'Dokter Asesor Medis TAT', instansi: 'Klinik Pratama BNNP', status: 'disahkan' as const, tandaTanganDigitalHash: 'SHA256:4C2D1E...' },
-                    { id: 'p3', nama: permohonan.asesmenHukum?.asesorNama || 'Jaksa Penuntut Umum', jabatan: 'Asesor Hukum TAT', instansi: 'Kejaksaan Tinggi Kaltim', status: 'disahkan' as const, tandaTanganDigitalHash: 'SHA256:9A1B8C...' }
+                    { id: 'p1', nama: '[TEST] Ketua Tim Asesmen Terpadu', jabatan: 'Ketua Tim Asesmen Terpadu', instansi: 'BNNP / Polda Kaltim', status: 'disahkan' as const, tandaTanganDigitalHash: 'SHA256:7B8F9A...' },
+                    { id: 'p2', nama: permohonan.asesmenMedis?.asesorNama || '[TEST] Dokter Asesor Medis TAT', jabatan: 'Dokter Asesor Medis TAT', instansi: 'Klinik Pratama BNNP', status: 'disahkan' as const, tandaTanganDigitalHash: 'SHA256:4C2D1E...' },
+                    { id: 'p3', nama: permohonan.asesmenHukum?.asesorNama || '[TEST] Jaksa Asesor Hukum TAT', jabatan: 'Asesor Hukum TAT', instansi: 'Kejaksaan Tinggi Kaltim', status: 'disahkan' as const, tandaTanganDigitalHash: 'SHA256:9A1B8C...' }
                   ];
 
               return (

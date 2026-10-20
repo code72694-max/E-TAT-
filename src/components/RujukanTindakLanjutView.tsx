@@ -79,7 +79,7 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
   const [schedTanggalMulai, setSchedTanggalMulai] = useState(new Date().toISOString().slice(0, 10));
   const [schedTanggalWajibLapor, setSchedTanggalWajibLapor] = useState(new Date().toISOString().slice(0, 10));
   const [schedFrekuensiKontrol, setSchedFrekuensiKontrol] = useState('Seminggu 2x (Selasa & Jumat)');
-  const [schedNamaPenyidik, setSchedNamaPenyidik] = useState('Bripka Heru Susanto');
+  const [schedNamaPenyidik, setSchedNamaPenyidik] = useState('[TEST] Penyidik Pengaju Satresnarkoba');
   const [schedInstansiPenyidik, setSchedInstansiPenyidik] = useState('Satresnarkoba Polresta Samarinda');
 
   // Filter: Hanya permohonan resmi e-TAT yang SUDAH SELESAI SIDANG PLENO TAT & memiliki rekomendasi resmi
@@ -478,7 +478,7 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
                               <span className="text-slate-600">•</span>
                               <span>Usia: <span className="text-slate-300">{item.terperiksa.usia} th</span></span>
                               <span className="text-slate-600">•</span>
-                              <span>Penyidik: <span className="text-slate-300">{item.perkara?.namaPenyidik || 'Bripka Heru Susanto'}</span></span>
+                              <span>Penyidik: <span className="text-slate-300">{item.perkara?.namaPenyidik || '[TEST] Penyidik Pengaju Satresnarkoba'}</span></span>
                             </div>
                           </div>
                         </div>

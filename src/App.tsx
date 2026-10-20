@@ -46,24 +46,22 @@ export const sanitizeUserProfile = (user: UserProfile | null): UserProfile | nul
   let defaultPetugas: PetugasLainnyaItem[] = [];
   if (r === 'HUKUM') {
     defaultPetugas = [
-      { nama: 'Kombes Pol. Andi Pratama, S.I.K., M.H.', tipeIdentitas: 'NRP', nomorIdentitas: '76090412' },
-      { nama: 'Ipda Budi Santoso, S.H.', tipeIdentitas: 'NRP', nomorIdentitas: '85010234' }
+      { nama: '[TEST] Asesor Hukum Polri TAT', tipeIdentitas: 'NRP', nomorIdentitas: '76090412' },
+      { nama: '[TEST] Jaksa Asesor Kejaksaan TAT', tipeIdentitas: 'NRP', nomorIdentitas: '85010234' }
     ];
   } else if (r === 'MEDIS') {
     defaultPetugas = [
-      { nama: 'dr. Farhan Hidayat, M.Kes.', tipeIdentitas: 'NIP', nomorIdentitas: '198603152012011002' }
+      { nama: '[TEST] Dokter Asesor Medis 2', tipeIdentitas: 'NIP', nomorIdentitas: '198603152012011002' }
     ];
   }
 
-  let cleanName = user.name ? user.name.replace(/\[TEST\]\s*/gi, '').replace(/\(Akun Uji\)/gi, '').trim() : '';
-  if (!cleanName || cleanName === 'Dokter Asesor Medis TAT' || cleanName.toLowerCase().includes('dokter asesor medis')) {
-    cleanName = 'dr. Sarah Amelia, Sp.KJ';
-  } else if (!cleanName || cleanName === 'Jaksa Asesor Hukum TAT' || cleanName.toLowerCase().includes('jaksa asesor hukum')) {
-    cleanName = 'Ahmad Fauzi, S.H., M.H.';
-  } else if (!cleanName || cleanName === 'Admin Sekretariat TAT' || cleanName.toLowerCase().includes('admin sekretariat')) {
-    cleanName = 'Kompol Hendra Kusuma, S.I.K., M.Si.';
-  } else if (!cleanName || cleanName === 'Penyidik Pengaju Satresnarkoba' || cleanName.toLowerCase().includes('penyidik pengaju')) {
-    cleanName = 'Ipda Budi Santoso, S.H.';
+  let displayName = user.name || '';
+  if (!displayName) {
+    if (r === 'ADMIN') displayName = '[TEST] Admin Sekretariat TAT';
+    else if (r === 'PENGAJU') displayName = '[TEST] Penyidik Pengaju Satresnarkoba';
+    else if (r === 'MEDIS') displayName = '[TEST] Dokter Asesor Medis TAT';
+    else if (r === 'HUKUM') displayName = '[TEST] Jaksa Asesor Hukum TAT';
+    else displayName = '[TEST] Petugas e-TAT';
   }
 
   const rawList = Array.isArray(user.petugasLainnya) ? user.petugasLainnya : defaultPetugas;
@@ -73,23 +71,23 @@ export const sanitizeUserProfile = (user: UserProfile | null): UserProfile | nul
       return {
         nama: item,
         tipeIdentitas: isPolice ? 'NRP' : 'NIP',
-        nomorIdentitas: item.includes('Andi Pratama') ? '76090412' : item.includes('Budi Santoso') ? '85010234' : item.includes('Farhan') ? '198603152012011002' : ''
+        nomorIdentitas: item.includes('Polri') ? '76090412' : item.includes('Penyidik') ? '85010234' : '198603152012011002'
       };
     }
     return item;
   });
 
-  const defaultTipeIdentitas = r === 'PENGAJU' || cleanName.includes('Pol') ? 'NRP' : 'NIP';
+  const defaultTipeIdentitas = r === 'PENGAJU' || displayName.includes('Penyidik') ? 'NRP' : 'NIP';
 
   return {
     ...user,
-    name: cleanName,
+    name: displayName,
     tipeIdentitas: user.tipeIdentitas || defaultTipeIdentitas,
-    position: user.position ? user.position.replace(/\(Akun Uji\)/gi, '').replace(/\[TEST\]\s*/gi, '').trim() : (
-      r === 'HUKUM' ? 'Jaksa Penuntut Umum / Tim Asesor Hukum TAT' :
-      r === 'MEDIS' ? 'Dokter Spesialis Kedokteran Jiwa / Asesor Medis TAT' :
-      r === 'PENGAJU' ? 'Kanit Idik Satresnarkoba / Penyidik Pengaju' :
-      'Ketua Tim Sekretariat TAT BNNP Kalimantan Timur'
+    position: user.position || (
+      r === 'HUKUM' ? 'Jaksa Penuntut Umum / Tim Asesor Hukum TAT (Akun Uji)' :
+      r === 'MEDIS' ? 'Dokter Pemeriksa Medis TAT (Akun Uji)' :
+      r === 'PENGAJU' ? 'Penyidik Pemohon Asesmen TAT (Akun Uji)' :
+      'Petugas Verifikasi & Sekretariat TAT (Akun Uji)'
     ),
     pangkat: user.pangkat || (
       r === 'HUKUM' ? 'Jaksa Muda / Penata Tk. I (III/d)' :
@@ -104,57 +102,57 @@ export const sanitizeUserProfile = (user: UserProfile | null): UserProfile | nul
 export const DEFAULT_USERS: UserProfile[] = [
   {
     id: 'user-admin',
-    name: 'Kompol Hendra Kusuma, S.I.K., M.Si.',
+    name: '[TEST] Admin Sekretariat TAT',
     nip: '79080512',
     tipeIdentitas: 'NRP',
     role: 'ADMIN',
     agency: 'Sekretariat TAT BNNP Kalimantan Timur',
-    email: 'admin@tat.polri.go.id',
+    email: 'admin@gmail.com',
     phone: '081234567890',
-    position: 'Ketua Tim Sekretariat TAT BNNP Kalimantan Timur',
+    position: 'Petugas Verifikasi & Sekretariat TAT (Akun Uji)',
     pangkat: 'Komisaris Polisi (Kompol)',
   },
   {
     id: 'user-pengaju',
-    name: 'Ipda Budi Santoso, S.H.',
+    name: '[TEST] Penyidik Pengaju Satresnarkoba',
     nip: '85010234',
     tipeIdentitas: 'NRP',
     role: 'PENGAJU',
     agency: 'Satresnarkoba Polresta Samarinda',
-    email: 'penyidik.samarinda@polri.go.id',
+    email: 'pengaju@gmail.com',
     phone: '081298765432',
-    position: 'Kanit Idik Satresnarkoba / Penyidik Pengaju',
+    position: 'Penyidik Pemohon Asesmen TAT (Akun Uji)',
     pangkat: 'Inspektur Polisi Dua (Ipda)',
   },
   {
     id: 'user-medis',
-    name: 'dr. Sarah Amelia, Sp.KJ',
+    name: '[TEST] Dokter Asesor Medis TAT',
     nip: '198205122008012001',
     tipeIdentitas: 'NIP',
     role: 'MEDIS',
-    agency: 'BNNP Kalimantan Timur / RSUD AW Sjahranie',
-    email: 'medis.sarah@tat.bnn.go.id',
+    agency: 'BNNP Kalimantan Timur / RS Pengayoman',
+    email: 'medis@gmail.com',
     phone: '081311223344',
-    position: 'Dokter Spesialis Kedokteran Jiwa / Asesor Medis TAT',
+    position: 'Dokter Pemeriksa Medis TAT (Akun Uji)',
     pangkat: 'Pembina / Penata Tk. I (IV/b)',
     petugasLainnya: [
-      { nama: 'dr. Farhan Hidayat, M.Kes.', tipeIdentitas: 'NIP', nomorIdentitas: '198603152012011002' }
+      { nama: '[TEST] Dokter Asesor Medis 2', tipeIdentitas: 'NIP', nomorIdentitas: '198603152012011002' }
     ],
   },
   {
     id: 'user-hukum',
-    name: 'Ahmad Fauzi, S.H., M.H.',
+    name: '[TEST] Jaksa Asesor Hukum TAT',
     nip: '197903152003121002',
     tipeIdentitas: 'NIP',
     role: 'HUKUM',
     agency: 'Kejaksaan Tinggi Kalimantan Timur',
-    email: 'hukum.fauzi@kejaksaan.go.id',
+    email: 'etatsiappulih@gmail.com',
     phone: '081399887766',
-    position: 'Jaksa Penuntut Umum / Tim Asesor Hukum TAT',
+    position: 'Jaksa / Penelaah Hukum TAT (Akun Uji)',
     pangkat: 'Jaksa Muda / Penata Tk. I (III/d)',
     petugasLainnya: [
-      { nama: 'Kombes Pol. Andi Pratama, S.I.K., M.H.', tipeIdentitas: 'NRP', nomorIdentitas: '76090412' },
-      { nama: 'Ipda Budi Santoso, S.H.', tipeIdentitas: 'NRP', nomorIdentitas: '85010234' }
+      { nama: '[TEST] Asesor Hukum Polri TAT', tipeIdentitas: 'NRP', nomorIdentitas: '76090412' },
+      { nama: '[TEST] Jaksa Asesor Kejaksaan TAT', tipeIdentitas: 'NRP', nomorIdentitas: '85010234' }
     ],
   },
 ];

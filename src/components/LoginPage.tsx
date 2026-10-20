@@ -299,7 +299,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                   { role: 'Admin', email: 'admin@gmail.com', desc: 'Sekretariat TAT' },
                   { role: 'Pengaju', email: 'pengaju@gmail.com', desc: 'Penyidik Pemohon' },
                   { role: 'Medis', email: 'medis@gmail.com', desc: 'Asesor Medis' },
-                  { role: 'Hukum', email: 'hukum@gmail.com', desc: 'Asesor Hukum' },
+                  { role: 'Hukum', email: 'etatsiappulih@gmail.com', desc: 'Asesor Hukum' },
                 ].map(item => (
                   <button
                     key={item.email}

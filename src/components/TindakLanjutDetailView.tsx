@@ -102,24 +102,24 @@ const buildSeededMonitoring = (permohonan: PermohonanAsesmen, userRole: UserRole
       jenisLayananSesuaiRekomendasi: isRawatInap ? 'Rehabilitasi Medis Rawat Inap Intensif (3 Bulan)' : 'Rehabilitasi Rawat Jalan Kontrol Berkala (8 Sesi)',
       namaFasilitasTujuan: fasilitas,
       alamatFasilitas: 'Jl. Poros Samarinda-Bontang Km. 24, Tanah Merah, Samarinda, Kaltim',
-      namaPenanggungJawabFasilitas: 'dr. Rina Lestari, Sp.KJ',
+      namaPenanggungJawabFasilitas: '[TEST] Dokter DPJP Fasilitas',
       kontakPenanggungJawabFasilitas: '0812-555-9821 / (0541) 743201',
       tanggalKoordinasiPenerimaan: '2026-09-15',
       hasilKoordinasiPenerimaan: `Fasilitas ${fasilitas} mengonfirmasi kesediaan tempat & tim medis penerima sesuai kuota rekomendasi TAT.`,
       catatanKoordinasi: 'Persyaratan administratif awal dan hasil uji toksikologi dinyatakan lengkap.',
       tanggalSerahTerimaAktual: '2026-09-16',
-      identitasPihakMenyerahkan: 'Bripka Heru Susanto (Penyidik Satresnarkoba)',
-      identitasPihakMenerima: 'dr. Rina Lestari, Sp.KJ (Tim Medis Balai Rehab)',
+      identitasPihakMenyerahkan: '[TEST] Penyidik Pengaju Satresnarkoba',
+      identitasPihakMenerima: '[TEST] Dokter DPJP Fasilitas (Tim Medis Balai Rehab)',
       fileBaSerahTerimaUrl: 'internal://ba-serah-terima',
       tanggalMasukLayananTerkonfirmasi: '2026-09-16',
       adaKendala: false,
       statusPelaksanaan: 'serah_terima_selesai',
-      diisiOleh: 'Aipda Bambang Supriyadi',
+      diisiOleh: '[TEST] Penyidik Pengaju Satresnarkoba',
       kapasitasPengisi: 'Penyidik Pengaju TAT',
       tanggalDiisi: '2026-09-16',
       statusVerifikasiAdmin: 'terverifikasi',
       catatanVerifikasiAdmin: 'Dokumen BA serah terima & syarat admisi terverifikasi valid oleh Sekretariat TAT.',
-      diverifikasiOleh: 'Bripka Tri Wahyudi (Admin Sekretariat)',
+      diverifikasiOleh: '[TEST] Admin Sekretariat TAT',
       tanggalVerifikasiAdmin: '2026-09-17'
     },
     laporanKontrolList: [
@@ -130,24 +130,24 @@ const buildSeededMonitoring = (permohonan: PermohonanAsesmen, userRole: UserRole
         namaFasilitasPelapor: fasilitas,
         nomorLaporanFasilitas: `LAP-KLINIK/2026/09/${permohonan.id.slice(-3)}`,
         tanggalLaporanFasilitas: '2026-09-26',
-        namaPenerbitLaporan: 'dr. Rina Lestari, Sp.KJ',
+        namaPenerbitLaporan: '[TEST] Dokter DPJP Fasilitas',
         kapasitasPenerbit: 'Dokter Penanggung Jawab Pasien (DPJP)',
         statusPelaksanaanBerdasarkanBukti: 'terlaksana',
         ringkasanAdministratif: 'Pasien telah menjalani minggu ke-2 program detoksifikasi dan konseling medis. Menunjukkan kemajuan kognitif signifikan dan kooperatif dalam sesi terapi harian.',
         rencanaBerdasarkanLaporan: 'Melanjutkan ke fase terapi kelompok (Therapeutic Community) dan pemeriksaan toksikologi urin acak minggu depan.',
         fileBuktiUrl: 'internal://laporan-kontrol-minggu-2',
-        diunggahOleh: 'Aipda Bambang Supriyadi',
+        diunggahOleh: '[TEST] Penyidik Pengaju Satresnarkoba',
         kapasitasPengunggah: 'Pengaju / Penyidik Pendamping',
         tanggalDiunggah: '2026-09-27',
         statusAdmin: 'terverifikasi',
         catatanAdmin: 'Laporan perkembangan periodik terverifikasi lengkap.',
-        diverifikasiOleh: 'Admin Sekretariat',
+        diverifikasiOleh: '[TEST] Admin Sekretariat TAT',
         tanggalVerifikasi: '2026-09-28',
         perluTelaahKlinis: true,
         statusTelaahKlinis: 'selesai',
         catatanTelaahKlinis: 'Hasil review medis TAT: Perkembangan klinis sesuai dengan target intervensi rawat inap 3 bulan. Rekomendasi dilanjutkan.',
         tanggalTelaahKlinis: '2026-09-29',
-        penugasanMedis: 'dr. Hendra Kusumah, Sp.KJ (Tim Medis TAT)'
+        penugasanMedis: '[TEST] Dokter Asesor Medis TAT'
       }
     ],
     buktiWajibLaporList: [
@@ -157,7 +157,7 @@ const buildSeededMonitoring = (permohonan: PermohonanAsesmen, userRole: UserRole
         tanggalPelaporanAktual: '2026-09-22',
         tanggalWajibLapor: '2026-09-22',
         waktuInputSistem: '2026-09-22 14:15:00 WIB',
-        namaPenyidikPenerima: 'Bripka Heru Susanto (Penyidik Satresnarkoba)',
+        namaPenyidikPenerima: '[TEST] Penyidik Pengaju Satresnarkoba',
         instansiPenyidik: 'Satresnarkoba Polresta Samarinda (Tatap Muka)',
         kegiatanRehabTerkait: 'Pelaporan Wajib Lapor Mingguan Ke-1',
         kanal: 'langsung',
@@ -165,7 +165,7 @@ const buildSeededMonitoring = (permohonan: PermohonanAsesmen, userRole: UserRole
         statusKonfirmasi: 'dikonfirmasi_penyidik',
         statusVerifikasiAdmin: 'terverifikasi',
         catatanAdmin: 'Telah diverifikasi Admin: Tanggal pelaporan aktual dan bukti fisik lengkap.',
-        diunggahOleh: 'Bripka Heru Susanto (Pengaju/Penyidik)',
+        diunggahOleh: '[TEST] Penyidik Pengaju Satresnarkoba',
         tanggalDiunggah: '2026-09-22'
       },
       {
@@ -174,7 +174,7 @@ const buildSeededMonitoring = (permohonan: PermohonanAsesmen, userRole: UserRole
         tanggalPelaporanAktual: '2026-09-29',
         tanggalWajibLapor: '2026-09-29',
         waktuInputSistem: '2026-09-29 10:05:12 WIB',
-        namaPenyidikPenerima: 'Aipda Bambang Supriyadi (Penyidik Satresnarkoba)',
+        namaPenyidikPenerima: '[TEST] Penyidik Pengaju Satresnarkoba',
         instansiPenyidik: 'Satresnarkoba Polresta Samarinda (Kanal Digital e-TAT)',
         kegiatanRehabTerkait: 'Pelaporan Wajib Lapor Mingguan Ke-2',
         kanal: 'digital',
@@ -182,7 +182,7 @@ const buildSeededMonitoring = (permohonan: PermohonanAsesmen, userRole: UserRole
         statusKonfirmasi: 'dikonfirmasi_penyidik',
         statusVerifikasiAdmin: 'terverifikasi',
         catatanAdmin: 'Penyidik Pengaju mengunggah BA absensi tepat waktu.',
-        diunggahOleh: 'Aipda Bambang Supriyadi (Pengaju/Penyidik)',
+        diunggahOleh: '[TEST] Penyidik Pengaju Satresnarkoba',
         tanggalDiunggah: '2026-09-29'
       }
     ],
@@ -191,11 +191,11 @@ const buildSeededMonitoring = (permohonan: PermohonanAsesmen, userRole: UserRole
       tanggalAkhirLayananAktual: '2026-10-01',
       statusAkhir: 'selesai_program',
       namaFasilitas: fasilitas,
-      pihakPenerbitKeterangan: 'dr. Rina Lestari, Sp.KJ (DPJP Balai Rehabilitasi)',
+      pihakPenerbitKeterangan: '[TEST] Dokter DPJP Fasilitas',
       hasilSesuaiDokumenFasilitas: 'Klien telah menyelesaikan seluruh rangkaian program rehabilitasi medis dan sosial dengan hasil Evaluasi Klinis Selesai Baik (Pulih & Produktif). Tidak ditemukan indikasi relapse (kekambuhan).',
       rencanaLanjutanDariFasilitas: 'Direkomendasikan mengikuti Program Wajib Lapor Bina Lanjut Pascarehab selama 3 bulan.',
       fileSuratAkhirLayananUrl: 'internal://surat-keterangan-selesai-rehab',
-      diisiOleh: 'Aipda Bambang Supriyadi',
+      diisiOleh: '[TEST] Penyidik Pengaju Satresnarkoba',
       kapasitasPengisi: 'Pengaju TAT / Penyidik Satresnarkoba',
       tanggalDiisi: '2026-10-02',
       statusVerifikasiAdmin: 'terverifikasi'
@@ -490,7 +490,7 @@ const PelaksanaanRehabSection: React.FC<{
                           <td style={{ width: '25px', verticalAlign: 'top' }}>1.</td>
                           <td style={{ width: '180px', verticalAlign: 'top' }}>Nama / Pangkat</td>
                           <td style={{ width: '12px', textAlign: 'center', verticalAlign: 'top' }}>:</td>
-                          <td style={{ fontWeight: 'bold' }}>{existing.identitasPihakMenyerahkan || 'Bripka Heru Susanto (Penyidik Satresnarkoba)'}</td>
+                          <td style={{ fontWeight: 'bold' }}>{existing.identitasPihakMenyerahkan || '[TEST] Penyidik Pengaju Satresnarkoba'}</td>
                         </tr>
                         <tr>
                           <td style={{ verticalAlign: 'top' }}>2.</td>
@@ -507,7 +507,7 @@ const PelaksanaanRehabSection: React.FC<{
                           <td style={{ width: '25px', verticalAlign: 'top' }}>1.</td>
                           <td style={{ width: '180px', verticalAlign: 'top' }}>Nama Penanggung Jawab</td>
                           <td style={{ width: '12px', textAlign: 'center', verticalAlign: 'top' }}>:</td>
-                          <td style={{ fontWeight: 'bold' }}>{existing.identitasPihakMenerima || existing.namaPenanggungJawabFasilitas || 'dr. Rina Lestari, Sp.KJ'}</td>
+                          <td style={{ fontWeight: 'bold' }}>{existing.identitasPihakMenerima || existing.namaPenanggungJawabFasilitas || '[TEST] Dokter DPJP Fasilitas'}</td>
                         </tr>
                         <tr>
                           <td style={{ verticalAlign: 'top' }}>2.</td>
@@ -577,7 +577,7 @@ const PelaksanaanRehabSection: React.FC<{
                               <p style={{ margin: 0 }}>Yang Menyerahkan (Pihak I),</p>
                               <div style={{ height: '65px' }}></div>
                               <p style={{ fontWeight: 'bold', textDecoration: 'underline', margin: 0 }}>
-                                {existing.identitasPihakMenyerahkan?.split('(')[0] || 'Bripka Heru Susanto'}
+                                {existing.identitasPihakMenyerahkan?.split('(')[0]?.trim() || '[TEST] Penyidik Pengaju Satresnarkoba'}
                               </p>
                               <p style={{ fontSize: '8.5pt', color: '#333', margin: 0 }}>Penyidik Pembantu Satresnarkoba</p>
                             </td>
@@ -595,7 +595,7 @@ const PelaksanaanRehabSection: React.FC<{
                               <p style={{ margin: 0 }}>Yang Menerima (Pihak II),</p>
                               <div style={{ height: '65px' }}></div>
                               <p style={{ fontWeight: 'bold', textDecoration: 'underline', margin: 0 }}>
-                                {existing.namaPenanggungJawabFasilitas || 'dr. Rina Lestari, Sp.KJ'}
+                                {existing.namaPenanggungJawabFasilitas || '[TEST] Dokter DPJP Fasilitas'}
                               </p>
                               <p style={{ fontSize: '8.5pt', color: '#333', margin: 0 }}>Dokter Penanggung Jawab Pasien (DPJP)</p>
                             </td>
@@ -708,7 +708,7 @@ const EvaluasiKlinisSection: React.FC<{
       jenisLaporan: jenisLaporan,
       tanggalKegiatanSebenarnya: today(),
       namaFasilitasPelapor: monitoring.pelaksanaanRehab?.namaFasilitasTujuan || 'Balai Rehab BNN',
-      namaPenerbitLaporan: 'dr. Rina Lestari, Sp.KJ',
+      namaPenerbitLaporan: '[TEST] Dokter DPJP Fasilitas',
       kapasitasPenerbit: 'Dokter Penanggung Jawab Pasien (DPJP)',
       statusPelaksanaanBerdasarkanBukti: 'terlaksana',
       ringkasanAdministratif: ringkasanKlinis,
@@ -865,7 +865,7 @@ const WajibLaporSection: React.FC<{
     kanal: 'langsung',
     statusKonfirmasi: 'dikonfirmasi_penyidik',
     diunggahOleh: 'Penyidik / JPU Pengaju Berwenang',
-    namaPenyidikPenerima: 'Bripka Heru Susanto',
+    namaPenyidikPenerima: '[TEST] Penyidik Pengaju Satresnarkoba',
     instansiPenyidik: 'Satresnarkoba Polresta Samarinda',
     buktiPenerimaanUrl: 'internal://bukti-wajib-lapor-aktual'
   });
@@ -1500,7 +1500,7 @@ const AkhirLayananSection: React.FC<{
     statusAkhir: 'selesai_program',
     hasilSesuaiDokumenFasilitas: 'Terperiksa menyelesaikan seluruh tahapan terapi rehabilitasi dengan evaluasi Pulih & Produktif.',
     namaFasilitas: monitoring.pelaksanaanRehab?.namaFasilitasTujuan || 'Balai Rehabilitasi BNN Tanah Merah',
-    pihakPenerbitKeterangan: 'dr. Rina Lestari, Sp.KJ',
+    pihakPenerbitKeterangan: '[TEST] Dokter DPJP Fasilitas',
     diisiOleh: '',
     kapasitasPengisi: '',
     tanggalDiisi: today(),
@@ -1516,7 +1516,7 @@ const AkhirLayananSection: React.FC<{
       hasilSesuaiDokumenFasilitas: form.hasilSesuaiDokumenFasilitas!,
       statusAkhir: form.statusAkhir!,
       namaFasilitas: form.namaFasilitas!,
-      pihakPenerbitKeterangan: form.pihakPenerbitKeterangan ?? 'dr. Rina Lestari, Sp.KJ',
+      pihakPenerbitKeterangan: form.pihakPenerbitKeterangan ?? '[TEST] Dokter DPJP Fasilitas',
       fileSuratAkhirLayananUrl: form.fileSuratAkhirLayananUrl || 'internal://surat-selesai-rehab',
       diisiOleh: userRole,
       kapasitasPengisi: 'Dokter / DPJP',
@@ -1681,7 +1681,7 @@ const AkhirLayananSection: React.FC<{
                         <td style={{ verticalAlign: 'top' }}>5.</td>
                         <td style={{ verticalAlign: 'top' }}>Dokter DPJP Medis</td>
                         <td style={{ textAlign: 'center', verticalAlign: 'top' }}>:</td>
-                        <td>{monitoring.pelaksanaanRehab?.namaPenanggungJawabFasilitas || 'dr. Rina Lestari, Sp.KJ'}</td>
+                        <td>{monitoring.pelaksanaanRehab?.namaPenanggungJawabFasilitas || '[TEST] Dokter DPJP Fasilitas'}</td>
                       </tr>
                     </tbody>
                   </table>

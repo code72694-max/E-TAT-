@@ -136,7 +136,7 @@ function getJadwalKontrolInfo(p: PermohonanAsesmen) {
   const dpjp =
     mon?.pelaksanaanRehab?.namaPenanggungJawabFasilitas ||
     pgw?.konselorPendamping ||
-    'dr. Rina Lestari, Sp.KJ';
+    '[TEST] Dokter DPJP Fasilitas';
 
   const modalitas =
     pgw?.modalitasLayanan ||

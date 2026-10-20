@@ -136,8 +136,8 @@ export const TabPenugasanJadwal: React.FC<TabPenugasanJadwalProps> = ({
       minute: '2-digit'
     }) + ' WIB';
 
-    const defaultMedis = tim?.asesorMedisNama || 'dr. Siti Aminah, Sp.KJ (RSJD Atma Husada)';
-    const defaultHukum = tim?.asesorHukumNama || 'Ahmad Fauzi, S.H., M.H. (Kejaksaan Tinggi Kaltim)';
+    const defaultMedis = tim?.asesorMedisNama || '[TEST] Dokter Asesor Medis TAT';
+    const defaultHukum = tim?.asesorHukumNama || '[TEST] Jaksa Asesor Hukum TAT';
     const defaultLokasi = tim?.lokasiPemeriksaan || 'Klinik Pratama BNNP Kaltim';
     const defaultJadwalMedis = tim?.jadwalPemeriksaanMedis || `${new Date().toISOString().split('T')[0]} 09:30 WIB`;
     const defaultJadwalHukum = tim?.jadwalPemeriksaanHukum || `${new Date().toISOString().split('T')[0]} 13:30 WIB`;
@@ -377,7 +377,7 @@ export const TabPenugasanJadwal: React.FC<TabPenugasanJadwalProps> = ({
             </div>
             <p className="text-xs text-slate-300 leading-relaxed max-w-2xl">
               Setelah penugasan ditetapkan, klik tombol di sebelah kanan untuk melimpahkan berkas ke dokter pemeriksa 
-              (<strong className="text-[#D4AF37]">{tim?.asesorMedisNama || 'dr. Siti Aminah, Sp.KJ'}</strong>). 
+              (<strong className="text-[#D4AF37]">{tim?.asesorMedisNama || '[TEST] Dokter Asesor Medis TAT'}</strong>). 
               Tahapan Asesmen Medis &amp; Telaah Hukum akan aktif di sistem.
             </p>
             {tim?.dikirimKeMedis && (
@@ -443,9 +443,8 @@ export const TabPenugasanJadwal: React.FC<TabPenugasanJadwalProps> = ({
                             {u.name} — {u.agency || 'Klinik / RS BNN'}
                           </option>
                         ))}
-                        <option value="dr. Haryono (BNNK Samarinda)">dr. Haryono (BNNK Samarinda)</option>
-                        <option value="dr. Siti Aminah, Sp.KJ (RSJD Atma Husada)">dr. Siti Aminah, Sp.KJ (RSJD Atma Husada)</option>
-                        <option value="dr. Sarah Amelia, Sp.KJ (RSUD AW Sjahranie)">dr. Sarah Amelia, Sp.KJ (RSUD AW Sjahranie)</option>
+                        <option value="[TEST] Dokter Asesor Medis TAT (BNNK Samarinda)">[TEST] Dokter Asesor Medis TAT (BNNK Samarinda)</option>
+                        <option value="[TEST] Dokter Spesialis Kedokteran Jiwa (RSJD)">[TEST] Dokter Spesialis Kedokteran Jiwa (RSJD)</option>
                       </>
                     ) : (
                       <>
@@ -454,9 +453,9 @@ export const TabPenugasanJadwal: React.FC<TabPenugasanJadwalProps> = ({
                             {u.name} — {u.agency || 'Kejaksaan / BNNP'}
                           </option>
                         ))}
-                        <option value="Ahmad Fauzi, S.H., M.H. (Kejaksaan Tinggi Kaltim)">Ahmad Fauzi, S.H., M.H. (Kejaksaan Tinggi Kaltim)</option>
-                        <option value="Tim Penelaah Hukum BNNP Kaltim">Tim Penelaah Hukum BNNP Kaltim</option>
-                        <option value="Penyidik Pembantu Satresnarkoba">Penyidik Pembantu Satresnarkoba</option>
+                        <option value="[TEST] Jaksa Asesor Hukum TAT (Kejaksaan Tinggi Kaltim)">[TEST] Jaksa Asesor Hukum TAT (Kejaksaan Tinggi Kaltim)</option>
+                        <option value="[TEST] Tim Penelaah Hukum BNNP Kaltim">[TEST] Tim Penelaah Hukum BNNP Kaltim</option>
+                        <option value="[TEST] Penyidik Pembantu Satresnarkoba">[TEST] Penyidik Pembantu Satresnarkoba</option>
                       </>
                     )}
                   </select>

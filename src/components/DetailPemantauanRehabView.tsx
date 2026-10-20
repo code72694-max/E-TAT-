@@ -62,7 +62,7 @@ export const DetailPemantauanRehabView: React.FC<DetailPemantauanRehabViewProps>
   const dpjp =
     mon?.pelaksanaanRehab?.namaPenanggungJawabFasilitas ||
     pgw?.konselorPendamping ||
-    'dr. Rina Lestari, Sp.KJ';
+    '[TEST] Dokter DPJP Fasilitas';
 
   const modalitas =
     pgw?.modalitasLayanan ||
@@ -112,7 +112,7 @@ export const DetailPemantauanRehabView: React.FC<DetailPemantauanRehabViewProps>
           jenisPemeriksaan: 'Terjadwal (Admisi)',
           parameter: ['AMP', 'MET', 'THC', 'BZO', 'MOP'],
           hasil: 'Negatif',
-          petugasPemeriksa: 'dr. Rina Lestari, Sp.KJ',
+          petugasPemeriksa: '[TEST] Dokter DPJP Fasilitas',
           keterangan: 'Skrining awal saat klien admisi ke balai rehab. Non-reaktif 5-panel.'
         },
         {
@@ -132,7 +132,7 @@ export const DetailPemantauanRehabView: React.FC<DetailPemantauanRehabViewProps>
           jenisPemeriksaan: 'Terjadwal (Evaluasi)',
           parameter: ['AMP', 'MET', 'THC', 'BZO', 'MOP'],
           hasil: 'Negatif',
-          petugasPemeriksa: 'dr. Rina Lestari, Sp.KJ',
+          petugasPemeriksa: '[TEST] Dokter DPJP Fasilitas',
           keterangan: 'Evaluasi berkala bulan ke-1. Hasil non-reaktif, kondisi fisik & emosi stabil.'
         }
       ];
@@ -146,7 +146,7 @@ export const DetailPemantauanRehabView: React.FC<DetailPemantauanRehabViewProps>
           tanggalPelaporanAktual: '22 September 2026',
           tanggalRencanaWajibLapor: '22 September 2026',
           tanggalWajibLapor: '22 September 2026',
-          namaPenyidikPenerima: permohonan.perkara?.namaPenyidik || 'Bripka Heru Susanto',
+          namaPenyidikPenerima: permohonan.perkara?.namaPenyidik || '[TEST] Penyidik Pengaju Satresnarkoba',
           instansiPenyidik: 'Satresnarkoba Polresta Samarinda',
           kanal: 'langsung' as const,
           statusKonfirmasi: 'dikonfirmasi_penyidik' as const,
@@ -158,7 +158,7 @@ export const DetailPemantauanRehabView: React.FC<DetailPemantauanRehabViewProps>
           tanggalPelaporanAktual: '06 Oktober 2026',
           tanggalRencanaWajibLapor: '06 Oktober 2026',
           tanggalWajibLapor: '06 Oktober 2026',
-          namaPenyidikPenerima: permohonan.perkara?.namaPenyidik || 'Bripka Heru Susanto',
+          namaPenyidikPenerima: permohonan.perkara?.namaPenyidik || '[TEST] Penyidik Pengaju Satresnarkoba',
           instansiPenyidik: 'Satresnarkoba Polresta Samarinda (Kanal Digital)',
           kanal: 'digital' as const,
           statusKonfirmasi: 'dikonfirmasi_penyidik' as const,
@@ -204,7 +204,7 @@ export const DetailPemantauanRehabView: React.FC<DetailPemantauanRehabViewProps>
               <span>&bull;</span>
               <span>Instansi: <strong className="text-slate-300">{permohonan.instansiPengaju}</strong></span>
               <span>&bull;</span>
-              <span>Penyidik: <strong className="text-slate-300">{permohonan.perkara?.namaPenyidik || 'Bripka Heru Susanto'}</strong></span>
+              <span>Penyidik: <strong className="text-slate-300">{permohonan.perkara?.namaPenyidik || '[TEST] Penyidik Pengaju Satresnarkoba'}</strong></span>
             </p>
           </div>
 

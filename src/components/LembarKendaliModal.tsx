@@ -31,8 +31,8 @@ export const LembarKendaliModal: React.FC<LembarKendaliModalProps> = ({
   const verificationUrl = buildLacakVerificationUrl(p, 'pleno');
 
   const fasilitas = pel?.namaFasilitasTujuan || 'Balai Rehabilitasi BNN Tanah Merah';
-  const dpjp = pel?.namaPenanggungJawabFasilitas || 'dr. Rina Lestari, Sp.KJ';
-  const penyidik = pel?.identitasPihakMenyerahkan || p.perkara?.namaPenyidik || 'Bripka Heru Susanto (Satresnarkoba)';
+  const dpjp = pel?.namaPenanggungJawabFasilitas || '[TEST] Dokter DPJP Fasilitas';
+  const penyidik = pel?.identitasPihakMenyerahkan || p.perkara?.namaPenyidik || '[TEST] Penyidik Pengaju (Satresnarkoba)';
 
   const handlePrint = () => {
     printLegalDocument(printRef.current?.innerHTML);
@@ -262,7 +262,7 @@ export const LembarKendaliModal: React.FC<LembarKendaliModalProps> = ({
                       <p style={{ margin: 0 }}>Penyidik Pengawas Satresnarkoba,</p>
                       <div style={{ height: '65px' }}></div>
                       <p style={{ fontWeight: 'bold', textDecoration: 'underline', margin: 0 }}>
-                        {penyidik?.split('(')[0]?.trim() || 'Bripka Heru Susanto'}
+                        {penyidik?.split('(')[0]?.trim() || '[TEST] Penyidik Pengaju'}
                       </p>
                       <p style={{ fontSize: '8.5pt', color: '#333', margin: 0 }}>Penyidik Pembantu</p>
                     </td>
