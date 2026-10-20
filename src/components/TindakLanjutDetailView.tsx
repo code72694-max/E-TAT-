@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import type {
   PermohonanAsesmen,
   MonitoringTindakLanjut,
@@ -15,6 +15,9 @@ import type {
 } from '../types';
 import { isSuspectExaminedByMedis } from '../utils/medisAuth';
 import { tindakLanjutApi } from '../services/api';
+import { LembarKendaliModal } from './LembarKendaliModal';
+import { printLegalDocument } from '../utils/printLegalDoc';
+import { QrCodeImg, buildLacakVerificationUrl } from './QrCodeComponent';
 import {
   ArrowLeft,
   Building2,
@@ -49,7 +52,8 @@ import {
   Award,
   Scale,
   FileSignature,
-  BadgeAlert
+  BadgeAlert,
+  X
 } from 'lucide-react';
 
 // =====================================================================
@@ -57,6 +61,7 @@ import {
 // =====================================================================
 const genId = () => `${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
 const today = () => new Date().toISOString().slice(0, 10);
+
 
 const STATUS_PELAKSANAAN_LABELS: Record<PelaksanaanRehab['statusPelaksanaan'], string> = {
   perlu_konfirmasi: 'Perlu Konfirmasi',
@@ -105,7 +110,7 @@ const buildSeededMonitoring = (permohonan: PermohonanAsesmen, userRole: UserRole
       tanggalSerahTerimaAktual: '2026-09-16',
       identitasPihakMenyerahkan: 'Bripka Heru Susanto (Penyidik Satresnarkoba)',
       identitasPihakMenerima: 'dr. Rina Lestari, Sp.KJ (Tim Medis Balai Rehab)',
-      fileBaSerahTerimaUrl: 'https://e-tat.polri.go.id/docs/BA-SERAH-TERIMA-REHAB.pdf',
+      fileBaSerahTerimaUrl: 'internal://ba-serah-terima',
       tanggalMasukLayananTerkonfirmasi: '2026-09-16',
       adaKendala: false,
       statusPelaksanaan: 'serah_terima_selesai',
@@ -130,7 +135,7 @@ const buildSeededMonitoring = (permohonan: PermohonanAsesmen, userRole: UserRole
         statusPelaksanaanBerdasarkanBukti: 'terlaksana',
         ringkasanAdministratif: 'Pasien telah menjalani minggu ke-2 program detoksifikasi dan konseling medis. Menunjukkan kemajuan kognitif signifikan dan kooperatif dalam sesi terapi harian.',
         rencanaBerdasarkanLaporan: 'Melanjutkan ke fase terapi kelompok (Therapeutic Community) dan pemeriksaan toksikologi urin acak minggu depan.',
-        fileBuktiUrl: 'https://e-tat.polri.go.id/docs/LAPORAN-KONTROL-MINGGU-2.pdf',
+        fileBuktiUrl: 'internal://laporan-kontrol-minggu-2',
         diunggahOleh: 'Aipda Bambang Supriyadi',
         kapasitasPengunggah: 'Pengaju / Penyidik Pendamping',
         tanggalDiunggah: '2026-09-27',
@@ -156,7 +161,7 @@ const buildSeededMonitoring = (permohonan: PermohonanAsesmen, userRole: UserRole
         instansiPenyidik: 'Satresnarkoba Polresta Samarinda (Tatap Muka)',
         kegiatanRehabTerkait: 'Pelaporan Wajib Lapor Mingguan Ke-1',
         kanal: 'langsung',
-        buktiPenerimaanUrl: 'https://e-tat.polri.go.id/docs/BUKTI-WAJIB-LAPOR-1.pdf',
+        buktiPenerimaanUrl: 'internal://bukti-wajib-lapor-1',
         statusKonfirmasi: 'dikonfirmasi_penyidik',
         statusVerifikasiAdmin: 'terverifikasi',
         catatanAdmin: 'Telah diverifikasi Admin: Tanggal pelaporan aktual dan bukti fisik lengkap.',
@@ -173,7 +178,7 @@ const buildSeededMonitoring = (permohonan: PermohonanAsesmen, userRole: UserRole
         instansiPenyidik: 'Satresnarkoba Polresta Samarinda (Kanal Digital e-TAT)',
         kegiatanRehabTerkait: 'Pelaporan Wajib Lapor Mingguan Ke-2',
         kanal: 'digital',
-        buktiPenerimaanUrl: 'https://e-tat.polri.go.id/docs/BUKTI-WAJIB-LAPOR-2.pdf',
+        buktiPenerimaanUrl: 'internal://bukti-wajib-lapor-2',
         statusKonfirmasi: 'dikonfirmasi_penyidik',
         statusVerifikasiAdmin: 'terverifikasi',
         catatanAdmin: 'Penyidik Pengaju mengunggah BA absensi tepat waktu.',
@@ -189,7 +194,7 @@ const buildSeededMonitoring = (permohonan: PermohonanAsesmen, userRole: UserRole
       pihakPenerbitKeterangan: 'dr. Rina Lestari, Sp.KJ (DPJP Balai Rehabilitasi)',
       hasilSesuaiDokumenFasilitas: 'Klien telah menyelesaikan seluruh rangkaian program rehabilitasi medis dan sosial dengan hasil Evaluasi Klinis Selesai Baik (Pulih & Produktif). Tidak ditemukan indikasi relapse (kekambuhan).',
       rencanaLanjutanDariFasilitas: 'Direkomendasikan mengikuti Program Wajib Lapor Bina Lanjut Pascarehab selama 3 bulan.',
-      fileSuratAkhirLayananUrl: 'https://e-tat.polri.go.id/docs/SURAT-KETERANGAN-SELESAI-REHAB.pdf',
+      fileSuratAkhirLayananUrl: 'internal://surat-keterangan-selesai-rehab',
       diisiOleh: 'Aipda Bambang Supriyadi',
       kapasitasPengisi: 'Pengaju TAT / Penyidik Satresnarkoba',
       tanggalDiisi: '2026-10-02',
@@ -249,13 +254,21 @@ const FieldGroup: React.FC<{ label: string; required?: boolean; hint?: string; c
 // =====================================================================
 const PelaksanaanRehabSection: React.FC<{
   monitoring: MonitoringTindakLanjut;
+  permohonan: PermohonanAsesmen;
   userRole: UserRole;
   readOnly?: boolean;
   onUpdate: (updated: MonitoringTindakLanjut) => void;
-}> = ({ monitoring, userRole, readOnly, onUpdate }) => {
+}> = ({ monitoring, permohonan, userRole, readOnly, onUpdate }) => {
   const existing = monitoring.pelaksanaanRehab;
   const [mode, setMode] = useState<'view' | 'edit' | 'new'>(!existing && !readOnly ? 'new' : 'view');
   const canEdit = !readOnly && ['PENGAJU', 'ADMIN', 'MEDIS'].includes(userRole);
+  const [showBaModal, setShowBaModal] = useState(false);
+  const baPrintRef = useRef<HTMLDivElement>(null);
+
+  const handlePrintBa = () => {
+    printLegalDocument(baPrintRef.current?.innerHTML);
+  };
+
 
   const [form, setForm] = useState<Partial<PelaksanaanRehab>>(existing ?? {
     adaKendala: false,
@@ -357,11 +370,242 @@ const PelaksanaanRehabSection: React.FC<{
           </div>
 
           {existing.fileBaSerahTerimaUrl && (
-            <div className="flex items-center gap-2.5 p-2.5 bg-slate-950/40 rounded-xl border border-slate-800/80 w-fit">
-              <FileText className="w-4 h-4 text-slate-400" />
-              <a href={existing.fileBaSerahTerimaUrl} target="_blank" rel="noreferrer" className="text-xs font-medium text-slate-200 hover:text-white flex items-center gap-1.5">
-                Berita Acara (BA) Serah Terima Klien <ExternalLink className="w-3 h-3 text-slate-400" />
-              </a>
+            <div className="flex items-center gap-2.5 p-2 bg-slate-950/60 rounded-xl border border-slate-800 w-fit">
+              <FileText className="w-4 h-4 text-[#D4AF37]" />
+              <button
+                type="button"
+                onClick={() => setShowBaModal(true)}
+                className="text-xs font-semibold text-slate-200 hover:text-white flex items-center gap-1.5 cursor-pointer transition-colors"
+              >
+                <span>Berita Acara (BA) Serah Terima Klien</span>
+                <ExternalLink className="w-3 h-3 text-[#D4AF37]" />
+              </button>
+            </div>
+          )}
+
+          {/* MODAL PRATINJAU BERITA ACARA SERAH TERIMA */}
+          {showBaModal && (
+            <div
+              className="fixed inset-0 z-[9999] flex items-center justify-center p-2 sm:p-4"
+              style={{ background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(5px)' }}
+            >
+              <div
+                className="bg-[#0b172a] border border-[#1b3459] rounded-2xl shadow-2xl w-full max-w-5xl flex flex-col"
+                style={{ maxHeight: '96vh' }}
+              >
+                {/* Top Header */}
+                <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#1b3459] shrink-0">
+                  <div>
+                    <h2 className="text-base font-bold text-white flex items-center gap-2">
+                      <span className="text-[#d4af37]">📄</span>
+                      Berita Acara (BA) Serah Terima Klien Rehabilitasi
+                    </h2>
+                    <p className="text-xs text-slate-400 mt-0.5">
+                      Nomor: BA-ST/{permohonan.id?.slice(-4).toUpperCase() || '001'}/IX/2026/SATRESNARKOBA &bull; Klien: {permohonan.terperiksa?.namaLengkap || '-'}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={handlePrintBa}
+                      className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-[#d4af37] text-[#0b172a] hover:bg-[#e8c84a] transition-colors cursor-pointer shadow"
+                    >
+                      <Printer className="w-3.5 h-3.5" />
+                      Cetak / Export PDF
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowBaModal(false)}
+                      className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-[#132d54] transition-colors cursor-pointer"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Document Content Viewport */}
+                <div className="overflow-y-auto flex-1 p-3 sm:p-6 bg-slate-900/60">
+                  <div
+                    ref={baPrintRef}
+                    className="bg-white text-black p-8 sm:p-12 rounded-lg shadow-2xl mx-auto"
+                    style={{
+                      maxWidth: '810px',
+                      fontFamily: "'Times New Roman', Times, serif",
+                      fontSize: '11pt',
+                      lineHeight: '1.45',
+                      color: '#000'
+                    }}
+                  >
+                    {/* Kop Surat BNN */}
+                    <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '2px' }}>
+                      <tbody>
+                        <tr>
+                          <td style={{ width: '85px', verticalAlign: 'middle', textAlign: 'left', padding: '0' }}>
+                            <img
+                              src="/bnn.png"
+                              alt="Logo BNN RI"
+                              style={{ width: '78px', height: '78px', objectFit: 'contain', display: 'block' }}
+                            />
+                          </td>
+                          <td style={{ verticalAlign: 'middle', textAlign: 'center', padding: '0 4px' }}>
+                            <div style={{ fontSize: '13pt', fontWeight: 'bold', lineHeight: '1.25', letterSpacing: '0.2px' }}>
+                              BADAN NARKOTIKA NASIONAL REPUBLIK INDONESIA
+                            </div>
+                            <div style={{ fontSize: '10.5pt', fontWeight: 'bold', lineHeight: '1.25', letterSpacing: '0.2px', marginTop: '1px' }}>
+                              TIM ASESMEN TERPADU (TAT) NARKOTIKA DAERAH KALIMANTAN TIMUR
+                            </div>
+                            <div style={{ fontSize: '8.5pt', marginTop: '3px', lineHeight: '1.35', color: '#111' }}>
+                              Sekretariat Bersama: Jl. Slamet Riyadi No. 1, Telp: (0541) 743201, Samarinda - Kaltim<br />
+                              Satresnarkoba Polresta Samarinda &bull; Balai Rehabilitasi BNN Tanah Merah
+                            </div>
+                          </td>
+                          <td style={{ width: '85px', verticalAlign: 'middle' }}></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    <hr style={{ border: 'none', borderTop: '2.5px solid #000', margin: '4px 0 1.5px 0' }} />
+                    <hr style={{ border: 'none', borderTop: '0.8px solid #000', margin: '1.5px 0 14px 0' }} />
+
+                    <div style={{ textAlign: 'center', margin: '12px 0 16px 0' }}>
+                      <div style={{ fontWeight: 'bold', fontSize: '12pt', textDecoration: 'underline' }}>
+                        BERITA ACARA SERAH TERIMA TERSANGKA / KLIEN
+                      </div>
+                      <div style={{ fontWeight: 'bold', fontSize: '10.5pt', marginTop: '3px' }}>
+                        Nomor: BA-ST/{permohonan.id?.slice(-4).toUpperCase() || '001'}/IX/2026/SATRESNARKOBA
+                      </div>
+                    </div>
+
+                    <p style={{ textAlign: 'justify', marginBottom: '10px' }}>
+                      Pada hari ini, tanggal <strong>{existing.tanggalSerahTerimaAktual || '16 September 2026'}</strong>, bertempat di Kantor Tim Asesmen Terpadu (TAT) / Balai Rehabilitasi, kami yang bertanda tangan di bawah ini:
+                    </p>
+
+                    <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '10px', fontSize: '10.5pt' }}>
+                      <tbody>
+                        <tr>
+                          <td colSpan={4} style={{ fontWeight: 'bold', paddingBottom: '4px', textDecoration: 'underline' }}>
+                            I. PIHAK YANG MENYERAHKAN:
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style={{ width: '25px', verticalAlign: 'top' }}>1.</td>
+                          <td style={{ width: '180px', verticalAlign: 'top' }}>Nama / Pangkat</td>
+                          <td style={{ width: '12px', textAlign: 'center', verticalAlign: 'top' }}>:</td>
+                          <td style={{ fontWeight: 'bold' }}>{existing.identitasPihakMenyerahkan || 'Bripka Heru Susanto (Penyidik Satresnarkoba)'}</td>
+                        </tr>
+                        <tr>
+                          <td style={{ verticalAlign: 'top' }}>2.</td>
+                          <td style={{ verticalAlign: 'top' }}>Instansi</td>
+                          <td style={{ textAlign: 'center', verticalAlign: 'top' }}>:</td>
+                          <td>{permohonan.instansiPengaju || 'Satresnarkoba Polresta Samarinda'}</td>
+                        </tr>
+                        <tr>
+                          <td colSpan={4} style={{ fontWeight: 'bold', paddingTop: '10px', paddingBottom: '4px', textDecoration: 'underline' }}>
+                            II. PIHAK YANG MENERIMA:
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style={{ width: '25px', verticalAlign: 'top' }}>1.</td>
+                          <td style={{ width: '180px', verticalAlign: 'top' }}>Nama Penanggung Jawab</td>
+                          <td style={{ width: '12px', textAlign: 'center', verticalAlign: 'top' }}>:</td>
+                          <td style={{ fontWeight: 'bold' }}>{existing.identitasPihakMenerima || existing.namaPenanggungJawabFasilitas || 'dr. Rina Lestari, Sp.KJ'}</td>
+                        </tr>
+                        <tr>
+                          <td style={{ verticalAlign: 'top' }}>2.</td>
+                          <td style={{ verticalAlign: 'top' }}>Fasilitas Penerima</td>
+                          <td style={{ textAlign: 'center', verticalAlign: 'top' }}>:</td>
+                          <td>{existing.namaFasilitasTujuan || 'Balai Rehabilitasi BNN Tanah Merah'}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+
+                    <p style={{ textAlign: 'justify', marginBottom: '8px' }}>
+                      Telah melakukan serah terima tersangka/klien tindak pidana penyalahgunaan narkotika untuk menjalani program rehabilitasi dengan identitas sebagai berikut:
+                    </p>
+
+                    <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '12px', fontSize: '10.5pt' }}>
+                      <tbody>
+                        <tr>
+                          <td style={{ width: '25px', verticalAlign: 'top' }}>•</td>
+                          <td style={{ width: '180px', verticalAlign: 'top' }}>Nama Klien</td>
+                          <td style={{ width: '12px', textAlign: 'center', verticalAlign: 'top' }}>:</td>
+                          <td style={{ fontWeight: 'bold' }}>{permohonan.terperiksa?.namaLengkap || '-'}</td>
+                        </tr>
+                        <tr>
+                          <td style={{ verticalAlign: 'top' }}>•</td>
+                          <td style={{ verticalAlign: 'top' }}>NIK / Usia</td>
+                          <td style={{ textAlign: 'center', verticalAlign: 'top' }}>:</td>
+                          <td>{permohonan.terperiksa?.nik || '-'} / {permohonan.terperiksa?.usia || '-'} Tahun</td>
+                        </tr>
+                        <tr>
+                          <td style={{ verticalAlign: 'top' }}>•</td>
+                          <td style={{ verticalAlign: 'top' }}>No. Laporan Polisi</td>
+                          <td style={{ textAlign: 'center', verticalAlign: 'top' }}>:</td>
+                          <td style={{ fontFamily: 'monospace' }}>{permohonan.perkara?.nomorLaporanPolisi || '-'}</td>
+                        </tr>
+                        <tr>
+                          <td style={{ verticalAlign: 'top' }}>•</td>
+                          <td style={{ verticalAlign: 'top' }}>Rekomendasi TAT</td>
+                          <td style={{ textAlign: 'center', verticalAlign: 'top' }}>:</td>
+                          <td style={{ fontWeight: 'bold', color: '#166534' }}>{existing.jenisLayananSesuaiRekomendasi || 'Rehabilitasi Medis dan Sosial'}</td>
+                        </tr>
+                        <tr>
+                          <td style={{ verticalAlign: 'top' }}>•</td>
+                          <td style={{ verticalAlign: 'top' }}>Status Serah Terima</td>
+                          <td style={{ textAlign: 'center', verticalAlign: 'top' }}>:</td>
+                          <td style={{ fontWeight: 'bold', color: '#166534' }}>✓ Selesai &amp; Memenuhi Syarat Admisi</td>
+                        </tr>
+                      </tbody>
+                    </table>
+
+                    <div style={{ border: '1.5px solid #000', padding: '8px 12px', marginBottom: '16px', background: '#fafafa' }}>
+                      <strong style={{ display: 'block', marginBottom: '3px' }}>Catatan Admisi &amp; Koordinasi:</strong>
+                      <p style={{ margin: 0, fontSize: '10pt', textAlign: 'justify' }}>
+                        {existing.hasilKoordinasiPenerimaan || 'Persyaratan administratif awal dan hasil pemeriksaan toksikologi dinyatakan lengkap dan memenuhi kuota rekomendasi Tim TAT.'}
+                      </p>
+                    </div>
+
+                    <p style={{ textAlign: 'justify', marginBottom: '18px' }}>
+                      Demikian Berita Acara Serah Terima Tersangka/Klien ini dibuat dengan sebenarnya atas kekuatan sumpah jabatan untuk dapat dipergunakan sebagaimana mestinya.
+                    </p>
+
+                    {/* Tanda Tangan */}
+                    <div className="ttd-section" style={{ marginTop: '24px', borderTop: '1px solid #000', paddingTop: '12px' }}>
+                      <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'center', fontSize: '10pt' }}>
+                        <tbody>
+                          <tr>
+                            <td style={{ width: '38%', verticalAlign: 'top' }}>
+                              <p style={{ margin: 0 }}>Yang Menyerahkan (Pihak I),</p>
+                              <div style={{ height: '65px' }}></div>
+                              <p style={{ fontWeight: 'bold', textDecoration: 'underline', margin: 0 }}>
+                                {existing.identitasPihakMenyerahkan?.split('(')[0] || 'Bripka Heru Susanto'}
+                              </p>
+                              <p style={{ fontSize: '8.5pt', color: '#333', margin: 0 }}>Penyidik Pembantu Satresnarkoba</p>
+                            </td>
+
+                            <td style={{ width: '24%', verticalAlign: 'middle', textAlign: 'center' }}>
+                              <div style={{ display: 'inline-block', border: '1px solid #888', padding: '4px 6px', borderRadius: '4px', background: '#fafafa' }}>
+                                <QrCodeImg value={buildLacakVerificationUrl(permohonan, 'pleno')} size={64} alt="QR Verifikasi BA" />
+                                <div style={{ fontSize: '7pt', fontFamily: 'monospace', color: '#444', marginTop: '2px' }}>
+                                  e-TAT SIAP PULIH
+                                </div>
+                              </div>
+                            </td>
+
+                            <td style={{ width: '38%', verticalAlign: 'top' }}>
+                              <p style={{ margin: 0 }}>Yang Menerima (Pihak II),</p>
+                              <div style={{ height: '65px' }}></div>
+                              <p style={{ fontWeight: 'bold', textDecoration: 'underline', margin: 0 }}>
+                                {existing.namaPenanggungJawabFasilitas || 'dr. Rina Lestari, Sp.KJ'}
+                              </p>
+                              <p style={{ fontSize: '8.5pt', color: '#333', margin: 0 }}>Dokter Penanggung Jawab Pasien (DPJP)</p>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
 
@@ -595,13 +839,22 @@ const EvaluasiKlinisSection: React.FC<{
 // =====================================================================
 const WajibLaporSection: React.FC<{
   monitoring: MonitoringTindakLanjut;
+  permohonan: PermohonanAsesmen;
   userRole: UserRole;
   readOnly?: boolean;
   onUpdate: (updated: MonitoringTindakLanjut) => void;
-}> = ({ monitoring, userRole, readOnly, onUpdate }) => {
+}> = ({ monitoring, permohonan, userRole, readOnly, onUpdate }) => {
   const [showForm, setShowForm] = useState(false);
   const [formMode, setFormMode] = useState<'aktual' | 'rencana'>('aktual');
   const [showSpModal, setShowSpModal] = useState(false);
+  const [selectedWlBuktiModal, setSelectedWlBuktiModal] = useState<BuktiWajibLapor | null>(null);
+  const [showLembarKendaliModal, setShowLembarKendaliModal] = useState(false);
+  const wlPrintRef = useRef<HTMLDivElement>(null);
+
+  const handlePrintWl = () => {
+    printLegalDocument(wlPrintRef.current?.innerHTML);
+  };
+
 
   const [spTingkat, setSpTingkat] = useState('SP-1 (Peringatan Awal)');
   const [spAlasan, setSpAlasan] = useState('Terperiksa mangkir dalam jadwal kontrol / wajib lapor tanpa keterangan sah.');
@@ -614,7 +867,7 @@ const WajibLaporSection: React.FC<{
     diunggahOleh: 'Penyidik / JPU Pengaju Berwenang',
     namaPenyidikPenerima: 'Bripka Heru Susanto',
     instansiPenyidik: 'Satresnarkoba Polresta Samarinda',
-    buktiPenerimaanUrl: 'https://e-tat.polri.go.id/docs/BUKTI-WAJIB-LAPOR-AKTUAL.pdf'
+    buktiPenerimaanUrl: 'internal://bukti-wajib-lapor-aktual'
   });
 
   const setF = (k: keyof BuktiWajibLapor, v: unknown) => setForm(p => ({ ...p, [k]: v }));
@@ -742,6 +995,15 @@ const WajibLaporSection: React.FC<{
           </button>
 
           <button
+            type="button"
+            onClick={() => setShowLembarKendaliModal(true)}
+            className="px-3.5 py-2 bg-[#142642] hover:bg-[#1a345a] text-[#D4AF37] border border-[#234b7d] rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
+          >
+            <Printer className="w-3.5 h-3.5 text-[#D4AF37]" />
+            <span>Cetak Rekap Wajib Lapor</span>
+          </button>
+
+          <button
             onClick={() => setShowSpModal(true)}
             className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-rose-400 hover:text-rose-300 border border-rose-500/30 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer ml-auto"
           >
@@ -750,6 +1012,7 @@ const WajibLaporSection: React.FC<{
           </button>
         </div>
       )}
+
 
       {showSpModal && (
         <form onSubmit={handleIssueSp} className="p-4 bg-slate-950/80 border border-rose-900/40 rounded-xl space-y-3 shadow-sm">
@@ -969,14 +1232,13 @@ const WajibLaporSection: React.FC<{
               <div className="flex flex-wrap items-center justify-between gap-3 pt-0.5 text-xs">
                 <div className="flex items-center gap-3">
                   {wl.buktiPenerimaanUrl && (
-                    <a
-                      href={wl.buktiPenerimaanUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-slate-300 hover:text-white font-medium flex items-center gap-1.5 bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-800"
+                    <button
+                      type="button"
+                      onClick={() => setSelectedWlBuktiModal(wl)}
+                      className="text-slate-300 hover:text-white font-medium flex items-center gap-1.5 bg-slate-900 hover:bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-800 cursor-pointer transition-colors"
                     >
-                      <FileText className="w-3.5 h-3.5 text-slate-400" /> Berkas Bukti <ExternalLink className="w-3 h-3 text-slate-400" />
-                    </a>
+                      <FileText className="w-3.5 h-3.5 text-[#D4AF37]" /> Berkas Bukti <ExternalLink className="w-3 h-3 text-slate-400" />
+                    </button>
                   )}
                   <span className="text-[11px] text-slate-400">Dicatat oleh: <strong className="text-slate-300 font-normal">{wl.diunggahOleh}</strong></span>
                 </div>
@@ -994,6 +1256,227 @@ const WajibLaporSection: React.FC<{
           );
         })}
       </div>
+
+      {/* MODAL PRATINJAU BERKAS BUKTI WAJIB LAPOR */}
+      {selectedWlBuktiModal && (
+        <div
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-2 sm:p-4"
+          style={{ background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(5px)' }}
+        >
+          <div
+            className="bg-[#0b172a] border border-[#1b3459] rounded-2xl shadow-2xl w-full max-w-5xl flex flex-col"
+            style={{ maxHeight: '96vh' }}
+          >
+            {/* Top Header */}
+            <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#1b3459] shrink-0">
+              <div>
+                <h2 className="text-base font-bold text-white flex items-center gap-2">
+                  <span className="text-[#d4af37]">📄</span>
+                  Surat Tanda Terima Pelaksanaan Wajib Lapor Klien
+                </h2>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Nomor: TT-WL/{selectedWlBuktiModal.id.slice(-6).toUpperCase()}/TAT/2026 &bull; Klien: {permohonan.terperiksa?.namaLengkap || '-'}
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handlePrintWl}
+                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-[#d4af37] text-[#0b172a] hover:bg-[#e8c84a] transition-colors cursor-pointer shadow"
+                >
+                  <Printer className="w-3.5 h-3.5" />
+                  Cetak / Export PDF
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSelectedWlBuktiModal(null)}
+                  className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-[#132d54] transition-colors cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Document Content Viewport */}
+            <div className="overflow-y-auto flex-1 p-3 sm:p-6 bg-slate-900/60">
+              <div
+                ref={wlPrintRef}
+                className="bg-white text-black p-8 sm:p-12 rounded-lg shadow-2xl mx-auto"
+                style={{
+                  maxWidth: '810px',
+                  fontFamily: "'Times New Roman', Times, serif",
+                  fontSize: '11pt',
+                  lineHeight: '1.45',
+                  color: '#000'
+                }}
+              >
+                {/* Kop Surat BNN */}
+                <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '2px' }}>
+                  <tbody>
+                    <tr>
+                      <td style={{ width: '85px', verticalAlign: 'middle', textAlign: 'left', padding: '0' }}>
+                        <img
+                          src="/bnn.png"
+                          alt="Logo BNN RI"
+                          style={{ width: '78px', height: '78px', objectFit: 'contain', display: 'block' }}
+                        />
+                      </td>
+                      <td style={{ verticalAlign: 'middle', textAlign: 'center', padding: '0 4px' }}>
+                        <div style={{ fontSize: '13pt', fontWeight: 'bold', lineHeight: '1.25', letterSpacing: '0.2px' }}>
+                          BADAN NARKOTIKA NASIONAL REPUBLIK INDONESIA
+                        </div>
+                        <div style={{ fontSize: '10.5pt', fontWeight: 'bold', lineHeight: '1.25', letterSpacing: '0.2px', marginTop: '1px' }}>
+                          TIM ASESMEN TERPADU (TAT) NARKOTIKA PROVINSI KALIMANTAN TIMUR
+                        </div>
+                        <div style={{ fontSize: '8.5pt', marginTop: '3px', lineHeight: '1.35', color: '#111' }}>
+                          Sekretariat Bersama: Jl. Slamet Riyadi No. 1, Telp: (0541) 743201, Samarinda - Kaltim<br />
+                          Satuan Reserse Narkoba &bull; Pengawasan &amp; Pemantauan Klien e-TAT SIAP PULIH
+                        </div>
+                      </td>
+                      <td style={{ width: '85px', verticalAlign: 'middle' }}></td>
+                    </tr>
+                  </tbody>
+                </table>
+                <hr style={{ border: 'none', borderTop: '2.5px solid #000', margin: '4px 0 1.5px 0' }} />
+                <hr style={{ border: 'none', borderTop: '0.8px solid #000', margin: '1.5px 0 14px 0' }} />
+
+                <div style={{ textAlign: 'center', margin: '12px 0 16px 0' }}>
+                  <div style={{ fontWeight: 'bold', fontSize: '12pt', textDecoration: 'underline' }}>
+                    SURAT TANDA TERIMA LAPOR DIRI (WAJIB LAPOR)
+                  </div>
+                  <div style={{ fontWeight: 'bold', fontSize: '10.5pt', marginTop: '3px' }}>
+                    Nomor: TT-WL/{selectedWlBuktiModal.id.slice(-6).toUpperCase()}/TAT/2026
+                  </div>
+                </div>
+
+                <p style={{ textAlign: 'justify', marginBottom: '10px' }}>
+                  Diterangkan dengan sebenarnya bahwa tersangka/klien di bawah ini telah hadir dan melaksanakan kewajiban lapor diri secara tertib dan berkala sesuai ketentuan rekomendasi Sidang Pleno Tim Asesmen Terpadu (TAT):
+                </p>
+
+                <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '12px', fontSize: '10.5pt' }}>
+                  <tbody>
+                    <tr>
+                      <td style={{ width: '25px', verticalAlign: 'top' }}>1.</td>
+                      <td style={{ width: '185px', verticalAlign: 'top' }}>Nama Tersangka / Klien</td>
+                      <td style={{ width: '12px', textAlign: 'center', verticalAlign: 'top' }}>:</td>
+                      <td style={{ fontWeight: 'bold' }}>{permohonan.terperiksa?.namaLengkap || '-'} {permohonan.terperiksa?.alias ? `(Alias: ${permohonan.terperiksa.alias})` : ''}</td>
+                    </tr>
+                    <tr>
+                      <td style={{ verticalAlign: 'top' }}>2.</td>
+                      <td style={{ verticalAlign: 'top' }}>NIK / Usia</td>
+                      <td style={{ textAlign: 'center', verticalAlign: 'top' }}>:</td>
+                      <td>{permohonan.terperiksa?.nik || '-'} / {permohonan.terperiksa?.usia || '-'} Tahun</td>
+                    </tr>
+                    <tr>
+                      <td style={{ verticalAlign: 'top' }}>3.</td>
+                      <td style={{ verticalAlign: 'top' }}>Nomor Laporan Polisi</td>
+                      <td style={{ textAlign: 'center', verticalAlign: 'top' }}>:</td>
+                      <td style={{ fontFamily: 'monospace' }}>{permohonan.perkara?.nomorLaporanPolisi || '-'}</td>
+                    </tr>
+                    <tr>
+                      <td style={{ verticalAlign: 'top' }}>4.</td>
+                      <td style={{ verticalAlign: 'top' }}>Tahap / Kegiatan</td>
+                      <td style={{ textAlign: 'center', verticalAlign: 'top' }}>:</td>
+                      <td>{selectedWlBuktiModal.kegiatanRehabTerkait || 'Wajib Lapor Rutin Berkala'}</td>
+                    </tr>
+                    <tr>
+                      <td style={{ verticalAlign: 'top' }}>5.</td>
+                      <td style={{ verticalAlign: 'top' }}>Tanggal Rencana Semula</td>
+                      <td style={{ textAlign: 'center', verticalAlign: 'top' }}>:</td>
+                      <td style={{ fontFamily: 'monospace' }}>{selectedWlBuktiModal.tanggalRencanaWajibLapor || selectedWlBuktiModal.tanggalWajibLapor || '-'}</td>
+                    </tr>
+                    <tr>
+                      <td style={{ verticalAlign: 'top' }}>6.</td>
+                      <td style={{ verticalAlign: 'top' }}>Tanggal Pelaporan Aktual</td>
+                      <td style={{ textAlign: 'center', verticalAlign: 'top' }}>:</td>
+                      <td style={{ fontFamily: 'monospace', fontWeight: 'bold', color: '#166534' }}>
+                        {selectedWlBuktiModal.tanggalPelaporanAktual} ({selectedWlBuktiModal.waktuInputSistem || 'Tepat Waktu'})
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style={{ verticalAlign: 'top' }}>7.</td>
+                      <td style={{ verticalAlign: 'top' }}>Kanal / Tempat Lapor</td>
+                      <td style={{ textAlign: 'center', verticalAlign: 'top' }}>:</td>
+                      <td>{selectedWlBuktiModal.kanal === 'langsung' ? 'Tatap Muka Langsung di Kantor Satresnarkoba' : 'Kanal Digital e-TAT SIAP PULIH'}</td>
+                    </tr>
+                    <tr>
+                      <td style={{ verticalAlign: 'top' }}>8.</td>
+                      <td style={{ verticalAlign: 'top' }}>Penyidik Penerima Laporan</td>
+                      <td style={{ textAlign: 'center', verticalAlign: 'top' }}>:</td>
+                      <td style={{ fontWeight: 'bold' }}>{selectedWlBuktiModal.namaPenyidikPenerima}</td>
+                    </tr>
+                    <tr>
+                      <td style={{ verticalAlign: 'top' }}>9.</td>
+                      <td style={{ verticalAlign: 'top' }}>Instansi Penerima</td>
+                      <td style={{ textAlign: 'center', verticalAlign: 'top' }}>:</td>
+                      <td>{selectedWlBuktiModal.instansiPenyidik}</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <div style={{ border: '1.5px solid #166534', padding: '8px 12px', marginBottom: '16px', background: '#f0fdf4' }}>
+                  <strong style={{ color: '#166534', display: 'block', marginBottom: '3px' }}>
+                    Status Pengawasan &amp; Catatan Petugas:
+                  </strong>
+                  <p style={{ margin: 0, fontSize: '10pt', color: '#14532d', textAlign: 'justify' }}>
+                    {selectedWlBuktiModal.catatanAdmin || 'Kehadiran dan bukti fisik telah diperiksa serta divalidasi oleh Tim Sekretariat TAT dan Penyidik Pendamping. Klien mematuhi seluruh protokol pengawasan.'}
+                  </p>
+                </div>
+
+                <p style={{ textAlign: 'justify', marginBottom: '18px' }}>
+                  Demikian Surat Tanda Terima Wajib Lapor ini diterbitkan secara sah melalui Sistem Elektronik Tim Asesmen Terpadu (e-TAT SIAP PULIH) untuk menjadi bukti pemenuhan kewajiban hukum tersangka.
+                </p>
+
+                {/* Tanda Tangan */}
+                <div className="ttd-section" style={{ marginTop: '24px', borderTop: '1px solid #000', paddingTop: '12px' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'center', fontSize: '10pt' }}>
+                    <tbody>
+                      <tr>
+                        <td style={{ width: '38%', verticalAlign: 'top' }}>
+                          <p style={{ margin: 0 }}>Tersangka / Klien yang Melapor,</p>
+                          <div style={{ height: '65px' }}></div>
+                          <p style={{ fontWeight: 'bold', textDecoration: 'underline', margin: 0 }}>
+                            {permohonan.terperiksa?.namaLengkap || 'Klien TAT'}
+                          </p>
+                          <p style={{ fontSize: '8.5pt', color: '#333', margin: 0 }}>Tanda Tangan Pelapor</p>
+                        </td>
+
+                        <td style={{ width: '24%', verticalAlign: 'middle', textAlign: 'center' }}>
+                          <div style={{ display: 'inline-block', border: '1px solid #888', padding: '4px 6px', borderRadius: '4px', background: '#fafafa' }}>
+                            <QrCodeImg value={buildLacakVerificationUrl(permohonan, 'pleno')} size={64} alt="QR Verifikasi WL" />
+                            <div style={{ fontSize: '7pt', fontFamily: 'monospace', color: '#444', marginTop: '2px' }}>
+                              e-TAT SIAP PULIH
+                            </div>
+                          </div>
+                        </td>
+
+                        <td style={{ width: '38%', verticalAlign: 'top' }}>
+                          <p style={{ margin: 0 }}>Penyidik Penerima Laporan,</p>
+                          <div style={{ height: '65px' }}></div>
+                          <p style={{ fontWeight: 'bold', textDecoration: 'underline', margin: 0 }}>
+                            {selectedWlBuktiModal.namaPenyidikPenerima?.split('(')[0] || 'Penyidik Satresnarkoba'}
+                          </p>
+                          <p style={{ fontSize: '8.5pt', color: '#333', margin: 0 }}>{selectedWlBuktiModal.instansiPenyidik || 'Satresnarkoba'}</p>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showLembarKendaliModal && (
+        <LembarKendaliModal
+          permohonan={permohonan}
+          monitoring={monitoring}
+          currentUser={userRole as any}
+          onClose={() => setShowLembarKendaliModal(false)}
+        />
+      )}
+
     </div>
   );
 };
@@ -1010,6 +1493,7 @@ const AkhirLayananSection: React.FC<{
 }> = ({ monitoring, permohonan, userRole, readOnly, onUpdate }) => {
   const existing = monitoring.akhirLayanan;
   const [showCertPreview, setShowCertPreview] = useState(false);
+  const sksrPrintRef = useRef<HTMLDivElement>(null);
 
   const [form, setForm] = useState<Partial<AkhirLayananRehab>>(existing ?? {
     tanggalAkhirLayananAktual: today(),
@@ -1033,7 +1517,7 @@ const AkhirLayananSection: React.FC<{
       statusAkhir: form.statusAkhir!,
       namaFasilitas: form.namaFasilitas!,
       pihakPenerbitKeterangan: form.pihakPenerbitKeterangan ?? 'dr. Rina Lestari, Sp.KJ',
-      fileSuratAkhirLayananUrl: form.fileSuratAkhirLayananUrl || 'https://e-tat.polri.go.id/docs/SURAT-SELESAI-REHAB.pdf',
+      fileSuratAkhirLayananUrl: form.fileSuratAkhirLayananUrl || 'internal://surat-selesai-rehab',
       diisiOleh: userRole,
       kapasitasPengisi: 'Dokter / DPJP',
       tanggalDiisi: today(),
@@ -1071,64 +1555,188 @@ const AkhirLayananSection: React.FC<{
           </div>
         </div>
 
-        {/* Dynamic Live Certificate Preview Document */}
+        {/* Modal Pratinjau & Cetak SKSR Resmi */}
         {showCertPreview && (
-          <div className="bg-slate-100 text-slate-900 p-8 rounded-xl shadow-2xl font-serif max-w-3xl mx-auto space-y-6 text-xs leading-relaxed border-4 border-slate-300">
-            {/* Kop Surat Resmi Kedinasan */}
-            <div className="text-center space-y-1 pb-4 border-b-2 border-slate-900">
-              <h2 className="text-sm font-extrabold tracking-wide uppercase font-sans text-slate-900">TIM ASESMEN TERPADU (TAT) NARKOTIKA</h2>
-              <p className="text-[11px] font-sans font-semibold text-slate-700">POLRESTA SAMARINDA / BNN PROVINSI KALIMANTAN TIMUR</p>
-              <p className="text-[10px] font-sans text-slate-600">Alamat: Jl. Slamet Riyadi No. 1, Samarinda • Hotline e-TAT: (0541) 743201</p>
-            </div>
-
-            <div className="text-center font-sans">
-              <h3 className="text-xs font-bold underline uppercase tracking-wider">SURAT KETERANGAN SELESAI REHABILITASI (SKSR)</h3>
-              <p className="text-[11px] text-slate-700 font-mono mt-0.5">Nomor: SKSR/TAT/2026/09/{permohonan.id.slice(-4)}</p>
-            </div>
-
-            <p className="font-sans">Ketua Tim Asesmen Terpadu (TAT) berdasarkan evaluasi klinis tim medis dan pengawasan tim hukum menerangkan bahwa:</p>
-
-            <div className="bg-slate-50 p-4 rounded-lg border border-slate-300 font-sans space-y-1.5 text-[11px]">
-              <div className="grid grid-cols-3"><span className="font-semibold">Nama Terperiksa</span><span>: {permohonan.terperiksa.namaLengkap || (permohonan.terperiksa as any).namaTerperiksa}</span></div>
-              <div className="grid grid-cols-3"><span className="font-semibold">NIK / Usia</span><span>: {permohonan.terperiksa.nik || '64720109880001'} / {permohonan.terperiksa.usia} Tahun</span></div>
-              <div className="grid grid-cols-3"><span className="font-semibold">Instansi Pengaju</span><span>: {permohonan.instansiPengaju}</span></div>
-              <div className="grid grid-cols-3"><span className="font-semibold">Fasilitas Rehabilitasi</span><span>: {monitoring.pelaksanaanRehab?.namaFasilitasTujuan || 'Balai Rehab BNN Tanah Merah'}</span></div>
-              <div className="grid grid-cols-3"><span className="font-semibold">Dokter DPJP Medis</span><span>: {monitoring.pelaksanaanRehab?.namaPenanggungJawabFasilitas || 'dr. Rina Lestari, Sp.KJ'}</span></div>
-            </div>
-
-            <div className="space-y-2 font-sans">
-              <h4 className="font-bold text-slate-900 border-b border-slate-300 pb-1 uppercase text-[10px]">HASIL EVALUASI KLINIS &amp; KEHADIRAN:</h4>
-              <p className="text-slate-800">{form.hasilSesuaiDokumenFasilitas}</p>
-              <div className="flex gap-4 font-semibold text-emerald-800 bg-emerald-50 p-2.5 rounded border border-emerald-200 text-[11px]">
-                <span>✓ Status Toksikologi: BEBAS ZAT (NEGATIF)</span>
-                <span>• Predikat: PULIH &amp; PRODUKTIF</span>
-              </div>
-            </div>
-
-            <div className="space-y-1 font-sans">
-              <h4 className="font-bold text-slate-900 uppercase text-[10px]">REKOMENDASI STATUS HUKUM:</h4>
-              <p className="text-slate-800">Menyelesaikan kewajiban rehabilitasi secara penuh. Direkomendasikan mempertahankan hak Restoratif Justice (RJ) / Keterangan Selesai untuk pertimbangan Hakim.</p>
-            </div>
-
-            {/* Signature Block */}
-            <div className="flex justify-between items-end pt-6 font-sans">
-              <div className="text-center space-y-1">
-                <QrCode className="w-14 h-14 mx-auto text-slate-800" />
-                <p className="text-[9px] text-slate-500 font-mono">Verifikasi Resmi e-TAT QR Code</p>
-              </div>
-              <div className="text-center space-y-12">
+          <div
+            className="fixed inset-0 z-[9999] flex items-center justify-center p-2 sm:p-4"
+            style={{ background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(5px)' }}
+          >
+            <div
+              className="bg-[#0b172a] border border-[#1b3459] rounded-2xl shadow-2xl w-full max-w-5xl flex flex-col"
+              style={{ maxHeight: '96vh' }}
+            >
+              {/* Top Header */}
+              <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#1b3459] shrink-0">
                 <div>
-                  <p className="text-[10px] text-slate-600">Samarinda, {today()}</p>
-                  <p className="font-bold text-slate-900 text-[11px]">Ketua Tim Asesmen Terpadu (TAT)</p>
+                  <h2 className="text-base font-bold text-white flex items-center gap-2">
+                    <span className="text-[#d4af37]">📄</span>
+                    Surat Keterangan Selesai Rehabilitasi (SKSR)
+                  </h2>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    Nomor: SKSR/TAT/2026/09/{permohonan.id.slice(-4)} &bull; Klien: {permohonan.terperiksa?.namaLengkap || '-'}
+                  </p>
                 </div>
-                <div>
-                  <p className="font-bold text-slate-900 underline text-[11px]">KOMBES POL AHMAD RIFA'I, S.I.K.</p>
-                  <p className="text-[10px] text-slate-600">NRP. 75080912</p>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => printLegalDocument(sksrPrintRef.current?.innerHTML)}
+                    className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-[#d4af37] text-[#0b172a] hover:bg-[#e8c84a] transition-colors cursor-pointer shadow"
+                  >
+                    <Printer className="w-3.5 h-3.5" />
+                    Cetak / Export PDF
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowCertPreview(false)}
+                    className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-[#132d54] transition-colors cursor-pointer"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Document Scroll Area */}
+              <div className="overflow-y-auto flex-1 p-3 sm:p-6 bg-slate-900/60">
+                <div
+                  ref={sksrPrintRef}
+                  className="bg-white text-black p-8 sm:p-12 rounded-lg shadow-2xl mx-auto"
+                  style={{
+                    maxWidth: '810px',
+                    fontFamily: "'Times New Roman', Times, serif",
+                    fontSize: '11pt',
+                    lineHeight: '1.45',
+                    color: '#000'
+                  }}
+                >
+                  {/* Kop Surat BNN */}
+                  <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '2px' }}>
+                    <tbody>
+                      <tr>
+                        <td style={{ width: '85px', verticalAlign: 'middle', textAlign: 'left', padding: '0' }}>
+                          <img
+                            src="/bnn.png"
+                            alt="Logo BNN RI"
+                            style={{ width: '78px', height: '78px', objectFit: 'contain', display: 'block' }}
+                          />
+                        </td>
+                        <td style={{ verticalAlign: 'middle', textAlign: 'center', padding: '0 4px' }}>
+                          <div style={{ fontSize: '13pt', fontWeight: 'bold', lineHeight: '1.25', letterSpacing: '0.2px' }}>
+                            BADAN NARKOTIKA NASIONAL REPUBLIK INDONESIA
+                          </div>
+                          <div style={{ fontSize: '10.5pt', fontWeight: 'bold', lineHeight: '1.25', letterSpacing: '0.2px', marginTop: '1px' }}>
+                            TIM ASESMEN TERPADU (TAT) NARKOTIKA PROVINSI KALIMANTAN TIMUR
+                          </div>
+                          <div style={{ fontSize: '8.5pt', marginTop: '3px', lineHeight: '1.35', color: '#111' }}>
+                            Sekretariat Bersama: Jl. Slamet Riyadi No. 1, Telp: (0541) 743201, Samarinda - Kaltim<br />
+                            Balai Besar Rehabilitasi BNN &bull; Kepolisian Daerah Kalimantan Timur
+                          </div>
+                        </td>
+                        <td style={{ width: '85px', verticalAlign: 'middle' }}></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <hr style={{ border: 'none', borderTop: '2.5px solid #000', margin: '4px 0 1.5px 0' }} />
+                  <hr style={{ border: 'none', borderTop: '0.8px solid #000', margin: '1.5px 0 14px 0' }} />
+
+                  <div style={{ textAlign: 'center', margin: '12px 0 16px 0' }}>
+                    <div style={{ fontWeight: 'bold', fontSize: '12pt', textDecoration: 'underline' }}>
+                      SURAT KETERANGAN SELESAI REHABILITASI (SKSR)
+                    </div>
+                    <div style={{ fontWeight: 'bold', fontSize: '10.5pt', marginTop: '3px' }}>
+                      Nomor: SKSR/TAT/2026/09/{permohonan.id.slice(-4)}
+                    </div>
+                  </div>
+
+                  <p style={{ textAlign: 'justify', marginBottom: '10px' }}>
+                    Ketua Tim Asesmen Terpadu (TAT) berdasarkan evaluasi klinis tim dokter pemeriksa dan pemantauan penegak hukum menerangkan dengan sebenarnya bahwa:
+                  </p>
+
+                  <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '12px', fontSize: '10.5pt' }}>
+                    <tbody>
+                      <tr>
+                        <td style={{ width: '25px', verticalAlign: 'top' }}>1.</td>
+                        <td style={{ width: '185px', verticalAlign: 'top' }}>Nama Terperiksa</td>
+                        <td style={{ width: '12px', textAlign: 'center', verticalAlign: 'top' }}>:</td>
+                        <td style={{ fontWeight: 'bold' }}>{permohonan.terperiksa.namaLengkap || (permohonan.terperiksa as any).namaTerperiksa}</td>
+                      </tr>
+                      <tr>
+                        <td style={{ verticalAlign: 'top' }}>2.</td>
+                        <td style={{ verticalAlign: 'top' }}>NIK / Usia</td>
+                        <td style={{ textAlign: 'center', verticalAlign: 'top' }}>:</td>
+                        <td>{permohonan.terperiksa.nik || '64720109880001'} / {permohonan.terperiksa.usia} Tahun</td>
+                      </tr>
+                      <tr>
+                        <td style={{ verticalAlign: 'top' }}>3.</td>
+                        <td style={{ verticalAlign: 'top' }}>Instansi Pengaju</td>
+                        <td style={{ textAlign: 'center', verticalAlign: 'top' }}>:</td>
+                        <td>{permohonan.instansiPengaju}</td>
+                      </tr>
+                      <tr>
+                        <td style={{ verticalAlign: 'top' }}>4.</td>
+                        <td style={{ verticalAlign: 'top' }}>Fasilitas Rehabilitasi</td>
+                        <td style={{ textAlign: 'center', verticalAlign: 'top' }}>:</td>
+                        <td>{monitoring.pelaksanaanRehab?.namaFasilitasTujuan || 'Balai Rehab BNN Tanah Merah'}</td>
+                      </tr>
+                      <tr>
+                        <td style={{ verticalAlign: 'top' }}>5.</td>
+                        <td style={{ verticalAlign: 'top' }}>Dokter DPJP Medis</td>
+                        <td style={{ textAlign: 'center', verticalAlign: 'top' }}>:</td>
+                        <td>{monitoring.pelaksanaanRehab?.namaPenanggungJawabFasilitas || 'dr. Rina Lestari, Sp.KJ'}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+
+                  <div style={{ margin: '12px 0' }}>
+                    <div style={{ fontWeight: 'bold', fontSize: '10.5pt', marginBottom: '4px', textDecoration: 'underline' }}>
+                      HASIL EVALUASI KLINIS &amp; KEHADIRAN:
+                    </div>
+                    <p style={{ textAlign: 'justify', marginBottom: '6px' }}>
+                      {form.hasilSesuaiDokumenFasilitas}
+                    </p>
+                    <div style={{ border: '1.5px solid #166534', background: '#f0fdf4', padding: '8px 12px', borderRadius: '4px' }}>
+                      <span style={{ color: '#166534', fontWeight: 'bold' }}>✓ Status Toksikologi: BEBAS ZAT NARKOTIKA (NEGATIF)</span>
+                      <span style={{ marginLeft: '14px', fontWeight: 'bold', color: '#14532d' }}>&bull; Predikat: PULIH &amp; PRODUKTIF</span>
+                    </div>
+                  </div>
+
+                  <div style={{ margin: '12px 0' }}>
+                    <div style={{ fontWeight: 'bold', fontSize: '10.5pt', marginBottom: '4px', textDecoration: 'underline' }}>
+                      REKOMENDASI STATUS HUKUM:
+                    </div>
+                    <p style={{ textAlign: 'justify' }}>
+                      Tersangka telah menyelesaikan seluruh kewajiban rehabilitasi medis dan sosial secara penuh dan tertib. Surat keterangan ini diterbitkan secara sah untuk dilampirkan sebagai kelengkapan pembelaan / pertimbangan vonis Majelis Hakim (Pasal 103 UU No. 35/2009) atau dasar penghentian penuntutan / penyidikan Keadilan Restoratif (Restorative Justice).
+                    </p>
+                  </div>
+
+                  {/* Signature Block */}
+                  <div className="ttd-section" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '28px', borderTop: '1px solid #000', paddingTop: '12px' }}>
+                    <div style={{ textAlign: 'center', width: '30%' }}>
+                      <div style={{ display: 'inline-block', border: '1px solid #888', padding: '4px 6px', borderRadius: '4px', background: '#fafafa' }}>
+                        <QrCodeImg value={buildLacakVerificationUrl(permohonan, 'pleno')} size={68} alt="QR Verifikasi SKSR" />
+                        <p style={{ fontSize: '7pt', fontFamily: 'monospace', color: '#444', margin: '2px 0 0 0' }}>
+                          e-TAT QR Code Sah
+                        </p>
+                      </div>
+                    </div>
+
+                    <div style={{ textAlign: 'center', width: '45%' }}>
+                      <div>
+                        <p style={{ fontSize: '9pt', color: '#333', margin: 0 }}>Samarinda, {today()}</p>
+                        <p style={{ fontWeight: 'bold', fontSize: '10.5pt', margin: '2px 0 0 0' }}>Ketua Tim Asesmen Terpadu (TAT)</p>
+                      </div>
+                      <div style={{ height: '55px' }}></div>
+                      <div>
+                        <p style={{ fontWeight: 'bold', textDecoration: 'underline', fontSize: '10.5pt', margin: 0 }}>KOMBES POL AHMAD RIFA'I, S.I.K.</p>
+                        <p style={{ fontSize: '9pt', color: '#444', margin: 0 }}>NRP. 75080912</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         )}
+
 
         {/* Input Form for Output Generation */}
         {!readOnly && (
@@ -1177,6 +1785,7 @@ export const TindakLanjutDetailView: React.FC<Props> = ({
   const initialMonitoring = permohonan.monitoringTindakLanjut ?? buildSeededMonitoring(permohonan, currentUser.role);
 
   const [monitoring, setMonitoring] = useState<MonitoringTindakLanjut>(initialMonitoring);
+  const [showLembarKendali, setShowLembarKendali] = useState(false);
 
   const handleMonitoringUpdate = (updated: MonitoringTindakLanjut) => {
     setMonitoring(updated);
@@ -1253,6 +1862,17 @@ export const TindakLanjutDetailView: React.FC<Props> = ({
             <span>•</span>
             <span>Instansi: {permohonan.instansiPengaju}</span>
           </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setShowLembarKendali(true)}
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-[#d4af37] text-[#0b172a] hover:bg-[#e8c84a] transition-all cursor-pointer shadow-md hover:scale-[1.02]"
+          >
+            <Printer className="w-3.5 h-3.5" />
+            <span>Cetak Lembar Kendali Pengawasan</span>
+          </button>
         </div>
       </div>
 
@@ -1333,18 +1953,27 @@ export const TindakLanjutDetailView: React.FC<Props> = ({
       {/* Active Sub View */}
       <div className="pt-1">
         {activeTab === 'pelaksanaan' && (
-          <PelaksanaanRehabSection monitoring={monitoring} userRole={currentUser.role} readOnly={!isMedisAuthorized} onUpdate={handleMonitoringUpdate} />
+          <PelaksanaanRehabSection monitoring={monitoring} permohonan={permohonan} userRole={currentUser.role} readOnly={!isMedisAuthorized} onUpdate={handleMonitoringUpdate} />
         )}
         {activeTab === 'laporan' && (
           <EvaluasiKlinisSection monitoring={monitoring} userRole={currentUser.role} readOnly={!isMedisAuthorized} onUpdate={handleMonitoringUpdate} />
         )}
         {activeTab === 'wajib_lapor' && (
-          <WajibLaporSection monitoring={monitoring} userRole={currentUser.role} readOnly={!isMedisAuthorized} onUpdate={handleMonitoringUpdate} />
+          <WajibLaporSection monitoring={monitoring} permohonan={permohonan} userRole={currentUser.role} readOnly={!isMedisAuthorized} onUpdate={handleMonitoringUpdate} />
         )}
         {activeTab === 'akhir' && (
           <AkhirLayananSection monitoring={monitoring} permohonan={permohonan} userRole={currentUser.role} readOnly={!isMedisAuthorized} onUpdate={handleMonitoringUpdate} />
         )}
       </div>
+
+      {showLembarKendali && (
+        <LembarKendaliModal
+          permohonan={permohonan}
+          monitoring={monitoring}
+          currentUser={currentUser}
+          onClose={() => setShowLembarKendali(false)}
+        />
+      )}
     </div>
   );
 };

@@ -439,6 +439,8 @@ export interface TindakLanjutLayanan {
   tanggalMulaiLayanan?: string;
   hambatanPelaksanaan?: string; // e.g. "Kapasitas bed rawat inap penuh hingga akhir bulan", "Kendala biaya transportasi"
   penanggungJawabTindakLanjut: string;
+  nomorSuratRujukan?: string;
+  kodeLacakRehab?: string;
   buktiPelaksanaanUrl?: string;
   statusProsesHukumTerkait?: string; // Catatan apakah penyidikan/sidang tetap lanjut
   terakhirDiperbarui: string;
@@ -849,18 +851,27 @@ export interface PermohonanAsesmen {
     jadwalPemeriksaanHukum?: string;
     jadwalPleno?: string;
     lokasiPemeriksaan?: string;
+    dikirimKeMedis?: boolean;
+    tanggalKirimMedis?: string;
+    dikirimKeHukum?: boolean;
+    tanggalKirimHukum?: string;
   };
 
   // Hasil Asesmen Substantif
   asesmenMedis?: AsesmenMedis;
   asesmenHukum?: AsesmenHukum;
   sidangPleno?: SidangPleno;
+  plenoAssesmen?: SidangPleno; // Alias backward-compatibility untuk komponen pendukung
   rekomendasiResmi?: RekomendasiResmi;
   tindakLanjut?: TindakLanjutLayanan;
   pengawasanKlien?: PengawasanKlien;
   monitoringTindakLanjut?: MonitoringTindakLanjut; // JUKNIS-aligned monitoring module
   instrumenKriteriaPlasemen?: InstrumenKriteriaPlasemen;
   prasyaratPemeriksaan?: PrasyaratPemeriksaan;
+  tindakLanjutDiteruskan?: boolean;
+  tanggalDiteruskanTindakLanjut?: string;
+  kodeLacakRehab?: string;
+  nomorSuratPengantarTersangka?: string;
 
   // Fitur Pendukung
   klarifikasiList: Klarifikasi[];

@@ -65,7 +65,10 @@ export const InputJadwalKontrolView: React.FC<InputJadwalKontrolViewProps> = ({
     }
 
     const isSubmitted = p.applicationStatus !== 'DRAFT';
-    const isSidangBeres = p.plenoAssesmen?.statusPleno === 'SELESAI' ||
+    const isSidangBeres = p.sidangPleno?.statusPleno === 'selesai_sepakat' ||
+      (p.sidangPleno?.statusPleno as string) === 'SELESAI' ||
+      (p.plenoAssesmen?.statusPleno as string) === 'SELESAI' ||
+      Boolean(p.sidangPleno?.nomorBeritaAcara) ||
       !!p.rekomendasiResmi ||
       p.applicationStatus === 'READY_FOR_CONFERENCE' ||
       p.applicationStatus === 'AWAITING_SIGNED_OUTPUTS' ||

@@ -478,6 +478,38 @@ export const PengajuanBaruView: React.FC<PengajuanBaruViewProps> = ({
     setBarangBuktiList(barangBuktiList.filter((b) => b.id !== id));
   };
 
+  const handleUploadFotoBb = (file: File) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setNewFotoBb(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+
+    uploadToCloudinary(file, 'barang-bukti')
+      .then(res => {
+        if (res?.url) setNewFotoBb(res.url);
+      })
+      .catch(err => {
+        console.warn('Upload BB fallback to dataURL:', err);
+      });
+  };
+
+  const handleUploadFotoLab = (file: File) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setNewFotoLab(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+
+    uploadToCloudinary(file, 'hasil-lab')
+      .then(res => {
+        if (res?.url) setNewFotoLab(res.url);
+      })
+      .catch(err => {
+        console.warn('Upload Lab fallback to dataURL:', err);
+      });
+  };
+
   const handleFileUpload = async (docId: string, file: File) => {
     const ext = '.' + file.name.split('.').pop()?.toLowerCase();
     const allowed = ['.pdf', '.jpg', '.jpeg', '.png'];
@@ -794,6 +826,12 @@ export const PengajuanBaruView: React.FC<PengajuanBaruViewProps> = ({
             setNewStatusLab={setNewStatusLab}
             newNomorLab={newNomorLab}
             setNewNomorLab={setNewNomorLab}
+            newFotoBb={newFotoBb}
+            setNewFotoBb={setNewFotoBb}
+            handleUploadFotoBb={handleUploadFotoBb}
+            newFotoLab={newFotoLab}
+            setNewFotoLab={setNewFotoLab}
+            handleUploadFotoLab={handleUploadFotoLab}
           />
         )}
 

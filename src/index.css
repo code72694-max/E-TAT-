@@ -138,3 +138,88 @@ textarea::placeholder {
   color: #64748b;
 }
 
+/* =========================================================
+   Print Styles: Full HVS / A4 Clean Official Document Output
+   Hides modal overlays, chrome, scrollbars, headers & buttons
+   ========================================================= */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 15mm 15mm 15mm 15mm;
+  }
+
+  html, body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Force background transparent/white and text black for general page print */
+  body *:not(.keep-bg) {
+    background-color: transparent !important;
+    color: #000000 !important;
+    border-color: #cbd5e1 !important;
+    text-shadow: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Hide app navigation, headers, footers, buttons, and modal overlays */
+  .no-print,
+  nav,
+  header,
+  footer,
+  aside,
+  button {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
+  /* Hide modal container backgrounds and borders */
+  .fixed.inset-0 {
+    position: static !important;
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  /* Make printable document container expand cleanly to full paper */
+  .printable-document {
+    position: static !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    page-break-inside: avoid !important;
+  }
+
+  /* Reset max-height scroll containers on print */
+  .max-h-\[75vh\],
+  .max-h-\[66vh\],
+  .max-h-\[90vh\],
+  .max-h-\[92vh\],
+  .max-h-\[96vh\],
+  .overflow-y-auto {
+    max-height: none !important;
+    overflow: visible !important;
+    padding: 0 !important;
+    background: transparent !important;
+  }
+}
+
+
+

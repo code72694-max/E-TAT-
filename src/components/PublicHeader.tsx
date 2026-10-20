@@ -91,21 +91,27 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
     <>
       {/* Top Sticky Header */}
       <header className="sticky top-0 z-40 bg-[#071325]/95 backdrop-blur-md border-b border-[#1b3459]">
-        {/* On Mobile Detail Page: Only Show Borderless Back Button in the left corner */}
         {isDetailPage && onBackFromDetail ? (
-          <div className="flex md:hidden items-center h-14 w-full px-4">
+          /* Clean Minimal Header on Detail Page */
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <button
               type="button"
               onClick={onBackFromDetail}
-              className="flex items-center space-x-2 text-slate-200 hover:text-white font-medium text-xs sm:text-sm transition-colors cursor-pointer bg-transparent border-0 p-0 focus:outline-none select-none active:opacity-75"
+              className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-xl bg-[#0b172a] hover:bg-[#12243d] text-slate-200 hover:text-white border border-[#1b3459] hover:border-[#D4AF37]/50 text-xs sm:text-sm font-medium transition-all cursor-pointer shadow-sm group select-none active:scale-[0.98]"
             >
-              <ArrowLeft className="w-4 h-4 text-[#D4AF37]" />
-              <span>Kembali</span>
+              <ArrowLeft className="w-4 h-4 text-[#D4AF37] group-hover:-translate-x-0.5 transition-transform" />
+              <span>Kembali ke Pencarian</span>
             </button>
-          </div>
-        ) : null}
 
-        <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 ${isDetailPage && onBackFromDetail ? 'hidden md:flex' : 'flex'} items-center justify-between`}>
+            <div className="flex items-center space-x-2">
+              <span className="font-extrabold text-base sm:text-lg tracking-wider text-white font-['Cinzel',serif]">
+                E-TAT <span className="text-[#D4AF37]">SIAP PULIH</span>
+              </span>
+            </div>
+          </div>
+        ) : (
+          /* Full Header on Landing & Search Pages */
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           {/* Brand Lockup & Interactive Tim TAT Kaltim Button */}
           <div className="flex items-center space-x-2 sm:space-x-2.5">
             <button
@@ -201,6 +207,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
             </button>
           </div>
         </div>
+        )}
       </header>
 
       {/* Mobile Off-Canvas Drawer Sidebar */}

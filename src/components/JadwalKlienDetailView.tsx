@@ -141,7 +141,7 @@ export const JadwalKlienDetailView: React.FC<JadwalKlienDetailViewProps> = ({
       step: 5,
       title: 'Sidang Pleno Terpadu (TAT) & Rekomendasi Bersama',
       subtitle: 'Musyawarah pleno tim medis, tim hukum, dan kejaksaan untuk penetapan rekomendasi',
-      tanggal: permohonan.plenoAssesmen?.tanggalPleno || '14 September 2026',
+      tanggal: permohonan.sidangPleno?.tanggalPleno || permohonan.plenoAssesmen?.tanggalPleno || '14 September 2026',
       petugas: 'Ketua Tim Asesmen Terpadu & Anggota Tim Panel Pleno TAT',
       status: 'Pleno Selesai Mufakat',
       isCompleted: true,

@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
 import { PermohonanAsesmen, UserProfile } from '../types';
-import { Users, FileText, Edit, Clock, CheckCircle2, PenTool, Eye } from 'lucide-react';
+import { Users, FileText, Edit, Clock, CheckCircle2, PenTool, Eye, Share2, Printer, ArrowRight, QrCode } from 'lucide-react';
 import { BeritaAcaraModal } from './BeritaAcaraModal';
 import { FormHasilPlenoModal } from './FormHasilPlenoModal';
 import { ModalUploadTtdDigital } from './ModalUploadTtdDigital';
+import { SuratPengantarTersangkaModal } from './SuratPengantarTersangkaModal';
 import { sidangPlenoApi } from '../services/api';
 
 interface PlenoTATViewProps {
   permohonanList: PermohonanAsesmen[];
   currentUser: UserProfile;
   onSelectPermohonan: (id: string) => void;
-  onUpdatePermohonan?: (id: string, updated: any) => void;
+  onUpdatePermohonan?: (updated: PermohonanAsesmen) => void;
 }
 
 export const PlenoTATView: React.FC<PlenoTATViewProps> = ({
@@ -22,11 +23,79 @@ export const PlenoTATView: React.FC<PlenoTATViewProps> = ({
   const [baPermohonan, setBaPermohonan] = useState<PermohonanAsesmen | null>(null);
   const [formPlenoItem, setFormPlenoItem] = useState<PermohonanAsesmen | null>(null);
   const [uploadTtdItem, setUploadTtdItem] = useState<PermohonanAsesmen | null>(null);
+  const [suratPengantarItem, setSuratPengantarItem] = useState<PermohonanAsesmen | null>(null);
+  const [toastMsg, setToastMsg] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'aktif' | 'riwayat'>('aktif');
 
   // Check if viewing from role Hukum or /hukum route
   const isHukum = currentUser?.role?.toUpperCase() === 'HUKUM' || 
     (typeof window !== 'undefined' && window.location.pathname.includes('/hukum'));
+
+  const handleTeruskanKeTindakLanjut = (item: PermohonanAsesmen) => {
+    const kodeLacak = (item as any).kodeLacakRehab || `RHB-${item.id.slice(-6).toUpperCase()}`;
+    const noSuratRujukan = (item.tindakLanjut as any)?.nomorSuratRujukan || `SR-TAT/2026/09/${item.id.slice(-4)}`;
+    const faskes = item.sidangPleno?.fasilitasRujukanUsulan || 'Balai Besar Rehabilitasi BNN Tanah Merah';
+
+    const updated: PermohonanAsesmen = {
+      ...item,
+      tindakLanjutDiteruskan: true,
+      tanggalDiteruskanTindakLanjut: new Date().toISOString(),
+      statusProsesUtama: 'selesai_tindak_lanjut',
+      applicationStatus: 'RESULTS_ISSUED',
+      kodeLacakRehab: kodeLacak,
+      nomorSuratPengantarTersangka: noSuratRujukan,
+      tindakLanjut: {
+        ...(item.tindakLanjut || {
+          id: `tl-${Date.now()}`,
+          jenisTindakLanjut: 'Rujukan Rehabilitasi',
+          statusRujukan: 'sedang_dikoordinasikan',
+          namaFasilitasTujuan: faskes,
+          penanggungJawabTindakLanjut: item.perkara?.namaPenyidik || 'Bripka Heru Susanto',
+          terakhirDiperbarui: new Date().toISOString()
+        }),
+        nomorSuratRujukan: noSuratRujukan,
+        kodeLacakRehab: kodeLacak,
+        tanggalRujukanDikirim: new Date().toISOString()
+      } as any,
+      pengawasanKlien: item.pengawasanKlien || {
+        id: `pgw-${Date.now()}`,
+        statusKepatuhan: 'sangat_patuh',
+        modalitasLayanan: (item.sidangPleno?.kesepakatanRekomendasi?.toLowerCase().includes('inap') ? 'Rawat Inap' : 'Rawat Jalan') as any,
+        durasiBulan: 3,
+        tanggalMulai: new Date().toISOString().slice(0, 10),
+        tanggalTargetSelesai: '3 Bulan Sejak Masuk',
+        instansiPelaksanaRehab: faskes,
+        konselorPendamping: 'Konselor Adiksi BNN',
+        penyidikPengawas: item.perkara?.namaPenyidik || 'Penyidik Pengawas',
+        totalSesiWajib: 12,
+        sesiTerselesaikan: 0,
+        jumlahMangkir: 0,
+        suratPeringatanList: [],
+        riwayatTesUrinBerkala: [],
+        jurnalPengawasan: [],
+        rekomendasiTindakLanjutHukum: 'Lanjut Rehabilitasi'
+      },
+      auditLogs: [
+        {
+          id: 'aud-' + Date.now(),
+          timestamp: new Date().toLocaleString('id-ID'),
+          actorNama: currentUser.name,
+          actorPeran: currentUser.role,
+          aksi: 'Pelimpahan ke Modul Tindak Lanjut',
+          rincian: `Hasil Sidang Pleno diteruskan ke modul Tindak Lanjut. Kode Lacak Klien: ${kodeLacak}. Surat Pengantar: ${noSuratRujukan}.`
+        },
+        ...(item.auditLogs || [])
+      ]
+    };
+
+    if (onUpdatePermohonan) {
+      onUpdatePermohonan(updated);
+    }
+
+    setToastMsg(`Berkas ${item.nomorPermohonan} (${item.terperiksa.namaLengkap}) Berhasil Diteruskan ke Menu Tindak Lanjut! Kode Lacak: ${kodeLacak}`);
+    setSuratPengantarItem(updated);
+    setTimeout(() => setToastMsg(null), 5000);
+  };
 
   const handleSavePleno = async (permohonanId: string, payload: any) => {
     try {
@@ -130,6 +199,21 @@ export const PlenoTATView: React.FC<PlenoTATViewProps> = ({
           currentUser={currentUser}
           onClose={() => setBaPermohonan(null)}
         />
+      )}
+
+      {suratPengantarItem && (
+        <SuratPengantarTersangkaModal
+          permohonan={suratPengantarItem}
+          currentUser={currentUser}
+          onClose={() => setSuratPengantarItem(null)}
+        />
+      )}
+
+      {toastMsg && (
+        <div className="p-4 bg-emerald-950/40 border border-emerald-500/40 rounded-xl text-xs font-semibold text-emerald-200 flex items-center gap-2 animate-in fade-in shadow-md">
+          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+          <span>{toastMsg}</span>
+        </div>
       )}
 
       {formPlenoItem && (
@@ -343,7 +427,41 @@ export const PlenoTATView: React.FC<PlenoTATViewProps> = ({
                           className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3.5 py-2 rounded-xl flex items-center justify-center space-x-1.5 shrink-0 transition-colors flex-1 sm:flex-none shadow-md shadow-emerald-950/40 cursor-pointer"
                         >
                           <Eye className="w-3.5 h-3.5" />
-                          <span>Lihat Berita Acara (TTD Tertempel)</span>
+                          <span>Lihat Berita Acara (TTD)</span>
+                        </button>
+                      )}
+
+                      {/* Tombol Teruskan ke Tindak Lanjut (Selesai Pleno) */}
+                      {hasSignedBA && !isHukum && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleTeruskanKeTindakLanjut(item);
+                          }}
+                          className={`text-xs font-bold px-3.5 py-2 rounded-xl flex items-center justify-center space-x-1.5 shrink-0 transition-all cursor-pointer shadow-md flex-1 sm:flex-none ${
+                            item.tindakLanjutDiteruskan
+                              ? 'bg-blue-950/80 hover:bg-blue-900 border border-blue-500/50 text-blue-300'
+                              : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-blue-900/40'
+                          }`}
+                        >
+                          <Share2 className="w-3.5 h-3.5 text-blue-200" />
+                          <span>{item.tindakLanjutDiteruskan ? '✓ Diteruskan ke Tindak Lanjut' : 'Teruskan ke Tindak Lanjut'}</span>
+                        </button>
+                      )}
+
+                      {/* Dokumen Surat Tersangka dengan Kode Lacak */}
+                      {hasSignedBA && !isHukum && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSuratPengantarItem(item);
+                          }}
+                          className="bg-amber-600/20 hover:bg-amber-600/30 border border-amber-500/50 text-amber-300 hover:text-amber-200 text-xs font-bold px-3.5 py-2 rounded-xl flex items-center justify-center space-x-1.5 shrink-0 transition-colors shadow-sm cursor-pointer flex-1 sm:flex-none"
+                        >
+                          <FileText className="w-3.5 h-3.5 text-amber-400" />
+                          <span>Dokumen Surat Tersangka</span>
                         </button>
                       )}
                     </div>

@@ -125,6 +125,16 @@ export const TabAsesmenHukum: React.FC<TabAsesmenHukumProps> = ({
         </div>
       )}
 
+      {/* Alert Alur Otomatis dari Asesmen Medis */}
+      {(permohonan.asesmenMedis?.status === 'FINAL' || permohonan.timAsesmen?.dikirimKeHukum) && (
+        <div className="p-3.5 bg-emerald-950/30 border border-emerald-500/40 rounded-xl text-xs text-emerald-200 flex items-center gap-2.5 shadow-sm animate-in fade-in">
+          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+          <span>
+            <strong>Hasil Asesmen Medis Telah Selesai:</strong> Diperiksa oleh <strong>{permohonan.timAsesmen?.asesorMedisNama || permohonan.asesmenMedis?.asesorNama || 'Dokter Asesor Medis'}</strong>. Berkas perkara secara otomatis dilanjutkan kepada Penelaah Hukum (<strong>{permohonan.timAsesmen?.asesorHukumNama || currentUser.name}</strong>) untuk verifikasi yuridis.
+          </span>
+        </div>
+      )}
+
       {/* Header Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#1b3459]">
         <div>

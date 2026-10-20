@@ -38,10 +38,12 @@ import {
   Eye,
   Layers,
   ChevronRight,
-  Info
+  Info,
+  QrCode
 } from 'lucide-react';
 
 import TindakLanjutDetailView from './TindakLanjutDetailView';
+import { SuratPengantarTersangkaModal } from './SuratPengantarTersangkaModal';
 
 interface RujukanTindakLanjutViewProps {
   permohonanList: PermohonanAsesmen[];
@@ -66,8 +68,8 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterModalitas, setFilterModalitas] = useState<'all' | 'Rawat Inap' | 'Rawat Jalan'>('all');
-  
-
+  const [subTab, setSubTab] = useState<'antrean_pleno' | 'monitoring'>('antrean_pleno');
+  const [suratPengantarItem, setSuratPengantarItem] = useState<PermohonanAsesmen | null>(null);
 
   // New Client Schedule Modal states
   const [showScheduleModal, setShowScheduleModal] = useState(false);
@@ -105,7 +107,10 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
     if (!checkOwner(p)) return false;
 
     const isSubmitted = p.applicationStatus !== 'DRAFT';
-    const isSidangBeres = p.plenoAssesmen?.statusPleno === 'SELESAI' ||
+    const isSidangBeres = p.sidangPleno?.statusPleno === 'selesai_sepakat' ||
+      (p.sidangPleno?.statusPleno as string) === 'SELESAI' ||
+      (p.plenoAssesmen?.statusPleno as string) === 'SELESAI' ||
+      Boolean(p.sidangPleno?.nomorBeritaAcara) ||
       !!p.rekomendasiResmi ||
       p.applicationStatus === 'READY_FOR_CONFERENCE' ||
       p.applicationStatus === 'AWAITING_SIGNED_OUTPUTS' ||
@@ -240,6 +245,38 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
     return !!p.monitoringTindakLanjut || !!p.tindakLanjut || !!p.pengawasanKlien || p.asesmenMedis?.status === 'FINAL' || p.applicationStatus === 'READY_FOR_CONFERENCE' || p.applicationStatus === 'AWAITING_SIGNED_OUTPUTS';
   });
 
+  // Kasus yang selesai pleno dan harus / sedang ditindaklanjuti
+  const antreanPlenoList = permohonanList.filter(p => {
+    if (!checkOwner(p)) return false;
+    const isPlenoSelesai = p.sidangPleno?.statusPleno === 'selesai_sepakat' ||
+      (p.sidangPleno?.statusPleno as string) === 'SELESAI' ||
+      (p.sidangPleno?.statusPleno as string) === 'selesai' ||
+      Boolean(p.sidangPleno?.nomorBeritaAcara) ||
+      Boolean(p.tindakLanjutDiteruskan) ||
+      p.statusProsesUtama === 'pengesahan_rekomendasi' ||
+      p.statusProsesUtama === 'selesai_tindak_lanjut' ||
+      p.applicationStatus === 'RESULTS_ISSUED' ||
+      p.applicationStatus === 'CONFERENCE_HELD' ||
+      Boolean(p.sidangPleno?.kesepakatanRekomendasi);
+    return isPlenoSelesai;
+  });
+
+  const filteredAntreanList = antreanPlenoList.filter(item => {
+    const q = searchTerm.toLowerCase();
+    const kode = ((item as any).kodeLacakRehab || (item.tindakLanjut as any)?.kodeLacakRehab || '').toLowerCase();
+    const matchSearch = item.nomorPermohonan.toLowerCase().includes(q) ||
+      item.terperiksa.namaLengkap.toLowerCase().includes(q) ||
+      (item.sidangPleno?.kesepakatanRekomendasi || '').toLowerCase().includes(q) ||
+      (item.sidangPleno?.fasilitasRujukanUsulan || item.tindakLanjut?.namaFasilitasTujuan || '').toLowerCase().includes(q) ||
+      kode.includes(q);
+    if (!matchSearch) return false;
+    if (filterModalitas !== 'all') {
+      const mod = item.sidangPleno?.kesepakatanRekomendasi?.toLowerCase().includes('inap') ? 'Rawat Inap' : 'Rawat Jalan';
+      if (mod !== filterModalitas) return false;
+    }
+    return true;
+  });
+
   const filteredList = eligibleList.filter(item => {
     const matchSearch = item.nomorPermohonan.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.terperiksa.namaLengkap.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -266,6 +303,15 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
 
   return (
     <div className="space-y-6 text-slate-100 font-sans">
+      {/* Modal Dokumen Surat Tersangka */}
+      {suratPengantarItem && (
+        <SuratPengantarTersangkaModal
+          permohonan={suratPengantarItem}
+          currentUser={currentUser}
+          onClose={() => setSuratPengantarItem(null)}
+        />
+      )}
+
       {/* Header View */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
@@ -276,19 +322,63 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
             <span>Tindak Lanjut &amp; Kontrol Rehabilitasi Pasca TAT</span>
           </h1>
           <p className="text-xs text-slate-400 mt-1">
-            Manajemen rujukan fasilitas mitra, verifikasi lembar ceklis berkas admisi, serta pengawasan sesi kontrol &amp; monitoring tes urin berkala klien.
+            Daftar kasus yang harus ditindaklanjuti pasca sidang pleno, penerbitan dokumen rujukan tersangka, dan monitoring sesi kontrol/urin berkala.
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-3 self-start shrink-0">
           <button
-            onClick={() => setShowScheduleModal(true)}
-            className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white border border-slate-700 hover:border-slate-600 font-medium rounded-xl text-xs flex items-center gap-2 transition-all cursor-pointer shadow-sm"
+            onClick={() => {
+              if (antreanPlenoList.length > 0 && !selectedSchedulePermohonanId) {
+                setSelectedSchedulePermohonanId(antreanPlenoList[0].id);
+              }
+              setShowScheduleModal(true);
+            }}
+            className="px-3.5 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-medium rounded-xl text-xs flex items-center gap-2 transition-all cursor-pointer shadow-md shadow-blue-900/30 ring-1 ring-blue-400/40"
           >
-            <Calendar className="w-3.5 h-3.5 text-slate-400" />
+            <Calendar className="w-3.5 h-3.5 text-blue-200" />
             <span>+ Input Jadwal Kontrol &amp; Lapor</span>
           </button>
         </div>
+      </div>
+
+      {/* SUB-MENU TABS NAVIGATION */}
+      <div className="flex flex-wrap items-center gap-2 p-1.5 bg-slate-900/90 border border-slate-800 rounded-2xl shadow-sm">
+        <button
+          type="button"
+          onClick={() => setSubTab('antrean_pleno')}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs transition-all cursor-pointer ${
+            subTab === 'antrean_pleno'
+              ? 'bg-blue-600 text-white shadow-md shadow-blue-900/40 ring-1 ring-blue-400/40'
+              : 'text-slate-400 hover:text-white hover:bg-slate-800/80'
+          }`}
+        >
+          <FileCheck2 className="w-4 h-4 text-blue-200" />
+          <span>Daftar Harus Ditindaklanjuti (Selesai Pleno)</span>
+          <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold ${
+            subTab === 'antrean_pleno' ? 'bg-white/20 text-white' : 'bg-slate-800 text-slate-300'
+          }`}>
+            {antreanPlenoList.length}
+          </span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setSubTab('monitoring')}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs transition-all cursor-pointer ${
+            subTab === 'monitoring'
+              ? 'bg-blue-600 text-white shadow-md shadow-blue-900/40 ring-1 ring-blue-400/40'
+              : 'text-slate-400 hover:text-white hover:bg-slate-800/80'
+          }`}
+        >
+          <Activity className="w-4 h-4 text-emerald-400" />
+          <span>Monitoring Pengawasan Klien Aktif</span>
+          <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold ${
+            subTab === 'monitoring' ? 'bg-white/20 text-white' : 'bg-slate-800 text-slate-300'
+          }`}>
+            {pengawasanList.length}
+          </span>
+        </button>
       </div>
 
       {/* FILTER & SEARCH BAR */}
@@ -297,7 +387,7 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
           <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
-            placeholder="Cari nama terperiksa, nomor permohonan, atau fasilitas rehab..."
+            placeholder={subTab === 'antrean_pleno' ? "Cari nama terperiksa, no permohonan, kode lacak rehab, fasilitas..." : "Cari nama terperiksa, nomor permohonan, atau fasilitas rehab..."}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-9 pr-4 py-2 bg-slate-950/80 border border-slate-800 rounded-xl text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-blue-500"
@@ -309,7 +399,7 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
           <select
             value={filterModalitas}
             onChange={(e) => setFilterModalitas(e.target.value as any)}
-            className="px-3 py-2 bg-slate-950/80 border border-slate-800 rounded-xl text-xs text-slate-300 focus:outline-none focus:border-blue-500"
+            className="px-3 py-2 bg-slate-950/80 border border-slate-800 rounded-xl text-xs text-slate-300 focus:outline-none focus:border-blue-500 cursor-pointer"
           >
             <option value="all">Semua Layanan</option>
             <option value="Rawat Inap">Rawat Inap</option>
@@ -318,130 +408,293 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
         </div>
       </div>
 
-      {/* Summary Scorecards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="bg-slate-900/60 border border-slate-800/80 rounded-xl p-3.5">
-          <span className="text-[11px] font-semibold uppercase text-slate-400 block tracking-wider">Total Klien Diawasi</span>
-          <div className="text-xl font-bold text-slate-100 mt-1 font-mono">{totalKlienDiawasi} <span className="text-xs font-normal text-slate-400 font-sans">Orang</span></div>
-          <span className="text-[10px] text-slate-500 mt-0.5 block">Pasca rekomendasi &amp; admisi</span>
-        </div>
+      {/* TAB 1: ANTREAN KASUS SELESAI PLENO (DAFTAR YANG HARUS DITINDAKLANJUTI) */}
+      {subTab === 'antrean_pleno' && (
+        <div className="space-y-4">
+          <div className="bg-slate-900/60 border border-slate-800/80 rounded-xl p-4 sm:p-5 space-y-3 shadow-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-800/70">
+              <div>
+                <h3 className="text-xs font-semibold text-slate-200 uppercase tracking-wider flex items-center gap-2">
+                  <FileCheck2 className="w-4 h-4 text-blue-400" />
+                  <span>Daftar Kasus Selesai Sidang Pleno (Harus Ditindaklanjuti)</span>
+                </h3>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Tersangka yang telah selesai sidang pleno &amp; Berita Acara tertandatangani. Berikan surat pengantar rujukan kepada tersangka, jadwalkan kontrol, atau teruskan admisi fasilitas mitra.
+                </p>
+              </div>
+              <span className="text-xs font-mono text-slate-400 self-start sm:self-auto bg-slate-800/80 px-2.5 py-1 rounded-lg border border-slate-700/60">
+                {filteredAntreanList.length} Berkas Siap Tindak Lanjut
+              </span>
+            </div>
 
-        <div className="bg-slate-900/60 border border-slate-800/80 rounded-xl p-3.5">
-          <span className="text-[11px] font-semibold uppercase text-slate-400 block tracking-wider">Klien Patuh / Aktif</span>
-          <div className="text-xl font-bold text-emerald-400 mt-1 font-mono">{klienPatuh} <span className="text-xs font-normal text-slate-400 font-sans">Orang</span></div>
-          <span className="text-[10px] text-slate-500 mt-0.5 block">Nihil mangkir &amp; tes urin negatif</span>
-        </div>
+            {filteredAntreanList.length === 0 ? (
+              <div className="text-center py-12 text-slate-400 text-xs space-y-2">
+                <FileCheck2 className="w-8 h-8 text-slate-600 mx-auto" />
+                <p>Tidak ada berkas selesai pleno yang sesuai dengan kriteria pencarian.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-3.5">
+                {filteredAntreanList.map(item => {
+                  const kodeLacak = (item as any).kodeLacakRehab || (item.tindakLanjut as any)?.kodeLacakRehab || `RHB-${item.id.slice(-6).toUpperCase()}`;
+                  const rekomendasi = item.sidangPleno?.kesepakatanRekomendasi || 'Rehabilitasi Medis dan Sosial';
+                  const isRawatInap = rekomendasi.toLowerCase().includes('inap');
+                  const fasilitas = item.tindakLanjut?.namaFasilitasTujuan || item.sidangPleno?.fasilitasRujukanUsulan || 'Balai Besar Rehabilitasi BNN Tanah Merah';
+                  const isDiteruskan = Boolean(item.tindakLanjutDiteruskan || (item.tindakLanjut && item.tindakLanjut.statusRujukan));
 
-        <div className="bg-slate-900/60 border border-slate-800/80 rounded-xl p-3.5">
-          <span className="text-[11px] font-semibold uppercase text-slate-400 block tracking-wider">Dalam Peringatan (SP)</span>
-          <div className="text-xl font-bold text-amber-400 mt-1 font-mono">{klienPeringatan} <span className="text-xs font-normal text-slate-400 font-sans">Orang</span></div>
-          <span className="text-[10px] text-slate-500 mt-0.5 block">Mangkir sesi / evaluasi khusus</span>
-        </div>
+                  return (
+                    <div
+                      key={item.id}
+                      className="p-4 sm:p-5 bg-slate-950/60 hover:bg-slate-900/90 border border-slate-800/80 hover:border-slate-700 rounded-xl transition-all shadow-md space-y-3.5"
+                    >
+                      {/* Top Row: Client Info & Status Badges */}
+                      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                        <div className="flex items-start gap-3">
+                          <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/30 text-blue-400 font-bold text-sm flex items-center justify-center shrink-0 mt-0.5">
+                            {item.terperiksa.namaLengkap.slice(0, 2).toUpperCase()}
+                          </div>
+                          <div>
+                            <div className="flex flex-wrap items-center gap-2">
+                              <h4 className="text-sm font-bold text-white">
+                                {item.terperiksa.namaLengkap}
+                              </h4>
+                              <span className="text-[11px] font-mono text-slate-400 bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700/60">
+                                {item.nomorPermohonan}
+                              </span>
+                              {isDiteruskan ? (
+                                <span className="text-[10px] font-bold text-emerald-300 bg-emerald-950/80 border border-emerald-700/60 px-2 py-0.5 rounded-full flex items-center gap-1">
+                                  <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                                  <span>Diteruskan ke Tindak Lanjut</span>
+                                </span>
+                              ) : (
+                                <span className="text-[10px] font-bold text-amber-300 bg-amber-950/80 border border-amber-700/60 px-2 py-0.5 rounded-full flex items-center gap-1">
+                                  <Clock className="w-3 h-3 text-amber-400" />
+                                  <span>Perlu Diteruskan</span>
+                                </span>
+                              )}
+                            </div>
 
-        <div className="bg-slate-900/60 border border-slate-800/80 rounded-xl p-3.5">
-          <span className="text-[11px] font-semibold uppercase text-slate-400 block tracking-wider">Selesai Program (SKSP)</span>
-          <div className="text-xl font-bold text-blue-400 mt-1 font-mono">{klienSelesai} <span className="text-xs font-normal text-slate-400 font-sans">Orang</span></div>
-          <span className="text-[10px] text-slate-500 mt-0.5 block">Tuntas memenuhi syarat</span>
-        </div>
-      </div>
+                            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-400 mt-1">
+                              <span>NIK: <span className="text-slate-300 font-mono">{item.terperiksa.nik || '-'}</span></span>
+                              <span className="text-slate-600">•</span>
+                              <span>Usia: <span className="text-slate-300">{item.terperiksa.usia} th</span></span>
+                              <span className="text-slate-600">•</span>
+                              <span>Penyidik: <span className="text-slate-300">{item.perkara?.namaPenyidik || 'Bripka Heru Susanto'}</span></span>
+                            </div>
+                          </div>
+                        </div>
 
-      {/* DAFTAR TINDAK LANJUT */}
-      <div className="space-y-3">
-        <div className="bg-slate-900/60 border border-slate-800/80 rounded-xl p-4 sm:p-5 space-y-3 shadow-sm">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-800/70">
-            <div>
-              <h3 className="text-xs font-semibold text-slate-200 uppercase tracking-wider flex items-center gap-2">
-                <FileCheck2 className="w-4 h-4 text-slate-400" />
-                <span>Daftar Kasus Tindak Lanjut</span>
-              </h3>
-              <p className="text-xs text-slate-400 mt-0.5">
-                Pengawasan berkala klien pasca rekomendasi TAT. Buka detail untuk melihat kelengkapan admisi dan monitoring.
-              </p>
+                        {/* Kode Lacak Rehab Badge (Bisa dilacak di Portal Lacak Berkas) */}
+                        <div className="sm:self-start">
+                          <div className="flex items-center gap-2 px-3 py-1.5 bg-amber-950/40 border border-amber-500/40 rounded-xl text-xs text-amber-300 font-mono shadow-sm">
+                            <QrCode className="w-4 h-4 text-amber-400 shrink-0" />
+                            <div>
+                              <span className="text-[10px] uppercase font-sans font-semibold text-amber-400/80 block leading-tight">Kode Akses Pelacakan:</span>
+                              <strong className="text-white font-bold tracking-wider text-xs">{kodeLacak}</strong>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Middle: Kesepakatan Pleno & Usulan Rujukan */}
+                      <div className="p-3 bg-[#081224] rounded-xl border border-[#1b3459] text-xs flex flex-col md:flex-row md:items-center justify-between gap-3">
+                        <div className="space-y-1 flex-1">
+                          <div className="flex items-center gap-2">
+                            <span className="text-[10px] uppercase font-bold text-[#d4af37] tracking-wider">HASIL REKOMENDASI SIDANG PLENO TAT:</span>
+                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${isRawatInap ? 'bg-indigo-950 text-indigo-300 border-indigo-700/60' : 'bg-teal-950 text-teal-300 border-teal-700/60'}`}>
+                              {isRawatInap ? 'Rawat Inap' : 'Rawat Jalan'}
+                            </span>
+                          </div>
+                          <p className="text-slate-200 font-medium leading-relaxed">
+                            {rekomendasi}
+                          </p>
+                          <div className="flex items-center gap-2 text-slate-400 text-[11px] pt-1">
+                            <Building2 className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                            <span>Fasilitas Tujuan: <strong className="text-slate-200">{fasilitas}</strong></span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Bottom Row: Action Buttons */}
+                      <div className="flex flex-wrap items-center justify-end gap-2.5 pt-1">
+                        {/* 1. Dokumen yang Diberikan ke Tersangka (dengan Kode Lacak & QR) */}
+                        <button
+                          type="button"
+                          onClick={() => setSuratPengantarItem(item)}
+                          className="px-3.5 py-2 rounded-xl text-xs font-bold bg-[#d4af37]/20 hover:bg-[#d4af37]/30 border border-[#d4af37]/60 text-[#d4af37] hover:text-amber-200 flex items-center gap-2 transition-all cursor-pointer shadow-sm"
+                        >
+                          <FileText className="w-3.5 h-3.5 text-[#d4af37]" />
+                          <span>Dokumen Surat Tersangka</span>
+                        </button>
+
+                        {/* 2. Tombol Input Jadwal Kontrol & Lapor */}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedSchedulePermohonanId(item.id);
+                            setShowScheduleModal(true);
+                          }}
+                          className="px-3.5 py-2 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-500 text-white flex items-center gap-2 transition-all cursor-pointer shadow-md shadow-blue-950/40"
+                        >
+                          <Calendar className="w-3.5 h-3.5 text-blue-200" />
+                          <span>Input Jadwal Kontrol &amp; Lapor</span>
+                        </button>
+
+                        {/* 3. Lembar Monitoring Detail */}
+                        <button
+                          type="button"
+                          onClick={() => onSelectCase ? onSelectCase(item.id) : onSelectPermohonan(item.id)}
+                          className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white border border-slate-700 flex items-center gap-1.5 transition-all cursor-pointer"
+                        >
+                          <span>Lembar Monitoring</span>
+                          <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* TAB 2: MONITORING PENGAWASAN KLIEN AKTIF */}
+      {subTab === 'monitoring' && (
+        <>
+          {/* Summary Scorecards */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="bg-slate-900/60 border border-slate-800/80 rounded-xl p-3.5">
+              <span className="text-[11px] font-semibold uppercase text-slate-400 block tracking-wider">Total Klien Diawasi</span>
+              <div className="text-xl font-bold text-slate-100 mt-1 font-mono">{totalKlienDiawasi} <span className="text-xs font-normal text-slate-400 font-sans">Orang</span></div>
+              <span className="text-[10px] text-slate-500 mt-0.5 block">Pasca rekomendasi &amp; admisi</span>
+            </div>
+
+            <div className="bg-slate-900/60 border border-slate-800/80 rounded-xl p-3.5">
+              <span className="text-[11px] font-semibold uppercase text-slate-400 block tracking-wider">Klien Patuh / Aktif</span>
+              <div className="text-xl font-bold text-emerald-400 mt-1 font-mono">{klienPatuh} <span className="text-xs font-normal text-slate-400 font-sans">Orang</span></div>
+              <span className="text-[10px] text-slate-500 mt-0.5 block">Nihil mangkir &amp; tes urin negatif</span>
+            </div>
+
+            <div className="bg-slate-900/60 border border-slate-800/80 rounded-xl p-3.5">
+              <span className="text-[11px] font-semibold uppercase text-slate-400 block tracking-wider">Dalam Peringatan (SP)</span>
+              <div className="text-xl font-bold text-amber-400 mt-1 font-mono">{klienPeringatan} <span className="text-xs font-normal text-slate-400 font-sans">Orang</span></div>
+              <span className="text-[10px] text-slate-500 mt-0.5 block">Mangkir sesi / evaluasi khusus</span>
+            </div>
+
+            <div className="bg-slate-900/60 border border-slate-800/80 rounded-xl p-3.5">
+              <span className="text-[11px] font-semibold uppercase text-slate-400 block tracking-wider">Selesai Program (SKSP)</span>
+              <div className="text-xl font-bold text-blue-400 mt-1 font-mono">{klienSelesai} <span className="text-xs font-normal text-slate-400 font-sans">Orang</span></div>
+              <span className="text-[10px] text-slate-500 mt-0.5 block">Tuntas memenuhi syarat</span>
             </div>
           </div>
 
-          {filteredList.length === 0 ? (
-            <div className="text-center py-10 text-slate-400 text-xs">
-              Tidak ada data klien yang sesuai dengan pencarian.
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 gap-2.5">
-              {filteredList.map(item => {
-                const modalitas = item.pengawasanKlien?.modalitasLayanan || item.asesmenMedis?.kebutuhanRawat || 'Rawat Jalan';
-                const status = item.tindakLanjut?.statusMonitoring || (item.pengawasanKlien ? 'Dalam Pengawasan' : 'Menunggu Pelaksanaan');
-                const fasilitas = item.pengawasanKlien?.instansiPelaksanaRehab || item.monitoringTindakLanjut?.pelaksanaanRehab?.namaFasilitasRehab || item.tindakLanjut?.namaFasilitasTujuan || '-';
+          {/* DAFTAR TINDAK LANJUT */}
+          <div className="space-y-3">
+            <div className="bg-slate-900/60 border border-slate-800/80 rounded-xl p-4 sm:p-5 space-y-3 shadow-sm">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-800/70">
+                <div>
+                  <h3 className="text-xs font-semibold text-slate-200 uppercase tracking-wider flex items-center gap-2">
+                    <FileCheck2 className="w-4 h-4 text-slate-400" />
+                    <span>Daftar Kasus Monitoring Pengawasan</span>
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    Pengawasan berkala klien pasca rekomendasi TAT. Buka detail untuk melihat kelengkapan admisi dan monitoring.
+                  </p>
+                </div>
+              </div>
 
-                return (
-                  <div
-                    key={item.id}
-                    className="group flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 bg-slate-950/50 hover:bg-slate-900/80 border border-slate-800/70 hover:border-slate-700/90 rounded-xl transition-all shadow-sm"
-                  >
-                    {/* Left: Client info & Badges */}
-                    <div className="flex items-start gap-3.5 min-w-0 flex-1">
-                      <div className="w-9 h-9 rounded-lg bg-slate-800/80 border border-slate-700/60 flex items-center justify-center text-slate-300 font-bold text-xs shrink-0 mt-0.5 group-hover:border-slate-600 transition-colors">
-                        {item.terperiksa.namaLengkap.slice(0, 2).toUpperCase()}
-                      </div>
+              {filteredList.length === 0 ? (
+                <div className="text-center py-10 text-slate-400 text-xs">
+                  Tidak ada data klien yang sesuai dengan pencarian.
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 gap-2.5">
+                  {filteredList.map(item => {
+                    const modalitas = item.pengawasanKlien?.modalitasLayanan || item.asesmenMedis?.kebutuhanRawat || 'Rawat Jalan';
+                    const status = item.tindakLanjut?.statusMonitoring || (item.pengawasanKlien ? 'Dalam Pengawasan' : 'Menunggu Pelaksanaan');
+                    const fasilitas = item.pengawasanKlien?.instansiPelaksanaRehab || item.monitoringTindakLanjut?.pelaksanaanRehab?.namaFasilitasRehab || item.tindakLanjut?.namaFasilitasTujuan || '-';
 
-                      <div className="space-y-1.5 min-w-0 flex-1">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <h4 className="text-sm font-semibold text-slate-100 group-hover:text-white transition-colors">
-                            {item.terperiksa.namaLengkap}
-                          </h4>
-                          <span className="text-[11px] font-mono text-slate-400 bg-slate-800/60 px-2 py-0.5 rounded border border-slate-700/50">
-                            {item.nomorPermohonan}
-                          </span>
-                        </div>
-
-                        <div className="flex flex-wrap items-center gap-y-1 gap-x-2.5 text-xs text-slate-400">
-                          <span>NIK: <span className="text-slate-300 font-mono">{item.terperiksa.nik || '-'}</span></span>
-                          <span className="text-slate-600">•</span>
-                          <span>Usia: <span className="text-slate-300">{item.terperiksa.usia} th</span></span>
-                          {fasilitas !== '-' && (
-                            <>
-                              <span className="text-slate-600">•</span>
-                              <span className="truncate max-w-[240px] text-slate-300 flex items-center gap-1">
-                                <Building2 className="w-3 h-3 text-slate-400 shrink-0" />
-                                {fasilitas}
-                              </span>
-                            </>
-                          )}
-                        </div>
-
-                        <div className="flex flex-wrap items-center gap-2 pt-0.5">
-                          <span className="text-[11px] font-medium bg-slate-800 text-slate-300 px-2.5 py-0.5 rounded-md border border-slate-700/60">
-                            {modalitas}
-                          </span>
-                          <span className="text-[11px] font-medium bg-slate-800/80 text-slate-300 px-2.5 py-0.5 rounded-md border border-slate-700/60 flex items-center gap-1.5">
-                            <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
-                            {status.replace(/_/g, ' ')}
-                          </span>
-                          {item.pengawasanKlien && (
-                            <span className="text-[11px] text-slate-400 bg-slate-800/40 px-2 py-0.5 rounded border border-slate-800/80">
-                              {item.pengawasanKlien.sesiTerselesaikan}/{item.pengawasanKlien.totalSesiWajib} Sesi
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Right: Subdued action button */}
-                    <div className="flex items-center justify-end shrink-0 pt-2 md:pt-0 border-t md:border-t-0 border-slate-800/60">
-                      <button
-                        type="button"
-                        onClick={() => onSelectCase ? onSelectCase(item.id) : onSelectPermohonan(item.id)}
-                        className="w-full md:w-auto px-4 py-2 bg-slate-800 hover:bg-slate-700/90 active:bg-slate-700 text-slate-200 hover:text-white border border-slate-700/80 hover:border-slate-600 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-sm"
+                    return (
+                      <div
+                        key={item.id}
+                        className="group flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 bg-slate-950/50 hover:bg-slate-900/80 border border-slate-800/70 hover:border-slate-700/90 rounded-xl transition-all shadow-sm"
                       >
-                        <span>Buka Detail</span>
-                        <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
+                        {/* Left: Client info & Badges */}
+                        <div className="flex items-start gap-3.5 min-w-0 flex-1">
+                          <div className="w-9 h-9 rounded-lg bg-slate-800/80 border border-slate-700/60 flex items-center justify-center text-slate-300 font-bold text-xs shrink-0 mt-0.5 group-hover:border-slate-600 transition-colors">
+                            {item.terperiksa.namaLengkap.slice(0, 2).toUpperCase()}
+                          </div>
+
+                          <div className="space-y-1.5 min-w-0 flex-1">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <h4 className="text-sm font-semibold text-slate-100 group-hover:text-white transition-colors">
+                                {item.terperiksa.namaLengkap}
+                              </h4>
+                              <span className="text-[11px] font-mono text-slate-400 bg-slate-800/60 px-2 py-0.5 rounded border border-slate-700/50">
+                                {item.nomorPermohonan}
+                              </span>
+                            </div>
+
+                            <div className="flex flex-wrap items-center gap-y-1 gap-x-2.5 text-xs text-slate-400">
+                              <span>NIK: <span className="text-slate-300 font-mono">{item.terperiksa.nik || '-'}</span></span>
+                              <span className="text-slate-600">•</span>
+                              <span>Usia: <span className="text-slate-300">{item.terperiksa.usia} th</span></span>
+                              {fasilitas !== '-' && (
+                                <>
+                                  <span className="text-slate-600">•</span>
+                                  <span className="truncate max-w-[240px] text-slate-300 flex items-center gap-1">
+                                    <Building2 className="w-3 h-3 text-slate-400 shrink-0" />
+                                    {fasilitas}
+                                  </span>
+                                </>
+                              )}
+                            </div>
+
+                            <div className="flex flex-wrap items-center gap-2 pt-0.5">
+                              <span className="text-[11px] font-medium bg-slate-800 text-slate-300 px-2.5 py-0.5 rounded-md border border-slate-700/60">
+                                {modalitas}
+                              </span>
+                              <span className="text-[11px] font-medium bg-slate-800/80 text-slate-300 px-2.5 py-0.5 rounded-md border border-slate-700/60 flex items-center gap-1.5">
+                                <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+                                {status.replace(/_/g, ' ')}
+                              </span>
+                              {item.pengawasanKlien && (
+                                <span className="text-[11px] text-slate-400 bg-slate-800/40 px-2 py-0.5 rounded border border-slate-800/80">
+                                  {item.pengawasanKlien.sesiTerselesaikan}/{item.pengawasanKlien.totalSesiWajib} Sesi
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Right: Action buttons */}
+                        <div className="flex items-center justify-end gap-2 shrink-0 pt-2 md:pt-0 border-t md:border-t-0 border-slate-800/60">
+                          <button
+                            type="button"
+                            onClick={() => setSuratPengantarItem(item)}
+                            className="px-3 py-1.5 rounded-lg text-xs font-medium bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1.5 transition-all cursor-pointer"
+                          >
+                            <FileText className="w-3.5 h-3.5" />
+                            <span>Surat Tersangka</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => onSelectCase ? onSelectCase(item.id) : onSelectPermohonan(item.id)}
+                            className="px-3.5 py-1.5 bg-slate-800 hover:bg-slate-700/90 active:bg-slate-700 text-slate-200 hover:text-white border border-slate-700/80 hover:border-slate-600 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-sm"
+                          >
+                            <span>Buka Detail</span>
+                            <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
-          )}
-        </div>
-      </div>
+          </div>
+        </>
+      )}
 
 
 

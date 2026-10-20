@@ -124,21 +124,29 @@ export const TabAsesmenMedis: React.FC<TabAsesmenMedisProps> = ({
       fasilitasRujukan: form.fasilitasRujukan,
     };
 
+    const targetHukum = permohonan.timAsesmen?.asesorHukumNama || 'Ahmad Fauzi, S.H., M.H. (Kejaksaan Tinggi Kaltim)';
+
     const updatedPermohonan: PermohonanAsesmen = {
       ...permohonan,
       asesmenMedis: updatedMedis as any,
+      medicalStatus: isFinal ? 'FINAL' : permohonan.medicalStatus,
       statusProsesUtama: isFinal
-        ? (permohonan.asesmenHukum?.status === 'FINAL' ? 'siap_pleno' : 'medis_selesai')
+        ? (permohonan.asesmenHukum?.status === 'FINAL' ? 'siap_pleno' : 'telaah_hukum')
         : permohonan.statusProsesUtama,
+      timAsesmen: {
+        ...(permohonan.timAsesmen as any),
+        dikirimKeHukum: isFinal ? true : permohonan.timAsesmen?.dikirimKeHukum,
+        tanggalKirimHukum: isFinal ? now : permohonan.timAsesmen?.tanggalKirimHukum,
+      },
       auditLogs: [
         {
           id: 'aud-' + Date.now(),
           timestamp: now,
           actorNama: currentUser.name,
           actorPeran: currentUser.role,
-          aksi: isFinal ? 'Finalisasi Rekam Medis TAT' : 'Simpan Draf Rekam Medis',
+          aksi: isFinal ? 'Finalisasi Rekam Medis & Teruskan ke Hukum' : 'Simpan Draf Rekam Medis',
           rincian: isFinal
-            ? `Asesmen medis difinalisasi. Diagnosis: ${form.diagnosisKlinisIcd}, Usulan: ${form.kebutuhanRawat} (${form.durasiUsulanBulan} Bulan).`
+            ? `Asesmen medis difinalisasi oleh ${currentUser.name}. Berkas secara otomatis diteruskan kepada Penelaah Hukum (${targetHukum}) sesuai penugasan dari Admin.`
             : `Draf medis diperbarui oleh ${currentUser.name}.`
         },
         ...(permohonan.auditLogs || [])
@@ -178,14 +186,24 @@ export const TabAsesmenMedis: React.FC<TabAsesmenMedisProps> = ({
 
         if (isFinal) {
           await asesmenMedisApi.finalisasi(permohonan.id, payload);
-          setFeedback('Asesmen Medis Berhasil Difinalisasi & Disimpan di Database!');
+          setFeedback(`Asesmen Medis Berhasil Difinalisasi! Berkas secara otomatis dilanjutkan ke Penelaah Hukum: ${targetHukum}.`);
+          setTimeout(() => {
+            onNavigateTab('hukum');
+          }, 1200);
         } else {
           await asesmenMedisApi.saveDraft(permohonan.id, payload);
           setFeedback('Draf Asesmen Medis Berhasil Disimpan di Database!');
         }
       } catch (err) {
         console.warn('Backend asesmenMedisApi notice:', err);
-        setFeedback(isFinal ? 'Asesmen Medis disimpan secara lokal (Backend fallback).' : 'Draf tersimpan secara lokal.');
+        setFeedback(isFinal 
+          ? `Asesmen Medis disimpan (Lokal). Berkas diteruskan ke Penelaah Hukum: ${targetHukum}.`
+          : 'Draf tersimpan secara lokal.');
+        if (isFinal) {
+          setTimeout(() => {
+            onNavigateTab('hukum');
+          }, 1200);
+        }
       }
     }
 
@@ -494,10 +512,10 @@ export const TabAsesmenMedis: React.FC<TabAsesmenMedisProps> = ({
               type="button"
               disabled={isSaving}
               onClick={() => handleSave(true)}
-              className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition-all shadow-lg shadow-emerald-950/40 flex items-center space-x-1.5 cursor-pointer disabled:opacity-50"
+              className="px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-xl text-xs font-bold transition-all shadow-lg shadow-emerald-950/40 flex items-center space-x-1.5 cursor-pointer disabled:opacity-50"
             >
               <CheckCircle2 className="w-4 h-4 text-emerald-200" />
-              <span>{isSaving ? 'Menyimpan...' : 'Finalisasi Asesmen Medis'}</span>
+              <span>{isSaving ? 'Menyimpan...' : 'Finalisasi & Teruskan ke Tim Hukum'}</span>
             </button>
           </div>
         )}

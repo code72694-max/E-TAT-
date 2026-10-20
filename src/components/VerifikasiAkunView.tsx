@@ -119,6 +119,9 @@ export const VerifikasiAkunView: React.FC<VerifikasiAkunViewProps> = ({
   const [newUserPosition, setNewUserPosition] = useState('');
   const [newUserPhone, setNewUserPhone] = useState('');
 
+  // Loading state for button actions (approve, reject, reset)
+  const [actionLoading, setActionLoading] = useState<{ id: string; action: 'approve' | 'reject' | 'reset' } | null>(null);
+
   // Stats
   const pendingRegistrations = registrations.filter(r => r.status === 'pending');
   const approvedRegistrations = registrations.filter(r => r.status === 'approved');
@@ -130,6 +133,9 @@ export const VerifikasiAkunView: React.FC<VerifikasiAkunViewProps> = ({
   };
 
   const handleApprove = async (reg: RegistrasiPengguna) => {
+    if (actionLoading) return;
+    setActionLoading({ id: reg.id, action: 'approve' });
+
     const verifikatorName = currentUser ? `${currentUser.name} (${currentUser.role.toUpperCase()})` : 'Sekretariat TAT POLRI';
     const note = reg.catatanAdmin || 'Dokumen KTP, KTA, dan Surat Penunjukan telah diverifikasi sah & valid.';
     
@@ -146,8 +152,12 @@ export const VerifikasiAkunView: React.FC<VerifikasiAkunViewProps> = ({
       if (res.data) {
         updated = { ...updated, ...res.data };
       }
+      // Brief visual delay so loading animation is clearly visible
+      await new Promise(r => setTimeout(r, 450));
     } catch (err) {
       console.warn('Backend approve error, using state:', err);
+    } finally {
+      setActionLoading(null);
     }
 
     if (onApproveRegistration) {
@@ -165,7 +175,9 @@ export const VerifikasiAkunView: React.FC<VerifikasiAkunViewProps> = ({
   };
 
   const handleConfirmReject = async () => {
-    if (!rejectModalTarget) return;
+    if (!rejectModalTarget || actionLoading) return;
+
+    setActionLoading({ id: rejectModalTarget.id, action: 'reject' });
 
     const note = rejectReasonInput.trim() || 'Dokumen persyaratan dinas tidak lengkap atau tidak valid.';
     let updated: RegistrasiPengguna = {
@@ -179,8 +191,11 @@ export const VerifikasiAkunView: React.FC<VerifikasiAkunViewProps> = ({
       if (res.data) {
         updated = { ...updated, ...res.data };
       }
+      await new Promise(r => setTimeout(r, 450));
     } catch (err) {
       console.warn('Backend reject error, using state:', err);
+    } finally {
+      setActionLoading(null);
     }
 
     onUpdateRegistration(updated);
@@ -190,7 +205,10 @@ export const VerifikasiAkunView: React.FC<VerifikasiAkunViewProps> = ({
     setRejectReasonInput('');
   };
 
-  const handleResetToPending = (reg: RegistrasiPengguna) => {
+  const handleResetToPending = async (reg: RegistrasiPengguna) => {
+    if (actionLoading) return;
+    setActionLoading({ id: reg.id, action: 'reset' });
+
     const updated: RegistrasiPengguna = {
       ...reg,
       status: 'pending',
@@ -198,6 +216,12 @@ export const VerifikasiAkunView: React.FC<VerifikasiAkunViewProps> = ({
       approvedBy: undefined,
       catatanAdmin: undefined
     };
+
+    try {
+      await new Promise(r => setTimeout(r, 400));
+    } finally {
+      setActionLoading(null);
+    }
 
     onUpdateRegistration(updated);
 
@@ -374,7 +398,8 @@ export const VerifikasiAkunView: React.FC<VerifikasiAkunViewProps> = ({
             {selectedRegDetail.status === 'approved' && (
               <button
                 onClick={() => handleOpenRejectModal(selectedRegDetail)}
-                className="px-4 py-2 bg-[#26161b] hover:bg-[#341b24] text-rose-300 hover:text-rose-200 rounded-xl text-xs font-semibold border border-rose-800/50 cursor-pointer flex items-center space-x-1.5 shadow-sm"
+                disabled={Boolean(actionLoading)}
+                className="px-4 py-2 bg-[#26161b] hover:bg-[#341b24] text-rose-300 hover:text-rose-200 rounded-xl text-xs font-semibold border border-rose-800/50 cursor-pointer flex items-center space-x-1.5 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all"
               >
                 <UserX className="w-4 h-4" />
                 <span>Nonaktifkan Akun</span>
@@ -386,14 +411,25 @@ export const VerifikasiAkunView: React.FC<VerifikasiAkunViewProps> = ({
               <>
                 <button
                   onClick={() => handleApprove(selectedRegDetail)}
-                  className="px-4 py-2 bg-[#17382d] hover:bg-[#1e473a] text-emerald-300 hover:text-emerald-200 rounded-xl text-xs font-semibold border border-emerald-700/50 cursor-pointer flex items-center space-x-1.5 shadow-sm"
+                  disabled={Boolean(actionLoading)}
+                  className="px-4 py-2 bg-[#17382d] hover:bg-[#1e473a] text-emerald-300 hover:text-emerald-200 rounded-xl text-xs font-semibold border border-emerald-700/50 cursor-pointer flex items-center space-x-1.5 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                 >
-                  <CheckCircle2 className="w-4 h-4" />
-                  <span>Setujui Akun</span>
+                  {actionLoading?.id === selectedRegDetail.id && actionLoading.action === 'approve' ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin text-emerald-300" />
+                      <span>Menyetujui Akun...</span>
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle2 className="w-4 h-4" />
+                      <span>Setujui Akun</span>
+                    </>
+                  )}
                 </button>
                 <button
                   onClick={() => handleOpenRejectModal(selectedRegDetail)}
-                  className="px-4 py-2 bg-[#26161b] hover:bg-[#341b24] text-rose-300 hover:text-rose-200 rounded-xl text-xs font-semibold border border-rose-800/50 cursor-pointer flex items-center space-x-1.5 shadow-sm"
+                  disabled={Boolean(actionLoading)}
+                  className="px-4 py-2 bg-[#26161b] hover:bg-[#341b24] text-rose-300 hover:text-rose-200 rounded-xl text-xs font-semibold border border-rose-800/50 cursor-pointer flex items-center space-x-1.5 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                 >
                   <XCircle className="w-4 h-4" />
                   <span>Tolak Pendaftaran</span>
@@ -405,10 +441,20 @@ export const VerifikasiAkunView: React.FC<VerifikasiAkunViewProps> = ({
             {selectedRegDetail.status === 'rejected' && (
               <button
                 onClick={() => handleApprove(selectedRegDetail)}
-                className="px-4 py-2 bg-[#17382d] hover:bg-[#1e473a] text-emerald-300 hover:text-emerald-200 rounded-xl text-xs font-semibold border border-emerald-700/50 cursor-pointer flex items-center space-x-1.5 shadow-sm"
+                disabled={Boolean(actionLoading)}
+                className="px-4 py-2 bg-[#17382d] hover:bg-[#1e473a] text-emerald-300 hover:text-emerald-200 rounded-xl text-xs font-semibold border border-emerald-700/50 cursor-pointer flex items-center space-x-1.5 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all"
               >
-                <CheckCircle2 className="w-4 h-4" />
-                <span>Aktifkan Kembali</span>
+                {actionLoading?.id === selectedRegDetail.id && actionLoading.action === 'approve' ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin text-emerald-300" />
+                    <span>Mengaktifkan Kembali...</span>
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle2 className="w-4 h-4" />
+                    <span>Aktifkan Kembali</span>
+                  </>
+                )}
               </button>
             )}
           </div>
@@ -546,53 +592,90 @@ export const VerifikasiAkunView: React.FC<VerifikasiAkunViewProps> = ({
                 {/* KTA */}
                 <div className="bg-[#060e1a] border border-[#1a2e4c] rounded-xl p-3 space-y-2">
                   <div className="flex items-center justify-between text-xs font-semibold text-slate-300">
-                    <span>KTA Kedinasan</span>
+                    <div className="flex items-center space-x-1.5">
+                      <span>KTA Kedinasan</span>
+                      {!selectedRegDetail.fotoKtaUrl && (
+                        <span className="text-[9px] px-1.5 py-0.2 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded font-normal">
+                          Sampel
+                        </span>
+                      )}
+                    </div>
                     <button
-                      onClick={() => setPreviewImage({ url: selectedRegDetail.fotoKtaUrl, title: `KTA: ${selectedRegDetail.namaLengkap}` })}
+                      onClick={() => setPreviewImage({
+                        url: selectedRegDetail.fotoKtaUrl || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1200&auto=format&fit=crop&q=80',
+                        title: `KTA Kedinasan: ${selectedRegDetail.namaLengkap}`
+                      })}
                       className="text-slate-400 hover:text-white cursor-pointer"
                     >
                       <ZoomIn className="w-4 h-4" />
                     </button>
                   </div>
                   <div
-                    onClick={() => setPreviewImage({ url: selectedRegDetail.fotoKtaUrl, title: `KTA: ${selectedRegDetail.namaLengkap}` })}
-                    className="h-28 rounded-lg bg-[#0c1a30] overflow-hidden cursor-pointer border border-[#1a2e4c]"
+                    onClick={() => setPreviewImage({
+                      url: selectedRegDetail.fotoKtaUrl || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1200&auto=format&fit=crop&q=80',
+                      title: `KTA Kedinasan: ${selectedRegDetail.namaLengkap}`
+                    })}
+                    className="h-28 rounded-lg bg-[#0c1a30] overflow-hidden cursor-pointer border border-[#1a2e4c] group relative"
                   >
                     <img
                       src={selectedRegDetail.fotoKtaUrl || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&auto=format&fit=crop&q=80'}
                       alt="KTA"
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
                     />
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                      <ZoomIn className="w-5 h-5 text-white" />
+                    </div>
                   </div>
                 </div>
 
                 {/* KTP */}
                 <div className="bg-[#060e1a] border border-[#1a2e4c] rounded-xl p-3 space-y-2">
                   <div className="flex items-center justify-between text-xs font-semibold text-slate-300">
-                    <span>KTP Sipil</span>
+                    <div className="flex items-center space-x-1.5">
+                      <span>KTP Sipil</span>
+                      {!selectedRegDetail.fotoKtpUrl && (
+                        <span className="text-[9px] px-1.5 py-0.2 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded font-normal">
+                          Sampel
+                        </span>
+                      )}
+                    </div>
                     <button
-                      onClick={() => setPreviewImage({ url: selectedRegDetail.fotoKtpUrl, title: `KTP: ${selectedRegDetail.namaLengkap}` })}
+                      onClick={() => setPreviewImage({
+                        url: selectedRegDetail.fotoKtpUrl || 'https://images.unsplash.com/photo-1544717305-2782549b5136?w=1200&auto=format&fit=crop&q=80',
+                        title: `KTP Sipil: ${selectedRegDetail.namaLengkap}`
+                      })}
                       className="text-slate-400 hover:text-white cursor-pointer"
                     >
                       <ZoomIn className="w-4 h-4" />
                     </button>
                   </div>
                   <div
-                    onClick={() => setPreviewImage({ url: selectedRegDetail.fotoKtpUrl, title: `KTP: ${selectedRegDetail.namaLengkap}` })}
-                    className="h-28 rounded-lg bg-[#0c1a30] overflow-hidden cursor-pointer border border-[#1a2e4c]"
+                    onClick={() => setPreviewImage({
+                      url: selectedRegDetail.fotoKtpUrl || 'https://images.unsplash.com/photo-1544717305-2782549b5136?w=1200&auto=format&fit=crop&q=80',
+                      title: `KTP Sipil: ${selectedRegDetail.namaLengkap}`
+                    })}
+                    className="h-28 rounded-lg bg-[#0c1a30] overflow-hidden cursor-pointer border border-[#1a2e4c] group relative"
                   >
                     <img
                       src={selectedRegDetail.fotoKtpUrl || 'https://images.unsplash.com/photo-1544717305-2782549b5136?w=600&auto=format&fit=crop&q=80'}
                       alt="KTP"
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
                     />
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                      <ZoomIn className="w-5 h-5 text-white" />
+                    </div>
                   </div>
                 </div>
 
                 {/* Surat Penunjukan */}
                 <div className="bg-[#060e1a] border border-[#1a2e4c] rounded-xl p-3 space-y-2 flex flex-col justify-between">
-                  <div className="text-xs font-semibold text-slate-300">
-                    Surat Penunjukan
+                  <div className="flex items-center justify-between text-xs font-semibold text-slate-300">
+                    <span>Surat Penunjukan</span>
+                    {!selectedRegDetail.suratPenunjukanUrl && (
+                      <span className="text-[9px] px-1.5 py-0.2 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded font-normal">
+                        Sampel
+                      </span>
+                    )}
                   </div>
                   <div className="text-center py-3">
                     <FileText className="w-8 h-8 text-slate-400 mx-auto" />
@@ -601,7 +684,7 @@ export const VerifikasiAkunView: React.FC<VerifikasiAkunViewProps> = ({
                     </span>
                   </div>
                   <a
-                    href={selectedRegDetail.suratPenunjukanUrl || '#'}
+                    href={selectedRegDetail.suratPenunjukanUrl || 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf'}
                     target="_blank"
                     rel="noreferrer"
                     className="w-full py-2 bg-[#142642] hover:bg-[#1b3459] text-slate-200 text-center rounded-lg text-xs font-semibold border border-[#234475] flex items-center justify-center space-x-1.5 cursor-pointer"
@@ -723,15 +806,28 @@ export const VerifikasiAkunView: React.FC<VerifikasiAkunViewProps> = ({
               <div className="flex items-center justify-end space-x-2 pt-1">
                 <button
                   onClick={() => setRejectModalTarget(null)}
-                  className="px-3 py-1.5 bg-[#142642] text-slate-300 hover:text-white rounded-lg text-xs cursor-pointer"
+                  disabled={Boolean(actionLoading)}
+                  className="px-3 py-1.5 bg-[#142642] text-slate-300 hover:text-white rounded-lg text-xs cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   Batal
                 </button>
                 <button
                   onClick={handleConfirmReject}
-                  className="px-3.5 py-1.5 bg-rose-900/80 hover:bg-rose-800 text-rose-200 rounded-lg text-xs font-semibold cursor-pointer"
+                  disabled={Boolean(actionLoading)}
+                  className="px-3.5 py-1.5 bg-rose-900/80 hover:bg-rose-800 text-rose-200 rounded-lg text-xs font-semibold cursor-pointer flex items-center space-x-1.5 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
-                  {rejectModalTarget.status === 'approved' ? 'Konfirmasi Nonaktifkan' : 'Konfirmasi Tolak'}
+                  {actionLoading?.id === rejectModalTarget.id && actionLoading.action === 'reject' ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin text-rose-200" />
+                      <span>
+                        {rejectModalTarget.status === 'approved' ? 'Menonaktifkan...' : 'Menolak...'}
+                      </span>
+                    </>
+                  ) : (
+                    <span>
+                      {rejectModalTarget.status === 'approved' ? 'Konfirmasi Nonaktifkan' : 'Konfirmasi Tolak'}
+                    </span>
+                  )}
                 </button>
               </div>
             </div>
@@ -742,20 +838,50 @@ export const VerifikasiAkunView: React.FC<VerifikasiAkunViewProps> = ({
         {previewImage && (
           <div
             onClick={() => setPreviewImage(null)}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-sm cursor-zoom-out"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-sm cursor-zoom-out animate-in fade-in duration-150"
           >
             <div
               onClick={(e) => e.stopPropagation()}
-              className="bg-[#091426] border border-[#1a2e4c] rounded-xl max-w-xl w-full p-3.5 space-y-2 shadow-2xl cursor-default"
+              className="bg-[#091426] border border-[#1a2e4c] rounded-2xl max-w-2xl w-full p-4 space-y-3 shadow-2xl cursor-default animate-in zoom-in-95 duration-150"
             >
-              <div className="flex items-center justify-between pb-1.5 border-b border-[#1a2e4c]">
-                <span className="text-xs font-semibold text-slate-200">{previewImage.title}</span>
-                <button onClick={() => setPreviewImage(null)} className="text-slate-400 hover:text-white">
-                  <X className="w-4 h-4" />
-                </button>
+              <div className="flex items-center justify-between pb-2 border-b border-[#1a2e4c]">
+                <span className="text-xs font-semibold text-slate-200 truncate pr-2">{previewImage.title}</span>
+                <div className="flex items-center space-x-1.5 shrink-0">
+                  {previewImage.url && (
+                    <a
+                      href={previewImage.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-1.5 text-slate-400 hover:text-white hover:bg-[#142642] rounded-lg transition-colors cursor-pointer"
+                      title="Buka Gambar Penuh di Tab Baru"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                    </a>
+                  )}
+                  <button
+                    onClick={() => setPreviewImage(null)}
+                    className="p-1.5 text-slate-400 hover:text-white hover:bg-[#142642] rounded-lg transition-colors cursor-pointer"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
-              <div className="max-h-[70vh] rounded bg-black flex items-center justify-center overflow-hidden">
-                <img src={previewImage.url} alt="Preview" className="max-h-[65vh] w-auto object-contain" />
+              <div className="min-h-[260px] max-h-[75vh] rounded-xl bg-[#060e1a] border border-[#1a2e4c] flex items-center justify-center overflow-hidden p-2">
+                {previewImage.url ? (
+                  <img
+                    src={previewImage.url}
+                    alt={previewImage.title || 'Preview'}
+                    className="max-h-[70vh] w-auto max-w-full object-contain rounded-lg shadow-lg"
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).src = 'https://images.unsplash.com/photo-1544717305-2782549b5136?w=1200&auto=format&fit=crop&q=80';
+                    }}
+                  />
+                ) : (
+                  <div className="text-center py-10 space-y-2">
+                    <FileText className="w-10 h-10 text-slate-500 mx-auto" />
+                    <p className="text-xs text-slate-400">File dokumen tidak tersedia</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -922,7 +1048,8 @@ export const VerifikasiAkunView: React.FC<VerifikasiAkunViewProps> = ({
                   <div className="flex items-center space-x-2 shrink-0 md:justify-end pt-2 md:pt-0 border-t md:border-t-0 border-[#1a2e4c]" onClick={(e) => e.stopPropagation()}>
                     <button
                       onClick={() => handleSelectRegistration(reg.id)}
-                      className="px-3 py-1.5 bg-[#142642] hover:bg-[#1b3459] text-slate-200 hover:text-white text-xs font-medium rounded-lg border border-[#234475] transition-colors cursor-pointer flex items-center space-x-1.5"
+                      disabled={Boolean(actionLoading)}
+                      className="px-3 py-1.5 bg-[#142642] hover:bg-[#1b3459] text-slate-200 hover:text-white text-xs font-medium rounded-lg border border-[#234475] transition-colors cursor-pointer flex items-center space-x-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <Eye className="w-3.5 h-3.5 text-slate-400" />
                       <span>Detail</span>
@@ -930,15 +1057,26 @@ export const VerifikasiAkunView: React.FC<VerifikasiAkunViewProps> = ({
 
                     <button
                       onClick={() => handleApprove(reg)}
-                      className="px-3 py-1.5 bg-[#17382d] hover:bg-[#1e473a] text-emerald-300 hover:text-emerald-200 text-xs font-semibold rounded-lg border border-emerald-700/50 transition-colors cursor-pointer flex items-center space-x-1"
+                      disabled={Boolean(actionLoading)}
+                      className="px-3 py-1.5 bg-[#17382d] hover:bg-[#1e473a] text-emerald-300 hover:text-emerald-200 text-xs font-semibold rounded-lg border border-emerald-700/50 transition-colors cursor-pointer flex items-center space-x-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      <CheckCircle2 className="w-3.5 h-3.5" />
-                      <span>Setujui</span>
+                      {actionLoading?.id === reg.id && actionLoading.action === 'approve' ? (
+                        <>
+                          <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-300" />
+                          <span>Menyetujui...</span>
+                        </>
+                      ) : (
+                        <>
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                          <span>Setujui</span>
+                        </>
+                      )}
                     </button>
 
                     <button
                       onClick={() => handleOpenRejectModal(reg)}
-                      className="px-3 py-1.5 bg-[#26161b] hover:bg-[#341b24] text-rose-300 hover:text-rose-200 text-xs font-semibold rounded-lg border border-rose-800/50 transition-colors cursor-pointer flex items-center space-x-1"
+                      disabled={Boolean(actionLoading)}
+                      className="px-3 py-1.5 bg-[#26161b] hover:bg-[#341b24] text-rose-300 hover:text-rose-200 text-xs font-semibold rounded-lg border border-rose-800/50 transition-colors cursor-pointer flex items-center space-x-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <XCircle className="w-3.5 h-3.5" />
                       <span>Tolak</span>
@@ -1141,15 +1279,28 @@ export const VerifikasiAkunView: React.FC<VerifikasiAkunViewProps> = ({
             <div className="flex items-center justify-end space-x-2 pt-1">
               <button
                 onClick={() => setRejectModalTarget(null)}
-                className="px-3 py-1.5 bg-[#142642] text-slate-300 hover:text-white rounded-lg text-xs cursor-pointer"
+                disabled={Boolean(actionLoading)}
+                className="px-3 py-1.5 bg-[#142642] text-slate-300 hover:text-white rounded-lg text-xs cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 Batal
               </button>
               <button
                 onClick={handleConfirmReject}
-                className="px-3.5 py-1.5 bg-rose-900/80 hover:bg-rose-800 text-rose-200 rounded-lg text-xs font-semibold cursor-pointer"
+                disabled={Boolean(actionLoading)}
+                className="px-3.5 py-1.5 bg-rose-900/80 hover:bg-rose-800 text-rose-200 rounded-lg text-xs font-semibold cursor-pointer flex items-center space-x-1.5 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                {rejectModalTarget.status === 'approved' ? 'Konfirmasi Nonaktifkan' : 'Konfirmasi Tolak'}
+                {actionLoading?.id === rejectModalTarget.id && actionLoading.action === 'reject' ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin text-rose-200" />
+                    <span>
+                      {rejectModalTarget.status === 'approved' ? 'Menonaktifkan...' : 'Menolak...'}
+                    </span>
+                  </>
+                ) : (
+                  <span>
+                    {rejectModalTarget.status === 'approved' ? 'Konfirmasi Nonaktifkan' : 'Konfirmasi Tolak'}
+                  </span>
+                )}
               </button>
             </div>
           </div>
@@ -1160,20 +1311,50 @@ export const VerifikasiAkunView: React.FC<VerifikasiAkunViewProps> = ({
       {previewImage && (
         <div
           onClick={() => setPreviewImage(null)}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-sm cursor-zoom-out"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-sm cursor-zoom-out animate-in fade-in duration-150"
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="bg-[#091426] border border-[#1a2e4c] rounded-xl max-w-xl w-full p-3.5 space-y-2 shadow-2xl cursor-default"
+            className="bg-[#091426] border border-[#1a2e4c] rounded-2xl max-w-2xl w-full p-4 space-y-3 shadow-2xl cursor-default animate-in zoom-in-95 duration-150"
           >
-            <div className="flex items-center justify-between pb-1.5 border-b border-[#1a2e4c]">
-              <span className="text-xs font-semibold text-slate-200">{previewImage.title}</span>
-              <button onClick={() => setPreviewImage(null)} className="text-slate-400 hover:text-white">
-                <X className="w-4 h-4" />
-              </button>
+            <div className="flex items-center justify-between pb-2 border-b border-[#1a2e4c]">
+              <span className="text-xs font-semibold text-slate-200 truncate pr-2">{previewImage.title}</span>
+              <div className="flex items-center space-x-1.5 shrink-0">
+                {previewImage.url && (
+                  <a
+                    href={previewImage.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-1.5 text-slate-400 hover:text-white hover:bg-[#142642] rounded-lg transition-colors cursor-pointer"
+                    title="Buka Gambar Penuh di Tab Baru"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                  </a>
+                )}
+                <button
+                  onClick={() => setPreviewImage(null)}
+                  className="p-1.5 text-slate-400 hover:text-white hover:bg-[#142642] rounded-lg transition-colors cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
             </div>
-            <div className="max-h-[70vh] rounded bg-black flex items-center justify-center overflow-hidden">
-              <img src={previewImage.url} alt="Preview" className="max-h-[65vh] w-auto object-contain" />
+            <div className="min-h-[260px] max-h-[75vh] rounded-xl bg-[#060e1a] border border-[#1a2e4c] flex items-center justify-center overflow-hidden p-2">
+              {previewImage.url ? (
+                <img
+                  src={previewImage.url}
+                  alt={previewImage.title || 'Preview'}
+                  className="max-h-[70vh] w-auto max-w-full object-contain rounded-lg shadow-lg"
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).src = 'https://images.unsplash.com/photo-1544717305-2782549b5136?w=1200&auto=format&fit=crop&q=80';
+                  }}
+                />
+              ) : (
+                <div className="text-center py-10 space-y-2">
+                  <FileText className="w-10 h-10 text-slate-500 mx-auto" />
+                  <p className="text-xs text-slate-400">File dokumen tidak tersedia</p>
+                </div>
+              )}
             </div>
           </div>
         </div>

@@ -26,7 +26,8 @@ import {
   ChevronDown,
   Layers,
   Share2,
-  MessageSquare
+  MessageSquare,
+  ShieldAlert
 } from 'lucide-react';
 import { BeritaAcaraModal } from './BeritaAcaraModal';
 import { DokumenHasilAsesmenModal } from './DokumenHasilAsesmenModal';
@@ -101,6 +102,8 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
   const [showHasilAsesmenModal, setShowHasilAsesmenModal] = useState(false);
   const [showSuratJawaban, setShowSuratJawaban] = useState(false);
   const [lockedDetailTab, setLockedDetailTab] = useState<{ id: DetailTab; label: string; reason: string } | null>(null);
+  const [adminForceEditMap, setAdminForceEditMap] = useState<Record<string, boolean>>({});
+  const [showDangerModal, setShowDangerModal] = useState<DetailTab | null>(null);
 
   // Sync props ke state jika ada perubahan dari parent
   useEffect(() => {
@@ -208,12 +211,33 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
       ];
     }
 
+    const isDispatchedToMedis = Boolean(
+      currentPermohonan.timAsesmen?.dikirimKeMedis ||
+      currentPermohonan.statusProsesUtama === 'asesmen_berlangsung' ||
+      currentPermohonan.statusProsesUtama === 'medis_selesai' ||
+      currentPermohonan.statusProsesUtama === 'telaah_hukum' ||
+      currentPermohonan.statusProsesUtama === 'siap_pleno' ||
+      currentPermohonan.statusProsesUtama === 'pleno_berlangsung' ||
+      currentPermohonan.statusProsesUtama === 'pengesahan_rekomendasi' ||
+      currentPermohonan.statusProsesUtama === 'rekomendasi_terbit' ||
+      currentPermohonan.statusProsesUtama === 'selesai_tindak_lanjut' ||
+      ['IN_ASSESSMENT', 'READY_FOR_CONFERENCE', 'CONFERENCE_HELD', 'AWAITING_SIGNED_OUTPUTS', 'RESULTS_ISSUED'].includes(currentPermohonan.applicationStatus || '') ||
+      currentPermohonan.id?.startsWith('riwayat-') ||
+      Boolean(currentPermohonan.asesmenMedis?.diagnosisKlinisIcd)
+    );
+
     const role = currentUser.role?.toLowerCase();
     switch (role) {
-      case 'pengaju':
-      case 'admin':
-      case 'sekretariat': {
-        const tabs: { id: DetailTab; label: string; icon: React.ReactNode }[] = [
+      case 'pengaju': {
+        if (!isDispatchedToMedis) {
+          return [
+            { id: 'ringkasan', label: 'Ringkasan Perkara', icon: <User className="w-3.5 h-3.5" /> },
+            { id: 'administrasi', label: 'Verifikasi Berkas', icon: <FileText className="w-3.5 h-3.5" /> },
+            { id: 'jadwal', label: 'Penjadwalan', icon: <Calendar className="w-3.5 h-3.5" /> },
+            { id: 'riwayat', label: 'Audit Log & Riwayat', icon: <History className="w-3.5 h-3.5" /> }
+          ];
+        }
+        return [
           { id: 'ringkasan', label: 'Ringkasan Perkara', icon: <User className="w-3.5 h-3.5" /> },
           { id: 'administrasi', label: 'Verifikasi Berkas', icon: <FileText className="w-3.5 h-3.5" /> },
           { id: 'jadwal', label: 'Penjadwalan', icon: <Calendar className="w-3.5 h-3.5" /> },
@@ -226,7 +250,31 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
           { id: 'klarifikasi', label: 'Klarifikasi Terarah', icon: <MessageSquare className="w-3.5 h-3.5" /> },
           { id: 'riwayat', label: 'Audit Log & Riwayat', icon: <History className="w-3.5 h-3.5" /> }
         ];
-        return tabs;
+      }
+      case 'admin':
+      case 'sekretariat': {
+        if (!isDispatchedToMedis) {
+          return [
+            { id: 'ringkasan', label: '1. Ringkasan Perkara', icon: <User className="w-3.5 h-3.5" /> },
+            { id: 'administrasi', label: '2. Verifikasi Berkas', icon: <FileText className="w-3.5 h-3.5" /> },
+            { id: 'jadwal', label: '3. Penjadwalan & Penugasan', icon: <Calendar className="w-3.5 h-3.5" /> },
+            { id: 'riwayat', label: 'Audit Log & Riwayat', icon: <History className="w-3.5 h-3.5" /> }
+          ];
+        }
+
+        return [
+          { id: 'ringkasan', label: '1. Ringkasan Perkara', icon: <User className="w-3.5 h-3.5" /> },
+          { id: 'administrasi', label: '2. Verifikasi Berkas', icon: <FileText className="w-3.5 h-3.5" /> },
+          { id: 'jadwal', label: '3. Penjadwalan', icon: <Calendar className="w-3.5 h-3.5" /> },
+          { id: 'medis', label: '4. Asesmen Medis', icon: <Stethoscope className="w-3.5 h-3.5" /> },
+          { id: 'hukum', label: '5. Telaah Hukum', icon: <Scale className="w-3.5 h-3.5" /> },
+          { id: 'pleno', label: '6. Sidang Pleno', icon: <Users className="w-3.5 h-3.5" /> },
+          { id: 'dokumen', label: '7. Rekomendasi TTE', icon: <FileSignature className="w-3.5 h-3.5" /> },
+          { id: 'tindak_lanjut', label: '8. Rujukan & Tindak Lanjut', icon: <Share2 className="w-3.5 h-3.5" /> },
+          { id: 'pengawasan', label: '9. Pengawasan Klien', icon: <Activity className="w-3.5 h-3.5" /> },
+          { id: 'klarifikasi', label: '10. Klarifikasi Terarah', icon: <MessageSquare className="w-3.5 h-3.5" /> },
+          { id: 'riwayat', label: 'Audit Log & Riwayat', icon: <History className="w-3.5 h-3.5" /> }
+        ];
       }
       case 'medis':
         return [
@@ -311,6 +359,11 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
     if (!status) return 'SELESAI';
     return String(status).replace(/_/g, ' ').toUpperCase();
   };
+
+  const isAdminRole = currentUser.role?.toLowerCase() === 'admin' || currentUser.role?.toLowerCase() === 'sekretariat';
+  const isStep4OrBeyond = ['medis', 'hukum', 'pleno', 'dokumen', 'tindak_lanjut', 'pengawasan', 'klarifikasi'].includes(activeTab);
+  const isTabForceEdited = Boolean(adminForceEditMap[activeTab]);
+  const currentTabReadonly = effectiveReadonly || (isAdminRole && isStep4OrBeyond && !isTabForceEdited);
 
   return (
     <div className="space-y-6 font-roboto">
@@ -564,6 +617,122 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
         </div>
       )}
 
+      {/* Danger Force-Edit Control Bar for Admin on Step 4+ */}
+      {isAdminRole && isStep4OrBeyond && (
+        <div className={`p-4 rounded-2xl border transition-all shadow-lg ${
+          isTabForceEdited
+            ? 'bg-rose-950/40 border-rose-500/60 text-rose-200'
+            : 'bg-[#091528] border-amber-500/40 text-amber-200'
+        }`}>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-start sm:items-center gap-3 text-xs">
+              {isTabForceEdited ? (
+                <div className="p-2 rounded-xl bg-rose-500/20 border border-rose-500/40 shrink-0">
+                  <AlertCircle className="w-4 h-4 text-rose-400" />
+                </div>
+              ) : (
+                <div className="p-2 rounded-xl bg-amber-500/20 border border-amber-500/40 shrink-0">
+                  <ShieldAlert className="w-4 h-4 text-amber-400" />
+                </div>
+              )}
+              <div>
+                <span className="font-bold text-sm block sm:inline">
+                  {isTabForceEdited ? 'Mode Pengeditan Darurat Administrator Aktif' : 'Tahapan Read-Only (Hanya Baca) untuk Admin:'}
+                </span>
+                <p className="text-slate-300 text-xs mt-0.5 leading-relaxed">
+                  {isTabForceEdited
+                    ? 'Anda telah membuka kunci pengeditan darurat untuk tahapan ini. Seluruh perubahan data klinis/teknis akan diaudit dan dicatat dalam sistem.'
+                    : 'Secara default, tahapan asesmen teknis & pleno hanya dapat diubah oleh Tim Asesor (Medis/Hukum). Admin berada dalam mode baca untuk menjaga integritas hasil asesmen.'}
+                </p>
+              </div>
+            </div>
+
+            <div className="shrink-0 flex items-center gap-2">
+              {isTabForceEdited ? (
+                <button
+                  type="button"
+                  onClick={() => setAdminForceEditMap(prev => ({ ...prev, [activeTab]: false }))}
+                  className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow"
+                >
+                  <Lock className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Kunci Kembali (Mode Baca)</span>
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setShowDangerModal(activeTab)}
+                  className="px-4 py-2 bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white font-extrabold rounded-xl text-xs flex items-center gap-2 shadow-lg shadow-rose-950/40 border border-rose-400/40 cursor-pointer transition-all hover:scale-[1.02]"
+                >
+                  <AlertTriangle className="w-3.5 h-3.5 text-rose-200 animate-pulse" />
+                  <span>⚠️ Aktifkan Pengeditan (Mode Khusus)</span>
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Konfirmasi Bahaya Buka Pengeditan Admin */}
+      {showDangerModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="w-full max-w-md bg-[#0b172a] border-2 border-rose-500/80 rounded-2xl shadow-2xl p-5 sm:p-6 space-y-4 animate-in zoom-in-95 duration-200">
+            <div className="flex items-center gap-3 pb-3 border-b border-[#1b3459]">
+              <div className="w-10 h-10 rounded-xl bg-rose-500/20 border border-rose-500/40 flex items-center justify-center shrink-0">
+                <AlertTriangle className="w-5 h-5 text-rose-400" />
+              </div>
+              <div>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-rose-400 bg-rose-950/80 border border-rose-800 px-2 py-0.5 rounded">
+                  Peringatan Bahaya (Danger Action)
+                </span>
+                <h3 className="text-sm font-bold text-white mt-1">
+                  Buka Kunci Pengeditan Admin?
+                </h3>
+              </div>
+            </div>
+
+            <p className="text-xs text-slate-300 leading-relaxed">
+              Anda akan membuka hak akses pengeditan langsung pada tahapan <strong>{availableTabs.find(t => t.id === showDangerModal)?.label || showDangerModal}</strong>. 
+              Sesuai SOP e-TAT, perubahan data teknis klinis dan hukum hanya boleh dilakukan bila terdapat koreksi administratif darurat yang telah dikoordinasikan dengan tim terkait. Tindakan ini akan dicatat dalam Audit Log sistem.
+            </p>
+
+            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-[#1b3459]">
+              <button
+                type="button"
+                onClick={() => setShowDangerModal(null)}
+                className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-semibold cursor-pointer"
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setAdminForceEditMap(prev => ({ ...prev, [showDangerModal]: true }));
+                  const tabName = availableTabs.find(t => t.id === showDangerModal)?.label || showDangerModal;
+                  setShowDangerModal(null);
+                  handleUpdate({
+                    ...currentPermohonan,
+                    auditLogs: [
+                      {
+                        id: 'aud-' + Date.now(),
+                        timestamp: new Date().toLocaleString('id-ID'),
+                        actorNama: currentUser.name,
+                        actorPeran: currentUser.role,
+                        aksi: 'Buka Akses Pengeditan Darurat Admin',
+                        rincian: `Administrator mengaktifkan mode pengeditan khusus pada tahapan ${tabName}.`
+                      },
+                      ...(currentPermohonan.auditLogs || [])
+                    ]
+                  });
+                }}
+                className="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-bold transition-all shadow-lg cursor-pointer"
+              >
+                ⚠️ Ya, Aktifkan Pengeditan
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Dynamic Tab Body: Render Komponen Modular */}
       <div className="space-y-6 min-h-[420px] pt-1">
         {activeTab === 'ringkasan' && (
@@ -599,7 +768,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
           <TabAsesmenMedis
             permohonan={currentPermohonan}
             currentUser={currentUser}
-            effectiveReadonly={effectiveReadonly}
+            effectiveReadonly={currentTabReadonly}
             onUpdatePermohonan={handleUpdate}
             onNavigateTab={(tab) => setActiveTab(tab)}
           />
@@ -609,7 +778,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
           <TabAsesmenHukum
             permohonan={currentPermohonan}
             currentUser={currentUser}
-            effectiveReadonly={effectiveReadonly}
+            effectiveReadonly={currentTabReadonly}
             onUpdatePermohonan={handleUpdate}
             onNavigateTab={(tab) => setActiveTab(tab)}
           />
@@ -619,7 +788,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
           <TabSidangPleno
             permohonan={currentPermohonan}
             currentUser={currentUser}
-            effectiveReadonly={effectiveReadonly}
+            effectiveReadonly={currentTabReadonly}
             onUpdatePermohonan={handleUpdate}
             onNavigateTab={(tab) => setActiveTab(tab)}
           />
@@ -629,7 +798,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
           <TabDokumenPengesahan
             permohonan={currentPermohonan}
             currentUser={currentUser}
-            effectiveReadonly={effectiveReadonly}
+            effectiveReadonly={currentTabReadonly}
             onOpenQrModal={onOpenQrModal}
             onOpenHasilAsesmenModal={() => setShowHasilAsesmenModal(true)}
             onUpdatePermohonan={handleUpdate}

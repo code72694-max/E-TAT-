@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { Scale, Calendar, Activity, Plus, Trash2 } from 'lucide-react';
+import { Scale, Calendar, Activity, Plus, Trash2, Upload, Image as ImageIcon, FileText, Eye } from 'lucide-react';
 
 interface Step3PerkaraBarangBuktiProps {
   jenisPengajuan: 'penangkapan_tanpa_bb' | 'penangkapan_dengan_bb' | 'p19' | 'penuntutan' | 'persidangan';
@@ -35,6 +35,12 @@ interface Step3PerkaraBarangBuktiProps {
   setNewStatusLab: (val: 'proses_lab' | 'positif' | 'negatif' | 'belum_uji') => void;
   newNomorLab: string;
   setNewNomorLab: (val: string) => void;
+  newFotoBb?: string;
+  setNewFotoBb?: (val: string) => void;
+  handleUploadFotoBb?: (file: File) => void;
+  newFotoLab?: string;
+  setNewFotoLab?: (val: string) => void;
+  handleUploadFotoLab?: (file: File) => void;
 }
 
 export const Step3PerkaraBarangBukti: React.FC<Step3PerkaraBarangBuktiProps> = ({
@@ -71,6 +77,12 @@ export const Step3PerkaraBarangBukti: React.FC<Step3PerkaraBarangBuktiProps> = (
   setNewStatusLab,
   newNomorLab,
   setNewNomorLab,
+  newFotoBb = '',
+  setNewFotoBb,
+  handleUploadFotoBb,
+  newFotoLab = '',
+  setNewFotoLab,
+  handleUploadFotoLab,
 }) => {
   const tanggalLpRef = useRef<HTMLInputElement>(null);
   const waktuPenangkapanRef = useRef<HTMLInputElement>(null);
@@ -369,7 +381,7 @@ export const Step3PerkaraBarangBukti: React.FC<Step3PerkaraBarangBuktiProps> = (
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
             <div>
               <div className="flex items-center justify-between mb-1">
                 <label className="text-xs text-slate-400 block">Nomor Surat Hasil Lab (Opsional)</label>
@@ -385,16 +397,112 @@ export const Step3PerkaraBarangBukti: React.FC<Step3PerkaraBarangBuktiProps> = (
               />
             </div>
 
-            <div className="flex items-end">
-              <button
-                type="button"
-                onClick={handleAddBb}
-                className="w-full py-2.5 bg-[#133863] hover:bg-[#1a4a82] text-white rounded-lg text-xs font-semibold flex items-center justify-center space-x-1.5 border border-[#245899] cursor-pointer transition-colors"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Tambahkan ke Daftar</span>
-              </button>
+            <div className="text-xs text-slate-400 flex flex-col justify-end">
+              <span className="text-[11px] text-slate-400 block mb-1">Kepatuhan Batasan SEMA</span>
+              <span className="text-[11px] text-slate-300">
+                Ambang batas SEMA No. 04/2010: Sabu &lt; 1 gr, Ganja &lt; 5 gr, Ekstasi &lt; 8 butir.
+              </span>
             </div>
+          </div>
+
+          {/* Upload Foto Barang Bukti & Scan Uji Lab */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
+            {/* Foto BB */}
+            <div className="p-3 bg-[#081224] rounded-lg border border-[#1b3459] space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-slate-300 flex items-center space-x-1.5">
+                  <ImageIcon className="w-3.5 h-3.5 text-[#D4AF37]" />
+                  <span>Foto Fisik Barang Bukti *</span>
+                </span>
+                {newFotoBb && setNewFotoBb && (
+                  <button
+                    type="button"
+                    onClick={() => setNewFotoBb('')}
+                    className="text-[10px] text-rose-400 hover:underline cursor-pointer"
+                  >
+                    Hapus Foto
+                  </button>
+                )}
+              </div>
+
+              {newFotoBb ? (
+                <div className="relative group rounded-lg overflow-hidden border border-[#234475] h-24 bg-black flex items-center justify-center">
+                  <img src={newFotoBb} alt="Foto Barang Bukti" className="h-full w-full object-cover" />
+                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center space-x-2">
+                    <span className="text-xs text-white font-medium">Foto BB Terlampir</span>
+                  </div>
+                </div>
+              ) : (
+                <label className="flex flex-col items-center justify-center h-24 border border-dashed border-[#234475] rounded-lg cursor-pointer hover:bg-[#142642]/50 transition-colors">
+                  <Upload className="w-5 h-5 text-[#D4AF37] mb-1" />
+                  <span className="text-[11px] font-semibold text-slate-200">Unggah Foto Barang Bukti</span>
+                  <span className="text-[10px] text-slate-400">JPG, PNG (Maks 10 MB)</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const f = e.target.files?.[0];
+                      if (f && handleUploadFotoBb) handleUploadFotoBb(f);
+                    }}
+                    className="hidden"
+                  />
+                </label>
+              )}
+            </div>
+
+            {/* Foto Hasil Uji Lab */}
+            <div className="p-3 bg-[#081224] rounded-lg border border-[#1b3459] space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-slate-300 flex items-center space-x-1.5">
+                  <FileText className="w-3.5 h-3.5 text-sky-400" />
+                  <span>Scan Surat Hasil Lab (Opsional)</span>
+                </span>
+                {newFotoLab && setNewFotoLab && (
+                  <button
+                    type="button"
+                    onClick={() => setNewFotoLab('')}
+                    className="text-[10px] text-rose-400 hover:underline cursor-pointer"
+                  >
+                    Hapus
+                  </button>
+                )}
+              </div>
+
+              {newFotoLab ? (
+                <div className="relative group rounded-lg overflow-hidden border border-[#234475] h-24 bg-black flex items-center justify-center">
+                  <img src={newFotoLab} alt="Hasil Lab" className="h-full w-full object-cover" />
+                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center space-x-2">
+                    <span className="text-xs text-white font-medium">Scan Lab Terlampir</span>
+                  </div>
+                </div>
+              ) : (
+                <label className="flex flex-col items-center justify-center h-24 border border-dashed border-[#234475] rounded-lg cursor-pointer hover:bg-[#142642]/50 transition-colors">
+                  <Upload className="w-5 h-5 text-sky-400 mb-1" />
+                  <span className="text-[11px] font-semibold text-slate-200">Unggah Scan Surat Uji Lab</span>
+                  <span className="text-[10px] text-slate-400">JPG, PNG, PDF (Maks 10 MB)</span>
+                  <input
+                    type="file"
+                    accept="image/*,application/pdf"
+                    onChange={(e) => {
+                      const f = e.target.files?.[0];
+                      if (f && handleUploadFotoLab) handleUploadFotoLab(f);
+                    }}
+                    className="hidden"
+                  />
+                </label>
+              )}
+            </div>
+          </div>
+
+          <div className="pt-2 flex justify-end">
+            <button
+              type="button"
+              onClick={handleAddBb}
+              className="w-full sm:w-auto px-6 py-2.5 bg-[#133863] hover:bg-[#1a4a82] text-white rounded-lg text-xs font-semibold flex items-center justify-center space-x-1.5 border border-[#245899] cursor-pointer transition-colors shadow-sm"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Tambahkan ke Daftar Barang Bukti</span>
+            </button>
           </div>
         </div>
 
@@ -406,14 +514,22 @@ export const Step3PerkaraBarangBukti: React.FC<Step3PerkaraBarangBuktiProps> = (
             barangBuktiList.map((bb) => (
               <div
                 key={bb.id}
-                className="p-3.5 bg-[#050e1c] rounded-xl border border-[#1b3459] flex items-center justify-between"
+                className="p-3.5 bg-[#050e1c] rounded-xl border border-[#1b3459] flex items-center justify-between gap-3"
               >
-                <div className="flex items-center space-x-3.5">
-                  <div className="w-9 h-9 rounded-lg bg-[#142642] flex items-center justify-center text-[#D4AF37] font-bold text-xs shrink-0">
-                    BB
-                  </div>
-                  <div>
-                    <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-3.5 min-w-0">
+                  {bb.fotoBarangBuktiUrl ? (
+                    <img
+                      src={bb.fotoBarangBuktiUrl}
+                      alt={bb.jenisZat}
+                      className="w-11 h-11 rounded-lg object-cover border border-[#234475] shrink-0"
+                    />
+                  ) : (
+                    <div className="w-11 h-11 rounded-lg bg-[#142642] flex items-center justify-center text-[#D4AF37] font-bold text-xs shrink-0 border border-[#234475]">
+                      BB
+                    </div>
+                  )}
+                  <div className="min-w-0">
+                    <div className="flex items-center space-x-2 flex-wrap gap-y-1">
                       <span className="font-bold text-white text-xs">{bb.jenisZat}</span>
                       <span className="font-mono text-xs text-[#D4AF37] font-semibold bg-[#D4AF37]/10 px-2 py-0.5 rounded border border-[#D4AF37]/20">
                         {bb.beratBersihGram} gr
@@ -427,6 +543,11 @@ export const Step3PerkaraBarangBukti: React.FC<Step3PerkaraBarangBuktiProps> = (
                       >
                         {bb.statusUjiLab === 'positif' ? 'Positif Lab' : bb.statusUjiLab === 'proses_lab' ? 'Proses Lab' : 'Belum Uji'}
                       </span>
+                      {bb.fotoBarangBuktiUrl && (
+                        <span className="text-[10px] text-emerald-400 bg-emerald-500/10 px-1.5 py-0.2 rounded border border-emerald-500/20">
+                          Foto Terlampir
+                        </span>
+                      )}
                     </div>
                     <div className="text-xs text-slate-400 mt-1 truncate font-mono">
                       {bb.nomorSuratLab ? `No. Lab: ${bb.nomorSuratLab}` : 'Surat Lab: Menunggu Puslabfor'}
