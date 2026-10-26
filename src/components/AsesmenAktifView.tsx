@@ -2,6 +2,7 @@ import React, { useState, useMemo } from "react";
 import { PermohonanAsesmen, UserProfile } from "../types";
 import { ModalInputAsesmen } from "./ModalInputAsesmen";
 import { PermohonanDetail } from "./PermohonanDetail";
+import { asesmenMedisApi, asesmenHukumApi, sidangPlenoApi, permohonanApi } from "../services/api";
 import {
   Activity,
   Stethoscope,
@@ -101,9 +102,9 @@ function buildDetailedPipeline(p: PermohonanAsesmen): AssessmentPipelineStep[] {
 
   const adminDone = true;
   const jadwalDone = Boolean(p.timAsesmen?.jadwalPemeriksaanMedis || p.timAsesmen?.asesorMedisNama || ["SCHEDULED", "ASSESSMENT_ACTIVE", "READY_FOR_CONFERENCE", "AWAITING_SIGNED_OUTPUTS", "RESULTS_ISSUED"].includes(appStatus));
-  const medisDone = p.medicalStatus === "FINAL" || p.statusMedis === "siap_dibahas" || Boolean(p.asesmenMedis?.diagnosisKlinisIcd);
-  const hukumDone = p.legalStatus === "FINAL" || p.statusHukum === "siap_dibahas" || Boolean(p.asesmenHukum?.analisisPeran);
-  const plenoDone = Boolean(p.sidangPleno?.nomorBeritaAcara) || prosesUtama === "pengesahan_rekomendasi" || prosesUtama === "rekomendasi_terbit" || ["AWAITING_SIGNED_OUTPUTS", "RESULTS_ISSUED"].includes(appStatus);
+  const medisDone = p.medicalStatus === "FINAL" || p.statusMedis === "siap_dibahas" || (p.asesmenMedis as any)?.status === "FINAL" || Boolean(p.asesmenMedis?.diagnosisKlinisIcd);
+  const hukumDone = p.legalStatus === "FINAL" || p.statusHukum === "siap_dibahas" || (p.asesmenHukum as any)?.status === "FINAL" || Boolean(p.asesmenHukum?.analisisPeran);
+  const plenoDone = Boolean(p.sidangPleno?.nomorBeritaAcara) || p.sidangPleno?.statusPleno === "selesai_sepakat" || prosesUtama === "pengesahan_rekomendasi" || prosesUtama === "rekomendasi_terbit" || ["AWAITING_SIGNED_OUTPUTS", "RESULTS_ISSUED"].includes(appStatus);
   const tteDone = p.rekomendasiResmi?.isLengkapPengesahan || prosesUtama === "rekomendasi_terbit" || appStatus === "RESULTS_ISSUED";
 
   const medisActive = jadwalDone && !medisDone;
@@ -356,29 +357,65 @@ function DedicatedAsesmenDetail({
           tipeAsesmen={modalInputType}
           namaTerperiksa={permohonan.terperiksa?.namaLengkap || 'Terperiksa'}
           nomorTat={permohonan.nomorPermohonan}
-          onSave={(data, isFinal) => {
+          initialData={modalInputType === 'medis' ? permohonan.asesmenMedis : permohonan.asesmenHukum}
+          onSave={async (data, isFinal) => {
+            const nowFormatted = new Date().toLocaleDateString('id-ID') + ' ' + new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+
+            // 1. Simpan ke Backend Database (PostgreSQL / Supabase)
+            if (permohonan.id) {
+              try {
+                if (modalInputType === 'medis') {
+                  if (isFinal) {
+                    await asesmenMedisApi.finalisasi(permohonan.id, data);
+                  } else {
+                    await asesmenMedisApi.saveDraft(permohonan.id, data);
+                  }
+                } else if (modalInputType === 'hukum') {
+                  if (isFinal) {
+                    await asesmenHukumApi.finalisasi(permohonan.id, data);
+                  } else {
+                    await asesmenHukumApi.saveDraft(permohonan.id, data);
+                  }
+                }
+              } catch (err) {
+                console.warn('Backend save notice di AsesmenAktifView:', err);
+              }
+            }
+
+            // 2. Sinkronkan state lokal frontend
             if (onUpdatePermohonan) {
               const updated: PermohonanAsesmen = {
                 ...permohonan,
                 ...(modalInputType === 'medis' ? {
+                  medicalStatus: isFinal ? 'FINAL' : (permohonan.medicalStatus || 'DRAFT'),
+                  statusMedis: isFinal ? 'siap_dibahas' : permohonan.statusMedis,
                   asesmenMedis: {
                     ...permohonan.asesmenMedis,
+                    status: isFinal ? 'FINAL' : 'DRAFT',
                     statusAsesmen: isFinal ? 'selesai' : 'draf',
-                    tanggalPemeriksaan: new Date().toLocaleDateString('id-ID') + ' ' + new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
+                    tanggalPemeriksaan: nowFormatted,
                     asesorNama: currentUser.name || 'dr. Asesor Medis',
                     ...data
                   }
                 } : {
+                  legalStatus: isFinal ? 'FINAL' : (permohonan.legalStatus || 'DRAFT'),
+                  statusHukum: isFinal ? 'siap_dibahas' : permohonan.statusHukum,
                   asesmenHukum: {
                     ...permohonan.asesmenHukum,
+                    status: isFinal ? 'FINAL' : 'DRAFT',
                     statusTelaah: isFinal ? 'selesai' : 'draf',
-                    tanggalTelaah: new Date().toLocaleDateString('id-ID') + ' ' + new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
+                    tanggalTelaah: nowFormatted,
                     asesorNama: currentUser.name || 'Asesor Hukum / Jaksa',
                     ...data
                   }
                 })
               };
               onUpdatePermohonan(updated);
+            }
+
+            // Jika Asesmen Medis difinalisasi, otomatis arahkan tampilan ke Step 4 (Telaah Hukum)
+            if (modalInputType === 'medis' && isFinal) {
+              setSelectedStepIdx(3);
             }
             setModalInputType(null);
           }}
@@ -677,13 +714,58 @@ function DedicatedAsesmenDetail({
             )}
 
             {activeStep.stepNumber === 4 && (
-              <button
-                onClick={() => setModalInputType('hukum')}
-                className="bg-rose-900 hover:bg-rose-800 text-white font-bold text-xs px-4 py-2.5 rounded-xl border border-rose-700/80 shadow-md transition-all cursor-pointer flex items-center space-x-2"
-              >
-                <Scale className="w-4 h-4 text-[#d4af37]" />
-                <span>Input / Edit Asesmen Hukum</span>
-              </button>
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setModalInputType('hukum')}
+                  className="bg-rose-900 hover:bg-rose-800 text-white font-bold text-xs px-4 py-2.5 rounded-xl border border-rose-700/80 shadow-md transition-all cursor-pointer flex items-center space-x-2"
+                >
+                  <Scale className="w-4 h-4 text-[#d4af37]" />
+                  <span>Input / Edit Asesmen Hukum</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={async () => {
+                    if (window.confirm('Kirimkan berkas perkara yang telah ditelaah Medis & Hukum ke Sidang Pleno TAT (Step 5)?')) {
+                      if (permohonan.id) {
+                        try {
+                          await sidangPlenoApi.jadwalkan(permohonan.id, {
+                            tanggalPleno: new Date().toISOString(),
+                            waktu: '09:30 WIB',
+                            tempat: permohonan.timAsesmen?.lokasiPemeriksaan || 'Ruang Sidang Utama TAT',
+                            pimpinanPleno: currentUser.name || 'Ketua Tim Asesmen Terpadu',
+                          });
+                        } catch (err) {
+                          console.warn('Backend jadwalkan pleno notice:', err);
+                        }
+                      }
+
+                      if (onUpdatePermohonan) {
+                        const updated: PermohonanAsesmen = {
+                          ...permohonan,
+                          applicationStatus: 'READY_FOR_CONFERENCE',
+                          statusProsesUtama: 'siap_pleno',
+                          sidangPleno: {
+                            ...(permohonan.sidangPleno as any),
+                            statusPleno: 'terjadwal' as any,
+                            tanggalPleno: new Date().toLocaleDateString('id-ID'),
+                            waktu: '09:30 WIB',
+                            tempat: permohonan.timAsesmen?.lokasiPemeriksaan || 'Ruang Sidang Utama TAT',
+                            pimpinanPleno: currentUser.name || 'Ketua Tim Asesmen Terpadu',
+                          }
+                        };
+                        onUpdatePermohonan(updated);
+                      }
+                      setSelectedStepIdx(4);
+                    }
+                  }}
+                  className="bg-gradient-to-r from-blue-700 to-indigo-700 hover:from-blue-600 hover:to-indigo-600 text-white font-bold text-xs px-4 py-2.5 rounded-xl border border-blue-500/60 shadow-md transition-all cursor-pointer flex items-center space-x-2"
+                >
+                  <SendHorizontal className="w-4 h-4 text-emerald-300" />
+                  <span>Kirim Berkas ke Sidang Pleno</span>
+                </button>
+              </div>
             )}
 
             {onOpenFullDetail && (

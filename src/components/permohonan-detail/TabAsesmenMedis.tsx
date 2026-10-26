@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   PermohonanAsesmen,
   UserProfile,
@@ -8,15 +8,12 @@ import {
   Activity,
   Heart,
   Syringe,
-  FileText,
-  CheckCircle2,
-  AlertTriangle,
   Building2,
   Save,
-  Award,
-  Sparkles,
-  ShieldCheck,
-  Calendar
+  CheckCircle2,
+  AlertTriangle,
+  Clock,
+  UserCheck
 } from 'lucide-react';
 import { asesmenMedisApi } from '../../services/api';
 import { isSuspectExaminedByMedis } from '../../utils/medisAuth';
@@ -28,6 +25,15 @@ interface TabAsesmenMedisProps {
   onUpdatePermohonan: (updated: PermohonanAsesmen) => void;
   onNavigateTab: (tab: any) => void;
 }
+
+const defaultUrinTests: Array<{ parameter: string; hasil: 'Positif' | 'Negatif' }> = [
+  { parameter: 'MET (Metamfetamina / Sabu)', hasil: 'Negatif' },
+  { parameter: 'AMP (Amfetamina)', hasil: 'Negatif' },
+  { parameter: 'THC (Ganja / Kanabis)', hasil: 'Negatif' },
+  { parameter: 'BZO (Benzodiazepin)', hasil: 'Negatif' },
+  { parameter: 'MOP (Morfin / Opiat)', hasil: 'Negatif' },
+  { parameter: 'COC (Kokain)', hasil: 'Negatif' },
+];
 
 export const TabAsesmenMedis: React.FC<TabAsesmenMedisProps> = ({
   permohonan,
@@ -43,41 +49,66 @@ export const TabAsesmenMedis: React.FC<TabAsesmenMedisProps> = ({
   const existingMedis = permohonan.asesmenMedis;
 
   const [form, setForm] = useState({
-    tekananDarah: (existingMedis as any)?.tekananDarah || '120/80',
-    denyutNadi: (existingMedis as any)?.denyutNadi || '82',
-    pernapasan: (existingMedis as any)?.pernapasan || '18',
-    suhuTubuh: (existingMedis as any)?.suhuTubuh || '36.6',
-    needleTracks: (existingMedis as any)?.needleTracks || 'tidak_ada',
-    kondisiIntoksikasi: (existingMedis as any)?.kondisiIntoksikasi || 'stabil',
-    komorbiditasMedis: existingMedis?.komorbiditasMedis || 'Tidak ditemukan penyakit penyerta berat.',
-    skorInstrumen: existingMedis?.skorInstrumen || 28,
-    tingkatRisikoInstrumen: existingMedis?.tingkatRisikoInstrumen || 'Tinggi (Ketergantungan)',
-    diagnosisKlinisIcd: existingMedis?.diagnosisKlinisIcd || 'F15.2 (Sindrom Ketergantungan Stimulansia)',
-    kebutuhanRawat: existingMedis?.kebutuhanRawat || 'Rawat Inap',
-    durasiUsulanBulan: existingMedis?.durasiUsulanBulan || 3,
-    fasilitasRujukan: (existingMedis as any)?.fasilitasRujukan || 'Balai Rehabilitasi BNN Tanah Merah',
-    jenisZat: existingMedis?.riwayatZat?.[0]?.jenisZat || 'Metamfetamina (Sabu)',
-    caraPakai: existingMedis?.riwayatZat?.[0]?.caraPakai || 'Dihisap (Bong)',
-    frekuensi: existingMedis?.riwayatZat?.[0]?.frekuensi || '3-4x Seminggu',
-    lamaPemakaianBulan: existingMedis?.riwayatZat?.[0]?.lamaPemakaianBulan || 12,
-    terakhirPakai: existingMedis?.riwayatZat?.[0]?.terakhirPakai || '2 hari sebelum penangkapan',
-    interpretasiKlinis: existingMedis?.interpretasiKlinis || 'Klien mengalami ketergantungan zat sedang-berat dengan indikasi penarikan (withdrawal). Memerlukan program rehabilitasi medis intensif.',
-    catatanKhusus: existingMedis?.catatanKhusus || 'Siap dilanjutkan ke musyawarah Sidang Pleno TAT.',
+    tekananDarah: existingMedis?.tekananDarah || '',
+    denyutNadi: existingMedis?.denyutNadi || '',
+    pernapasan: (existingMedis as any)?.pernapasan || '',
+    suhuTubuh: (existingMedis as any)?.suhuTubuh || '',
+    needleTracks: (existingMedis as any)?.needleTracks || '',
+    kondisiIntoksikasi: (existingMedis as any)?.kondisiIntoksikasi || '',
+    komorbiditasMedis: existingMedis?.komorbiditasMedis || '',
+    skorInstrumen: existingMedis?.skorInstrumen ?? '',
+    tingkatRisikoInstrumen: existingMedis?.tingkatRisikoInstrumen || '',
+    diagnosisKlinisIcd: existingMedis?.diagnosisKlinisIcd || '',
+    kebutuhanRawat: existingMedis?.kebutuhanRawat || '',
+    durasiUsulanBulan: existingMedis?.durasiUsulanBulan ?? '',
+    fasilitasRujukan: (existingMedis as any)?.fasilitasRujukan || '',
+    jenisZat: existingMedis?.riwayatZat?.[0]?.jenisZat || '',
+    caraPakai: existingMedis?.riwayatZat?.[0]?.caraPakai || '',
+    frekuensi: existingMedis?.riwayatZat?.[0]?.frekuensi || '',
+    lamaPemakaianBulan: existingMedis?.riwayatZat?.[0]?.lamaPemakaianBulan ?? '',
+    terakhirPakai: existingMedis?.riwayatZat?.[0]?.terakhirPakai || '',
+    interpretasiKlinis: existingMedis?.interpretasiKlinis || '',
+    catatanKhusus: existingMedis?.catatanKhusus || '',
   });
 
   const [urinTests, setUrinTests] = useState<Array<{ parameter: string; hasil: 'Positif' | 'Negatif' }>>(() => {
     if (existingMedis?.hasilUrin && existingMedis.hasilUrin.length > 0) {
       return existingMedis.hasilUrin;
     }
-    return [
-      { parameter: 'MET (Metamfetamina / Sabu)', hasil: 'Positif' },
-      { parameter: 'AMP (Amfetamina)', hasil: 'Positif' },
-      { parameter: 'THC (Ganja / Kanabis)', hasil: 'Negatif' },
-      { parameter: 'BZO (Benzodiazepin)', hasil: 'Negatif' },
-      { parameter: 'MOP (Morfin / Opiat)', hasil: 'Negatif' },
-      { parameter: 'COC (Kokain)', hasil: 'Negatif' },
-    ];
+    return defaultUrinTests;
   });
+
+  // Sinkronisasi form jika data asesmenMedis dari backend diperbarui
+  useEffect(() => {
+    if (permohonan.asesmenMedis) {
+      const m = permohonan.asesmenMedis;
+      setForm({
+        tekananDarah: m.tekananDarah || '',
+        denyutNadi: m.denyutNadi || '',
+        pernapasan: (m as any).pernapasan || '',
+        suhuTubuh: (m as any).suhuTubuh || '',
+        needleTracks: (m as any).needleTracks || '',
+        kondisiIntoksikasi: (m as any).kondisiIntoksikasi || '',
+        komorbiditasMedis: m.komorbiditasMedis || '',
+        skorInstrumen: m.skorInstrumen ?? '',
+        tingkatRisikoInstrumen: m.tingkatRisikoInstrumen || '',
+        diagnosisKlinisIcd: m.diagnosisKlinisIcd || '',
+        kebutuhanRawat: m.kebutuhanRawat || '',
+        durasiUsulanBulan: m.durasiUsulanBulan ?? '',
+        fasilitasRujukan: (m as any).fasilitasRujukan || '',
+        jenisZat: m.riwayatZat?.[0]?.jenisZat || '',
+        caraPakai: m.riwayatZat?.[0]?.caraPakai || '',
+        frekuensi: m.riwayatZat?.[0]?.frekuensi || '',
+        lamaPemakaianBulan: m.riwayatZat?.[0]?.lamaPemakaianBulan ?? '',
+        terakhirPakai: m.riwayatZat?.[0]?.terakhirPakai || '',
+        interpretasiKlinis: m.interpretasiKlinis || '',
+        catatanKhusus: m.catatanKhusus || '',
+      });
+      if (m.hasilUrin && m.hasilUrin.length > 0) {
+        setUrinTests(m.hasilUrin);
+      }
+    }
+  }, [permohonan.asesmenMedis]);
 
   const [isSaving, setIsSaving] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
@@ -97,21 +128,21 @@ export const TabAsesmenMedis: React.FC<TabAsesmenMedisProps> = ({
       ...existingMedis,
       status: (isFinal ? 'FINAL' : 'DRAFT') as any,
       asesorNama: currentUser.name,
-      skorInstrumen: Number(form.skorInstrumen),
+      skorInstrumen: form.skorInstrumen !== '' ? Number(form.skorInstrumen) : undefined,
       tingkatRisikoInstrumen: form.tingkatRisikoInstrumen,
       diagnosisKlinisIcd: form.diagnosisKlinisIcd,
       komorbiditasMedis: form.komorbiditasMedis,
       kebutuhanRawat: form.kebutuhanRawat,
-      durasiUsulanBulan: Number(form.durasiUsulanBulan),
-      riwayatZat: [
+      durasiUsulanBulan: form.durasiUsulanBulan !== '' ? Number(form.durasiUsulanBulan) : undefined,
+      riwayatZat: form.jenisZat ? [
         {
           jenisZat: form.jenisZat,
-          caraPakai: form.caraPakai,
-          frekuensi: form.frekuensi,
-          lamaPemakaianBulan: Number(form.lamaPemakaianBulan),
+          caraPakai: form.caraPakai || 'Hisap',
+          frekuensi: form.frekuensi || 'Setiap Hari',
+          lamaPemakaianBulan: form.lamaPemakaianBulan !== '' ? Number(form.lamaPemakaianBulan) : 0,
           terakhirPakai: form.terakhirPakai,
         }
-      ],
+      ] : [],
       hasilUrin: urinTests,
       interpretasiKlinis: form.interpretasiKlinis,
       catatanKhusus: form.catatanKhusus,
@@ -122,14 +153,15 @@ export const TabAsesmenMedis: React.FC<TabAsesmenMedisProps> = ({
       needleTracks: form.needleTracks,
       kondisiIntoksikasi: form.kondisiIntoksikasi,
       fasilitasRujukan: form.fasilitasRujukan,
+      terakhirDiperbarui: new Date().toISOString(),
     };
 
-    const targetHukum = permohonan.timAsesmen?.asesorHukumNama || 'Ahmad Fauzi, S.H., M.H. (Kejaksaan Tinggi Kaltim)';
+    const targetHukum = permohonan.timAsesmen?.asesorHukumNama || 'Penelaah Hukum TAT';
 
     const updatedPermohonan: PermohonanAsesmen = {
       ...permohonan,
       asesmenMedis: updatedMedis as any,
-      medicalStatus: isFinal ? 'FINAL' : permohonan.medicalStatus,
+      medicalStatus: isFinal ? 'FINAL' : (permohonan.medicalStatus === 'NOT_STARTED' ? 'DRAFT' : permohonan.medicalStatus),
       statusProsesUtama: isFinal
         ? (permohonan.asesmenHukum?.status === 'FINAL' ? 'siap_pleno' : 'telaah_hukum')
         : permohonan.statusProsesUtama,
@@ -146,7 +178,7 @@ export const TabAsesmenMedis: React.FC<TabAsesmenMedisProps> = ({
           actorPeran: currentUser.role,
           aksi: isFinal ? 'Finalisasi Rekam Medis & Teruskan ke Hukum' : 'Simpan Draf Rekam Medis',
           rincian: isFinal
-            ? `Asesmen medis difinalisasi oleh ${currentUser.name}. Berkas secara otomatis diteruskan kepada Penelaah Hukum (${targetHukum}) sesuai penugasan dari Admin.`
+            ? `Asesmen medis difinalisasi oleh ${currentUser.name}. Berkas secara otomatis diteruskan kepada Penelaah Hukum (${targetHukum}).`
             : `Draf medis diperbarui oleh ${currentUser.name}.`
         },
         ...(permohonan.auditLogs || [])
@@ -166,35 +198,37 @@ export const TabAsesmenMedis: React.FC<TabAsesmenMedisProps> = ({
           needleTracks: form.needleTracks,
           kondisiIntoksikasi: form.kondisiIntoksikasi,
           komorbiditasMedis: form.komorbiditasMedis,
-          skorInstrumen: Number(form.skorInstrumen),
+          skorInstrumen: form.skorInstrumen !== '' ? Number(form.skorInstrumen) : undefined,
           tingkatRisikoInstrumen: form.tingkatRisikoInstrumen,
           diagnosisKlinisIcd: form.diagnosisKlinisIcd,
           kebutuhanRawat: form.kebutuhanRawat,
-          durasiUsulanBulan: Number(form.durasiUsulanBulan),
+          durasiUsulanBulan: form.durasiUsulanBulan !== '' ? Number(form.durasiUsulanBulan) : undefined,
+          fasilitasRujukan: form.fasilitasRujukan,
           interpretasiKlinis: form.interpretasiKlinis,
           catatanKhusus: form.catatanKhusus,
-          riwayatZat: [
+          riwayatZat: form.jenisZat ? [
             {
               jenisZat: form.jenisZat,
-              caraPakai: form.caraPakai,
-              frekuensi: form.frekuensi,
-              lamaPemakaianBulan: Number(form.lamaPemakaianBulan),
+              caraPakai: form.caraPakai || 'Hisap',
+              frekuensi: form.frekuensi || 'Setiap Hari',
+              lamaPemakaianBulan: form.lamaPemakaianBulan !== '' ? Number(form.lamaPemakaianBulan) : 0,
               terakhirPakai: form.terakhirPakai,
             }
-          ],
+          ] : [],
+          hasilUrin: urinTests,
         };
 
         if (isFinal) {
           await asesmenMedisApi.finalisasi(permohonan.id, payload);
-          setFeedback(`Asesmen Medis Berhasil Difinalisasi! Berkas secara otomatis dilanjutkan ke Penelaah Hukum: ${targetHukum}.`);
+          setFeedback(`Asesmen Medis Berhasil Difinalisasi! Berkas diteruskan ke Penelaah Hukum: ${targetHukum}.`);
           setTimeout(() => {
             onNavigateTab('hukum');
           }, 1200);
         } else {
           await asesmenMedisApi.saveDraft(permohonan.id, payload);
-          setFeedback('Draf Asesmen Medis Berhasil Disimpan di Database!');
+          setFeedback('Draf Asesmen Medis Berhasil Disimpan di Server!');
         }
-      } catch (err) {
+      } catch (err: any) {
         console.warn('Backend asesmenMedisApi notice:', err);
         setFeedback(isFinal 
           ? `Asesmen Medis disimpan (Lokal). Berkas diteruskan ke Penelaah Hukum: ${targetHukum}.`
@@ -210,6 +244,8 @@ export const TabAsesmenMedis: React.FC<TabAsesmenMedisProps> = ({
     setIsSaving(false);
     setTimeout(() => setFeedback(null), 4000);
   };
+
+  const isFormEmpty = !form.tekananDarah && !form.diagnosisKlinisIcd && !form.jenisZat;
 
   return (
     <div className="space-y-6">
@@ -236,7 +272,7 @@ export const TabAsesmenMedis: React.FC<TabAsesmenMedisProps> = ({
         <div>
           <h3 className="text-sm font-bold text-white flex items-center space-x-2">
             <Stethoscope className="w-4 h-4 text-emerald-400" />
-            <span>Rekam Medis & Pemeriksaan Toksikologi Klinis Terpadu</span>
+            <span>Rekam Medis &amp; Pemeriksaan Toksikologi Klinis Terpadu</span>
           </h3>
           <p className="text-xs text-slate-400 mt-1">
             Standar Pemeriksaan Medis TAT BNN/Kemenkes: Anamnesis riwayat adiksi, instrumen WHO ASSIST, skrining urin 6 parameter, dan rekomendasi pemulihan.
@@ -244,12 +280,20 @@ export const TabAsesmenMedis: React.FC<TabAsesmenMedisProps> = ({
         </div>
 
         <div className="flex items-center space-x-2">
+          {existingMedis?.asesorNama && (
+            <span className="text-[11px] text-slate-400 flex items-center gap-1 mr-2 font-medium">
+              <UserCheck className="w-3.5 h-3.5 text-emerald-400" />
+              <span>Oleh: <strong className="text-slate-200">{existingMedis.asesorNama}</strong></span>
+            </span>
+          )}
           <span className={`text-xs font-mono font-bold px-3 py-1 rounded-xl border ${
             existingMedis?.status === 'FINAL'
               ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
+              : isFormEmpty
+              ? 'bg-slate-800 text-slate-400 border-slate-700'
               : 'bg-amber-500/20 text-amber-300 border-amber-500/30'
           }`}>
-            {existingMedis?.status === 'FINAL' ? '✓ STATUS: FINAL' : 'STATUS: DRAF MEDIS'}
+            {existingMedis?.status === 'FINAL' ? '✓ STATUS: FINAL' : isFormEmpty ? 'BELUM DIISI' : 'STATUS: DRAF MEDIS'}
           </span>
         </div>
       </div>
@@ -260,7 +304,7 @@ export const TabAsesmenMedis: React.FC<TabAsesmenMedisProps> = ({
         <div className="bg-[#081224] border border-[#1b3459] rounded-2xl p-5 space-y-4 shadow-xl">
           <div className="flex items-center space-x-2 pb-2.5 border-b border-[#1b3459]">
             <Heart className="w-4 h-4 text-rose-400" />
-            <h4 className="text-xs font-bold text-white uppercase tracking-wider">Tanda-Tanda Vital & Pemeriksaan Fisik</h4>
+            <h4 className="text-xs font-bold text-white uppercase tracking-wider">Tanda-Tanda Vital &amp; Pemeriksaan Fisik</h4>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -271,8 +315,8 @@ export const TabAsesmenMedis: React.FC<TabAsesmenMedisProps> = ({
                 disabled={!canEdit}
                 value={form.tekananDarah}
                 onChange={e => setForm({ ...form, tekananDarah: e.target.value })}
-                placeholder="120/80"
-                className="w-full p-2 bg-[#050e1c] border border-[#1b3459] rounded-lg text-white font-mono text-xs outline-none focus:border-emerald-500"
+                placeholder="cth: 120/80"
+                className="w-full p-2 bg-[#050e1c] border border-[#1b3459] rounded-lg text-white font-mono text-xs outline-none focus:border-emerald-500 placeholder-slate-600"
               />
             </div>
             <div>
@@ -282,8 +326,8 @@ export const TabAsesmenMedis: React.FC<TabAsesmenMedisProps> = ({
                 disabled={!canEdit}
                 value={form.denyutNadi}
                 onChange={e => setForm({ ...form, denyutNadi: e.target.value })}
-                placeholder="80"
-                className="w-full p-2 bg-[#050e1c] border border-[#1b3459] rounded-lg text-white font-mono text-xs outline-none focus:border-emerald-500"
+                placeholder="cth: 80"
+                className="w-full p-2 bg-[#050e1c] border border-[#1b3459] rounded-lg text-white font-mono text-xs outline-none focus:border-emerald-500 placeholder-slate-600"
               />
             </div>
             <div>
@@ -293,8 +337,8 @@ export const TabAsesmenMedis: React.FC<TabAsesmenMedisProps> = ({
                 disabled={!canEdit}
                 value={form.pernapasan}
                 onChange={e => setForm({ ...form, pernapasan: e.target.value })}
-                placeholder="18"
-                className="w-full p-2 bg-[#050e1c] border border-[#1b3459] rounded-lg text-white font-mono text-xs outline-none focus:border-emerald-500"
+                placeholder="cth: 18"
+                className="w-full p-2 bg-[#050e1c] border border-[#1b3459] rounded-lg text-white font-mono text-xs outline-none focus:border-emerald-500 placeholder-slate-600"
               />
             </div>
             <div>
@@ -304,8 +348,8 @@ export const TabAsesmenMedis: React.FC<TabAsesmenMedisProps> = ({
                 disabled={!canEdit}
                 value={form.suhuTubuh}
                 onChange={e => setForm({ ...form, suhuTubuh: e.target.value })}
-                placeholder="36.5"
-                className="w-full p-2 bg-[#050e1c] border border-[#1b3459] rounded-lg text-white font-mono text-xs outline-none focus:border-emerald-500"
+                placeholder="cth: 36.5"
+                className="w-full p-2 bg-[#050e1c] border border-[#1b3459] rounded-lg text-white font-mono text-xs outline-none focus:border-emerald-500 placeholder-slate-600"
               />
             </div>
           </div>
@@ -319,6 +363,7 @@ export const TabAsesmenMedis: React.FC<TabAsesmenMedisProps> = ({
                 onChange={e => setForm({ ...form, needleTracks: e.target.value })}
                 className="w-full p-2 bg-[#050e1c] border border-[#1b3459] rounded-lg text-white text-xs outline-none focus:border-emerald-500"
               >
+                <option value="">-- Belum Diperiksa / Pilih --</option>
                 <option value="tidak_ada">Tidak Ada Bekas Suntikan</option>
                 <option value="ada_lama">Ada (Bekas Luka Lama / Inaktif)</option>
                 <option value="ada_baru">Ada (Bekas Suntikan Baru / Aktif)</option>
@@ -332,12 +377,25 @@ export const TabAsesmenMedis: React.FC<TabAsesmenMedisProps> = ({
                 onChange={e => setForm({ ...form, kondisiIntoksikasi: e.target.value })}
                 className="w-full p-2 bg-[#050e1c] border border-[#1b3459] rounded-lg text-white text-xs outline-none focus:border-emerald-500"
               >
+                <option value="">-- Belum Diperiksa / Pilih --</option>
                 <option value="stabil">Stabil (Sadar Penuh / Kompos Mentis)</option>
                 <option value="intoksikasi_ringan">Intoksikasi Ringan</option>
                 <option value="putus_zat">Gejala Putus Zat (Withdrawal / Sakau)</option>
                 <option value="intoksikasi_akut">Intoksikasi Akut (Perlu Rujukan Darurat)</option>
               </select>
             </div>
+          </div>
+
+          <div>
+            <label className="text-[10px] text-slate-400 uppercase font-semibold block mb-1">Komorbiditas / Penyakit Penyerta Medis</label>
+            <input
+              type="text"
+              disabled={!canEdit}
+              value={form.komorbiditasMedis}
+              onChange={e => setForm({ ...form, komorbiditasMedis: e.target.value })}
+              placeholder="cth: Tidak ada komorbiditas / Hepatitis B / HIV / Hipertensi"
+              className="w-full p-2 bg-[#050e1c] border border-[#1b3459] rounded-lg text-white text-xs outline-none focus:border-emerald-500 placeholder-slate-600"
+            />
           </div>
         </div>
 
@@ -359,12 +417,12 @@ export const TabAsesmenMedis: React.FC<TabAsesmenMedisProps> = ({
                 className={`p-2.5 rounded-xl border flex items-center justify-between cursor-pointer transition-all ${
                   t.hasil === 'Positif'
                     ? 'bg-rose-950/30 border-rose-500/40 text-rose-200'
-                    : 'bg-emerald-950/20 border-emerald-500/30 text-emerald-200'
+                    : 'bg-[#050e1c] border-[#1b3459] text-slate-300 hover:border-slate-600'
                 }`}
               >
                 <span className="font-mono text-xs font-semibold">{t.parameter}</span>
                 <span className={`text-[10px] font-bold px-2 py-0.5 rounded font-mono ${
-                  t.hasil === 'Positif' ? 'bg-rose-600 text-white' : 'bg-emerald-600 text-white'
+                  t.hasil === 'Positif' ? 'bg-rose-600 text-white' : 'bg-slate-700 text-slate-300'
                 }`}>
                   {t.hasil}
                 </span>
@@ -372,7 +430,7 @@ export const TabAsesmenMedis: React.FC<TabAsesmenMedisProps> = ({
             ))}
           </div>
           <p className="text-[10px] text-slate-400 italic">
-            * Klik pada baris di atas untuk mengubah parameter positif/negatif.
+            * Klik pada baris parameter di atas untuk mengubah status Positif / Negatif.
           </p>
         </div>
       </div>
@@ -381,7 +439,7 @@ export const TabAsesmenMedis: React.FC<TabAsesmenMedisProps> = ({
       <div className="bg-[#081224] border border-[#1b3459] rounded-2xl p-5 space-y-4 shadow-xl">
         <div className="flex items-center space-x-2 pb-2.5 border-b border-[#1b3459]">
           <Activity className="w-4 h-4 text-emerald-400" />
-          <h4 className="text-xs font-bold text-white uppercase tracking-wider">Anamnesis Adiksi & Diagnosis Klinis</h4>
+          <h4 className="text-xs font-bold text-white uppercase tracking-wider">Anamnesis Adiksi &amp; Diagnosis Klinis</h4>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
@@ -392,32 +450,55 @@ export const TabAsesmenMedis: React.FC<TabAsesmenMedisProps> = ({
               disabled={!canEdit}
               value={form.jenisZat}
               onChange={e => setForm({ ...form, jenisZat: e.target.value })}
-              className="w-full p-2.5 bg-[#050e1c] border border-[#1b3459] rounded-xl text-white outline-none focus:border-emerald-500"
+              placeholder="cth: Metamfetamina (Sabu)"
+              className="w-full p-2.5 bg-[#050e1c] border border-[#1b3459] rounded-xl text-white outline-none focus:border-emerald-500 placeholder-slate-600"
             />
           </div>
           <div>
-            <label className="text-slate-400 font-semibold block mb-1">Metode & Frekuensi Penggunaan:</label>
-            <input
-              type="text"
-              disabled={!canEdit}
-              value={`${form.caraPakai} - ${form.frekuensi}`}
-              onChange={e => setForm({ ...form, caraPakai: e.target.value })}
-              className="w-full p-2.5 bg-[#050e1c] border border-[#1b3459] rounded-xl text-white outline-none focus:border-emerald-500"
-            />
+            <label className="text-slate-400 font-semibold block mb-1">Cara Pakai &amp; Frekuensi:</label>
+            <div className="grid grid-cols-2 gap-2">
+              <input
+                type="text"
+                disabled={!canEdit}
+                value={form.caraPakai}
+                onChange={e => setForm({ ...form, caraPakai: e.target.value })}
+                placeholder="Cara (Hisap/Suntik)"
+                className="w-full p-2.5 bg-[#050e1c] border border-[#1b3459] rounded-xl text-white outline-none focus:border-emerald-500 placeholder-slate-600"
+              />
+              <input
+                type="text"
+                disabled={!canEdit}
+                value={form.frekuensi}
+                onChange={e => setForm({ ...form, frekuensi: e.target.value })}
+                placeholder="Frekuensi (cth: 3x/mgg)"
+                className="w-full p-2.5 bg-[#050e1c] border border-[#1b3459] rounded-xl text-white outline-none focus:border-emerald-500 placeholder-slate-600"
+              />
+            </div>
           </div>
           <div>
-            <label className="text-slate-400 font-semibold block mb-1">Lama Pemakaian (Bulan) & Terakhir Pakai:</label>
-            <input
-              type="text"
-              disabled={!canEdit}
-              value={`${form.lamaPemakaianBulan} Bulan (Terakhir: ${form.terakhirPakai})`}
-              onChange={e => setForm({ ...form, terakhirPakai: e.target.value })}
-              className="w-full p-2.5 bg-[#050e1c] border border-[#1b3459] rounded-xl text-white outline-none focus:border-emerald-500"
-            />
+            <label className="text-slate-400 font-semibold block mb-1">Lama Pemakaian &amp; Terakhir Pakai:</label>
+            <div className="grid grid-cols-2 gap-2">
+              <input
+                type="number"
+                disabled={!canEdit}
+                value={form.lamaPemakaianBulan}
+                onChange={e => setForm({ ...form, lamaPemakaianBulan: e.target.value })}
+                placeholder="Durasi (bulan)"
+                className="w-full p-2.5 bg-[#050e1c] border border-[#1b3459] rounded-xl text-white outline-none focus:border-emerald-500 placeholder-slate-600"
+              />
+              <input
+                type="text"
+                disabled={!canEdit}
+                value={form.terakhirPakai}
+                onChange={e => setForm({ ...form, terakhirPakai: e.target.value })}
+                placeholder="Terakhir pakai (hari)"
+                className="w-full p-2.5 bg-[#050e1c] border border-[#1b3459] rounded-xl text-white outline-none focus:border-emerald-500 placeholder-slate-600"
+              />
+            </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs pt-2">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs pt-2">
           <div>
             <label className="text-slate-400 font-semibold block mb-1">Diagnosis Klinis ICD-10:</label>
             <input
@@ -425,29 +506,46 @@ export const TabAsesmenMedis: React.FC<TabAsesmenMedisProps> = ({
               disabled={!canEdit}
               value={form.diagnosisKlinisIcd}
               onChange={e => setForm({ ...form, diagnosisKlinisIcd: e.target.value })}
-              className="w-full p-2.5 bg-[#050e1c] border border-[#1b3459] rounded-xl text-white font-mono outline-none focus:border-emerald-500"
+              placeholder="cth: F15.2 (Sindrom Ketergantungan Stimulansia)"
+              className="w-full p-2.5 bg-[#050e1c] border border-[#1b3459] rounded-xl text-white font-mono outline-none focus:border-emerald-500 placeholder-slate-600"
             />
           </div>
           <div>
-            <label className="text-slate-400 font-semibold block mb-1">Tingkat Risiko & Skor Instrumen:</label>
+            <label className="text-slate-400 font-semibold block mb-1">Skor Instrumen (ASSIST):</label>
             <input
-              type="text"
+              type="number"
               disabled={!canEdit}
-              value={`Skor WHO ASSIST: ${form.skorInstrumen} (${form.tingkatRisikoInstrumen})`}
+              value={form.skorInstrumen}
+              onChange={e => setForm({ ...form, skorInstrumen: e.target.value })}
+              placeholder="cth: 28"
+              className="w-full p-2.5 bg-[#050e1c] border border-[#1b3459] rounded-xl text-white outline-none focus:border-emerald-500 placeholder-slate-600"
+            />
+          </div>
+          <div>
+            <label className="text-slate-400 font-semibold block mb-1">Tingkat Risiko:</label>
+            <select
+              disabled={!canEdit}
+              value={form.tingkatRisikoInstrumen}
               onChange={e => setForm({ ...form, tingkatRisikoInstrumen: e.target.value })}
               className="w-full p-2.5 bg-[#050e1c] border border-[#1b3459] rounded-xl text-white outline-none focus:border-emerald-500"
-            />
+            >
+              <option value="">-- Pilih Tingkat Risiko --</option>
+              <option value="Rendah">Rendah (Penyalahgunaan Eksperimental)</option>
+              <option value="Sedang">Sedang (Penyalahgunaan Teratur / Berisiko)</option>
+              <option value="Tinggi (Ketergantungan)">Tinggi (Ketergantungan Berat)</option>
+            </select>
           </div>
         </div>
 
         <div className="text-xs pt-2">
-          <label className="text-slate-400 font-semibold block mb-1">Interpretasi Klinis & Resume Medis:</label>
+          <label className="text-slate-400 font-semibold block mb-1">Interpretasi Klinis &amp; Resume Medis:</label>
           <textarea
             rows={2}
             disabled={!canEdit}
             value={form.interpretasiKlinis}
             onChange={e => setForm({ ...form, interpretasiKlinis: e.target.value })}
-            className="w-full p-2.5 bg-[#050e1c] border border-[#1b3459] rounded-xl text-white outline-none focus:border-emerald-500 leading-relaxed"
+            placeholder="Tuliskan interpretasi kondisi fisik, gejala ketergantungan, komplikasi, dan pertimbangan klinis..."
+            className="w-full p-2.5 bg-[#050e1c] border border-[#1b3459] rounded-xl text-white outline-none focus:border-emerald-500 leading-relaxed placeholder-slate-600"
           />
         </div>
       </div>
@@ -468,8 +566,11 @@ export const TabAsesmenMedis: React.FC<TabAsesmenMedisProps> = ({
               onChange={e => setForm({ ...form, kebutuhanRawat: e.target.value })}
               className="w-full p-2.5 bg-[#050e1c] border border-[#1b3459] rounded-xl text-white outline-none focus:border-emerald-500"
             >
+              <option value="">-- Pilih Modalitas Usulan --</option>
               <option value="Rawat Inap">Rehabilitasi Medis Rawat Inap (Balai / RS)</option>
               <option value="Rawat Jalan">Rehabilitasi Medis Rawat Jalan (Kontrol Berkala)</option>
+              <option value="Detoksifikasi Medis Darurat">Detoksifikasi Medis Darurat</option>
+              <option value="Tidak Memerlukan Rawat">Tidak Memerlukan Rawat</option>
             </select>
           </div>
           <div>
@@ -477,12 +578,14 @@ export const TabAsesmenMedis: React.FC<TabAsesmenMedisProps> = ({
             <select
               disabled={!canEdit}
               value={form.durasiUsulanBulan}
-              onChange={e => setForm({ ...form, durasiUsulanBulan: Number(e.target.value) })}
+              onChange={e => setForm({ ...form, durasiUsulanBulan: e.target.value })}
               className="w-full p-2.5 bg-[#050e1c] border border-[#1b3459] rounded-xl text-white outline-none focus:border-emerald-500"
             >
+              <option value="">-- Pilih Durasi --</option>
+              <option value={1}>1 Bulan Detoksifikasi &amp; Stabilisasi</option>
               <option value={3}>3 (Tiga) Bulan Program Intensif</option>
               <option value={6}>6 (Enam) Bulan Program Lanjutan</option>
-              <option value={1}>1 Bulan Detoksifikasi & Stabilisasi</option>
+              <option value={12}>12 Bulan Program Komprehensif</option>
             </select>
           </div>
           <div>
@@ -492,9 +595,22 @@ export const TabAsesmenMedis: React.FC<TabAsesmenMedisProps> = ({
               disabled={!canEdit}
               value={form.fasilitasRujukan}
               onChange={e => setForm({ ...form, fasilitasRujukan: e.target.value })}
-              className="w-full p-2.5 bg-[#050e1c] border border-[#1b3459] rounded-xl text-white outline-none focus:border-emerald-500"
+              placeholder="cth: Balai Rehabilitasi BNN Tanah Merah"
+              className="w-full p-2.5 bg-[#050e1c] border border-[#1b3459] rounded-xl text-white outline-none focus:border-emerald-500 placeholder-slate-600"
             />
           </div>
+        </div>
+
+        <div>
+          <label className="text-slate-400 font-semibold block mb-1 text-xs">Catatan Khusus Dokter Asesor:</label>
+          <input
+            type="text"
+            disabled={!canEdit}
+            value={form.catatanKhusus}
+            onChange={e => setForm({ ...form, catatanKhusus: e.target.value })}
+            placeholder="Catatan tambahan untuk pembahasan pada Sidang Pleno TAT..."
+            className="w-full p-2.5 bg-[#050e1c] border border-[#1b3459] rounded-xl text-white outline-none focus:border-emerald-500 placeholder-slate-600 text-xs"
+          />
         </div>
 
         {canEdit && (
@@ -515,7 +631,7 @@ export const TabAsesmenMedis: React.FC<TabAsesmenMedisProps> = ({
               className="px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-xl text-xs font-bold transition-all shadow-lg shadow-emerald-950/40 flex items-center space-x-1.5 cursor-pointer disabled:opacity-50"
             >
               <CheckCircle2 className="w-4 h-4 text-emerald-200" />
-              <span>{isSaving ? 'Menyimpan...' : 'Finalisasi & Teruskan ke Tim Hukum'}</span>
+              <span>{isSaving ? 'Menyimpan...' : 'Finalisasi &amp; Teruskan ke Tim Hukum'}</span>
             </button>
           </div>
         )}

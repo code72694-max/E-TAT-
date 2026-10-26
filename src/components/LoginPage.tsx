@@ -288,42 +288,6 @@ export const LoginPage: React.FC<LoginPageProps> = ({
               </button>
             </div>
 
-            {/* Quick Fill Role Accounts */}
-            <div className="pt-1">
-              <div className="flex items-center justify-between text-[11px] text-slate-400 mb-2">
-                <span>Pilih Akun Role Cepat:</span>
-                <span className="text-slate-500 font-mono text-[10px]">Pass: password123</span>
-              </div>
-              <div className="grid grid-cols-2 gap-1.5">
-                {[
-                  { role: 'Admin', email: 'admin@gmail.com', desc: 'Sekretariat TAT' },
-                  { role: 'Pengaju', email: 'pengaju@gmail.com', desc: 'Penyidik Pemohon' },
-                  { role: 'Medis', email: 'medis@gmail.com', desc: 'Asesor Medis' },
-                  { role: 'Hukum', email: 'etatsiappulih@gmail.com', desc: 'Asesor Hukum' },
-                ].map(item => (
-                  <button
-                    key={item.email}
-                    type="button"
-                    onClick={() => {
-                      setEmailInput(item.email);
-                      setPasswordInput('password123');
-                      setLoginNotice(null);
-                    }}
-                    className={`px-2.5 py-1.5 rounded-lg border text-left transition-all text-xs flex flex-col justify-center cursor-pointer ${
-                      emailInput === item.email
-                        ? 'bg-[#D4AF37]/20 border-[#D4AF37] text-amber-200'
-                        : 'bg-[#081224]/80 border-[#1b3459] text-slate-300 hover:border-slate-500 hover:bg-[#0e1e36]'
-                    }`}
-                  >
-                    <span className="font-semibold text-[11px] leading-tight text-white flex items-center justify-between">
-                      {item.role}
-                      <span className="text-[10px] text-[#D4AF37] font-normal">{item.desc}</span>
-                    </span>
-                    <span className="text-[10px] text-slate-400 font-mono truncate">{item.email}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
 
             {/* Login Button */}
             <button

@@ -140,15 +140,25 @@ export const TabAdministrasi: React.FC<TabAdministrasiProps> = ({
           </p>
         </div>
 
-        <div className="flex items-center space-x-2">
-          <button
-            onClick={() => setShowSuratJawaban(true)}
-            className="bg-[#142642] hover:bg-[#1a345a] text-[#D4AF37] border border-[#234475] px-3.5 py-1.5 rounded-xl text-xs font-semibold flex items-center space-x-1.5 transition-colors cursor-pointer shadow"
-          >
-            <Printer className="w-3.5 h-3.5" />
-            <span>Draft Surat Jawaban</span>
-          </button>
-        </div>
+        {Boolean(
+          permohonan.timAsesmen ||
+          ['SCHEDULED', 'IN_ASSESSMENT', 'READY_FOR_CONFERENCE', 'CONFERENCE_HELD', 'AWAITING_SIGNED_OUTPUTS', 'RESULTS_ISSUED'].includes(permohonan.applicationStatus || '')
+        ) ? (
+          <div className="flex items-center space-x-2">
+            <button
+              type="button"
+              onClick={() => setShowSuratJawaban(true)}
+              className="bg-[#142642] hover:bg-[#1a345a] text-[#D4AF37] border border-[#234475] px-3.5 py-1.5 rounded-xl text-xs font-semibold flex items-center space-x-1.5 transition-colors cursor-pointer shadow"
+            >
+              <Printer className="w-3.5 h-3.5" />
+              <span>Draft Surat Jawaban</span>
+            </button>
+          </div>
+        ) : (
+          <div className="text-[11px] text-slate-500 italic bg-slate-900/60 border border-slate-800 px-3 py-1.5 rounded-lg">
+            Surat jawaban diterbitkan saat berkas disetujui &amp; masuk ke tahapan asesmen (Step 4)
+          </div>
+        )}
       </div>
 
       {/* Progress & Stat Cards */}

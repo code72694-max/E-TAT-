@@ -20,7 +20,9 @@ import {
   Award,
   Briefcase,
   Hash,
-  BadgeCheck
+  BadgeCheck,
+  Info,
+  ArrowLeft
 } from 'lucide-react';
 
 interface ProfileViewProps {
@@ -30,6 +32,7 @@ interface ProfileViewProps {
   onGoToLogin?: () => void;
   onGoToLanding?: () => void;
   onUpdateUser?: (updated: UserProfile) => void;
+  onBack?: () => void;
 }
 
 const normalizePetugas = (list?: (string | PetugasLainnyaItem)[]): PetugasLainnyaItem[] => {
@@ -57,7 +60,8 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
   onSelectUser,
   onGoToLogin,
   onGoToLanding,
-  onUpdateUser
+  onUpdateUser,
+  onBack
 }) => {
   const [showRoleSwitcher, setShowRoleSwitcher] = useState(false);
   const [showEditProfileModal, setShowEditProfileModal] = useState(false);
@@ -65,6 +69,16 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
   // Normalized Role checks
   const roleUpper = (currentUser.role || '').toUpperCase();
   const isMedisOrHukum = roleUpper === 'MEDIS' || roleUpper === 'HUKUM';
+  const isAdmin = roleUpper === 'ADMIN' || roleUpper === 'SEKRETARIAT';
+
+  // State for Ketua Tim TAT (Admin configuration)
+  const [isEditingKetua, setIsEditingKetua] = useState(false);
+  const [ketuaForm, setKetuaForm] = useState({
+    namaKetuaTAT: currentUser.namaKetuaTAT || 'Kompol Hendra Kusuma, S.I.K., M.Si.',
+    nipKetuaTAT: currentUser.nipKetuaTAT || '79080512',
+    pangkatKetuaTAT: currentUser.pangkatKetuaTAT || 'Komisaris Polisi (Kompol)',
+    jabatanKetuaTAT: currentUser.jabatanKetuaTAT || 'Ketua Tim TAT Kaltim'
+  });
 
   // Profile Edit Form State
   const [profileForm, setProfileForm] = useState({
@@ -111,7 +125,43 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
       phone: currentUser.phone || ''
     });
     setPetugasList(normalizePetugas(currentUser.petugasLainnya));
+    setKetuaForm({
+      namaKetuaTAT: currentUser.namaKetuaTAT || 'Kompol Hendra Kusuma, S.I.K., M.Si.',
+      nipKetuaTAT: currentUser.nipKetuaTAT || '79080512',
+      pangkatKetuaTAT: currentUser.pangkatKetuaTAT || 'Komisaris Polisi (Kompol)',
+      jabatanKetuaTAT: currentUser.jabatanKetuaTAT || 'Ketua Tim TAT Kaltim'
+    });
   }, [currentUser, roleUpper]);
+
+  const handleSaveKetua = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!ketuaForm.namaKetuaTAT.trim()) {
+      setNotification({
+        type: 'error',
+        message: 'Nama Ketua Tim TAT tidak boleh kosong.'
+      });
+      return;
+    }
+
+    const updatedUser: UserProfile = {
+      ...currentUser,
+      namaKetuaTAT: ketuaForm.namaKetuaTAT.trim(),
+      nipKetuaTAT: ketuaForm.nipKetuaTAT.trim(),
+      pangkatKetuaTAT: ketuaForm.pangkatKetuaTAT.trim(),
+      jabatanKetuaTAT: ketuaForm.jabatanKetuaTAT.trim()
+    };
+
+    if (onUpdateUser) {
+      onUpdateUser(updatedUser);
+    }
+
+    setIsEditingKetua(false);
+    setNotification({
+      type: 'success',
+      message: 'Pejabat Ketua Tim TAT berhasil diperbarui dan diterapkan ke seluruh dokumen!'
+    });
+    setTimeout(() => setNotification(null), 4000);
+  };
 
   // Cohesive, professional rank badges
   const getRoleBadge = (role: UserRole) => {
@@ -344,6 +394,17 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
 
   return (
     <div className="space-y-5 pb-12">
+      {/* Page Title Header */}
+      <div className="pb-3 border-b border-slate-800">
+        <h1 className="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+          <User className="w-5 h-5 text-blue-400" />
+          <span>Halaman Profil &amp; Pengaturan Pejabat TAT</span>
+        </h1>
+        <p className="text-xs text-slate-400 mt-0.5">
+          Kelola data profil kedinasan akun dan data Pejabat Ketua Tim TAT untuk dokumen penandatanganan resmi.
+        </p>
+      </div>
+
       {/* Toast Notification */}
       {notification && (
         <div
@@ -372,28 +433,28 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
       )}
 
       {/* Top Banner Profile Header */}
-      <div className="bg-[#0b172a] border border-[#1c355e] rounded-2xl p-5 sm:p-6 shadow-md relative overflow-hidden">
+      <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 sm:p-6 shadow-sm relative overflow-hidden">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-5">
           <div className="flex items-center space-x-4 min-w-0">
-            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-[#13243d] border border-[#274675] flex items-center justify-center shrink-0 shadow-inner">
-              <UserCheck className="w-8 h-8 sm:w-10 sm:h-10 text-[#d4af37]" />
+            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center shrink-0">
+              <UserCheck className="w-8 h-8 sm:w-10 sm:h-10 text-slate-300" />
             </div>
             <div className="min-w-0 flex-1">
               <div className="flex items-center space-x-2 flex-wrap gap-y-1">
                 <span className={`text-[10px] uppercase font-bold font-mono px-2 py-0.5 rounded border ${badgeInfo.color}`}>
                   {badgeInfo.label}
                 </span>
-                <span className="text-[10px] text-slate-300 font-mono font-medium bg-[#14243e] px-2 py-0.5 rounded border border-[#234168] flex items-center space-x-1">
-                  <ShieldCheck className="w-3 h-3 text-[#d4af37] inline" />
+                <span className="text-[10px] text-slate-300 font-mono font-medium bg-slate-800 px-2 py-0.5 rounded border border-slate-700 flex items-center space-x-1">
+                  <ShieldCheck className="w-3 h-3 text-emerald-400 inline" />
                   <span>TERVERIFIKASI PUSDATIN</span>
                 </span>
               </div>
-              <h1 className="text-lg sm:text-2xl font-bold text-white mt-1 tracking-tight truncate">
+              <h2 className="text-lg sm:text-2xl font-bold text-white mt-1 tracking-tight truncate">
                 {currentUser.name}
-              </h1>
+              </h2>
               <div className="flex items-center space-x-2 text-xs sm:text-sm text-slate-300 font-medium mt-0.5 flex-wrap gap-y-1">
                 {currentUser.pangkat && (
-                  <span className="text-[#d4af37] font-semibold">{currentUser.pangkat}</span>
+                  <span className="text-amber-400 font-semibold">{currentUser.pangkat}</span>
                 )}
                 {currentUser.pangkat && currentUser.position && <span>•</span>}
                 {currentUser.position && (
@@ -406,11 +467,11 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
             </div>
           </div>
 
-          <div className="flex items-center space-x-3 shrink-0 pt-3 md:pt-0 border-t md:border-t-0 border-[#1c355e]">
+          <div className="flex items-center space-x-3 shrink-0 pt-3 md:pt-0 border-t md:border-t-0 border-slate-800">
             <button
               type="button"
               onClick={() => setShowEditProfileModal(true)}
-              className="bg-[#1b2b48] hover:bg-[#23385d] text-[#d4af37] text-xs font-semibold px-3.5 py-2 rounded-xl border border-[#d4af37]/40 transition-colors flex items-center space-x-2 cursor-pointer shadow-sm"
+              className="bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white text-xs font-semibold px-3.5 py-2 rounded-xl border border-slate-700 transition-colors flex items-center space-x-2 cursor-pointer shadow-sm"
             >
               <Edit3 className="w-3.5 h-3.5" />
               <span>Edit Profil &amp; Jabatan</span>
@@ -497,6 +558,162 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
 
         {/* Right Column: Tim Pemeriksa Lainnya (Khusus Hukum & Medis), Hak Akses, Keamanan */}
         <div className="lg:col-span-2 space-y-5">
+          {/* Card Khusus: Pengaturan Pejabat Ketua Tim TAT (HANYA UNTUK ROLE ADMIN / SEKRETARIAT) */}
+          {isAdmin && (
+            <div className="bg-[#0b172a] border-2 border-[#d4af37]/40 rounded-2xl p-5 sm:p-6 shadow-md space-y-4 relative overflow-hidden">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-[#1c355e] gap-2">
+                <div>
+                  <h2 className="text-sm font-bold text-white flex items-center space-x-2">
+                    <Award className="w-4 h-4 text-[#d4af37]" />
+                    <span>Pejabat Penandatangan: Ketua Tim Asesmen Terpadu (TAT)</span>
+                  </h2>
+                  <p className="text-[11px] text-slate-400 mt-0.5">
+                    Nama dan identitas Ketua Tim TAT yang dicantumkan pada Berita Acara Pleno, Surat Pengantar Tersangka, dan Surat Rekomendasi Resmi.
+                  </p>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className="text-[10px] font-mono font-bold px-2.5 py-1 rounded-full border bg-emerald-500/10 text-emerald-300 border-emerald-500/30 flex items-center gap-1">
+                    <ShieldCheck className="w-3 h-3 text-emerald-400" />
+                    OTORISASI ADMIN
+                  </span>
+                </div>
+              </div>
+
+              {/* Informative Guidance */}
+              <div className="bg-[#081224] border border-[#1e3a6a] rounded-xl p-3.5 text-xs text-slate-300 space-y-1">
+                <div className="flex items-start space-x-2">
+                  <Info className="w-4 h-4 text-[#d4af37] shrink-0 mt-0.5" />
+                  <p className="leading-relaxed">
+                    Admin dapat menentukan siapa nama Ketua Tim TAT yang bertandatangan di dokumen resmi. Anda dapat menggunakan akun Anda sendiri atau nama pejabat Ketua TAT yang berwenang.
+                  </p>
+                </div>
+              </div>
+
+              {/* Ketua Current Info Card */}
+              <div className="bg-[#10223d] border border-[#d4af37]/40 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex items-center space-x-3 min-w-0">
+                  <div className="w-10 h-10 rounded-xl bg-[#d4af37]/20 border border-[#d4af37]/50 flex items-center justify-center shrink-0">
+                    <Award className="w-5 h-5 text-[#d4af37]" />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-center space-x-2 flex-wrap gap-y-0.5">
+                      <span className="font-bold text-sm text-white">{currentUser.namaKetuaTAT || currentUser.name}</span>
+                      <span className="text-[9px] bg-[#d4af37]/20 text-[#d4af37] border border-[#d4af37]/40 font-mono font-bold px-2 py-0.5 rounded">
+                        KETUA TIM TAT AKTIF
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-300 mt-0.5">
+                      {currentUser.jabatanKetuaTAT || 'Ketua Tim TAT Kaltim'} •{' '}
+                      <span className="text-[#d4af37] font-semibold">{currentUser.pangkatKetuaTAT || 'Komisaris Polisi (Kompol)'}</span> •{' '}
+                      <span className="font-mono text-slate-300">NRP/NIP: {currentUser.nipKetuaTAT || currentUser.nip || '79080512'}</span>
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setIsEditingKetua(!isEditingKetua)}
+                  className="bg-[#1b3459] hover:bg-[#234475] border border-[#2e5a96] text-white text-xs font-semibold px-3 py-1.5 rounded-xl transition-colors flex items-center space-x-1.5 shrink-0 cursor-pointer"
+                >
+                  <Edit3 className="w-3.5 h-3.5 text-[#d4af37]" />
+                  <span>{isEditingKetua ? 'Tutup Form' : 'Ubah Pejabat Ketua'}</span>
+                </button>
+              </div>
+
+              {/* Form Ubah Ketua */}
+              {isEditingKetua && (
+                <form onSubmit={handleSaveKetua} className="bg-[#081224] border border-[#234475] rounded-xl p-4 space-y-3 animate-in fade-in duration-150">
+                  <div className="flex items-center justify-between pb-2 border-b border-[#1c355e]">
+                    <span className="text-xs font-bold text-white flex items-center gap-1.5">
+                      <Edit3 className="w-3.5 h-3.5 text-[#d4af37]" />
+                      Edit Pejabat Ketua Tim TAT
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setKetuaForm({
+                          namaKetuaTAT: currentUser.name,
+                          nipKetuaTAT: currentUser.nip,
+                          pangkatKetuaTAT: currentUser.pangkat || 'Komisaris Polisi (Kompol)',
+                          jabatanKetuaTAT: 'Ketua Tim TAT Kaltim'
+                        });
+                      }}
+                      className="text-[11px] text-[#d4af37] hover:underline cursor-pointer"
+                    >
+                      ⚡ Gunakan Data Profil Admin Sendiri
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                    <div className="space-y-1">
+                      <label className="text-slate-300 font-semibold block">Nama Lengkap &amp; Gelar Resmi *</label>
+                      <input
+                        type="text"
+                        required
+                        value={ketuaForm.namaKetuaTAT}
+                        onChange={(e) => setKetuaForm({ ...ketuaForm, namaKetuaTAT: e.target.value })}
+                        placeholder="Contoh: Kompol Hendra Kusuma, S.I.K., M.Si."
+                        className="w-full bg-[#0b172a] border border-[#1c355e] focus:border-[#d4af37] text-white px-3 py-2 rounded-xl outline-none"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-slate-300 font-semibold block">NRP / NIP Ketua TAT *</label>
+                      <input
+                        type="text"
+                        required
+                        value={ketuaForm.nipKetuaTAT}
+                        onChange={(e) => setKetuaForm({ ...ketuaForm, nipKetuaTAT: e.target.value })}
+                        placeholder="Contoh: 79080512"
+                        className="w-full bg-[#0b172a] border border-[#1c355e] focus:border-[#d4af37] text-white px-3 py-2 rounded-xl outline-none font-mono"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-slate-300 font-semibold block">Pangkat / Korps *</label>
+                      <input
+                        type="text"
+                        required
+                        value={ketuaForm.pangkatKetuaTAT}
+                        onChange={(e) => setKetuaForm({ ...ketuaForm, pangkatKetuaTAT: e.target.value })}
+                        placeholder="Contoh: Komisaris Polisi (Kompol)"
+                        className="w-full bg-[#0b172a] border border-[#1c355e] focus:border-[#d4af37] text-white px-3 py-2 rounded-xl outline-none"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-slate-300 font-semibold block">Jabatan Resmi pada Dokumen *</label>
+                      <input
+                        type="text"
+                        required
+                        value={ketuaForm.jabatanKetuaTAT}
+                        onChange={(e) => setKetuaForm({ ...ketuaForm, jabatanKetuaTAT: e.target.value })}
+                        placeholder="Contoh: Ketua Tim TAT Kaltim"
+                        className="w-full bg-[#0b172a] border border-[#1c355e] focus:border-[#d4af37] text-white px-3 py-2 rounded-xl outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end gap-2 pt-2 border-t border-[#1c355e]">
+                    <button
+                      type="button"
+                      onClick={() => setIsEditingKetua(false)}
+                      className="px-3 py-1.5 rounded-xl text-xs text-slate-300 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
+                    >
+                      Batal
+                    </button>
+                    <button
+                      type="submit"
+                      className="bg-[#d4af37] hover:bg-[#c49f27] text-[#0b172a] font-bold text-xs px-4 py-1.5 rounded-xl transition-colors cursor-pointer shadow-md"
+                    >
+                      Simpan Pejabat Ketua TAT
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
+          )}
+
           {/* Card Khusus: Daftar Petugas Tim Pemeriksa (HANYA UNTUK ROLE HUKUM & MEDIS) */}
           {isMedisOrHukum && (
             <div className="bg-[#0b172a] border-2 border-[#d4af37]/30 rounded-2xl p-5 sm:p-6 shadow-md space-y-4 relative overflow-hidden">

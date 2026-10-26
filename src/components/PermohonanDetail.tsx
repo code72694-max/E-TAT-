@@ -110,7 +110,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
     setCurrentPermohonan(initialPermohonan);
   }, [initialPermohonan]);
 
-  // Muat data riil terkini dari backend API saat komponen dipasang (lewati untuk seed mock riwayat-*)
+  // Muat data riil terkini dari backend API saat komponen dipasang & polling halus berkala
   useEffect(() => {
     if (!initialPermohonan.id || initialPermohonan.id.startsWith('riwayat-')) return;
 
@@ -145,8 +145,16 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
 
     fetchLatestData();
 
+    // Polling halus setiap 12 detik agar admin & pengaju langsung melihat perubahan dari asesor medis & hukum
+    const interval = setInterval(() => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+        fetchLatestData();
+      }
+    }, 12000);
+
     return () => {
       isMounted = false;
+      clearInterval(interval);
     };
   }, [initialPermohonan.id]);
 
@@ -213,6 +221,8 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
 
     const isDispatchedToMedis = Boolean(
       currentPermohonan.timAsesmen?.dikirimKeMedis ||
+      Boolean(currentPermohonan.timAsesmen?.asesorMedisNama) ||
+      Boolean(currentPermohonan.timAsesmen?.jadwalPemeriksaanMedis) ||
       currentPermohonan.statusProsesUtama === 'asesmen_berlangsung' ||
       currentPermohonan.statusProsesUtama === 'medis_selesai' ||
       currentPermohonan.statusProsesUtama === 'telaah_hukum' ||
@@ -221,7 +231,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
       currentPermohonan.statusProsesUtama === 'pengesahan_rekomendasi' ||
       currentPermohonan.statusProsesUtama === 'rekomendasi_terbit' ||
       currentPermohonan.statusProsesUtama === 'selesai_tindak_lanjut' ||
-      ['IN_ASSESSMENT', 'READY_FOR_CONFERENCE', 'CONFERENCE_HELD', 'AWAITING_SIGNED_OUTPUTS', 'RESULTS_ISSUED'].includes(currentPermohonan.applicationStatus || '') ||
+      ['SCHEDULED', 'ASSESSMENT_ACTIVE', 'IN_ASSESSMENT', 'READY_FOR_CONFERENCE', 'CONFERENCE_HELD', 'AWAITING_SIGNED_OUTPUTS', 'RESULTS_ISSUED'].includes(currentPermohonan.applicationStatus || '') ||
       currentPermohonan.id?.startsWith('riwayat-') ||
       Boolean(currentPermohonan.asesmenMedis?.diagnosisKlinisIcd)
     );
@@ -331,6 +341,27 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
   // Info penguncian tab untuk tahapan yang belum selesai
   const getTabLockInfo = (tabId: DetailTab): { isLocked: boolean; reason: string } => {
     if (isTahapPermohonan) return { isLocked: false, reason: '' };
+
+    // Tab 5: Telaah Hukum non-aktif jika Asesmen Medis belum selesai
+    if (tabId === 'hukum') {
+      const isMedisDone =
+        currentPermohonan.medicalStatus === 'FINAL' ||
+        currentPermohonan.statusMedis === 'siap_dibahas' ||
+        (currentPermohonan.asesmenMedis as any)?.status === 'FINAL' ||
+        Boolean(currentPermohonan.asesmenMedis?.diagnosisKlinisIcd) ||
+        Boolean(currentPermohonan.timAsesmen?.dikirimKeHukum) ||
+        ['telaah_hukum', 'medis_selesai', 'siap_pleno', 'pleno_berlangsung', 'pengesahan_rekomendasi', 'rekomendasi_terbit', 'selesai_tindak_lanjut'].includes(currentPermohonan.statusProsesUtama || '') ||
+        ['READY_FOR_CONFERENCE', 'CONFERENCE_HELD', 'AWAITING_SIGNED_OUTPUTS', 'RESULTS_ISSUED'].includes(currentPermohonan.applicationStatus || '') ||
+        currentPermohonan.id?.startsWith('riwayat-');
+
+      if (!isMedisDone) {
+        return {
+          isLocked: true,
+          reason: 'Tahap Telaah Hukum belum dapat diakses karena Pemeriksaan Asesmen Medis & Toksikologi harus diselesaikan dan difinalisasi terlebih dahulu oleh Tim Dokter Asesor Medis.'
+        };
+      }
+    }
+
     if (tabId === 'pleno') {
       const medisDone = currentPermohonan.medicalStatus === 'FINAL' || Boolean(currentPermohonan.asesmenMedis?.diagnosisKlinisIcd);
       const hukumDone = currentPermohonan.legalStatus === 'FINAL' || Boolean(currentPermohonan.asesmenHukum?.analisisPeran);
@@ -384,6 +415,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
       {showSuratJawaban && (
         <SuratJawabanModal
           permohonan={currentPermohonan}
+          currentUser={currentUser}
           onClose={() => setShowSuratJawaban(false)}
         />
       )}
@@ -393,38 +425,39 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-1.5 text-[11px] sm:text-xs w-full">
           <div className="grid grid-cols-[115px_10px_1fr] items-center gap-y-1.5">
             <span className="text-slate-400 font-medium">No. Permohonan</span>
-              <span className="text-slate-500 font-medium">:</span>
-              <span className="font-semibold text-slate-100 font-mono">
-                {currentPermohonan.nomorPermohonan}
-              </span>
+            <span className="text-slate-500 font-medium">:</span>
+            <span className="font-semibold text-slate-100 font-mono">
+              {currentPermohonan.nomorPermohonan}
+            </span>
 
-              <span className="text-slate-400 font-medium">Nama Pengaju</span>
-              <span className="text-slate-500 font-medium">:</span>
-              <span className="font-semibold text-slate-100">
-                {currentPermohonan.pengajuNama || currentPermohonan.perkara?.namaPenyidik || 'Penyidik Sat Resnarkoba'}
-              </span>
+            <span className="text-slate-400 font-medium">Nama Pengaju</span>
+            <span className="text-slate-500 font-medium">:</span>
+            <span className="font-semibold text-slate-100">
+              {currentPermohonan.pengajuNama || currentPermohonan.perkara?.namaPenyidik || 'Penyidik Sat Resnarkoba'}
+            </span>
 
-              {!hideEmailPengaju && (
-                <>
-                  <span className="text-slate-400 font-medium">Email Pengaju</span>
-                  <span className="text-slate-500 font-medium">:</span>
-                  <span className="font-semibold text-slate-100 truncate">
-                    {currentPermohonan.pengajuEmail || 'etatsiappulih@gmail.com'}
-                  </span>
-                </>
-              )}
-            </div>
+            {!hideEmailPengaju && (
+              <>
+                <span className="text-slate-400 font-medium">Email Pengaju</span>
+                <span className="text-slate-500 font-medium">:</span>
+                <span className="font-semibold text-slate-100 truncate">
+                  {currentPermohonan.pengajuEmail || 'etatsiappulih@gmail.com'}
+                </span>
+              </>
+            )}
+          </div>
 
-            <div className="grid grid-cols-[115px_10px_1fr] items-center gap-y-1.5">
-              <span className="text-slate-400 font-medium">Tanggal Pengajuan</span>
-              <span className="text-slate-500 font-medium">:</span>
-              <span className="font-semibold text-slate-200">
-                {currentPermohonan.tanggalPengajuan}
-              </span>
+          <div className="grid grid-cols-[115px_10px_1fr] items-center gap-y-1.5">
+            <span className="text-slate-400 font-medium">Tanggal Pengajuan</span>
+            <span className="text-slate-500 font-medium">:</span>
+            <span className="font-semibold text-slate-200">
+              {currentPermohonan.tanggalPengajuan}
+            </span>
 
-              <span className="text-slate-400 font-medium">Status</span>
-              <span className="text-slate-500 font-medium">:</span>
-              <div className="flex items-center">
+            <span className="text-slate-400 font-medium">Status</span>
+            <span className="text-slate-500 font-medium">:</span>
+            <div className="flex items-center justify-between gap-2">
+              <div>
                 {isTahapPermohonan ? (
                   currentPermohonan.applicationStatus === 'NEEDS_CORRECTION' || currentPermohonan.statusProsesUtama === 'perlu_perbaikan' ? (
                     <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-md text-[11px] font-bold bg-rose-950/80 text-rose-300 border border-rose-700/60 shadow-sm">
@@ -449,9 +482,23 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
                   </span>
                 )}
               </div>
+
+              {/* Tombol Lihat Surat Jawaban (Tersedia untuk Pengaju & Admin saat berkas telah masuk Step 4 / Disetujui) */}
+              {(!isTahapPermohonan || currentPermohonan.timAsesmen || currentPermohonan.suratJawabanNomor) && (
+                <button
+                  type="button"
+                  onClick={() => setShowSuratJawaban(true)}
+                  className="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-600/20 hover:bg-amber-600/30 text-amber-300 hover:text-amber-200 border border-amber-500/40 rounded-lg text-[11px] font-bold transition-all shadow-sm cursor-pointer shrink-0"
+                  title="Lihat Surat Jawaban Resmi & Jadwal Asesmen Terpadu"
+                >
+                  <FileText className="w-3 h-3 text-amber-400" />
+                  <span>Surat Jawaban</span>
+                </button>
+              )}
             </div>
           </div>
         </div>
+      </div>
 
       {/* Read-Only Mode Banner */}
       {effectiveReadonly && (

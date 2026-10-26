@@ -295,6 +295,36 @@ export const permohonanApi = {
   lacak: async (trackingNumber: string) => {
     return request<any>(`/permohonan/lacak/${encodeURIComponent(trackingNumber)}`);
   },
+
+  getSuratJawabanPdfUrl: (id: string) => {
+    return `${API_BASE}/permohonan/${id}/surat-jawaban/pdf`;
+  },
+
+  downloadSuratJawabanPdf: async (id: string, filename?: string) => {
+    const token = tokenStorage.getAccessToken();
+    const res = await fetch(`${API_BASE}/permohonan/${id}/surat-jawaban/pdf`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => null);
+      throw new Error(err?.message || 'Gagal mengunduh Surat Jawaban PDF.');
+    }
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename || `SURAT-JAWABAN-${id}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+  },
+
+  kirimUlangSuratJawaban: async (id: string) => {
+    return request<any>(`/permohonan/${id}/surat-jawaban/kirim`, {
+      method: 'POST',
+    });
+  },
 };
 
 // =====================================================================

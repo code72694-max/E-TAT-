@@ -3,6 +3,7 @@ import { X, Printer } from 'lucide-react';
 import { PermohonanAsesmen, MonitoringTindakLanjut, UserProfile } from '../types';
 import { QrCodeImg, buildLacakVerificationUrl } from './QrCodeComponent';
 import { printLegalDocument } from '../utils/printLegalDoc';
+import { getKetuaTAT } from '../utils/getKetuaTAT';
 
 interface LembarKendaliModalProps {
   permohonan: PermohonanAsesmen;
@@ -23,6 +24,7 @@ export const LembarKendaliModal: React.FC<LembarKendaliModalProps> = ({
 
   const t = permohonan.terperiksa;
   const p = permohonan;
+  const ketuaInfo = getKetuaTAT(currentUser, p);
   const pel = monitoring.pelaksanaanRehab;
   const namaKlien = cleanStr(t?.namaLengkap || (t as any)?.namaTerperiksa) || 'Klien Terperiksa';
   const noLp = p.perkara?.nomorLaporanPolisi || p.perkara?.nomorLp || '-';
@@ -295,9 +297,11 @@ export const LembarKendaliModal: React.FC<LembarKendaliModalProps> = ({
                 </p>
                 <div style={{ height: '55px' }}></div>
                 <p style={{ fontWeight: 'bold', textDecoration: 'underline', fontSize: '10.5pt', margin: 0 }}>
-                  KOMBES POL AHMAD RIFA'I, S.I.K.
+                  {ketuaInfo.nama}
                 </p>
-                <p style={{ fontSize: '9pt', color: '#333', margin: 0 }}>NRP. 75080912</p>
+                <p style={{ fontSize: '9pt', color: '#333', margin: 0 }}>
+                  {ketuaInfo.nrp ? `${ketuaInfo.nrp.length > 10 ? 'NIP' : 'NRP'}. ${ketuaInfo.nrp}` : ketuaInfo.jabatan}
+                </p>
               </div>
             </div>
           </div>

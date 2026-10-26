@@ -3,6 +3,7 @@ import { PermohonanAsesmen, UserProfile } from '../types';
 import { PublicHeader } from './PublicHeader';
 import { PermohonanDetail } from './PermohonanDetail';
 import { DetailPemantauanRehabView } from './DetailPemantauanRehabView';
+import { getKodeLacakRehab, normalizeSearchCode } from '../utils/getKodeLacak';
 import {
   Search,
   CheckCircle2,
@@ -247,17 +248,21 @@ export const LacakBerkasPage: React.FC<LacakBerkasPageProps> = ({
 
     const searchTarget = (idFromUrl || nomorFromUrl || trackFromUrl || baFromUrl || qFromUrl || '').trim().toLowerCase();
     if (!searchTarget) return;
+    const searchTargetClean = normalizeSearchCode(searchTarget);
 
     // 1. Cari di local permohonanList
     const found = permohonanList.find(p => {
-      const matchId = p.id && p.id.toLowerCase() === searchTarget;
-      const matchNo = p.nomorPermohonan && (p.nomorPermohonan.toLowerCase() === searchTarget || p.nomorPermohonan.toLowerCase().includes(searchTarget));
-      const matchTrack = p.trackingNumber && (p.trackingNumber.toLowerCase() === searchTarget || p.trackingNumber.toLowerCase().includes(searchTarget));
+      const kode = getKodeLacakRehab(p).toLowerCase();
+      const cleanKode = normalizeSearchCode(kode);
+      const matchKodeLacak =
+        (cleanKode && searchTargetClean && (cleanKode === searchTargetClean || cleanKode.includes(searchTargetClean) || searchTargetClean.includes(cleanKode))) ||
+        (kode && (kode === searchTarget || kode.includes(searchTarget))) ||
+        (p.nomorSuratPengantarTersangka && (p.nomorSuratPengantarTersangka.toLowerCase().includes(searchTarget) || normalizeSearchCode(p.nomorSuratPengantarTersangka).includes(searchTargetClean)));
+      const matchId = p.id && (p.id.toLowerCase() === searchTarget || p.id.toLowerCase().includes(searchTarget) || normalizeSearchCode(p.id).includes(searchTargetClean));
+      const matchNo = p.nomorPermohonan && (p.nomorPermohonan.toLowerCase() === searchTarget || p.nomorPermohonan.toLowerCase().includes(searchTarget) || normalizeSearchCode(p.nomorPermohonan).includes(searchTargetClean));
+      const matchTrack = p.trackingNumber && (p.trackingNumber.toLowerCase() === searchTarget || p.trackingNumber.toLowerCase().includes(searchTarget) || normalizeSearchCode(p.trackingNumber).includes(searchTargetClean));
       const matchBa = p.sidangPleno?.nomorBeritaAcara && p.sidangPleno.nomorBeritaAcara.toLowerCase().includes(searchTarget);
       const matchRekom = p.rekomendasiResmi?.nomorSurat && p.rekomendasiResmi.nomorSurat.toLowerCase().includes(searchTarget);
-      const matchKodeLacak = (p.kodeLacakRehab && p.kodeLacakRehab.toLowerCase() === searchTarget) ||
-        ((p.tindakLanjut as any)?.kodeLacakRehab && (p.tindakLanjut as any).kodeLacakRehab.toLowerCase() === searchTarget) ||
-        (p.nomorSuratPengantarTersangka && p.nomorSuratPengantarTersangka.toLowerCase().includes(searchTarget));
       return matchId || matchNo || matchTrack || matchBa || matchRekom || matchKodeLacak;
     });
 
@@ -292,6 +297,7 @@ export const LacakBerkasPage: React.FC<LacakBerkasPageProps> = ({
       return [];
     }
     const q = searchQuery.trim().toLowerCase();
+    const qClean = normalizeSearchCode(q);
     return permohonanList.filter(p => {
       const noPermohonan = (p.nomorPermohonan || '').toLowerCase();
       const tracking = (p.trackingNumber || '').toLowerCase();
@@ -299,14 +305,20 @@ export const LacakBerkasPage: React.FC<LacakBerkasPageProps> = ({
       const nik = (p.terperiksa?.nik || '').toLowerCase();
       const lp = (p.perkara?.nomorLaporanPolisi || '').toLowerCase();
       const instansi = (p.instansiPengaju || '').toLowerCase();
+      const kodeLacak = getKodeLacakRehab(p).toLowerCase();
+      const cleanKode = normalizeSearchCode(kodeLacak);
 
       return (
         noPermohonan.includes(q) ||
+        normalizeSearchCode(noPermohonan).includes(qClean) ||
         tracking.includes(q) ||
         nama.includes(q) ||
         nik.includes(q) ||
         lp.includes(q) ||
-        instansi.includes(q)
+        instansi.includes(q) ||
+        kodeLacak.includes(q) ||
+        (cleanKode && qClean && (cleanKode.includes(qClean) || qClean.includes(cleanKode))) ||
+        (p.id && (p.id.toLowerCase().includes(q) || normalizeSearchCode(p.id).includes(qClean)))
       );
     });
   }, [searchQuery, hasSearched, permohonanList]);
@@ -316,12 +328,24 @@ export const LacakBerkasPage: React.FC<LacakBerkasPageProps> = ({
     if (!hasSearched || !searchQuery.trim()) {
       return [];
     }
-    const rehabEligibleList = permohonanList.filter(isRehabEligible);
     const q = searchQuery.trim().toLowerCase();
-    return rehabEligibleList.filter(p => {
+    const qClean = normalizeSearchCode(q);
+
+    return permohonanList.filter(p => {
+      const kodeLacak = getKodeLacakRehab(p).toLowerCase();
+      const cleanKode = normalizeSearchCode(kodeLacak);
+      const isDirectKodeMatch = Boolean(cleanKode && qClean && (cleanKode.includes(qClean) || qClean.includes(cleanKode)));
+
+      // Jika cocok langsung dengan kode lacak, selalu loloskan! Jika bukan, pastikan perkara masuk tahap pleno / rehab
+      if (!isDirectKodeMatch && !isRehabEligible(p)) {
+        return false;
+      }
+
       const noPermohonan = (p.nomorPermohonan || '').toLowerCase();
       const tracking = (p.trackingNumber || '').toLowerCase();
       const nama = (p.terperiksa?.namaLengkap || '').toLowerCase();
+      const nik = (p.terperiksa?.nik || '').toLowerCase();
+      const lp = (p.perkara?.nomorLaporanPolisi || '').toLowerCase();
       const noRekom = (p.rekomendasiResmi?.nomorSurat || '').toLowerCase();
       const noBa = (p.sidangPleno?.nomorBeritaAcara || '').toLowerCase();
       const fasilitas = (
@@ -330,19 +354,22 @@ export const LacakBerkasPage: React.FC<LacakBerkasPageProps> = ({
         p.sidangPleno?.fasilitasRujukanUsulan ||
         ''
       ).toLowerCase();
-
-      const kodeLacak = (p.kodeLacakRehab || (p.tindakLanjut as any)?.kodeLacakRehab || '').toLowerCase();
       const noSurat = (p.nomorSuratPengantarTersangka || (p.tindakLanjut as any)?.nomorSuratRujukan || '').toLowerCase();
 
       return (
+        isDirectKodeMatch ||
+        kodeLacak.includes(q) ||
         noPermohonan.includes(q) ||
+        normalizeSearchCode(noPermohonan).includes(qClean) ||
         tracking.includes(q) ||
         nama.includes(q) ||
+        nik.includes(q) ||
+        lp.includes(q) ||
         noRekom.includes(q) ||
         noBa.includes(q) ||
         fasilitas.includes(q) ||
-        kodeLacak.includes(q) ||
-        noSurat.includes(q)
+        noSurat.includes(q) ||
+        (p.id && (p.id.toLowerCase().includes(q) || normalizeSearchCode(p.id).includes(qClean)))
       );
     });
   }, [searchQuery, hasSearched, permohonanList]);
@@ -352,6 +379,12 @@ export const LacakBerkasPage: React.FC<LacakBerkasPageProps> = ({
     e.preventDefault();
     setHasSearched(true);
     setSelectedPermohonan(null);
+
+    // Auto-switch ke tab rehab jika yang dicari adalah format kode lacak rehabilitasi RHB-
+    const cleanQ = normalizeSearchCode(searchQuery);
+    if (cleanQ.startsWith('rhb')) {
+      setActivePortalTab('rehab');
+    }
   };
 
   const selectSample = (code: string) => {
@@ -710,9 +743,14 @@ export const LacakBerkasPage: React.FC<LacakBerkasPageProps> = ({
                                       <span className="text-slate-400 font-normal text-xs">({item.terperiksa.usia} th)</span>
                                     )}
                                   </h3>
-                                  <span className="font-mono text-xs text-slate-400 block">
-                                    {noRekom}
-                                  </span>
+                                  <div className="flex items-center gap-2 flex-wrap pt-0.5">
+                                    <span className="font-mono text-xs text-slate-400">
+                                      {noRekom}
+                                    </span>
+                                    <span className="bg-emerald-950/90 border border-emerald-500/50 text-emerald-300 text-[10.5px] font-mono font-bold px-2 py-0.5 rounded-md shadow-sm">
+                                      Kode Lacak: {getKodeLacakRehab(item)}
+                                    </span>
+                                  </div>
                                 </div>
                                 <span className={`text-[10px] font-bold px-2.5 py-1 rounded-md border shrink-0 ${info.statusKepatuhan.badgeCls}`}>
                                   {info.statusKepatuhan.label}

@@ -201,15 +201,18 @@ export const BeritaAcaraModal: React.FC<BeritaAcaraModalProps> = ({ permohonan, 
 
   // Pimpinan / Ketua Tim TAT
   const ketuaNama = cleanStr(
+    currentUser?.namaKetuaTAT ||
     (isAdminLoggedIn ? currentUser.name : null) ||
     pleno?.pimpinanPleno ||
     p.timAsesmen?.sekretariatNama ||
     'Kompol Hendra Kusuma, S.I.K., M.Si.'
   );
-  const ketuaNrp = (isAdminLoggedIn ? currentUser.nip : null) ||
+  const ketuaNrp = currentUser?.nipKetuaTAT ||
+    (isAdminLoggedIn ? currentUser.nip : null) ||
     (pleno as any)?.nrpPimpinan ||
     '79080512';
-  const ketuaJabatan = (isAdminLoggedIn ? currentUser.position : null) ||
+  const ketuaJabatan = currentUser?.jabatanKetuaTAT ||
+    (isAdminLoggedIn ? currentUser.position : null) ||
     'KOMISARIS POLISI / KETUA TIM';
 
   // URL verifikasi resmi e-TAT untuk barcode dan scan publik

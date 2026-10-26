@@ -1,23 +1,29 @@
-import React, { useRef } from 'react';
-import { X, Printer } from 'lucide-react';
-import { PermohonanAsesmen } from '../types';
+import React, { useRef, useState } from 'react';
+import { X, Printer, Download, Send, CheckCircle2, Loader2, Mail } from 'lucide-react';
+import { PermohonanAsesmen, UserProfile } from '../types';
+import { permohonanApi } from '../services/api';
 
 interface SuratJawabanModalProps {
   permohonan: PermohonanAsesmen;
+  currentUser?: UserProfile;
   onClose: () => void;
 }
 
-export const SuratJawabanModal: React.FC<SuratJawabanModalProps> = ({ permohonan, onClose }) => {
+export const SuratJawabanModal: React.FC<SuratJawabanModalProps> = ({ permohonan, currentUser, onClose }) => {
   const printRef = useRef<HTMLDivElement>(null);
+  const [isSendingEmail, setIsSendingEmail] = useState(false);
+  const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
+  const [emailNotice, setEmailNotice] = useState<{ ok: boolean; msg: string } | null>(null);
 
   const p = permohonan;
   const pk = p.perkara;
   const tr = p.terperiksa;
 
-  const nomorSuratJawaban = (p as any).suratJawaban?.nomor
+  const nomorSuratJawaban = p.suratJawabanNomor
+    || (p as any).suratJawaban?.nomor
     || `B/${(p.nomorPermohonan || 'TAT').replace(/[^a-zA-Z0-9]/g, '')}/${new Date().getMonth() + 1}/${new Date().getFullYear()}/TAT`;
 
-  const rawTanggal = (p as any).suratJawaban?.tanggal || p.tanggalPengajuan || new Date().toISOString().split('T')[0];
+  const rawTanggal = p.suratJawabanTanggal || (p as any).suratJawaban?.tanggal || p.tanggalPengajuan || new Date().toISOString().split('T')[0];
   const dateObj = new Date(rawTanggal);
   const tanggalSurat = isNaN(dateObj.getTime())
     ? new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
@@ -27,16 +33,16 @@ export const SuratJawabanModal: React.FC<SuratJawabanModalProps> = ({ permohonan
   const namaPenyidik = pk?.namaPenyidik || p.pengajuNama || 'Kepala Satuan Reserse Narkoba';
   const pangkatPenyidik = (pk as any)?.pangkatPenyidik || 'AKP';
 
-  const nomorSuratPenyidik = pk?.nomorLp || pk?.nomorSpdp || p.nomorPermohonan || 'B/..../..../Resnarkoba';
+  const nomorSuratPenyidik = pk?.nomorLaporanPolisi || (pk as any)?.nomorLp || (pk as any)?.nomorSpdp || p.nomorPermohonan || 'B/..../..../Resnarkoba';
   const rawTanggalPenyidik = pk?.tanggalLp || p.tanggalPengajuan || '2026-10-01';
   const datePenyidik = new Date(rawTanggalPenyidik);
   const tanggalSuratPenyidik = isNaN(datePenyidik.getTime())
     ? '01 Oktober 2026'
     : datePenyidik.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 
-  const namaTersangka = tr?.namaLengkap || p.tersangkaNama || 'Tersangka';
+  const namaTersangka = tr?.namaLengkap || (p as any).tersangkaNama || 'Tersangka';
   const nikTersangka = tr?.nik || '-';
-  const pasalDisangkakan = pk?.pasalDisangkakan || (pk as any)?.pasalDipersangkakan || 'Pasal 127 ayat (1) huruf a UU RI No. 35 Tahun 2009';
+  const pasalDisangkakan = pk?.pasalDipersangkakan || (pk as any)?.pasalDisangkakan || 'Pasal 127 ayat (1) huruf a UU RI No. 35 Tahun 2009';
 
   const statusBerkas = p.applicationStatus === 'NEEDS_CORRECTION' ? 'perlu_perbaikan' : 'diterima';
 
@@ -45,6 +51,8 @@ export const SuratJawabanModal: React.FC<SuratJawabanModalProps> = ({ permohonan
   const ketuaJabatan = 'Sekretariat Tim Asesmen Terpadu (TAT)';
   const instansiBNNP = 'Kalimantan Timur';
   const kotaTAT = 'Samarinda';
+
+  const isAdmin = currentUser?.role?.toLowerCase() === 'admin' || currentUser?.role?.toLowerCase() === 'sekretariat';
 
   const handlePrint = () => {
     const win = window.open('', '_blank', 'width=900,height=1200');
@@ -80,38 +88,106 @@ export const SuratJawabanModal: React.FC<SuratJawabanModalProps> = ({ permohonan
     setTimeout(() => { win.print(); win.close(); }, 600);
   };
 
+  const handleDownloadServerPdf = async () => {
+    try {
+      setIsDownloadingPdf(true);
+      await permohonanApi.downloadSuratJawabanPdf(p.id, `SURAT-JAWABAN-${nomorSuratJawaban.replace(/[\\/]/g, '_')}.pdf`);
+    } catch (err: any) {
+      alert(err.message || 'Gagal mengunduh PDF');
+    } finally {
+      setIsDownloadingPdf(false);
+    }
+  };
+
+  const handleKirimUlangEmail = async () => {
+    try {
+      setIsSendingEmail(true);
+      setEmailNotice(null);
+      const res = await permohonanApi.kirimUlangSuratJawaban(p.id);
+      setEmailNotice({ ok: true, msg: res?.message || 'Surat jawaban (PDF) berhasil dikirim ulang ke email pengaju!' });
+    } catch (err: any) {
+      setEmailNotice({ ok: false, msg: err.message || 'Gagal mengirim ulang email' });
+    } finally {
+      setIsSendingEmail(false);
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-2 sm:p-4"
       style={{ background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(5px)' }}>
       <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl shadow-2xl w-full max-w-5xl flex flex-col"
         style={{ maxHeight: '96vh' }}>
 
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#1b3459] shrink-0">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between px-5 py-3.5 border-b border-[#1b3459] gap-3 shrink-0">
           <div>
             <h2 className="text-base font-bold text-white flex items-center gap-2">
               <span className="text-[#d4af37]">📨</span>
               Surat Jawaban Permohonan Asesmen Terpadu (TAT)
             </h2>
             <p className="text-xs text-slate-400 mt-0.5">
-              No: {nomorSuratJawaban} &bull; Tersangka: {namaTersangka}
+              No: <span className="font-mono text-amber-300 font-semibold">{nomorSuratJawaban}</span> &bull; Tersangka: {namaTersangka}
             </p>
+            {p.suratJawabanDikirimAt && (
+              <p className="text-[11px] text-emerald-400 mt-0.5 flex items-center gap-1">
+                <CheckCircle2 className="w-3 h-3 shrink-0" />
+                <span>Telah dikirim via email ke <strong>{p.suratJawabanEmailTo || p.pengajuEmail || 'pengaju'}</strong> pada {new Date(p.suratJawabanDikirimAt).toLocaleDateString('id-ID')}</span>
+              </p>
+            )}
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center flex-wrap gap-2">
+            {isAdmin && (
+              <button
+                type="button"
+                disabled={isSendingEmail}
+                onClick={handleKirimUlangEmail}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-[#142642] text-amber-300 border border-amber-500/40 hover:bg-[#1b3459] transition-colors cursor-pointer disabled:opacity-50"
+                title="Kirimkan kembali dokumen PDF ke email pengaju"
+              >
+                {isSendingEmail ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
+                <span>{isSendingEmail ? 'Mengirim...' : 'Kirim Ulang Email'}</span>
+              </button>
+            )}
+
             <button
+              type="button"
+              disabled={isDownloadingPdf}
+              onClick={handleDownloadServerPdf}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-emerald-700 hover:bg-emerald-600 text-white transition-colors cursor-pointer disabled:opacity-50 shadow"
+              title="Unduh file PDF resmi yang di-generate server"
+            >
+              {isDownloadingPdf ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />}
+              <span>{isDownloadingPdf ? 'Mengunduh...' : 'Unduh PDF Asli'}</span>
+            </button>
+
+            <button
+              type="button"
               onClick={handlePrint}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-[#d4af37] text-[#0b172a] hover:bg-[#e8c84a] transition-colors cursor-pointer shadow"
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-[#d4af37] text-[#0b172a] hover:bg-[#e8c84a] transition-colors cursor-pointer shadow"
             >
               <Printer className="w-3.5 h-3.5" />
-              Cetak / Export PDF
+              <span>Cetak</span>
             </button>
             <button
+              type="button"
               onClick={onClose}
-              className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-[#132d54] transition-colors cursor-pointer"
+              className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-[#132d54] transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
         </div>
+
+        {emailNotice && (
+          <div className={`mx-5 mt-3 p-3 rounded-xl text-xs font-semibold flex items-center justify-between border ${
+            emailNotice.ok ? 'bg-emerald-950/40 border-emerald-500/40 text-emerald-200' : 'bg-rose-950/40 border-rose-500/40 text-rose-200'
+          }`}>
+            <span className="flex items-center gap-2">
+              <Mail className="w-4 h-4 shrink-0" />
+              {emailNotice.msg}
+            </span>
+            <button onClick={() => setEmailNotice(null)} className="text-slate-400 hover:text-white">✕</button>
+          </div>
+        )}
 
         <div className="overflow-y-auto flex-1 p-3 sm:p-6 bg-slate-900/60">
           <div

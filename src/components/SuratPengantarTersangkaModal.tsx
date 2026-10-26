@@ -3,6 +3,8 @@ import { X, Printer, QrCode } from 'lucide-react';
 import { PermohonanAsesmen, UserProfile } from '../types';
 import { QrCodeImg } from './QrCodeComponent';
 import { printLegalDocument } from '../utils/printLegalDoc';
+import { getKetuaTAT } from '../utils/getKetuaTAT';
+import { getKodeLacakRehab } from '../utils/getKodeLacak';
 
 interface SuratPengantarTersangkaModalProps {
   permohonan: PermohonanAsesmen;
@@ -24,6 +26,7 @@ export const SuratPengantarTersangkaModal: React.FC<SuratPengantarTersangkaModal
   const pleno = p.sidangPleno;
   const rek = p.rekomendasiResmi;
   const tl = p.tindakLanjut;
+  const ketuaInfo = getKetuaTAT(currentUser, p);
 
   const namaKlien = cleanStr(t?.namaLengkap || (t as any)?.namaTerperiksa) || 'Klien Terperiksa';
   const nik = t?.nik || '64720109880001';
@@ -34,7 +37,7 @@ export const SuratPengantarTersangkaModal: React.FC<SuratPengantarTersangkaModal
   const namaPenyidik = p.perkara?.namaPenyidik || '[TEST] Penyidik Pengaju Satresnarkoba';
 
   // Kode Lacak & Nomor Surat Rujukan
-  const kodeLacak = (p as any).kodeLacakRehab || tl?.kodeLacakRehab || `RHB-${p.id.slice(-6).toUpperCase()}`;
+  const kodeLacak = getKodeLacakRehab(p);
   const noSurat = tl?.nomorSuratRujukan || (p as any).nomorSuratPengantarTersangka || `SR-TAT/2026/09/${p.id.slice(-4)}`;
   const noBa = pleno?.nomorBeritaAcara || rek?.nomorSurat || `BA-PLENO/TAT/2026/${p.nomorPermohonan?.replace(/[^0-9]/g, '') || '0101'}`;
 
@@ -286,9 +289,14 @@ export const SuratPengantarTersangkaModal: React.FC<SuratPengantarTersangkaModal
                       <div>Ketua Tim Asesmen Terpadu,</div>
                       <div style={{ height: '55px' }}></div>
                       <div style={{ fontWeight: 'bold', textDecoration: 'underline' }}>
-                        KOMBES POL AHMAD RIFA'I, S.I.K.
+                        {ketuaInfo.nama}
                       </div>
-                      <div style={{ fontSize: '9pt' }}>Ketua Tim TAT Kaltim</div>
+                      <div style={{ fontSize: '9pt' }}>{ketuaInfo.jabatan}</div>
+                      {ketuaInfo.nrp && (
+                        <div style={{ fontSize: '8.5pt', color: '#444', marginTop: '2px' }}>
+                          {ketuaInfo.nrp.length > 10 ? 'NIP' : 'NRP'}. {ketuaInfo.nrp}
+                        </div>
+                      )}
                     </td>
                   </tr>
                 </tbody>

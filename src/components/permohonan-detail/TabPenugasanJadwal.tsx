@@ -90,7 +90,7 @@ export const TabPenugasanJadwal: React.FC<TabPenugasanJadwalProps> = ({
 
     const updated: PermohonanAsesmen = {
       ...permohonan,
-      applicationStatus: 'SCHEDULED',
+      applicationStatus: 'ASSESSMENT_ACTIVE',
       statusProsesUtama: 'asesmen_berlangsung',
       timAsesmen: updatedTim,
     };
@@ -155,7 +155,7 @@ export const TabPenugasanJadwal: React.FC<TabPenugasanJadwalProps> = ({
 
     const updated: PermohonanAsesmen = {
       ...permohonan,
-      applicationStatus: 'IN_ASSESSMENT',
+      applicationStatus: 'ASSESSMENT_ACTIVE',
       statusProsesUtama: 'asesmen_berlangsung',
       timAsesmen: updatedTim,
       auditLogs: [

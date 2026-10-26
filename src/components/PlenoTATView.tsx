@@ -269,20 +269,20 @@ export const PlenoTATView: React.FC<PlenoTATViewProps> = ({
       </div>
 
       {/* 2 Tabs: Aktif vs Riwayat */}
-      <div className="flex items-center space-x-2 border-b border-[#1b3459] pb-3">
+      <div className="flex flex-wrap items-center gap-1.5 p-1 bg-slate-900/90 border border-slate-800 rounded-xl shadow-sm">
         <button
           type="button"
           onClick={() => setActiveTab('aktif')}
-          className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center space-x-2 transition-all cursor-pointer ${
+          className={`flex items-center gap-2 px-3.5 py-2 rounded-lg font-medium text-xs transition-all cursor-pointer ${
             activeTab === 'aktif'
-              ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/40 border border-blue-500'
-              : 'bg-[#0b172a] text-slate-400 hover:text-slate-200 border border-[#1b3459] hover:bg-[#142642]'
+              ? 'bg-slate-800 text-white border border-slate-700 shadow-sm'
+              : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
           }`}
         >
-          <Clock className="w-4 h-4" />
+          <Clock className="w-3.5 h-3.5 text-slate-300" />
           <span>Pleno Aktif / Menunggu TTD</span>
-          <span className={`text-[11px] px-2 py-0.5 rounded-full font-mono font-bold ${
-            activeTab === 'aktif' ? 'bg-blue-800 text-white' : 'bg-[#142642] text-slate-300'
+          <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-medium ${
+            activeTab === 'aktif' ? 'bg-slate-700 text-slate-200' : 'bg-slate-800 text-slate-400'
           }`}>
             {aktifCases.length}
           </span>
@@ -291,16 +291,16 @@ export const PlenoTATView: React.FC<PlenoTATViewProps> = ({
         <button
           type="button"
           onClick={() => setActiveTab('riwayat')}
-          className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center space-x-2 transition-all cursor-pointer ${
+          className={`flex items-center gap-2 px-3.5 py-2 rounded-lg font-medium text-xs transition-all cursor-pointer ${
             activeTab === 'riwayat'
-              ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-900/40 border border-emerald-500'
-              : 'bg-[#0b172a] text-slate-400 hover:text-slate-200 border border-[#1b3459] hover:bg-[#142642]'
+              ? 'bg-slate-800 text-white border border-slate-700 shadow-sm'
+              : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
           }`}
         >
-          <CheckCircle2 className="w-4 h-4" />
+          <CheckCircle2 className="w-3.5 h-3.5 text-slate-300" />
           <span>Riwayat Pleno (Selesai TTD)</span>
-          <span className={`text-[11px] px-2 py-0.5 rounded-full font-mono font-bold ${
-            activeTab === 'riwayat' ? 'bg-emerald-800 text-white' : 'bg-[#142642] text-slate-300'
+          <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-medium ${
+            activeTab === 'riwayat' ? 'bg-slate-700 text-slate-200' : 'bg-slate-800 text-slate-400'
           }`}>
             {riwayatCases.length}
           </span>
@@ -308,21 +308,21 @@ export const PlenoTATView: React.FC<PlenoTATViewProps> = ({
       </div>
 
       {/* Case List Display */}
-      <div className="grid grid-cols-1 gap-4">
+      <div className="grid grid-cols-1 gap-3.5">
         {displayedCases.length === 0 ? (
-          <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl p-10 text-center space-y-3">
+          <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-10 text-center space-y-2">
             {activeTab === 'aktif' ? (
               <>
-                <CheckCircle2 className="w-12 h-12 text-emerald-400/80 mx-auto" />
-                <h3 className="text-base font-bold text-white">Tidak Ada Pleno Aktif</h3>
+                <CheckCircle2 className="w-10 h-10 text-slate-500 mx-auto" />
+                <h3 className="text-sm font-semibold text-slate-200">Tidak Ada Pleno Aktif</h3>
                 <p className="text-xs text-slate-400 max-w-md mx-auto">
                   Semua berkas sidang pleno telah selesai diunggah tanda tangan (TTD) dan diarsipkan ke tab Riwayat.
                 </p>
               </>
             ) : (
               <>
-                <Clock className="w-12 h-12 text-slate-500 mx-auto" />
-                <h3 className="text-base font-bold text-white">Belum Ada Riwayat Pleno Selesai</h3>
+                <Clock className="w-10 h-10 text-slate-500 mx-auto" />
+                <h3 className="text-sm font-semibold text-slate-200">Belum Ada Riwayat Pleno Selesai</h3>
                 <p className="text-xs text-slate-400 max-w-md mx-auto">
                   Sidang pleno yang telah mengunggah berkas Berita Acara bertanda tangan akan otomatis masuk ke daftar ini.
                 </p>
@@ -332,177 +332,178 @@ export const PlenoTATView: React.FC<PlenoTATViewProps> = ({
         ) : (
           displayedCases.map(item => {
             const hasSignedBA = Boolean(item.sidangPleno?.fileBeritaAcaraSigned);
+            const isDiteruskan = Boolean(item.tindakLanjutDiteruskan || (item as any).statusProsesUtama === 'selesai_tindak_lanjut' || Boolean(item.tindakLanjut));
 
             return (
               <div
                 key={item.id}
                 onClick={() => onSelectPermohonan(item.id)}
-                className="bg-[#0b172a] border border-[#1b3459] hover:border-[#d4af37]/60 rounded-2xl p-4 sm:p-5 transition-all cursor-pointer space-y-3 shadow-md group"
+                className="bg-slate-950/60 hover:bg-slate-900/80 border border-slate-800/80 hover:border-slate-700 rounded-xl p-4 sm:p-5 transition-all cursor-pointer space-y-3.5 shadow-sm group"
               >
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center space-x-2 flex-wrap gap-y-1">
-                      <span className="font-mono font-bold text-xs text-[#d4af37] group-hover:underline">{item.nomorPermohonan}</span>
-                      <span className="text-xs text-slate-300">&bull; Terperiksa: <strong className="text-white">{item.terperiksa.namaLengkap}</strong></span>
+                {/* Header: Client Info & Status Badge */}
+                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                  <div className="flex items-start gap-3">
+                    <div className="w-9 h-9 rounded-lg bg-slate-800 border border-slate-700/80 text-slate-300 font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">
+                      {item.terperiksa.namaLengkap.slice(0, 2).toUpperCase()}
                     </div>
-                    <p className="text-xs text-slate-400 mt-0.5">
-                      No. Berita Acara: <strong className="text-slate-200">{item.sidangPleno?.nomorBeritaAcara || 'Menunggu Penyusunan'}</strong>
-                    </p>
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h3 className="text-sm font-semibold text-slate-100">
+                          {item.terperiksa.namaLengkap}
+                        </h3>
+                        <span className="text-[11px] font-mono text-slate-400 bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700/60">
+                          {item.nomorPermohonan}
+                        </span>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-400 mt-1">
+                        <span>No. BA: <span className="text-slate-300 font-mono">{item.sidangPleno?.nomorBeritaAcara || 'Menunggu Penyusunan'}</span></span>
+                        <span className="text-slate-600">•</span>
+                        <span>Penyidik: <span className="text-slate-300">{item.perkara?.namaPenyidik || '-'}</span></span>
+                      </div>
+                    </div>
                   </div>
 
-                  <div className="flex items-center space-x-2 shrink-0">
-                    <span className={`text-[10px] sm:text-xs font-semibold px-2.5 py-0.5 rounded-full border ${
+                  <div className="sm:self-start">
+                    <span className={`text-[11px] font-medium px-2.5 py-0.5 rounded-full border flex items-center gap-1.5 ${
                       hasSignedBA
-                        ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
+                        ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
                         : item.sidangPleno?.kesepakatanRekomendasi
-                        ? 'bg-amber-500/15 text-amber-400 border-amber-500/30'
-                        : 'bg-[#142642] text-slate-200 border-[#234475]'
+                        ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                        : 'bg-slate-800 text-slate-300 border-slate-700'
                     }`}>
-                      {hasSignedBA
-                        ? 'Pleno Selesai (TTD Sah)'
-                        : item.sidangPleno?.kesepakatanRekomendasi
-                        ? 'Menunggu Unggah TTD'
-                        : 'Siap Diperiksa / Berlangsung'}
+                      {hasSignedBA ? (
+                        <>
+                          <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                          <span>Pleno Selesai (TTD Sah)</span>
+                        </>
+                      ) : item.sidangPleno?.kesepakatanRekomendasi ? (
+                        <>
+                          <Clock className="w-3 h-3 text-amber-400" />
+                          <span>Menunggu Unggah TTD</span>
+                        </>
+                      ) : (
+                        <span>Siap Diperiksa</span>
+                      )}
                     </span>
                   </div>
                 </div>
 
-                {/* Side by side preview Medis vs Hukum */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1 text-xs">
-                  <div className="p-3 bg-[#081224] rounded-xl border border-[#1b3459] space-y-0.5">
-                    <span className="text-[10px] uppercase font-bold text-[#d4af37] block">ASPEK MEDIS:</span>
-                    <p className="font-semibold text-white leading-snug">{item.asesmenMedis?.diagnosisKlinisIcd || 'Dalam proses'}</p>
-                    <p className="text-slate-400 text-[11px]">Usulan: {item.asesmenMedis?.kebutuhanRawat || '-'} ({item.asesmenMedis?.durasiUsulanBulan || 0} Bulan)</p>
+                {/* Compact Aspek Medis & Hukum 2-Column Strip */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+                  <div className="p-2.5 bg-slate-900/50 rounded-lg border border-slate-800/80 space-y-0.5">
+                    <span className="text-[10px] uppercase font-semibold text-slate-400 block tracking-wider">Aspek Medis</span>
+                    <p className="text-slate-200 font-medium truncate">{item.asesmenMedis?.diagnosisKlinisIcd || 'Dalam proses'}</p>
+                    <p className="text-slate-400 text-[11px]">Usulan: {item.asesmenMedis?.kebutuhanRawat || '-'} ({item.asesmenMedis?.durasiUsulanBulan || 0} Bln)</p>
                   </div>
 
-                  <div className="p-3 bg-[#081224] rounded-xl border border-[#1b3459] space-y-0.5">
-                    <span className="text-[10px] uppercase font-bold text-[#d4af37] block">ASPEK HUKUM:</span>
-                    <p className="font-semibold text-white leading-snug">{item.asesmenHukum?.analisisPeran || 'Dalam proses'}</p>
+                  <div className="p-2.5 bg-slate-900/50 rounded-lg border border-slate-800/80 space-y-0.5">
+                    <span className="text-[10px] uppercase font-semibold text-slate-400 block tracking-wider">Aspek Hukum</span>
+                    <p className="text-slate-200 font-medium truncate">{item.asesmenHukum?.analisisPeran || 'Dalam proses'}</p>
                     <p className="text-slate-400 text-[11px]">Rekomendasi: {item.asesmenHukum?.rekomendasiHukum || '-'}</p>
                   </div>
                 </div>
 
-                {/* Kesepakatan Final + Tombol Aksi */}
+                {/* Kesepakatan Final Musyawarah Pleno */}
                 {item.sidangPleno?.kesepakatanRekomendasi && (
-                  <div className="p-3 bg-[#081224] rounded-xl border border-[#1b3459] text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <div className="min-w-0 flex-1">
-                      <span className="text-[10px] uppercase font-bold text-[#d4af37] block">KESEPAKATAN MUSYAWARAH PLENO:</span>
-                      <span className="font-semibold text-white text-xs leading-snug block">{item.sidangPleno.kesepakatanRekomendasi}</span>
-                    </div>
+                  <div className="p-3 bg-slate-900/60 rounded-xl border border-slate-800 text-xs space-y-1">
+                    <span className="text-[10px] uppercase font-semibold text-slate-400 tracking-wider block">Kesepakatan Musyawarah Pleno:</span>
+                    <p className="text-slate-200 font-medium leading-relaxed">
+                      {item.sidangPleno.kesepakatanRekomendasi}
+                    </p>
+                  </div>
+                )}
 
-                    <div className="flex items-center gap-2 mt-2 sm:mt-0 w-full sm:w-auto flex-wrap">
-                      {/* Tombol Buka Modal TTD Digital */}
-                      <button 
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setUploadTtdItem(item);
-                        }}
-                        className="bg-[#142642] hover:bg-[#1b3459] text-white text-xs font-bold px-3.5 py-2 rounded-xl flex items-center justify-center space-x-1.5 cursor-pointer border border-[#234475] transition-colors flex-1 sm:flex-none shadow-sm"
-                      >
-                        <PenTool className="w-3.5 h-3.5 text-blue-400" />
-                        <span>{hasSignedBA ? 'Ubah TTD Asesor' : 'Unggah TTD Digital'}</span>
-                      </button>
-
-                      {/* Lihat Berita Acara Draf - DIHIDE untuk /hukum/dashboard/pleno */}
-                      {!isHukum && (
-                        <button
-                          type="button"
-                          onClick={(e) => { e.stopPropagation(); setBaPermohonan(item); }}
-                          className="bg-[#d4af37] hover:bg-[#e8c84a] text-[#0b172a] text-xs font-bold px-3.5 py-2 rounded-xl flex items-center justify-center space-x-1.5 shrink-0 transition-colors flex-1 sm:flex-none shadow-sm cursor-pointer"
-                        >
-                          <FileText className="w-3.5 h-3.5" />
-                          <span>{hasSignedBA ? 'Lihat Draf / Cetak' : 'Lihat Berita Acara'}</span>
-                        </button>
-                      )}
-
-                      {/* Tombol Lihat Berita Acara dengan TTD yang sudah tertempel */}
-                      {hasSignedBA && (
-                        <button 
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setBaPermohonan(item);
-                          }}
-                          className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3.5 py-2 rounded-xl flex items-center justify-center space-x-1.5 shrink-0 transition-colors flex-1 sm:flex-none shadow-md shadow-emerald-950/40 cursor-pointer"
-                        >
-                          <Eye className="w-3.5 h-3.5" />
-                          <span>Lihat Berita Acara (TTD)</span>
-                        </button>
-                      )}
-
-                      {/* Tombol Teruskan ke Tindak Lanjut (Selesai Pleno) */}
-                      {hasSignedBA && !isHukum && (
+                {/* Minimalist Bottom Actions Bar */}
+                <div className="flex flex-wrap items-center justify-between gap-2.5 pt-2 border-t border-slate-800/70">
+                  {/* Left: Status / Aksi Teruskan ke Tindak Lanjut */}
+                  <div>
+                    {hasSignedBA && !isHukum && (
+                      isDiteruskan ? (
+                        <span className="inline-flex items-center gap-1.5 text-xs text-emerald-400 font-medium bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-lg">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                          <span>Diteruskan ke Tindak Lanjut</span>
+                        </span>
+                      ) : (
                         <button
                           type="button"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleTeruskanKeTindakLanjut(item);
                           }}
-                          className={`text-xs font-bold px-3.5 py-2 rounded-xl flex items-center justify-center space-x-1.5 shrink-0 transition-all cursor-pointer shadow-md flex-1 sm:flex-none ${
-                            item.tindakLanjutDiteruskan
-                              ? 'bg-blue-950/80 hover:bg-blue-900 border border-blue-500/50 text-blue-300'
-                              : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-blue-900/40'
-                          }`}
+                          className="inline-flex items-center gap-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-500 px-3 py-1.5 rounded-lg transition-all cursor-pointer shadow-sm border border-blue-500/30"
                         >
                           <Share2 className="w-3.5 h-3.5 text-blue-200" />
-                          <span>{item.tindakLanjutDiteruskan ? '✓ Diteruskan ke Tindak Lanjut' : 'Teruskan ke Tindak Lanjut'}</span>
+                          <span>Teruskan ke Tindak Lanjut</span>
                         </button>
-                      )}
-
-                      {/* Dokumen Surat Tersangka dengan Kode Lacak */}
-                      {hasSignedBA && !isHukum && (
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSuratPengantarItem(item);
-                          }}
-                          className="bg-amber-600/20 hover:bg-amber-600/30 border border-amber-500/50 text-amber-300 hover:text-amber-200 text-xs font-bold px-3.5 py-2 rounded-xl flex items-center justify-center space-x-1.5 shrink-0 transition-colors shadow-sm cursor-pointer flex-1 sm:flex-none"
-                        >
-                          <FileText className="w-3.5 h-3.5 text-amber-400" />
-                          <span>Dokumen Surat Tersangka</span>
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* Tombol Input Hasil Pleno / Revisi */}
-                {!item.sidangPleno?.kesepakatanRekomendasi ? (
-                  <div className="flex flex-wrap justify-end gap-2 pt-1">
-                    {!isHukum && (
-                      <button
-                        onClick={(e) => { e.stopPropagation(); setFormPlenoItem(item); }}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-semibold bg-[#1b3459] text-white hover:bg-[#234475] transition-colors cursor-pointer"
-                      >
-                        <Edit className="w-3 h-3" />
-                        Input Hasil Pleno
-                      </button>
-                    )}
-                    {!isHukum && (
-                      <button
-                        onClick={(e) => { e.stopPropagation(); setBaPermohonan(item); }}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-semibold border border-[#1b3459] text-slate-300 hover:border-[#d4af37]/50 hover:text-[#d4af37] transition-colors cursor-pointer"
-                      >
-                        <FileText className="w-3 h-3" />
-                        Draft Berita Acara
-                      </button>
+                      )
                     )}
                   </div>
-                ) : (
-                  !isHukum && (
-                    <div className="flex justify-end gap-2 mt-1">
+
+                  {/* Right: Unified Action Buttons */}
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {/* Dokumen Surat Tersangka */}
+                    {hasSignedBA && !isHukum && (
                       <button
-                        onClick={(e) => { e.stopPropagation(); setFormPlenoItem(item); }}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-semibold bg-[#1b3459] text-white hover:bg-[#234475] transition-colors cursor-pointer"
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSuratPengantarItem(item);
+                        }}
+                        className="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-750 text-slate-200 hover:text-white border border-slate-700 flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
                       >
-                        <Edit className="w-3 h-3" />
-                        Revisi Pleno
+                        <FileText className="w-3.5 h-3.5 text-slate-400" />
+                        <span>Dokumen Surat Tersangka</span>
                       </button>
-                    </div>
-                  )
-                )}
+                    )}
+
+                    {/* Berita Acara (Satu Tombol Jelas) */}
+                    {!isHukum && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setBaPermohonan(item);
+                        }}
+                        className="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-750 text-slate-200 hover:text-white border border-slate-700 flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
+                      >
+                        <Eye className="w-3.5 h-3.5 text-slate-400" />
+                        <span>{hasSignedBA ? 'Lihat Berita Acara (TTD)' : 'Draft Berita Acara'}</span>
+                      </button>
+                    )}
+
+                    {/* Unggah / Ubah TTD */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setUploadTtdItem(item);
+                      }}
+                      className="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-750 text-slate-200 hover:text-white border border-slate-700 flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
+                    >
+                      <PenTool className="w-3.5 h-3.5 text-slate-400" />
+                      <span>{hasSignedBA ? 'Ubah TTD' : 'Unggah TTD'}</span>
+                    </button>
+
+                    {/* Input Pleno / Revisi */}
+                    {!isHukum && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setFormPlenoItem(item);
+                        }}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer shadow-sm ${
+                          !item.sidangPleno?.kesepakatanRekomendasi
+                            ? 'bg-blue-600 hover:bg-blue-500 text-white border border-blue-500/30'
+                            : 'bg-slate-800 hover:bg-slate-750 text-slate-300 hover:text-white border border-slate-700'
+                        }`}
+                      >
+                        <Edit className="w-3.5 h-3.5" />
+                        <span>{!item.sidangPleno?.kesepakatanRekomendasi ? 'Input Hasil Pleno' : 'Revisi'}</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
               </div>
             );
           })

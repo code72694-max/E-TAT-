@@ -48,6 +48,11 @@ export interface UserProfile {
   position?: string;
   pangkat?: string;
   petugasLainnya?: (string | PetugasLainnyaItem)[]; // Nama & NIP/NRP petugas/rekan pemeriksa lainnya (maksimal 2 nama tambahan -> total maks 3 di hukum dan medis)
+  // Pengaturan Pejabat Ketua Tim Asesmen Terpadu (TAT) untuk tanda tangan dokumen resmi (Admin/Sekretariat)
+  namaKetuaTAT?: string;
+  nipKetuaTAT?: string;
+  pangkatKetuaTAT?: string;
+  jabatanKetuaTAT?: string;
 }
 
 export interface RegistrasiPengguna {
@@ -316,12 +321,17 @@ export interface AsesmenMedis {
   }[];
   
   // Pemeriksaan Fisik & Jiwa
-  kondisiFisik: string;
-  tekananDarah: string;
-  denyutNadi: string;
-  tandaBekasSuntikan: boolean;
-  komorbiditasMedis: string; // Penyakit penyerta (Hepatitis, HIV, dll)
-  kondisiPsikologis: string; // Cemas, Depresi, Halusinasi, Stabil
+  kondisiFisik?: string;
+  tekananDarah?: string;
+  denyutNadi?: string;
+  pernapasan?: string;
+  suhuTubuh?: string;
+  needleTracks?: string;
+  kondisiIntoksikasi?: string;
+  fasilitasRujukan?: string;
+  tandaBekasSuntikan?: boolean;
+  komorbiditasMedis?: string; // Penyakit penyerta (Hepatitis, HIV, dll)
+  kondisiPsikologis?: string; // Cemas, Depresi, Halusinasi, Stabil
   
   // Hasil Laboratorium Toksikologi Urin
   hasilUrin: {
@@ -826,6 +836,12 @@ export interface PermohonanAsesmen {
   penanggungJawabBerikutnya: string;
   tindakanBerikutnyaLabel: string;
   nextAction?: string;                         // Kode aksi (COMPLETE_DOCUMENT_REVIEW, dll)
+
+  // Surat Jawaban
+  suratJawabanNomor?: string;
+  suratJawabanTanggal?: string;
+  suratJawabanDikirimAt?: string;
+  suratJawabanEmailTo?: string;
 
   // Blockers & Visibility
   blockers?: BlockerItem[];

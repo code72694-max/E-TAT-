@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { PermohonanAsesmen, StatusProsesUtama, UserProfile } from '../types';
+import { getKodeLacakRehab, normalizeSearchCode } from '../utils/getKodeLacak';
 import {
   Search,
   Filter,
@@ -83,12 +84,20 @@ export const PermohonanList: React.FC<PermohonanListProps> = ({
 
       // Search match
       const query = searchQuery.toLowerCase();
+      const qClean = normalizeSearchCode(query);
+      const kode = getKodeLacakRehab(item).toLowerCase();
+      const cleanKode = normalizeSearchCode(kode);
+
       const matchSearch =
         !query ||
-        (item.nomorPermohonan && item.nomorPermohonan.toLowerCase().includes(query)) ||
+        (item.nomorPermohonan && (item.nomorPermohonan.toLowerCase().includes(query) || normalizeSearchCode(item.nomorPermohonan).includes(qClean))) ||
         (item.terperiksa?.namaLengkap && item.terperiksa.namaLengkap.toLowerCase().includes(query)) ||
+        (item.terperiksa?.nik && item.terperiksa.nik.includes(query)) ||
         (item.perkara?.nomorLaporanPolisi && item.perkara.nomorLaporanPolisi.toLowerCase().includes(query)) ||
-        (item.perkara?.pasalDipersangkakan && item.perkara.pasalDipersangkakan.toLowerCase().includes(query));
+        (item.perkara?.pasalDipersangkakan && item.perkara.pasalDipersangkakan.toLowerCase().includes(query)) ||
+        kode.includes(query) ||
+        (cleanKode && qClean && (cleanKode.includes(qClean) || qClean.includes(cleanKode))) ||
+        (item.id && (item.id.toLowerCase().includes(query) || normalizeSearchCode(item.id).includes(qClean)));
 
       // Stage match (Hanya status sebelum/saat verifikasi)
       let matchStage = true;

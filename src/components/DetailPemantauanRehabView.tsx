@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { PermohonanAsesmen } from '../types';
+import { getKetuaTAT } from '../utils/getKetuaTAT';
+import { resolveMonitoringData, getMonitoringUrineHistory, getMonitoringWajibLaporHistory } from '../utils/getMonitoringData';
 import {
   ArrowLeft,
   Activity,
@@ -40,11 +42,17 @@ export const DetailPemantauanRehabView: React.FC<DetailPemantauanRehabViewProps>
   const [showSksrModal, setShowSksrModal] = useState(false);
   const [activeTabSection, setActiveTabSection] = useState<'kontrol' | 'urin' | 'wajib_lapor'>('kontrol');
 
+  const mon = resolveMonitoringData(permohonan);
+  const isSelesaiRehab = Boolean(
+    mon?.akhirLayanan &&
+    (mon.statusMonitoring === 'selesai' || mon.akhirLayanan.statusAkhir === 'selesai_program')
+  );
+
   const t = permohonan.terperiksa;
   const pgw = permohonan.pengawasanKlien;
   const tl = permohonan.tindakLanjut;
-  const mon = permohonan.monitoringTindakLanjut;
   const pleno = permohonan.sidangPleno;
+  const ketuaInfo = getKetuaTAT(null, permohonan);
   const rekom = permohonan.rekomendasiResmi;
 
   // Resolusi data fasilitas & DPJP
@@ -98,74 +106,16 @@ export const DetailPemantauanRehabView: React.FC<DetailPemantauanRehabViewProps>
 
   // Sesi & Kepatuhan
   const totalSesi = pgw?.totalSesiWajib || 12;
-  const sesiSelesai = pgw?.sesiTerselesaikan || 8;
-  const persenSelesai = Math.round((sesiSelesai / totalSesi) * 100);
+  const sesiSelesai = isSelesaiRehab
+    ? totalSesi
+    : (pgw?.sesiTerselesaikan || (mon?.laporanKontrolList?.length ? mon.laporanKontrolList.length * 2 : 4));
+  const persenSelesai = Math.min(100, Math.round((sesiSelesai / totalSesi) * 100));
 
-  // Riwayat Tes Urin
-  const riwayatUrin = (pgw?.riwayatTesUrinBerkala && pgw.riwayatTesUrinBerkala.length > 0)
-    ? pgw.riwayatTesUrinBerkala
-    : [
-        {
-          id: 'urin-1',
-          tanggalTes: '16 September 2026',
-          tahapKe: 1,
-          jenisPemeriksaan: 'Terjadwal (Admisi)',
-          parameter: ['AMP', 'MET', 'THC', 'BZO', 'MOP'],
-          hasil: 'Negatif',
-          petugasPemeriksa: '[TEST] Dokter DPJP Fasilitas',
-          keterangan: 'Skrining awal saat klien admisi ke balai rehab. Non-reaktif 5-panel.'
-        },
-        {
-          id: 'urin-2',
-          tanggalTes: '30 September 2026',
-          tahapKe: 2,
-          jenisPemeriksaan: 'Acak (Random)',
-          parameter: ['AMP', 'MET', 'THC', 'BZO', 'MOP'],
-          hasil: 'Negatif',
-          petugasPemeriksa: 'Analis Lab Balai BNN',
-          keterangan: 'Pemeriksaan toksikologi mendadak minggu ke-2. Tidak ditemukan zat narkotika.'
-        },
-        {
-          id: 'urin-3',
-          tanggalTes: '14 Oktober 2026',
-          tahapKe: 3,
-          jenisPemeriksaan: 'Terjadwal (Evaluasi)',
-          parameter: ['AMP', 'MET', 'THC', 'BZO', 'MOP'],
-          hasil: 'Negatif',
-          petugasPemeriksa: '[TEST] Dokter DPJP Fasilitas',
-          keterangan: 'Evaluasi berkala bulan ke-1. Hasil non-reaktif, kondisi fisik & emosi stabil.'
-        }
-      ];
+  // Riwayat Tes Urin dari sistem
+  const riwayatUrin = getMonitoringUrineHistory(mon, permohonan);
 
-  // Riwayat Wajib Lapor
-  const riwayatWajibLapor = (mon?.buktiWajibLaporList && mon.buktiWajibLaporList.length > 0)
-    ? mon.buktiWajibLaporList
-    : [
-        {
-          id: 'wl-1',
-          tanggalPelaporanAktual: '22 September 2026',
-          tanggalRencanaWajibLapor: '22 September 2026',
-          tanggalWajibLapor: '22 September 2026',
-          namaPenyidikPenerima: permohonan.perkara?.namaPenyidik || '[TEST] Penyidik Pengaju Satresnarkoba',
-          instansiPenyidik: 'Satresnarkoba Polresta Samarinda',
-          kanal: 'langsung' as const,
-          statusKonfirmasi: 'dikonfirmasi_penyidik' as const,
-          statusVerifikasiAdmin: 'terverifikasi',
-          diunggahOleh: 'Penyidik Satresnarkoba'
-        },
-        {
-          id: 'wl-2',
-          tanggalPelaporanAktual: '06 Oktober 2026',
-          tanggalRencanaWajibLapor: '06 Oktober 2026',
-          tanggalWajibLapor: '06 Oktober 2026',
-          namaPenyidikPenerima: permohonan.perkara?.namaPenyidik || '[TEST] Penyidik Pengaju Satresnarkoba',
-          instansiPenyidik: 'Satresnarkoba Polresta Samarinda (Kanal Digital)',
-          kanal: 'digital' as const,
-          statusKonfirmasi: 'dikonfirmasi_penyidik' as const,
-          statusVerifikasiAdmin: 'terverifikasi',
-          diunggahOleh: 'Penyidik Satresnarkoba'
-        }
-      ];
+  // Riwayat Wajib Lapor dari sistem
+  const riwayatWajibLapor = getMonitoringWajibLaporHistory(mon, permohonan);
 
   const noSuratRekom = rekom?.nomorSurat || pleno?.nomorBeritaAcara || `R-TAT/2026/${permohonan.id.slice(-4)}`;
 
@@ -180,27 +130,34 @@ export const DetailPemantauanRehabView: React.FC<DetailPemantauanRehabViewProps>
   return (
     <div className="space-y-6 animate-in fade-in duration-200">
       {/* Main Title & Executive Badge */}
-      <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl p-5 sm:p-6 shadow-xl space-y-5">
-        <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4 pb-5 border-b border-[#1b3459]">
+      <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 sm:p-6 shadow-sm space-y-5">
+        <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4 pb-5 border-b border-slate-800">
           <div className="space-y-1">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="font-mono text-xs font-bold text-[#D4AF37] bg-[#142642] border border-[#234475] px-2.5 py-0.5 rounded-lg">
+              <span className="font-mono text-xs font-semibold text-slate-300 bg-slate-800 border border-slate-700 px-2.5 py-0.5 rounded-lg">
                 {noSuratRekom}
               </span>
-              <span className="text-xs px-2.5 py-0.5 rounded-full font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span>SEDANG MENJALANI REHABILITASI</span>
-              </span>
+              {isSelesaiRehab ? (
+                <span className="text-xs px-2.5 py-0.5 rounded-full font-medium bg-blue-500/10 text-blue-300 border border-blue-500/20 flex items-center gap-1">
+                  <Award className="w-3.5 h-3.5 text-blue-400" />
+                  <span>REHABILITASI SELESAI (LULUS)</span>
+                </span>
+              ) : (
+                <span className="text-xs px-2.5 py-0.5 rounded-full font-medium bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                  <span>SEDANG MENJALANI REHABILITASI</span>
+                </span>
+              )}
             </div>
 
-            <h1 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight pt-1">
+            <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight pt-1">
               {t?.namaLengkap || 'Terperiksa'} {t?.alias ? `(${t.alias})` : ''}
             </h1>
 
             <p className="text-xs text-slate-400 flex flex-wrap items-center gap-2">
-              <span>NIK: <strong className="text-slate-300 font-mono">{t?.nik || '64720109880001'}</strong></span>
+              <span>NIK: <strong className="text-slate-300 font-mono">{t?.nik || '-'}</strong></span>
               <span>&bull;</span>
-              <span>Usia: <strong className="text-slate-300">{t?.usia || 28} Tahun</strong></span>
+              <span>Usia: <strong className="text-slate-300">{t?.usia || '-'} Tahun</strong></span>
               <span>&bull;</span>
               <span>Instansi: <strong className="text-slate-300">{permohonan.instansiPengaju}</strong></span>
               <span>&bull;</span>
@@ -209,68 +166,76 @@ export const DetailPemantauanRehabView: React.FC<DetailPemantauanRehabViewProps>
           </div>
 
           <div className="flex flex-col sm:flex-row lg:flex-col items-start lg:items-end gap-3 shrink-0">
-            <div className="text-left lg:text-right bg-[#081224] p-3 rounded-xl border border-[#1b3459] text-xs space-y-0.5 w-full sm:w-auto">
-              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">Modalitas &amp; Masa Program</span>
-              <span className="font-bold text-white text-sm block">{modalitas}</span>
-              <span className="text-[#D4AF37] font-semibold block">{durasiBulan} Bulan Program Terpadu</span>
+            <div className="text-left lg:text-right bg-slate-950/50 p-3 rounded-xl border border-slate-800 text-xs space-y-0.5 w-full sm:w-auto">
+              <span className="text-[10px] uppercase font-semibold text-slate-400 tracking-wider block">Modalitas &amp; Masa Program</span>
+              <span className="font-bold text-slate-100 text-sm block">{modalitas}</span>
+              <span className="text-slate-300 font-medium block">{durasiBulan} Bulan Program Terpadu</span>
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
               <button
                 type="button"
                 onClick={handleDownloadPdf}
-                className="px-3.5 py-1.5 bg-[#0f274a] hover:bg-[#163a69] text-sky-200 border border-[#234b7d] rounded-xl text-xs font-medium flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
+                className="px-3.5 py-1.5 bg-slate-800 hover:bg-slate-750 text-slate-200 hover:text-white border border-slate-700 rounded-xl text-xs font-medium flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
               >
-                <Download className="w-3.5 h-3.5 text-sky-400" />
+                <Download className="w-3.5 h-3.5 text-slate-400" />
                 <span>Unduh Rekomendasi (PDF)</span>
               </button>
 
-              <button
-                type="button"
-                onClick={() => setShowSksrModal(true)}
-                className="px-3.5 py-1.5 bg-gradient-to-r from-[#D4AF37] to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-medium rounded-xl text-xs flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
-              >
-                <Award className="w-3.5 h-3.5 text-slate-950" />
-                <span>Pratinjau &amp; Cetak SKSR</span>
-              </button>
+              {isSelesaiRehab && (
+                <button
+                  type="button"
+                  onClick={() => setShowSksrModal(true)}
+                  className="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-500 text-white font-medium rounded-xl text-xs flex items-center gap-1.5 shadow-sm transition-all cursor-pointer border border-blue-500/30"
+                >
+                  <Award className="w-3.5 h-3.5 text-blue-200" />
+                  <span>Pratinjau &amp; Cetak SKSR</span>
+                </button>
+              )}
             </div>
           </div>
         </div>
 
         {/* 4 Pillars Summary Metric Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <div className="bg-[#081224] border border-[#1b3459] rounded-xl p-3.5 space-y-1">
-            <span className="text-[10px] font-bold uppercase text-slate-400 tracking-wider block">Sesi Terlaksana</span>
+          <div className="bg-slate-950/50 border border-slate-800 rounded-xl p-3.5 space-y-1">
+            <span className="text-[10px] font-semibold uppercase text-slate-400 tracking-wider block">Sesi Terlaksana</span>
             <div className="flex items-baseline gap-1.5">
               <span className="text-lg font-bold text-white font-mono">{sesiSelesai} / {totalSesi}</span>
-              <span className="text-xs text-[#D4AF37] font-bold">({persenSelesai}%)</span>
+              <span className="text-xs text-slate-300 font-medium">({persenSelesai}%)</span>
             </div>
-            <div className="w-full h-1 bg-[#142642] rounded-full overflow-hidden mt-1">
-              <div className="h-full bg-gradient-to-r from-emerald-500 to-[#D4AF37] rounded-full" style={{ width: `${persenSelesai}%` }} />
+            <div className="w-full h-1 bg-slate-800 rounded-full overflow-hidden mt-1">
+              <div className="h-full bg-blue-500 rounded-full" style={{ width: `${persenSelesai}%` }} />
             </div>
           </div>
 
-          <div className="bg-[#081224] border border-[#1b3459] rounded-xl p-3.5 space-y-1">
-            <span className="text-[10px] font-bold uppercase text-slate-400 tracking-wider block">Hasil Toksikologi</span>
+          <div className="bg-slate-950/50 border border-slate-800 rounded-xl p-3.5 space-y-1">
+            <span className="text-[10px] font-semibold uppercase text-slate-400 tracking-wider block">Hasil Toksikologi</span>
             <span className="text-base font-bold text-emerald-400 flex items-center gap-1 font-mono">
               <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span>3x NEGATIF</span>
+              <span>{isSelesaiRehab ? '3x NEGATIF' : '2x NEGATIF'}</span>
             </span>
-            <span className="text-[10px] text-slate-400 block truncate">Non-Reaktif (Bebas Zat)</span>
+            <span className="text-[10px] text-slate-400 block truncate">
+              {isSelesaiRehab ? 'Lulus Uji Toksikologi' : 'Non-Reaktif (Bebas Zat)'}
+            </span>
           </div>
 
-          <div className="bg-[#081224] border border-[#1b3459] rounded-xl p-3.5 space-y-1">
-            <span className="text-[10px] font-bold uppercase text-slate-400 tracking-wider block">Kepatuhan Klien</span>
-            <span className="text-base font-bold text-emerald-300 block">Sangat Patuh</span>
+          <div className="bg-slate-950/50 border border-slate-800 rounded-xl p-3.5 space-y-1">
+            <span className="text-[10px] font-semibold uppercase text-slate-400 tracking-wider block">Kepatuhan Klien</span>
+            <span className="text-base font-bold text-slate-200 block">Sangat Patuh</span>
             <span className="text-[10px] text-emerald-400 block">✓ Nihil Mangkir Sesi</span>
           </div>
 
-          <div className="bg-[#081224] border border-amber-500/30 rounded-xl p-3.5 space-y-1 bg-gradient-to-b from-amber-500/5 to-transparent">
-            <span className="text-[10px] font-bold uppercase text-amber-400 tracking-wider block flex items-center gap-1">
-              <Clock className="w-3 h-3" /> Kontrol Terdekat
+          <div className="bg-slate-950/50 border border-slate-800 rounded-xl p-3.5 space-y-1">
+            <span className="text-[10px] font-semibold uppercase text-slate-400 tracking-wider block flex items-center gap-1">
+              <Clock className="w-3 h-3 text-slate-400" /> {isSelesaiRehab ? 'Status Program' : 'Kontrol Terdekat'}
             </span>
-            <span className="text-sm font-bold text-amber-300 font-mono block truncate">{tanggalKontrolBerikutnya}</span>
-            <span className="text-[10px] text-slate-300 block">{waktuKontrolBerikutnya} WITA</span>
+            <span className="text-sm font-bold text-slate-200 font-mono block truncate">
+              {isSelesaiRehab ? 'Program Selesai' : tanggalKontrolBerikutnya}
+            </span>
+            <span className="text-[10px] text-slate-400 block">
+              {isSelesaiRehab ? 'Tuntas 100% Seluruh Sesi' : `${waktuKontrolBerikutnya} WITA`}
+            </span>
           </div>
         </div>
       </div>
@@ -279,86 +244,86 @@ export const DetailPemantauanRehabView: React.FC<DetailPemantauanRehabViewProps>
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
         
         {/* COLUMN 1: JADWAL KONTROL MEDIS & INSTRUKSI (7 COLS) */}
-        <div className="lg:col-span-7 bg-[#0b172a] border-2 border-amber-500/50 rounded-2xl p-5 flex flex-col justify-between space-y-4 shadow-xl">
+        <div className="lg:col-span-7 bg-slate-900/60 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between space-y-4 shadow-sm">
           <div className="space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-amber-500/20">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
               <div className="flex items-center space-x-2">
-                <Calendar className="w-4 h-4 text-amber-400" />
-                <h3 className="text-xs sm:text-sm font-bold text-amber-300 uppercase tracking-wider">
+                <Calendar className="w-4 h-4 text-slate-300" />
+                <h3 className="text-xs sm:text-sm font-bold text-slate-200 uppercase tracking-wider">
                   Jadwal Kontrol Medis &amp; Konseling Berikutnya
                 </h3>
               </div>
-              <span className="text-[11px] font-bold text-slate-950 bg-amber-400 px-2.5 py-0.5 rounded-full font-mono">
+              <span className="text-[11px] font-semibold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2.5 py-0.5 rounded-full font-mono">
                 WAJIB HADIR
               </span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-              <div className="bg-[#061222] p-3 rounded-xl border border-amber-500/20">
+              <div className="bg-slate-950/50 p-3 rounded-xl border border-slate-800">
                 <span className="text-[10px] font-semibold uppercase text-slate-400 block">Tanggal Sesi:</span>
                 <span className="text-sm font-bold font-mono text-white mt-0.5 block">{tanggalKontrolBerikutnya}</span>
-                <span className="text-[11px] text-amber-400 flex items-center gap-1 mt-1 font-mono">
-                  <Clock className="w-3 h-3" /> Pukul {waktuKontrolBerikutnya}
+                <span className="text-[11px] text-slate-400 flex items-center gap-1 mt-1 font-mono">
+                  <Clock className="w-3 h-3 text-slate-400" /> Pukul {waktuKontrolBerikutnya}
                 </span>
               </div>
 
-              <div className="bg-[#061222] p-3 rounded-xl border border-amber-500/20">
+              <div className="bg-slate-950/50 p-3 rounded-xl border border-slate-800">
                 <span className="text-[10px] font-semibold uppercase text-slate-400 block">Dokter DPJP / Konselor:</span>
-                <span className="text-sm font-bold text-slate-100 mt-0.5 block flex items-center gap-1">
-                  <Stethoscope className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                <span className="text-sm font-semibold text-slate-200 mt-0.5 block flex items-center gap-1">
+                  <Stethoscope className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                   <span>{dpjp}</span>
                 </span>
                 <span className="text-[11px] text-slate-400 block mt-1">Spesialis Kedokteran Jiwa / Adiksi</span>
               </div>
             </div>
 
-            <div className="bg-[#061222] p-3 rounded-xl border border-amber-500/20 text-xs space-y-1">
+            <div className="bg-slate-950/50 p-3 rounded-xl border border-slate-800 text-xs space-y-1">
               <span className="text-[10px] font-semibold uppercase text-slate-400 block">Lokasi Pelaksanaan Kontrol:</span>
-              <span className="font-bold text-slate-200 block flex items-start gap-1.5">
-                <MapPin className="w-3.5 h-3.5 text-rose-400 shrink-0 mt-0.5" />
+              <span className="font-semibold text-slate-200 block flex items-start gap-1.5">
+                <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0 mt-0.5" />
                 <span>{namaFasilitas}</span>
               </span>
               <span className="text-[11px] text-slate-400 block pl-5">{alamatFasilitas}</span>
             </div>
 
-            <div className="p-3 bg-[#081a33] border border-[#234b7d] rounded-xl text-xs text-slate-300 flex items-start gap-2.5 leading-relaxed">
-              <Info className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+            <div className="p-3 bg-slate-950/50 border border-slate-800 rounded-xl text-xs text-slate-300 flex items-start gap-2.5 leading-relaxed">
+              <Info className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
               <div>
-                <strong className="text-amber-300 block mb-0.5 text-xs">Instruksi Penting Bagi Tersangka / Penjamin:</strong>
-                <p className="text-[11px] text-slate-300">{catatanKontrolBerikutnya}</p>
+                <strong className="text-slate-200 block mb-0.5 text-xs">Instruksi Penting Bagi Tersangka / Penjamin:</strong>
+                <p className="text-[11px] text-slate-400">{catatanKontrolBerikutnya}</p>
               </div>
             </div>
           </div>
         </div>
 
         {/* COLUMN 2: FASILITAS & PENETAPAN REHAB (5 COLS) */}
-        <div className="lg:col-span-5 bg-[#0b172a] border border-[#1b3459] rounded-2xl p-5 flex flex-col justify-between space-y-4 shadow-xl">
+        <div className="lg:col-span-5 bg-slate-900/60 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between space-y-4 shadow-sm">
           <div className="space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-[#1b3459]">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
               <div className="flex items-center space-x-2">
-                <Building2 className="w-4 h-4 text-[#D4AF37]" />
+                <Building2 className="w-4 h-4 text-slate-300" />
                 <h3 className="text-xs sm:text-sm font-bold text-white uppercase tracking-wider">
                   Fasilitas &amp; Rujukan Resmi
                 </h3>
               </div>
-              <span className="text-xs font-mono font-bold text-emerald-400 bg-emerald-950 px-2.5 py-0.5 rounded-full border border-emerald-700/60">
+              <span className="text-xs font-mono font-medium text-slate-300 bg-slate-800 px-2.5 py-0.5 rounded-full border border-slate-700">
                 {modalitas}
               </span>
             </div>
 
             <div className="space-y-2.5 text-xs">
-              <div className="bg-[#081224] p-3 rounded-xl border border-[#1b3459]">
+              <div className="bg-slate-950/50 p-3 rounded-xl border border-slate-800">
                 <span className="text-[10px] font-semibold uppercase text-slate-400 block">Fasilitas Rujukan Sesuai Rekomendasi:</span>
                 <span className="text-xs font-bold text-white block mt-0.5">{namaFasilitas}</span>
                 <span className="text-[10px] text-slate-400 block mt-0.5">Akreditasi Tingkat Nasional (BNN)</span>
               </div>
 
               <div className="grid grid-cols-2 gap-2 text-xs">
-                <div className="bg-[#081224] p-2.5 rounded-xl border border-[#1b3459]">
+                <div className="bg-slate-950/50 p-2.5 rounded-xl border border-slate-800">
                   <span className="text-[10px] font-semibold uppercase text-slate-400 block">Tanggal Masuk:</span>
                   <span className="font-mono text-slate-200 font-bold mt-0.5 block">{tanggalMulai}</span>
                 </div>
-                <div className="bg-[#081224] p-2.5 rounded-xl border border-[#1b3459]">
+                <div className="bg-slate-950/50 p-2.5 rounded-xl border border-slate-800">
                   <span className="text-[10px] font-semibold uppercase text-slate-400 block">Target Selesai:</span>
                   <span className="font-mono text-slate-200 font-bold mt-0.5 block">{tanggalTargetSelesai}</span>
                 </div>
@@ -366,10 +331,10 @@ export const DetailPemantauanRehabView: React.FC<DetailPemantauanRehabViewProps>
             </div>
           </div>
 
-          <div className="p-3 bg-[#081224] border border-[#1b3459] rounded-xl text-xs space-y-1">
+          <div className="p-3 bg-slate-950/50 border border-slate-800 rounded-xl text-xs space-y-1">
             <div className="flex items-center justify-between text-[11px]">
               <span className="text-slate-400">Pemberian Rekomendasi Hukum:</span>
-              <span className="text-[#D4AF37] font-bold">Keadilan Restoratif (RJ)</span>
+              <span className="text-slate-200 font-semibold">Keadilan Restoratif (RJ)</span>
             </div>
             <p className="text-[10px] text-slate-400 leading-relaxed">
               Memenuhi kriteria SEMA No. 4/2010 Pasal 127 UU 35/2009 untuk menjalani rehabilitasi dan tidak dipenjara.
@@ -379,37 +344,37 @@ export const DetailPemantauanRehabView: React.FC<DetailPemantauanRehabViewProps>
       </div>
 
       {/* Section Tabs Switcher: [1. Riwayat Skrining Urin] & [2. Catatan Wajib Lapor] */}
-      <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl p-5 shadow-xl space-y-4">
-        <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[#1b3459]">
+      <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 shadow-sm space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-800">
           <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={() => setActiveTabSection('kontrol')}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
                 activeTabSection === 'kontrol'
-                  ? 'bg-gradient-to-r from-[#144782] to-[#1c64b8] text-white border border-[#2d7ad6]/70 shadow'
-                  : 'text-slate-400 hover:text-white hover:bg-[#0e1d35]'
+                  ? 'bg-slate-800 text-white border border-slate-700 shadow-sm'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
               }`}
             >
-              <Syringe className="w-3.5 h-3.5" />
+              <Syringe className="w-3.5 h-3.5 text-slate-300" />
               <span>1. Rekam Toksikologi Urin ({riwayatUrin.length})</span>
             </button>
 
             <button
               type="button"
               onClick={() => setActiveTabSection('wajib_lapor')}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
                 activeTabSection === 'wajib_lapor'
-                  ? 'bg-gradient-to-r from-[#144782] to-[#1c64b8] text-white border border-[#2d7ad6]/70 shadow'
-                  : 'text-slate-400 hover:text-white hover:bg-[#0e1d35]'
+                  ? 'bg-slate-800 text-white border border-slate-700 shadow-sm'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
               }`}
             >
-              <CheckSquare className="w-3.5 h-3.5" />
+              <CheckSquare className="w-3.5 h-3.5 text-slate-300" />
               <span>2. Jurnal Wajib Lapor Penyidik ({riwayatWajibLapor.length})</span>
             </button>
           </div>
 
-          <span className="text-xs font-mono text-emerald-400 font-bold bg-emerald-950/80 px-2.5 py-0.5 rounded-full border border-emerald-700/60">
+          <span className="text-xs font-mono text-emerald-400 font-medium bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20">
             ✓ Evaluasi Klinis Lengkap
           </span>
         </div>
@@ -417,82 +382,102 @@ export const DetailPemantauanRehabView: React.FC<DetailPemantauanRehabViewProps>
         {/* Tab 1: Rekam Uji Toksikologi Urin */}
         {(activeTabSection === 'kontrol' || activeTabSection === 'urin') && (
           <div className="space-y-3">
-            {riwayatUrin.map((urin, idx) => (
-              <div
-                key={urin.id}
-                className="bg-[#081224] border border-[#1b3459] rounded-xl p-3.5 space-y-2 text-xs hover:border-[#234b7d] transition-all"
-              >
-                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#1b3459]/60 pb-2">
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono font-bold text-white bg-[#142642] px-2 py-0.5 rounded text-[11px]">
-                      Uji Ke-{idx + 1} &bull; {urin.jenisPemeriksaan}
-                    </span>
-                    <span className="text-emerald-400 font-bold bg-emerald-950/90 border border-emerald-600/40 px-2.5 py-0.5 rounded text-[11px]">
-                      ✓ HASIL: {urin.hasil.toUpperCase()} (NON-REAKTIF)
-                    </span>
-                  </div>
-                  <span className="font-mono text-slate-400 text-[11px]">{urin.tanggalTes}</span>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5 text-slate-300 pt-1">
-                  <div>
-                    <span className="text-[10px] uppercase font-semibold text-slate-400 block">Parameter Skrining 5-Panel:</span>
-                    <span className="font-mono font-bold text-slate-200 mt-0.5 block">
-                      {Array.isArray(urin.parameter) ? urin.parameter.join(', ') : 'AMP, MET, THC, BZO, MOP'}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-[10px] uppercase font-semibold text-slate-400 block">Dokter Pemeriksa / Analis:</span>
-                    <span className="text-slate-200 font-medium mt-0.5 block">{urin.petugasPemeriksa}</span>
-                  </div>
-                  <div>
-                    <span className="text-[10px] uppercase font-semibold text-slate-400 block">Catatan Medis:</span>
-                    <span className="text-slate-300 italic mt-0.5 block">{urin.keterangan}</span>
-                  </div>
-                </div>
+            {riwayatUrin.length === 0 ? (
+              <div className="p-8 text-center bg-slate-950/50 border border-slate-800 rounded-xl text-xs text-slate-400 space-y-1.5">
+                <Syringe className="w-6 h-6 text-slate-500 mx-auto" />
+                <p className="font-semibold text-slate-300">Belum Ada Rekam Uji Toksikologi Urin</p>
+                <p className="text-[11px] text-slate-400">Hasil pemeriksaan laboratorium toksikologi berkala akan tercatat di sini setelah diinput oleh DPJP/analis medis fasilitas.</p>
               </div>
-            ))}
+            ) : (
+              riwayatUrin.map((urin, idx) => (
+                <div
+                  key={urin.id}
+                  className="bg-slate-950/50 border border-slate-800 rounded-xl p-3.5 space-y-2 text-xs hover:border-slate-700 transition-all"
+                >
+                  <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-2">
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono font-semibold text-slate-200 bg-slate-800 px-2 py-0.5 rounded text-[11px]">
+                        Uji Ke-{idx + 1} &bull; {urin.jenisPemeriksaan}
+                      </span>
+                      <span className={`font-medium px-2.5 py-0.5 rounded text-[11px] ${
+                        urin.hasil.toLowerCase() === 'positif'
+                          ? 'text-rose-400 bg-rose-500/10 border border-rose-500/20'
+                          : 'text-emerald-400 bg-emerald-500/10 border border-emerald-500/20'
+                      }`}>
+                        {urin.hasil.toLowerCase() === 'positif' ? '⚠ HASIL: POSITIF (TERDETEKSI ZAT)' : '✓ HASIL: NEGATIF (NON-REAKTIF)'}
+                      </span>
+                    </div>
+                    <span className="font-mono text-slate-400 text-[11px]">{urin.tanggalTes}</span>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5 text-slate-300 pt-1">
+                    <div>
+                      <span className="text-[10px] uppercase font-semibold text-slate-400 block">Parameter Skrining 5-Panel:</span>
+                      <span className="font-mono font-medium text-slate-200 mt-0.5 block">
+                        {Array.isArray(urin.parameter) ? urin.parameter.join(', ') : 'AMP, MET, THC, BZO, MOP'}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] uppercase font-semibold text-slate-400 block">Dokter Pemeriksa / Analis:</span>
+                      <span className="text-slate-200 font-medium mt-0.5 block">{urin.petugasPemeriksa}</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] uppercase font-semibold text-slate-400 block">Catatan Medis:</span>
+                      <span className="text-slate-300 italic mt-0.5 block">{urin.keterangan}</span>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         )}
 
         {/* Tab 2: Catatan Wajib Lapor Penyidik */}
         {activeTabSection === 'wajib_lapor' && (
           <div className="space-y-3">
-            {riwayatWajibLapor.map((wl, idx) => (
-              <div
-                key={wl.id}
-                className="bg-[#081224] border border-[#1b3459] rounded-xl p-3.5 space-y-2 text-xs hover:border-[#234b7d] transition-all"
-              >
-                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#1b3459]/60 pb-2">
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono font-bold text-emerald-400 bg-emerald-950 px-2 py-0.5 rounded text-[11px] border border-emerald-700/50">
-                      ✓ Pelaporan Ke-{idx + 1} ({wl.kanal.toUpperCase()})
-                    </span>
-                    <span className="text-slate-300 font-medium text-[11px]">
-                      Status: Dikonfirmasi &amp; Diverifikasi Penyidik
-                    </span>
-                  </div>
-                  <span className="font-mono text-slate-400 text-[11px]">
-                    {wl.tanggalPelaporanAktual || wl.tanggalWajibLapor}
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-slate-300 pt-1">
-                  <div>
-                    <span className="text-[10px] uppercase font-semibold text-slate-400 block">Penyidik Penerima Laporan:</span>
-                    <span className="text-white font-semibold">{wl.namaPenyidikPenerima}</span>
-                  </div>
-                  <div>
-                    <span className="text-[10px] uppercase font-semibold text-slate-400 block">Satuan / Instansi:</span>
-                    <span className="text-slate-200">{wl.instansiPenyidik}</span>
-                  </div>
-                  <div>
-                    <span className="text-[10px] uppercase font-semibold text-slate-400 block">Status Administrasi:</span>
-                    <span className="text-emerald-400 font-medium">✓ Hadir Tepat Waktu</span>
-                  </div>
-                </div>
+            {riwayatWajibLapor.length === 0 ? (
+              <div className="p-8 text-center bg-slate-950/50 border border-slate-800 rounded-xl text-xs text-slate-400 space-y-1.5">
+                <CheckSquare className="w-6 h-6 text-slate-500 mx-auto" />
+                <p className="font-semibold text-slate-300">Belum Ada Catatan Wajib Lapor</p>
+                <p className="text-[11px] text-slate-400">Bukti penerimaan wajib lapor berkala klien akan tampil di sini setelah diverifikasi penyidik pengawas.</p>
               </div>
-            ))}
+            ) : (
+              riwayatWajibLapor.map((wl, idx) => (
+                <div
+                  key={wl.id}
+                  className="bg-slate-950/50 border border-slate-800 rounded-xl p-3.5 space-y-2 text-xs hover:border-slate-700 transition-all"
+                >
+                  <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#1b3459]/60 pb-2">
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono font-bold text-emerald-400 bg-emerald-950 px-2 py-0.5 rounded text-[11px] border border-emerald-700/50">
+                        ✓ Pelaporan Ke-{idx + 1} ({wl.kanal?.toUpperCase() || 'LANGSUNG'})
+                      </span>
+                      <span className="text-slate-300 font-medium text-[11px]">
+                        Status: Dikonfirmasi &amp; Diverifikasi Penyidik
+                      </span>
+                    </div>
+                    <span className="font-mono text-slate-400 text-[11px]">
+                      {wl.tanggalPelaporanAktual || wl.tanggalWajibLapor}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-slate-300 pt-1">
+                    <div>
+                      <span className="text-[10px] uppercase font-semibold text-slate-400 block">Penyidik Penerima Laporan:</span>
+                      <span className="text-white font-semibold">{wl.namaPenyidikPenerima}</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] uppercase font-semibold text-slate-400 block">Satuan / Instansi:</span>
+                      <span className="text-slate-200">{wl.instansiPenyidik}</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] uppercase font-semibold text-slate-400 block">Status Administrasi:</span>
+                      <span className="text-emerald-400 font-medium">✓ Hadir Tepat Waktu</span>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         )}
       </div>
@@ -604,8 +589,10 @@ export const DetailPemantauanRehabView: React.FC<DetailPemantauanRehabViewProps>
                       <p className="font-bold text-slate-900 text-[11px]">Ketua Tim Asesmen Terpadu (TAT)</p>
                     </div>
                     <div>
-                      <p className="font-bold text-slate-900 underline text-[11px]">KOMBES POL AHMAD RIFA'I, S.I.K.</p>
-                      <p className="text-[10px] text-slate-600">NRP. 75080912</p>
+                      <p className="font-bold text-slate-900 underline text-[11px]">{ketuaInfo.nama}</p>
+                      <p className="text-[10px] text-slate-600">
+                        {ketuaInfo.nrp ? `${ketuaInfo.nrp.length > 10 ? 'NIP' : 'NRP'}. ${ketuaInfo.nrp}` : ketuaInfo.jabatan}
+                      </p>
                     </div>
                   </div>
                 </div>

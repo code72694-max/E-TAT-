@@ -110,6 +110,10 @@ export const DEFAULT_USERS: UserProfile[] = [
     phone: '081234567890',
     position: 'Petugas Verifikasi & Sekretariat TAT (Akun Uji)',
     pangkat: 'Komisaris Polisi (Kompol)',
+    namaKetuaTAT: 'Kompol Hendra Kusuma, S.I.K., M.Si.',
+    nipKetuaTAT: '79080512',
+    pangkatKetuaTAT: 'Komisaris Polisi (Kompol)',
+    jabatanKetuaTAT: 'Ketua Tim TAT Kaltim',
   },
   {
     id: 'user-pengaju',
@@ -589,7 +593,8 @@ export default function App() {
     (currentTab.startsWith('tindak_lanjut') && selectedTindakLanjutId) ||
     (currentTab === 'verifikasi_akun' && selectedRegistrasiId) ||
     currentTab === 'riwayat' ||
-    currentTab === 'pengajuan_baru'
+    currentTab === 'pengajuan_baru' ||
+    currentTab === 'profile'
   );
 
   // Badge calculations for sidebar (menggunakan applicationStatus kanonis)
@@ -1047,6 +1052,7 @@ export default function App() {
             onGoToLogin={() => changeAppViewMode('login')}
             onGoToLanding={() => changeAppViewMode('landing')}
             onUpdateUser={handleUpdateCurrentUser}
+            onBack={() => handleSelectTab('beranda')}
           />
         );
 
@@ -1160,9 +1166,15 @@ export default function App() {
         onLogout={handleLogout}
         onGoToLanding={() => changeAppViewMode('landing')}
         onGoToLogin={() => changeAppViewMode('login')}
+        onNavigateToProfile={() => handleSelectTab('profile')}
         selectedPermohonan={activeDetailPermohonan}
         isPengajuanBaru={currentTab === 'pengajuan_baru'}
+        isProfilePage={currentTab === 'profile'}
         onBackFromDetail={() => {
+          if (currentTab === 'profile') {
+            handleSelectTab('beranda');
+            return;
+          }
           if (currentTab === 'pengajuan_baru') {
             handleSelectTab('beranda');
             return;
@@ -1210,8 +1222,8 @@ export default function App() {
 
       {/* Main Workspace Layout - Desktop: Sidebar hidden when viewing detail page or pengajuan_baru */}
       <div className="flex-1 flex w-full bg-[#071326]">
-        {/* Sidebar at desktop corner (Hidden on permohonan detail view and pengajuan_baru) */}
-        {!activeDetailPermohonan && !selectedPermohonan && currentTab !== 'pengajuan_baru' && (
+        {/* Sidebar at desktop corner (Hidden on permohonan detail view, pengajuan_baru, and profile) */}
+        {!activeDetailPermohonan && !selectedPermohonan && currentTab !== 'pengajuan_baru' && currentTab !== 'profile' && (
           <Sidebar
             currentTab={currentTab}
             onSelectTab={handleSelectTab}
@@ -1237,8 +1249,8 @@ export default function App() {
         </main>
       </div>
 
-      {/* Mobile Native App Bottom Navigation Bar - Hidden on Detail View */}
-      {!isViewingAnyDetail && (
+      {/* Mobile Native App Bottom Navigation Bar - Hidden on Detail View & Profile */}
+      {!isViewingAnyDetail && currentTab !== 'profile' && (
         <MobileBottomNav
           userRole={currentUser.role}
           currentTab={currentTab}

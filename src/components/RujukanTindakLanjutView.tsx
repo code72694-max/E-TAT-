@@ -44,6 +44,7 @@ import {
 
 import TindakLanjutDetailView from './TindakLanjutDetailView';
 import { SuratPengantarTersangkaModal } from './SuratPengantarTersangkaModal';
+import { getKodeLacakRehab, normalizeSearchCode } from '../utils/getKodeLacak';
 
 interface RujukanTindakLanjutViewProps {
   permohonanList: PermohonanAsesmen[];
@@ -263,12 +264,18 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
 
   const filteredAntreanList = antreanPlenoList.filter(item => {
     const q = searchTerm.toLowerCase();
-    const kode = ((item as any).kodeLacakRehab || (item.tindakLanjut as any)?.kodeLacakRehab || '').toLowerCase();
+    const qClean = normalizeSearchCode(q);
+    const kode = getKodeLacakRehab(item).toLowerCase();
+    const cleanKode = normalizeSearchCode(kode);
+
     const matchSearch = item.nomorPermohonan.toLowerCase().includes(q) ||
+      normalizeSearchCode(item.nomorPermohonan).includes(qClean) ||
       item.terperiksa.namaLengkap.toLowerCase().includes(q) ||
+      (item.terperiksa.nik && item.terperiksa.nik.includes(q)) ||
       (item.sidangPleno?.kesepakatanRekomendasi || '').toLowerCase().includes(q) ||
       (item.sidangPleno?.fasilitasRujukanUsulan || item.tindakLanjut?.namaFasilitasTujuan || '').toLowerCase().includes(q) ||
-      kode.includes(q);
+      kode.includes(q) ||
+      (cleanKode && qClean && (cleanKode.includes(qClean) || qClean.includes(cleanKode)));
     if (!matchSearch) return false;
     if (filterModalitas !== 'all') {
       const mod = item.sidangPleno?.kesepakatanRekomendasi?.toLowerCase().includes('inap') ? 'Rawat Inap' : 'Rawat Jalan';
@@ -278,10 +285,19 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
   });
 
   const filteredList = eligibleList.filter(item => {
-    const matchSearch = item.nomorPermohonan.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.terperiksa.namaLengkap.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (item.pengawasanKlien?.instansiPelaksanaRehab || item.monitoringTindakLanjut?.pelaksanaanRehab?.namaFasilitasRehab || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (item.tindakLanjut?.namaFasilitasTujuan || '').toLowerCase().includes(searchTerm.toLowerCase());
+    const q = searchTerm.toLowerCase();
+    const qClean = normalizeSearchCode(q);
+    const kode = getKodeLacakRehab(item).toLowerCase();
+    const cleanKode = normalizeSearchCode(kode);
+
+    const matchSearch = item.nomorPermohonan.toLowerCase().includes(q) ||
+      normalizeSearchCode(item.nomorPermohonan).includes(qClean) ||
+      item.terperiksa.namaLengkap.toLowerCase().includes(q) ||
+      (item.terperiksa.nik && item.terperiksa.nik.includes(q)) ||
+      (item.pengawasanKlien?.instansiPelaksanaRehab || item.monitoringTindakLanjut?.pelaksanaanRehab?.namaFasilitasRehab || '').toLowerCase().includes(q) ||
+      (item.tindakLanjut?.namaFasilitasTujuan || '').toLowerCase().includes(q) ||
+      kode.includes(q) ||
+      (cleanKode && qClean && (cleanKode.includes(qClean) || qClean.includes(cleanKode)));
     
     if (!matchSearch) return false;
     if (filterModalitas !== 'all') {
@@ -315,9 +331,9 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
       {/* Header View */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-xl font-extrabold text-slate-100 flex items-center gap-2.5 tracking-tight">
-            <div className="p-2.5 bg-blue-500/10 border border-blue-500/20 text-blue-400 rounded-xl">
-              <Share2 className="w-5 h-5" />
+          <h1 className="text-xl font-bold text-slate-100 flex items-center gap-2.5 tracking-tight">
+            <div className="p-2 bg-slate-800 border border-slate-700/80 text-slate-300 rounded-xl">
+              <Share2 className="w-4 h-4" />
             </div>
             <span>Tindak Lanjut &amp; Kontrol Rehabilitasi Pasca TAT</span>
           </h1>
@@ -334,7 +350,7 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
               }
               setShowScheduleModal(true);
             }}
-            className="px-3.5 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-medium rounded-xl text-xs flex items-center gap-2 transition-all cursor-pointer shadow-md shadow-blue-900/30 ring-1 ring-blue-400/40"
+            className="px-3.5 py-2 bg-blue-600 hover:bg-blue-500 text-white font-medium rounded-xl text-xs flex items-center gap-2 transition-all cursor-pointer shadow-sm border border-blue-500/30"
           >
             <Calendar className="w-3.5 h-3.5 text-blue-200" />
             <span>+ Input Jadwal Kontrol &amp; Lapor</span>
@@ -343,20 +359,20 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
       </div>
 
       {/* SUB-MENU TABS NAVIGATION */}
-      <div className="flex flex-wrap items-center gap-2 p-1.5 bg-slate-900/90 border border-slate-800 rounded-2xl shadow-sm">
+      <div className="flex flex-wrap items-center gap-1.5 p-1 bg-slate-900/90 border border-slate-800 rounded-xl shadow-sm">
         <button
           type="button"
           onClick={() => setSubTab('antrean_pleno')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs transition-all cursor-pointer ${
+          className={`flex items-center gap-2 px-3.5 py-2 rounded-lg font-medium text-xs transition-all cursor-pointer ${
             subTab === 'antrean_pleno'
-              ? 'bg-blue-600 text-white shadow-md shadow-blue-900/40 ring-1 ring-blue-400/40'
-              : 'text-slate-400 hover:text-white hover:bg-slate-800/80'
+              ? 'bg-slate-800 text-white border border-slate-700 shadow-sm'
+              : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
           }`}
         >
-          <FileCheck2 className="w-4 h-4 text-blue-200" />
+          <FileCheck2 className="w-3.5 h-3.5 text-slate-300" />
           <span>Daftar Harus Ditindaklanjuti (Selesai Pleno)</span>
-          <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold ${
-            subTab === 'antrean_pleno' ? 'bg-white/20 text-white' : 'bg-slate-800 text-slate-300'
+          <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-medium ${
+            subTab === 'antrean_pleno' ? 'bg-slate-700 text-slate-200' : 'bg-slate-800 text-slate-400'
           }`}>
             {antreanPlenoList.length}
           </span>
@@ -365,16 +381,16 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
         <button
           type="button"
           onClick={() => setSubTab('monitoring')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs transition-all cursor-pointer ${
+          className={`flex items-center gap-2 px-3.5 py-2 rounded-lg font-medium text-xs transition-all cursor-pointer ${
             subTab === 'monitoring'
-              ? 'bg-blue-600 text-white shadow-md shadow-blue-900/40 ring-1 ring-blue-400/40'
-              : 'text-slate-400 hover:text-white hover:bg-slate-800/80'
+              ? 'bg-slate-800 text-white border border-slate-700 shadow-sm'
+              : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
           }`}
         >
-          <Activity className="w-4 h-4 text-emerald-400" />
+          <Activity className="w-3.5 h-3.5 text-slate-300" />
           <span>Monitoring Pengawasan Klien Aktif</span>
-          <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold ${
-            subTab === 'monitoring' ? 'bg-white/20 text-white' : 'bg-slate-800 text-slate-300'
+          <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-medium ${
+            subTab === 'monitoring' ? 'bg-slate-700 text-slate-200' : 'bg-slate-800 text-slate-400'
           }`}>
             {pengawasanList.length}
           </span>
@@ -382,15 +398,15 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
       </div>
 
       {/* FILTER & SEARCH BAR */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-slate-900/90 border border-slate-800 p-3 rounded-2xl shadow-md">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-slate-900/70 border border-slate-800 p-2.5 rounded-xl shadow-sm">
         <div className="relative flex-1">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             placeholder={subTab === 'antrean_pleno' ? "Cari nama terperiksa, no permohonan, kode lacak rehab, fasilitas..." : "Cari nama terperiksa, nomor permohonan, atau fasilitas rehab..."}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 bg-slate-950/80 border border-slate-800 rounded-xl text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-blue-500"
+            className="w-full pl-9 pr-3.5 py-1.5 bg-slate-950/80 border border-slate-800 rounded-lg text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-slate-600"
           />
         </div>
 
@@ -399,7 +415,7 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
           <select
             value={filterModalitas}
             onChange={(e) => setFilterModalitas(e.target.value as any)}
-            className="px-3 py-2 bg-slate-950/80 border border-slate-800 rounded-xl text-xs text-slate-300 focus:outline-none focus:border-blue-500 cursor-pointer"
+            className="px-3 py-1.5 bg-slate-950/80 border border-slate-800 rounded-lg text-xs text-slate-300 focus:outline-none focus:border-slate-600 cursor-pointer"
           >
             <option value="all">Semua Layanan</option>
             <option value="Rawat Inap">Rawat Inap</option>
@@ -444,29 +460,30 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
                   return (
                     <div
                       key={item.id}
-                      className="p-4 sm:p-5 bg-slate-950/60 hover:bg-slate-900/90 border border-slate-800/80 hover:border-slate-700 rounded-xl transition-all shadow-md space-y-3.5"
+                      onClick={() => onSelectCase ? onSelectCase(item.id) : onSelectPermohonan(item.id)}
+                      className="p-4 sm:p-5 bg-slate-950/60 hover:bg-slate-900/80 border border-slate-800/80 hover:border-slate-700 rounded-xl transition-all shadow-sm space-y-3.5 cursor-pointer"
                     >
                       {/* Top Row: Client Info & Status Badges */}
                       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
                         <div className="flex items-start gap-3">
-                          <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/30 text-blue-400 font-bold text-sm flex items-center justify-center shrink-0 mt-0.5">
+                          <div className="w-9 h-9 rounded-lg bg-slate-800 border border-slate-700/80 text-slate-300 font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">
                             {item.terperiksa.namaLengkap.slice(0, 2).toUpperCase()}
                           </div>
                           <div>
                             <div className="flex flex-wrap items-center gap-2">
-                              <h4 className="text-sm font-bold text-white">
+                              <h4 className="text-sm font-semibold text-slate-100">
                                 {item.terperiksa.namaLengkap}
                               </h4>
                               <span className="text-[11px] font-mono text-slate-400 bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700/60">
                                 {item.nomorPermohonan}
                               </span>
                               {isDiteruskan ? (
-                                <span className="text-[10px] font-bold text-emerald-300 bg-emerald-950/80 border border-emerald-700/60 px-2 py-0.5 rounded-full flex items-center gap-1">
+                                <span className="text-[11px] font-medium text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-md flex items-center gap-1">
                                   <CheckCircle2 className="w-3 h-3 text-emerald-400" />
                                   <span>Diteruskan ke Tindak Lanjut</span>
                                 </span>
                               ) : (
-                                <span className="text-[10px] font-bold text-amber-300 bg-amber-950/80 border border-amber-700/60 px-2 py-0.5 rounded-full flex items-center gap-1">
+                                <span className="text-[11px] font-medium text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-md flex items-center gap-1">
                                   <Clock className="w-3 h-3 text-amber-400" />
                                   <span>Perlu Diteruskan</span>
                                 </span>
@@ -485,22 +502,22 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
 
                         {/* Kode Lacak Rehab Badge (Bisa dilacak di Portal Lacak Berkas) */}
                         <div className="sm:self-start">
-                          <div className="flex items-center gap-2 px-3 py-1.5 bg-amber-950/40 border border-amber-500/40 rounded-xl text-xs text-amber-300 font-mono shadow-sm">
-                            <QrCode className="w-4 h-4 text-amber-400 shrink-0" />
+                          <div className="flex items-center gap-2.5 px-3 py-1.5 bg-slate-900 border border-slate-700/80 rounded-lg text-xs font-mono shadow-sm">
+                            <QrCode className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                             <div>
-                              <span className="text-[10px] uppercase font-sans font-semibold text-amber-400/80 block leading-tight">Kode Akses Pelacakan:</span>
-                              <strong className="text-white font-bold tracking-wider text-xs">{kodeLacak}</strong>
+                              <span className="text-[10px] uppercase font-sans font-medium text-slate-400 block leading-tight">Kode Akses Pelacakan:</span>
+                              <strong className="text-slate-200 font-bold tracking-wider text-xs">{kodeLacak}</strong>
                             </div>
                           </div>
                         </div>
                       </div>
 
                       {/* Middle: Kesepakatan Pleno & Usulan Rujukan */}
-                      <div className="p-3 bg-[#081224] rounded-xl border border-[#1b3459] text-xs flex flex-col md:flex-row md:items-center justify-between gap-3">
+                      <div className="p-3.5 bg-slate-900/60 rounded-xl border border-slate-800 text-xs flex flex-col md:flex-row md:items-center justify-between gap-3">
                         <div className="space-y-1 flex-1">
                           <div className="flex items-center gap-2">
-                            <span className="text-[10px] uppercase font-bold text-[#d4af37] tracking-wider">HASIL REKOMENDASI SIDANG PLENO TAT:</span>
-                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${isRawatInap ? 'bg-indigo-950 text-indigo-300 border-indigo-700/60' : 'bg-teal-950 text-teal-300 border-teal-700/60'}`}>
+                            <span className="text-[10px] uppercase font-semibold text-slate-400 tracking-wider">HASIL REKOMENDASI SIDANG PLENO TAT:</span>
+                            <span className="text-[10px] font-medium px-2 py-0.5 rounded border border-slate-700 bg-slate-800 text-slate-300">
                               {isRawatInap ? 'Rawat Inap' : 'Rawat Jalan'}
                             </span>
                           </div>
@@ -516,26 +533,30 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
 
                       {/* Bottom Row: Action Buttons */}
                       <div className="flex flex-wrap items-center justify-end gap-2.5 pt-1">
-                        {/* 1. Dokumen yang Diberikan ke Tersangka (dengan Kode Lacak & QR) */}
+                        {/* 1. Dokumen yang Diberikan ke Tersangka */}
                         <button
                           type="button"
-                          onClick={() => setSuratPengantarItem(item)}
-                          className="px-3.5 py-2 rounded-xl text-xs font-bold bg-[#d4af37]/20 hover:bg-[#d4af37]/30 border border-[#d4af37]/60 text-[#d4af37] hover:text-amber-200 flex items-center gap-2 transition-all cursor-pointer shadow-sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSuratPengantarItem(item);
+                          }}
+                          className="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-750 text-slate-200 hover:text-white border border-slate-700 flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
                         >
-                          <FileText className="w-3.5 h-3.5 text-[#d4af37]" />
+                          <FileText className="w-3.5 h-3.5 text-slate-400" />
                           <span>Dokumen Surat Tersangka</span>
                         </button>
 
                         {/* 2. Tombol Input Jadwal Kontrol & Lapor */}
                         <button
                           type="button"
-                          onClick={() => {
+                          onClick={(e) => {
+                            e.stopPropagation();
                             setSelectedSchedulePermohonanId(item.id);
                             setShowScheduleModal(true);
                           }}
-                          className="px-3.5 py-2 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-500 text-white flex items-center gap-2 transition-all cursor-pointer shadow-md shadow-blue-950/40"
+                          className="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-750 text-slate-200 hover:text-white border border-slate-700 flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
                         >
-                          <Calendar className="w-3.5 h-3.5 text-blue-200" />
+                          <Calendar className="w-3.5 h-3.5 text-slate-400" />
                           <span>Input Jadwal Kontrol &amp; Lapor</span>
                         </button>
 
@@ -543,10 +564,10 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
                         <button
                           type="button"
                           onClick={() => onSelectCase ? onSelectCase(item.id) : onSelectPermohonan(item.id)}
-                          className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white border border-slate-700 flex items-center gap-1.5 transition-all cursor-pointer"
+                          className="px-3.5 py-1.5 rounded-lg text-xs font-medium bg-blue-600 hover:bg-blue-500 text-white border border-blue-500/40 flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
                         >
                           <span>Lembar Monitoring</span>
-                          <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+                          <ChevronRight className="w-3.5 h-3.5 text-blue-200" />
                         </button>
                       </div>
                     </div>
@@ -617,7 +638,8 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
                     return (
                       <div
                         key={item.id}
-                        className="group flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 bg-slate-950/50 hover:bg-slate-900/80 border border-slate-800/70 hover:border-slate-700/90 rounded-xl transition-all shadow-sm"
+                        onClick={() => onSelectCase ? onSelectCase(item.id) : onSelectPermohonan(item.id)}
+                        className="group flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 bg-slate-950/50 hover:bg-slate-900/80 border border-slate-800/70 hover:border-blue-500/60 rounded-xl transition-all shadow-sm cursor-pointer"
                       >
                         {/* Left: Client info & Badges */}
                         <div className="flex items-start gap-3.5 min-w-0 flex-1">
@@ -671,19 +693,22 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
                         <div className="flex items-center justify-end gap-2 shrink-0 pt-2 md:pt-0 border-t md:border-t-0 border-slate-800/60">
                           <button
                             type="button"
-                            onClick={() => setSuratPengantarItem(item)}
-                            className="px-3 py-1.5 rounded-lg text-xs font-medium bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1.5 transition-all cursor-pointer"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSuratPengantarItem(item);
+                            }}
+                            className="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-750 text-slate-200 hover:text-white border border-slate-700 flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
                           >
-                            <FileText className="w-3.5 h-3.5" />
+                            <FileText className="w-3.5 h-3.5 text-slate-400" />
                             <span>Surat Tersangka</span>
                           </button>
                           <button
                             type="button"
                             onClick={() => onSelectCase ? onSelectCase(item.id) : onSelectPermohonan(item.id)}
-                            className="px-3.5 py-1.5 bg-slate-800 hover:bg-slate-700/90 active:bg-slate-700 text-slate-200 hover:text-white border border-slate-700/80 hover:border-slate-600 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-sm"
+                            className="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-500 text-white border border-blue-500/40 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-sm"
                           >
                             <span>Buka Detail</span>
-                            <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
+                            <ChevronRight className="w-3.5 h-3.5 text-blue-200 group-hover:translate-x-0.5 transition-transform" />
                           </button>
                         </div>
                       </div>

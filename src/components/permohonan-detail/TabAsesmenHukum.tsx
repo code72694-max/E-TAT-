@@ -39,13 +39,27 @@ export const TabAsesmenHukum: React.FC<TabAsesmenHukumProps> = ({
   const bbList = permohonan.perkara?.barangBuktiList || [];
 
   const [form, setForm] = useState({
-    analisisPeran: existingHukum?.analisisPeran || 'Penyalahguna Murni untuk Diri Sendiri',
-    analisisBarangBukti: existingHukum?.analisisBarangBukti || 'Barang bukti berada di bawah ambang batas gramatur pemakaian 1 hari sesuai SEMA 04/2010.',
-    statusKeterlibatanJaringan: (existingHukum as any)?.statusKeterlibatanJaringan || 'Bukan bagian dari sindikat / peredaran gelap narkotika.',
-    rekomendasiHukum: existingHukum?.rekomendasiHukum || 'Proses hukum diselesaikan melalui Rehabilitasi Medis dan Sosial',
-    pertimbanganYuridis: (existingHukum as any)?.pertimbanganYuridis || 'Memenuhi ketentuan Pasal 54, 55, 103 UU No. 35/2009 dan Perber 2014.',
-    catatanKhusus: existingHukum?.catatanKhusus || 'Dapat diproses untuk penetapan rehabilitasi dalam Sidang Pleno TAT.',
+    analisisPeran: existingHukum?.analisisPeran || '',
+    analisisBarangBukti: existingHukum?.analisisBarangBukti || '',
+    statusKeterlibatanJaringan: (existingHukum as any)?.statusKeterlibatanJaringan || '',
+    rekomendasiHukum: existingHukum?.rekomendasiHukum || '',
+    pertimbanganYuridis: (existingHukum as any)?.pertimbanganYuridis || '',
+    catatanKhusus: existingHukum?.catatanKhusus || '',
   });
+
+  // Sinkronisasi form jika data asesmenHukum di permohonan diperbarui
+  React.useEffect(() => {
+    if (permohonan.asesmenHukum) {
+      setForm({
+        analisisPeran: permohonan.asesmenHukum.analisisPeran || '',
+        analisisBarangBukti: permohonan.asesmenHukum.analisisBarangBukti || '',
+        statusKeterlibatanJaringan: (permohonan.asesmenHukum as any)?.statusKeterlibatanJaringan || '',
+        rekomendasiHukum: permohonan.asesmenHukum.rekomendasiHukum || '',
+        pertimbanganYuridis: (permohonan.asesmenHukum as any)?.pertimbanganYuridis || '',
+        catatanKhusus: permohonan.asesmenHukum.catatanKhusus || '',
+      });
+    }
+  }, [permohonan.asesmenHukum]);
 
   const [isSaving, setIsSaving] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
@@ -214,6 +228,7 @@ export const TabAsesmenHukum: React.FC<TabAsesmenHukumProps> = ({
               onChange={e => setForm({ ...form, analisisPeran: e.target.value })}
               className="w-full p-2.5 bg-[#050e1c] border border-[#1b3459] rounded-xl text-white outline-none focus:border-amber-500"
             >
+              <option value="">-- Pilih Analisis Peran (SEMA) --</option>
               <option value="Penyalahguna Murni untuk Diri Sendiri">Penyalahguna Murni untuk Diri Sendiri (Pasal 127)</option>
               <option value="Korban Penyalahgunaan Narkotika">Korban Penyalahgunaan Narkotika (Bujukan / Tekanan)</option>
               <option value="Pecandu dan Indikasi Pengedar Skala Kecil">Pecandu & Indikasi Pengedar Skala Kecil (Batas SEMA)</option>
@@ -226,6 +241,7 @@ export const TabAsesmenHukum: React.FC<TabAsesmenHukumProps> = ({
             <input
               type="text"
               disabled={!canEdit}
+              placeholder="Contoh: Bukan bagian dari sindikat / peredaran gelap narkotika"
               value={form.statusKeterlibatanJaringan}
               onChange={e => setForm({ ...form, statusKeterlibatanJaringan: e.target.value })}
               className="w-full p-2.5 bg-[#050e1c] border border-[#1b3459] rounded-xl text-white outline-none focus:border-amber-500"
@@ -238,6 +254,7 @@ export const TabAsesmenHukum: React.FC<TabAsesmenHukumProps> = ({
           <textarea
             rows={2}
             disabled={!canEdit}
+            placeholder="Ketik pertimbangan yuridis, pasal yang dilanggar, fakta penangkapan..."
             value={form.pertimbanganYuridis}
             onChange={e => setForm({ ...form, pertimbanganYuridis: e.target.value })}
             className="w-full p-2.5 bg-[#050e1c] border border-[#1b3459] rounded-xl text-white outline-none focus:border-amber-500 leading-relaxed"
@@ -261,6 +278,7 @@ export const TabAsesmenHukum: React.FC<TabAsesmenHukumProps> = ({
               onChange={e => setForm({ ...form, rekomendasiHukum: e.target.value })}
               className="w-full p-2.5 bg-[#050e1c] border border-[#1b3459] rounded-xl text-white outline-none focus:border-amber-500"
             >
+              <option value="">-- Pilih Rekomendasi Penanganan Perkara --</option>
               <option value="Proses hukum diselesaikan melalui Rehabilitasi Medis dan Sosial">
                 Proses hukum diselesaikan melalui Rehabilitasi Medis & Sosial (Restorative Justice)
               </option>
