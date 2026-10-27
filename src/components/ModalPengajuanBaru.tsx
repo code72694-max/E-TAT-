@@ -1212,28 +1212,28 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
               </div>
 
               <div className="space-y-2">
-                {getDocTemplates(jenisPengajuan).map((doc) => {
+                {getDocTemplates(jenisPengajuan).map((doc, idx) => {
                   const isChecked = uploadedDocIds.includes(doc.id);
                   return (
                     <div
                       key={doc.id}
-                      onClick={() => toggleDocUpload(doc.id)}
-                      className={`p-3 rounded-lg border cursor-pointer flex items-center justify-between transition-all ${
+                      className={`p-3 rounded-lg border flex items-center justify-between transition-all ${
                         isChecked
-                          ? 'border-[#D4AF37] bg-[#081224]'
-                          : 'border-[#1b3459] bg-[#0b172a] hover:bg-[#081224]'
+                          ? 'border-emerald-500/40 bg-[#081528]'
+                          : 'border-[#1b3459] bg-[#0b172a]'
                       }`}
                     >
                       <div className="flex items-center space-x-3">
-                        <input
-                          type="checkbox"
-                          checked={isChecked}
-                          onChange={() => {}}
-                          className="rounded text-[#D4AF37] accent-[#D4AF37]"
-                        />
+                        <div className={`w-6 h-6 rounded-md flex items-center justify-center font-mono font-bold text-[10px] shrink-0 ${
+                          isChecked
+                            ? 'bg-emerald-500/20 border border-emerald-500/40 text-emerald-400'
+                            : 'bg-[#10223b] border border-[#1b3860] text-[#D4AF37]'
+                        }`}>
+                          {isChecked ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> : String(idx + 1).padStart(2, '0')}
+                        </div>
                         <div>
                           <div className="flex items-center space-x-2">
-                            <span className="font-bold text-white">{doc.nama}</span>
+                            <span className="font-bold text-white text-xs">{doc.nama}</span>
                             {doc.wajib && (
                               <span className="text-[10px] bg-rose-500/20 text-rose-300 border border-rose-500/40 px-1.5 py-0.5 rounded font-semibold">
                                 Wajib
@@ -1244,10 +1244,21 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
                         </div>
                       </div>
 
-                      <div className="flex items-center space-x-3" onClick={(e) => e.stopPropagation()}>
+                      <div className="flex items-center space-x-2 sm:space-x-3" onClick={(e) => e.stopPropagation()}>
                         <span className={`text-[10px] font-semibold hidden sm:inline ${isChecked ? 'text-emerald-400' : 'text-slate-500'}`}>
                           {isChecked ? 'Sudah Diunggah' : 'Belum Dilampirkan'}
                         </span>
+
+                        {isChecked && (
+                          <button
+                            type="button"
+                            onClick={() => setUploadedDocIds(uploadedDocIds.filter(d => d !== doc.id))}
+                            className="text-[10px] text-rose-400 hover:text-rose-300 px-2 py-1 rounded hover:bg-rose-500/10 transition-colors"
+                          >
+                            Hapus
+                          </button>
+                        )}
+
                         <label className={`cursor-pointer px-3 py-1.5 rounded-lg border flex items-center space-x-1.5 transition-colors ${
                           isChecked 
                             ? 'bg-[#142642] border-[#234475] text-slate-300 hover:text-white' 
@@ -1262,8 +1273,11 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
                             className="hidden" 
                             onChange={(e) => {
                               if (e.target.files && e.target.files.length > 0) {
-                                if (!isChecked) toggleDocUpload(doc.id);
+                                if (!uploadedDocIds.includes(doc.id)) {
+                                  setUploadedDocIds([...uploadedDocIds, doc.id]);
+                                }
                               }
+                              e.target.value = '';
                             }}
                           />
                         </label>

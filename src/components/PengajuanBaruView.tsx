@@ -544,12 +544,18 @@ export const PengajuanBaruView: React.FC<PengajuanBaruViewProps> = ({
     }
   };
 
-  const toggleDocUpload = (docId: string) => {
-    if (uploadedDocIds.includes(docId)) {
-      setUploadedDocIds(uploadedDocIds.filter((id) => id !== docId));
-    } else {
-      setUploadedDocIds([...uploadedDocIds, docId]);
-    }
+  const handleRemoveDoc = (docId: string) => {
+    setUploadedDocIds((prev) => prev.filter((id) => id !== docId));
+    setUploadedDocUrls((prev) => {
+      const copy = { ...prev };
+      delete copy[docId];
+      return copy;
+    });
+    setUploadedDocNames((prev) => {
+      const copy = { ...prev };
+      delete copy[docId];
+      return copy;
+    });
   };
 
   const handleSubmitAll = async () => {
@@ -569,16 +575,20 @@ export const PengajuanBaruView: React.FC<PengajuanBaruViewProps> = ({
 
     setIsSendingEmail(true);
 
-    const fullDokumen: DokumenPersyaratan[] = getDocTemplates(jenisPengajuan).map((doc) => ({
-      id: doc.id,
-      nama: doc.nama,
-      kode: doc.kode,
-      wajib: doc.wajib,
-      fileUrl: uploadedDocUrls[doc.id] || (uploadedDocIds.includes(doc.id) ? 'https://res.cloudinary.com/hsvutda8/image/upload/v1/etat/dokumen-permohonan.pdf' : ''),
-      statusVerifikasi: uploadedDocIds.includes(doc.id) ? 'sesuai' : 'belum_diunggah',
-      keterangan: doc.keterangan,
-      versi: 1
-    }));
+    const fullDokumen: DokumenPersyaratan[] = getDocTemplates(jenisPengajuan).map((doc) => {
+      const isAttached = Boolean(uploadedDocUrls[doc.id] || uploadedDocNames[doc.id]);
+      return {
+        id: doc.id,
+        nama: doc.nama,
+        kode: doc.kode,
+        wajib: doc.wajib,
+        fileUrl: uploadedDocUrls[doc.id] || undefined,
+        fileName: uploadedDocNames[doc.id] || undefined,
+        statusVerifikasi: isAttached ? 'belum_diperiksa' : 'belum_diunggah',
+        keterangan: doc.keterangan,
+        versi: 1
+      };
+    });
 
     const terperiksaPayload = {
       namaLengkap: namaLengkap.trim(),
@@ -839,11 +849,11 @@ export const PengajuanBaruView: React.FC<PengajuanBaruViewProps> = ({
           <Step4KelengkapanDokumen
             jenisPengajuan={jenisPengajuan}
             uploadedDocIds={uploadedDocIds}
-            toggleDocUpload={toggleDocUpload}
             uploadedDocUrls={uploadedDocUrls}
             uploadedDocNames={uploadedDocNames}
             uploadingDocId={uploadingDocId}
             handleFileUpload={handleFileUpload}
+            handleRemoveDoc={handleRemoveDoc}
           />
         )}
 

@@ -21,7 +21,6 @@ import { QrCodeImg, buildLacakVerificationUrl } from './QrCodeComponent';
 import { getKetuaTAT } from '../utils/getKetuaTAT';
 import { resolveMonitoringData, getMonitoringUrineHistory, getMonitoringWajibLaporHistory } from '../utils/getMonitoringData';
 import {
-  ArrowLeft,
   Building2,
   FileText,
   CheckCircle2,
@@ -1955,27 +1954,16 @@ export const TindakLanjutDetailView: React.FC<Props> = ({
 
   return (
     <div className="space-y-6 text-slate-100 font-sans animate-in fade-in duration-200">
-      {/* Top Bar Navigation */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      {/* Top Action Bar */}
+      <div className="flex items-center justify-end gap-3">
         <button
           type="button"
-          onClick={onBack}
-          className="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700/80 flex items-center gap-1.5 transition-all cursor-pointer shadow-sm hover:text-white"
+          onClick={() => setShowLembarKendali(true)}
+          className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-medium bg-slate-800 hover:bg-slate-750 text-slate-200 hover:text-white border border-slate-700/80 transition-all cursor-pointer shadow-sm"
         >
-          <ArrowLeft className="w-3.5 h-3.5" />
-          <span>Kembali ke Daftar Tindak Lanjut</span>
+          <Printer className="w-3.5 h-3.5 text-slate-400" />
+          <span>Cetak Lembar Kendali Pengawasan</span>
         </button>
-
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setShowLembarKendali(true)}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-medium bg-slate-800 hover:bg-slate-750 text-slate-200 hover:text-white border border-slate-700/80 transition-all cursor-pointer shadow-sm"
-          >
-            <Printer className="w-3.5 h-3.5 text-slate-400" />
-            <span>Cetak Lembar Kendali Pengawasan</span>
-          </button>
-        </div>
       </div>
 
       {/* Role-Specific Medical Authorization Banner */}
