@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MessageSquare, Send } from 'lucide-react';
+import { MessageSquare, Send, Check, X } from 'lucide-react';
 import { PermohonanAsesmen, UserProfile, UserRole } from '../../types';
 import { klarifikasiApi } from '../../services/api';
 
@@ -17,6 +17,8 @@ export const TabKlarifikasi: React.FC<TabKlarifikasiProps> = ({
   const [tujuanPeran, setTujuanPeran] = useState<UserRole>('pengaju');
   const [pertanyaanInput, setPertanyaanInput] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [answeringItem, setAnsweringItem] = useState<typeof permohonan.klarifikasiList[0] | null>(null);
+  const [answerTextInput, setAnswerTextInput] = useState('');
 
   const handleSendKlarifikasi = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -70,14 +72,14 @@ export const TabKlarifikasi: React.FC<TabKlarifikasiProps> = ({
     }
   };
 
-  const handleAnswerKlarifikasi = async (item: typeof permohonan.klarifikasiList[0]) => {
-    const ans = prompt(`Jawab klarifikasi untuk ${item.dariNama}:`);
-    if (!ans) return;
+  const handleSaveAnswer = async () => {
+    if (!answeringItem || !answerTextInput.trim()) return;
 
+    const ans = answerTextInput.trim();
     const nowStr = new Date().toLocaleDateString('id-ID') + ' ' + new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
 
     const updatedKlarifikasi = permohonan.klarifikasiList.map(k => {
-      if (k.id === item.id) {
+      if (k.id === answeringItem.id) {
         return {
           ...k,
           jawaban: ans,
@@ -94,9 +96,13 @@ export const TabKlarifikasi: React.FC<TabKlarifikasiProps> = ({
       klarifikasiList: updatedKlarifikasi
     });
 
-    if (item.id && !item.id.startsWith('klar-')) {
+    const targetId = answeringItem.id;
+    setAnsweringItem(null);
+    setAnswerTextInput('');
+
+    if (targetId && !targetId.startsWith('klar-')) {
       try {
-        await klarifikasiApi.jawab(item.id, ans);
+        await klarifikasiApi.jawab(targetId, ans);
       } catch (err) {
         console.warn('Backend klarifikasiApi.jawab notice:', err);
       }
@@ -191,7 +197,10 @@ export const TabKlarifikasi: React.FC<TabKlarifikasiProps> = ({
                   <span>Menunggu tanggapan dari {item.kepadaPeran}...</span>
                   {currentUser.role.toLowerCase() === item.kepadaPeran.toLowerCase() && (
                     <button
-                      onClick={() => handleAnswerKlarifikasi(item)}
+                      onClick={() => {
+                        setAnsweringItem(item);
+                        setAnswerTextInput(item.jawaban || '');
+                      }}
                       className="text-xs bg-[#17549c] hover:bg-[#1c64b8] text-white px-2.5 py-1 rounded font-semibold cursor-pointer border border-[#2d7ad6]"
                     >
                       Tanggapi Sekarang
@@ -203,6 +212,70 @@ export const TabKlarifikasi: React.FC<TabKlarifikasiProps> = ({
           ))
         )}
       </div>
+
+      {/* Modal Tanggapi Klarifikasi */}
+      {answeringItem && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl text-slate-100 ring-1 ring-blue-500/20">
+            <div className="flex items-start justify-between pb-3 border-b border-[#1b3459]">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 rounded-xl bg-blue-500/10 border border-blue-500/30 text-blue-400">
+                  <MessageSquare className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-white">Tanggapi Klarifikasi Dokumen</h4>
+                  <p className="text-[11px] text-slate-400">Menjawab pertanyaan dari {answeringItem.dariNama} ({answeringItem.dariPeran})</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setAnsweringItem(null)}
+                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="bg-[#050e1c] border border-[#1b3459] rounded-xl p-3 space-y-1">
+              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Pertanyaan Diajukan:</span>
+              <p className="text-xs font-semibold text-slate-200">"{answeringItem.pertanyaan}"</p>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-slate-200 block">
+                Jawaban / Klarifikasi Resmi <span className="text-rose-400">*</span>
+              </label>
+              <textarea
+                rows={4}
+                value={answerTextInput}
+                onChange={(e) => setAnswerTextInput(e.target.value)}
+                placeholder="Tuliskan jawaban atau penjelasan klarifikasi berkas..."
+                className="w-full bg-[#050e1c] border border-[#1b3459] focus:border-blue-500 text-white text-xs p-3 rounded-xl outline-none leading-relaxed resize-none shadow-inner transition-colors"
+                autoFocus
+              />
+            </div>
+
+            <div className="flex items-center justify-end space-x-2 pt-3 border-t border-[#1b3459]">
+              <button
+                type="button"
+                onClick={() => setAnsweringItem(null)}
+                className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-semibold transition-colors cursor-pointer"
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                disabled={!answerTextInput.trim()}
+                onClick={handleSaveAnswer}
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl text-xs font-bold transition-all shadow-md flex items-center space-x-1.5 cursor-pointer"
+              >
+                <Check className="w-3.5 h-3.5" />
+                <span>Kirim Tanggapan</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

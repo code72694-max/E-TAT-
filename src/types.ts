@@ -861,8 +861,10 @@ export interface PermohonanAsesmen {
     sekretariatNama: string;
     asesorMedisId?: string;
     asesorMedisNama?: string;
+    asesorMedisEmail?: string;
     asesorHukumId?: string;
     asesorHukumNama?: string;
+    asesorHukumEmail?: string;
     jadwalPemeriksaanMedis?: string;
     jadwalPemeriksaanHukum?: string;
     jadwalPleno?: string;

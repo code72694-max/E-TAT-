@@ -123,6 +123,25 @@ async function request<T = any>(
 // AUTHENTICATION API
 // =====================================================================
 export const authApi = {
+  googleLogin: async (param: { credential?: string; accessToken?: string } | string) => {
+    const body = typeof param === 'string' ? { credential: param } : param;
+    const res = await request<{
+      user: { id: string; email: string; role: UserRole; name: string };
+      accessToken: string;
+      refreshToken: string;
+      expiresIn: number;
+    }>('/auth/google', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    });
+
+    if (res.data) {
+      tokenStorage.setAccessToken(res.data.accessToken);
+      tokenStorage.setRefreshToken(res.data.refreshToken);
+    }
+    return res;
+  },
+
   login: async (email: string, password: string) => {
     const res = await request<{
       user: { id: string; email: string; role: UserRole; name: string };

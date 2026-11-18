@@ -674,6 +674,7 @@ export const PengajuanBaruView: React.FC<PengajuanBaruViewProps> = ({
       isMelewatiTenggat: false,
       pengajuId: currentUser.id,
       pengajuNama: currentUser.name,
+      pengajuEmail: currentUser.email || 'pengaju.etatsiappulih@gmail.com',
       instansiPengaju: currentUser.agency,
       penanggungJawabBerikutnya: 'Sekretariat TAT',
       tindakanBerikutnyaLabel: 'Verifikasi Berkas Dokumen Persyaratan',

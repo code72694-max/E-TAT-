@@ -354,14 +354,6 @@ export const VerifikasiAkunView: React.FC<VerifikasiAkunViewProps> = ({
         {/* Top Header & Navigation Bar */}
         <div className="flex flex-wrap items-center justify-between gap-3 bg-[#091426] border border-[#1a2e4c] rounded-2xl p-4 sm:p-5 shadow-sm">
           <div className="flex items-center space-x-3.5">
-            <button
-              onClick={() => handleSelectRegistration(null)}
-              className="p-2 bg-[#142642] hover:bg-[#1b3459] text-slate-300 hover:text-white rounded-xl border border-[#234475] transition-colors cursor-pointer flex items-center space-x-1.5 text-xs font-semibold"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span>Kembali</span>
-            </button>
-
             <div>
               <div className="flex items-center space-x-2">
                 <span className="font-mono text-xs text-[#d4af37] font-bold">

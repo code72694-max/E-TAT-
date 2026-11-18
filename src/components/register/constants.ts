@@ -40,20 +40,22 @@ export const WILAYAH_OPTIONS = [
   'Polda Kalimantan Timur (Seluruh Kaltim)'
 ];
 
-// Opsi Peran Utama Akses Akun
+// Opsi Peran Utama Akses Akun (Khusus Pengaju, Medis, dan Hukum)
 export const PERAN_OPTIONS = [
   { value: 'pengaju', label: 'Penyidik / Pengaju Asesmen' },
-  { value: 'sekretariat', label: 'Sekretariat TAT' },
-  { value: 'medis', label: 'Tim Asesmen Medis' },
-  { value: 'hukum', label: 'Tim Asesmen Hukum' },
-  { value: 'koordinator', label: 'Ketua / Koordinator TAT' },
-  { value: 'pimpinan', label: 'Pimpinan Satwil / Pengawas' },
-  { value: 'rehabilitasi', label: 'Petugas Fasilitas Rehabilitasi' }
+  { value: 'medis', label: 'Tim Asesor Medis TAT' },
+  { value: 'hukum', label: 'Tim Asesor Hukum TAT' }
 ];
 
 // Opsi Spesialisasi berdasarkan Peran
 export const getSpesialisasiOptions = (peran: string): string[] => {
   switch (peran) {
+    case 'pengaju':
+      return [
+        'Kasat Resnarkoba',
+        'Kanit Idik',
+        'Penyidik Pembantu'
+      ];
     case 'medis':
       return [
         'Dokter Umum',
@@ -70,25 +72,6 @@ export const getSpesialisasiOptions = (peran: string): string[] => {
         'Hakim',
         'Ahli Hukum / Akademisi',
         'Petugas Bapas (PK Bapas)'
-      ];
-    case 'sekretariat':
-      return [
-        'Koordinator Sekretariat',
-        'Staf Administrasi',
-        'Penerima Berkas / Front Desk'
-      ];
-    case 'rehabilitasi':
-      return [
-        'Kepala Fasilitas Rehabilitasi',
-        'Konselor Adiksi',
-        'Pekerja Sosial',
-        'Petugas Pengawas Klien (Aftercare)'
-      ];
-    case 'pengaju':
-      return [
-        'Kasat Resnarkoba',
-        'Kanit Idik',
-        'Penyidik Pembantu'
       ];
     default:
       return [];

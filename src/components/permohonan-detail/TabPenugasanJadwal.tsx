@@ -18,9 +18,12 @@ import {
   X,
   Send,
   ArrowRight,
-  ShieldCheck
+  ShieldCheck,
+  Mail,
+  Info
 } from 'lucide-react';
 import { permohonanApi, authApi } from '../../services/api';
+import { sendPenjadwalanEmailNotification } from '../../services/emailService';
 
 interface TabPenugasanJadwalProps {
   permohonan: PermohonanAsesmen;
@@ -43,6 +46,13 @@ export const TabPenugasanJadwal: React.FC<TabPenugasanJadwalProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
 
+  // Form State for dynamic scheduling & destination email
+  const [selectedAssessorId, setSelectedAssessorId] = useState<string>('');
+  const [targetEmailInput, setTargetEmailInput] = useState<string>('');
+  const [lokasiInput, setLokasiInput] = useState<string>('Klinik Pratama BNNP Kaltim');
+  const [jadwalInput, setJadwalInput] = useState<string>('');
+  const [catatanInput, setCatatanInput] = useState<string>('');
+
   const tim = permohonan.timAsesmen;
 
   // Load real assessor accounts from backend
@@ -55,32 +65,102 @@ export const TabPenugasanJadwal: React.FC<TabPenugasanJadwalProps> = ({
       .catch(() => {});
   }, []);
 
+  const openModal = (type: 'medis' | 'hukum' | 'pleno') => {
+    setModalType(type);
+    setCatatanInput('');
+
+    if (type === 'medis') {
+      const existing = medisUsers.find(u => u.name === tim?.asesorMedisNama || u.id === tim?.asesorMedisId);
+      const chosen = existing || medisUsers[0];
+      setSelectedAssessorId(chosen?.id || '');
+      setTargetEmailInput(tim?.asesorMedisEmail || chosen?.email || 'medis@gmail.com');
+      setLokasiInput(tim?.lokasiPemeriksaan || 'Klinik Pratama BNNP Kaltim');
+      setJadwalInput(tim?.jadwalPemeriksaanMedis ? tim.jadwalPemeriksaanMedis.replace(' WIB', '') : '');
+    } else if (type === 'hukum') {
+      const existing = hukumUsers.find(u => u.name === tim?.asesorHukumNama || u.id === tim?.asesorHukumId);
+      const chosen = existing || hukumUsers[0];
+      setSelectedAssessorId(chosen?.id || '');
+      setTargetEmailInput(tim?.asesorHukumEmail || chosen?.email || 'etatsiappulih@gmail.com');
+      setJadwalInput(tim?.jadwalPemeriksaanHukum ? tim.jadwalPemeriksaanHukum.replace(' WIB', '') : '');
+    } else {
+      // Pleno: gabungkan email asesor medis, asesor hukum, dan pengaju
+      const defaultTargets = [
+        tim?.asesorMedisEmail,
+        tim?.asesorHukumEmail,
+        permohonan.pengajuEmail
+      ].filter(Boolean) as string[];
+      setTargetEmailInput(defaultTargets.join(', '));
+      setJadwalInput(tim?.jadwalPleno ? tim.jadwalPleno.replace(' WIB', '') : '');
+    }
+  };
+
+  const handleAssessorSelectChange = (userId: string) => {
+    setSelectedAssessorId(userId);
+    const list = modalType === 'medis' ? medisUsers : hukumUsers;
+    const user = list.find(u => u.id === userId);
+    if (user?.email) {
+      setTargetEmailInput(user.email);
+    }
+  };
+
   const handleSavePenugasan = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
     const formData = new FormData(e.currentTarget);
-    const asesor = formData.get('asesor') as string;
-    const lokasi = formData.get('lokasi') as string;
-    const jadwal = formData.get('jadwal') as string;
+    const lokasi = (formData.get('lokasi') as string) || lokasiInput;
+    const jadwal = (formData.get('jadwal') as string) || jadwalInput;
+    const dynamicEmails = targetEmailInput.trim();
 
     let formattedDate = jadwal;
     if (jadwal) {
       const d = new Date(jadwal);
-      const pad = (n: number) => n.toString().padStart(2, '0');
-      formattedDate = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())} WIB`;
+      if (!isNaN(d.getTime())) {
+        const pad = (n: number) => n.toString().padStart(2, '0');
+        formattedDate = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())} WIB`;
+      }
+    }
+
+    let assessorId: string | undefined = undefined;
+    let assessorNama = '';
+    let assessorEmail = '';
+
+    if (modalType === 'medis') {
+      const found = medisUsers.find(u => u.id === selectedAssessorId);
+      if (found) {
+        assessorId = found.id;
+        assessorNama = `${found.name} (${found.agency || 'Faskes TAT'})`;
+        assessorEmail = found.email;
+      } else {
+        assessorNama = (formData.get('customAsesor') as string) || tim?.asesorMedisNama || '[TEST] Dokter Asesor Medis TAT';
+        assessorEmail = dynamicEmails.split(/[,;\s]+/)[0] || '';
+      }
+    } else if (modalType === 'hukum') {
+      const found = hukumUsers.find(u => u.id === selectedAssessorId);
+      if (found) {
+        assessorId = found.id;
+        assessorNama = `${found.name} (${found.agency || 'Instansi Penegak Hukum'})`;
+        assessorEmail = found.email;
+      } else {
+        assessorNama = (formData.get('customAsesor') as string) || tim?.asesorHukumNama || '[TEST] Jaksa Asesor Hukum TAT';
+        assessorEmail = dynamicEmails.split(/[,;\s]+/)[0] || '';
+      }
     }
 
     const updatedTim = {
       ...(tim as any),
       ...(modalType === 'medis'
         ? {
-            asesorMedisNama: asesor,
+            asesorMedisId: assessorId || tim?.asesorMedisId,
+            asesorMedisNama: assessorNama,
+            asesorMedisEmail: dynamicEmails || assessorEmail || tim?.asesorMedisEmail,
             lokasiPemeriksaan: lokasi || tim?.lokasiPemeriksaan,
             jadwalPemeriksaanMedis: formattedDate,
           }
         : modalType === 'hukum'
         ? {
-            asesorHukumNama: asesor,
+            asesorHukumId: assessorId || tim?.asesorHukumId,
+            asesorHukumNama: assessorNama,
+            asesorHukumEmail: dynamicEmails || assessorEmail || tim?.asesorHukumEmail,
             jadwalPemeriksaanHukum: formattedDate,
           }
         : {
@@ -97,31 +177,57 @@ export const TabPenugasanJadwal: React.FC<TabPenugasanJadwalProps> = ({
 
     onUpdatePermohonan(updated);
 
+    // Kirim notifikasi email ke alamat tujuan dinamis yang ditentukan admin
+    let emailStatusNote = '';
+    try {
+      const emailRes = await sendPenjadwalanEmailNotification({
+        permohonan: updated,
+        tipe: modalType!,
+        targetRecipients: dynamicEmails || assessorEmail,
+        asesorNama: assessorNama || (modalType === 'pleno' ? 'Seluruh Tim Asesor TAT' : 'Asesor Terpilih'),
+        asesorEmail: assessorEmail || dynamicEmails.split(/[,;\s]+/)[0],
+        jadwal: formattedDate,
+        lokasi: lokasi || updatedTim.lokasiPemeriksaan,
+        catatan: catatanInput,
+      });
+
+      if (emailRes.success) {
+        emailStatusNote = ` & Notifikasi email dikirim ke ${dynamicEmails || assessorEmail}`;
+      } else if (emailRes.error) {
+        console.warn('Notice email penugasan:', emailRes.error);
+        emailStatusNote = ` (Info email: ${emailRes.error})`;
+      }
+    } catch (err) {
+      console.warn('Gagal memproses kirim email:', err);
+    }
+
     if (permohonan.id) {
       try {
         await permohonanApi.tugaskan(permohonan.id, {
           ...(modalType === 'medis'
             ? {
-                asesorMedisNama: asesor,
+                asesorMedisId: assessorId,
+                asesorMedisNama: assessorNama,
                 lokasiPemeriksaan: lokasi,
                 jadwalPemeriksaanMedis: jadwal ? new Date(jadwal).toISOString() : undefined,
               }
             : modalType === 'hukum'
             ? {
-                asesorHukumNama: asesor,
+                asesorHukumId: assessorId,
+                asesorHukumNama: assessorNama,
                 jadwalPemeriksaanHukum: jadwal ? new Date(jadwal).toISOString() : undefined,
               }
             : {
                 jadwalPleno: jadwal ? new Date(jadwal).toISOString() : undefined,
               }),
         });
-        setToastMsg(`Penugasan ${modalType?.toUpperCase()} berhasil ditetapkan & notifikasi email dikirim!`);
-        setTimeout(() => setToastMsg(null), 4000);
       } catch (err) {
         console.warn('Backend tugaskan notice:', err);
       }
     }
 
+    setToastMsg(`Penugasan ${modalType?.toUpperCase()} berhasil ditetapkan${emailStatusNote}!`);
+    setTimeout(() => setToastMsg(null), 5000);
     setIsSubmitting(false);
     setModalType(null);
   };
@@ -173,10 +279,32 @@ export const TabPenugasanJadwal: React.FC<TabPenugasanJadwalProps> = ({
 
     onUpdatePermohonan(updated);
 
+    // Kirim notifikasi email dinamis ke tim yang ditugaskan & pengaju
+    const targets = [
+      tim?.asesorMedisEmail,
+      tim?.asesorHukumEmail,
+      permohonan.pengajuEmail
+    ].filter(Boolean) as string[];
+
+    if (targets.length > 0) {
+      sendPenjadwalanEmailNotification({
+        permohonan: updated,
+        tipe: 'medis',
+        targetRecipients: targets,
+        asesorNama: defaultMedis,
+        asesorEmail: tim?.asesorMedisEmail,
+        jadwal: defaultJadwalMedis,
+        lokasi: defaultLokasi,
+        catatan: 'Pelimpahan berkas perkara resmi dari Admin Sekretariat TAT. Formulir pemeriksaan klinis kini dapat diakses.',
+      }).catch(err => console.warn('Email notice kirim medis:', err));
+    }
+
     if (permohonan.id) {
       try {
         await permohonanApi.tugaskan(permohonan.id, {
+          asesorMedisId: tim?.asesorMedisId,
           asesorMedisNama: defaultMedis,
+          asesorHukumId: tim?.asesorHukumId,
           asesorHukumNama: defaultHukum,
           lokasiPemeriksaan: defaultLokasi,
           jadwalPemeriksaanMedis: new Date().toISOString(),
@@ -212,7 +340,7 @@ export const TabPenugasanJadwal: React.FC<TabPenugasanJadwalProps> = ({
             <span>Penugasan Tim Asesor & Penjadwalan Pemeriksaan</span>
           </h3>
           <p className="text-xs text-slate-400 mt-1">
-            Penetapan dokter asesor medis, jaksa/penelaah hukum, faskes lokasi pemeriksaan, dan jadwal sidang pleno.
+            Penetapan dokter asesor medis, jaksa/penelaah hukum, faskes lokasi pemeriksaan, dan jadwal sidang pleno dengan routing email tujuan dinamis.
           </p>
         </div>
       </div>
@@ -240,6 +368,12 @@ export const TabPenugasanJadwal: React.FC<TabPenugasanJadwalProps> = ({
                 <span className="font-bold text-white text-sm block mt-0.5">
                   {tim?.asesorMedisNama || 'Belum ada dokter ditugaskan'}
                 </span>
+                {tim?.asesorMedisEmail && (
+                  <span className="text-[11px] text-sky-400 font-mono flex items-center gap-1 mt-0.5 break-all">
+                    <Mail className="w-3 h-3 text-sky-400 shrink-0" />
+                    <span>{tim.asesorMedisEmail}</span>
+                  </span>
+                )}
               </div>
               <div>
                 <span className="text-[10px] text-slate-400 uppercase font-semibold block">Jadwal Pemeriksaan Klinis:</span>
@@ -258,7 +392,7 @@ export const TabPenugasanJadwal: React.FC<TabPenugasanJadwalProps> = ({
 
           {!effectiveReadonly && (
             <button
-              onClick={() => setModalType('medis')}
+              onClick={() => openModal('medis')}
               className="w-full py-2 bg-[#132c52] hover:bg-[#1a3c70] text-sky-200 border border-[#234b80] rounded-xl text-xs font-semibold flex items-center justify-center space-x-1.5 transition-colors cursor-pointer mt-2"
             >
               <Plus className="w-3.5 h-3.5 text-[#D4AF37]" />
@@ -288,6 +422,12 @@ export const TabPenugasanJadwal: React.FC<TabPenugasanJadwalProps> = ({
                 <span className="font-bold text-white text-sm block mt-0.5">
                   {tim?.asesorHukumNama || 'Belum ada penelaah ditugaskan'}
                 </span>
+                {tim?.asesorHukumEmail && (
+                  <span className="text-[11px] text-amber-400 font-mono flex items-center gap-1 mt-0.5 break-all">
+                    <Mail className="w-3 h-3 text-amber-400 shrink-0" />
+                    <span>{tim.asesorHukumEmail}</span>
+                  </span>
+                )}
               </div>
               <div>
                 <span className="text-[10px] text-slate-400 uppercase font-semibold block">Jadwal Telaah Perkara:</span>
@@ -298,7 +438,7 @@ export const TabPenugasanJadwal: React.FC<TabPenugasanJadwalProps> = ({
               <div>
                 <span className="text-[10px] text-slate-400 uppercase font-semibold block">Materi Telaah:</span>
                 <span className="text-slate-200 block mt-0.5">
-                  Uji Bukti SEMA 04/2010 & Kualifikasi Pasal Pidana
+                  Uji Bukti SEMA 04/2010 &amp; Kualifikasi Pasal Pidana
                 </span>
               </div>
             </div>
@@ -306,7 +446,7 @@ export const TabPenugasanJadwal: React.FC<TabPenugasanJadwalProps> = ({
 
           {!effectiveReadonly && (
             <button
-              onClick={() => setModalType('hukum')}
+              onClick={() => openModal('hukum')}
               className="w-full py-2 bg-[#132c52] hover:bg-[#1a3c70] text-sky-200 border border-[#234b80] rounded-xl text-xs font-semibold flex items-center justify-center space-x-1.5 transition-colors cursor-pointer mt-2"
             >
               <Plus className="w-3.5 h-3.5 text-[#D4AF37]" />
@@ -332,7 +472,7 @@ export const TabPenugasanJadwal: React.FC<TabPenugasanJadwalProps> = ({
 
             <div className="space-y-2 text-xs">
               <div>
-                <span className="text-[10px] text-slate-400 uppercase font-semibold block">Tanggal & Waktu Sidang Pleno:</span>
+                <span className="text-[10px] text-slate-400 uppercase font-semibold block">Tanggal &amp; Waktu Sidang Pleno:</span>
                 <span className="font-mono text-white text-sm font-bold block mt-0.5">
                   {tim?.jadwalPleno || 'Menunggu asesmen medis & hukum selesai'}
                 </span>
@@ -354,7 +494,7 @@ export const TabPenugasanJadwal: React.FC<TabPenugasanJadwalProps> = ({
 
           {!effectiveReadonly && (
             <button
-              onClick={() => setModalType('pleno')}
+              onClick={() => openModal('pleno')}
               className="w-full py-2 bg-[#1b3459] hover:bg-[#234475] text-[#D4AF37] border border-[#2d5289] rounded-xl text-xs font-semibold flex items-center justify-center space-x-1.5 transition-colors cursor-pointer mt-2"
             >
               <Calendar className="w-3.5 h-3.5" />
@@ -368,17 +508,15 @@ export const TabPenugasanJadwal: React.FC<TabPenugasanJadwalProps> = ({
       {!effectiveReadonly && (
         <div className="bg-gradient-to-r from-[#0d2240] via-[#09182d] to-[#081224] border-2 border-[#D4AF37]/40 rounded-2xl p-5 shadow-2xl flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-1.5">
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-              <h4 className="text-sm font-bold text-white flex items-center gap-2">
-                <Send className="w-4 h-4 text-[#D4AF37]" />
-                <span>Kirimkan Berkas &amp; Lanjutkan ke Tim Medis</span>
+            <div className="flex items-center space-x-2">
+              <ShieldCheck className="w-5 h-5 text-[#D4AF37]" />
+              <h4 className="text-sm font-bold text-white tracking-wide">
+                Pelimpahan Berkas &amp; Aktivasi Tahapan Asesmen Medis
               </h4>
             </div>
             <p className="text-xs text-slate-300 leading-relaxed max-w-2xl">
-              Setelah penugasan ditetapkan, klik tombol di sebelah kanan untuk melimpahkan berkas ke dokter pemeriksa 
-              (<strong className="text-[#D4AF37]">{tim?.asesorMedisNama || '[TEST] Dokter Asesor Medis TAT'}</strong>). 
-              Tahapan Asesmen Medis &amp; Telaah Hukum akan aktif di sistem.
+              Pastikan berkas telah diverifikasi lengkap. Tombol ini akan mengesahkan pelimpahan berkas perkara secara resmi ke Dokter Asesor Medis 
+              (<strong className="text-[#D4AF37]">{tim?.asesorMedisNama || '[TEST] Dokter Asesor Medis TAT'}</strong>) dan mengirimkan notifikasi jadwal otomatis ke email tujuan.
             </p>
             {tim?.dikirimKeMedis && (
               <div className="text-[11px] font-semibold text-emerald-400 flex items-center gap-1.5 pt-0.5">
@@ -403,65 +541,108 @@ export const TabPenugasanJadwal: React.FC<TabPenugasanJadwalProps> = ({
         </div>
       )}
 
-      {/* Modal Form Penugasan */}
+      {/* Modal Form Penugasan & Penjadwalan */}
       {modalType && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl max-w-md w-full shadow-2xl overflow-hidden">
+          <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl max-w-lg w-full shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             <div className="p-4 border-b border-[#1b3459] flex items-center justify-between bg-gradient-to-r from-[#0d1f38] to-[#0b172a]">
               <h4 className="text-sm font-bold text-white flex items-center space-x-2">
                 <Calendar className="w-4 h-4 text-[#D4AF37]" />
                 <span>
                   {modalType === 'medis'
-                    ? 'Tetapkan Penugasan Dokter Asesor Medis'
+                    ? 'Penugasan & Jadwal Dokter Asesor Medis'
                     : modalType === 'hukum'
-                    ? 'Tetapkan Penugasan Penelaah Hukum'
-                    : 'Jadwalkan Sidang Pleno Terpadu'}
+                    ? 'Penugasan & Jadwal Penelaah Hukum'
+                    : 'Penjadwalan Sidang Pleno Terpadu (TAT)'}
                 </span>
               </h4>
-              <button onClick={() => setModalType(null)} className="text-slate-400 hover:text-white">
+              <button
+                type="button"
+                onClick={() => setModalType(null)}
+                className="text-slate-400 hover:text-white cursor-pointer"
+              >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <form onSubmit={handleSavePenugasan} className="p-5 space-y-4 text-xs">
+              {/* Asesor Selection (Medis / Hukum) */}
               {modalType !== 'pleno' && (
                 <div>
                   <label className="block text-slate-300 font-semibold mb-1">
                     Pilih Akun Asesor Terdaftar: *
                   </label>
                   <select
-                    name="asesor"
+                    name="asesorSelect"
+                    value={selectedAssessorId}
+                    onChange={(e) => handleAssessorSelectChange(e.target.value)}
                     required
-                    defaultValue={modalType === 'medis' ? tim?.asesorMedisNama : tim?.asesorHukumNama}
                     className="w-full p-2.5 bg-[#050e1c] border border-[#1b3459] rounded-xl text-white outline-none focus:border-[#D4AF37]"
                   >
-                    <option value="">-- Pilih Asesor dari Sistem --</option>
+                    <option value="">-- Pilih Akun Asesor dari Sistem --</option>
                     {modalType === 'medis' ? (
                       <>
                         {medisUsers.map(u => (
-                          <option key={u.id} value={`${u.name} (${u.agency || 'Faskes TAT'})`}>
-                            {u.name} — {u.agency || 'Klinik / RS BNN'}
+                          <option key={u.id} value={u.id}>
+                            {u.name} — {u.agency || 'Klinik / RS BNN'} ({u.email})
                           </option>
                         ))}
-                        <option value="[TEST] Dokter Asesor Medis TAT (BNNK Samarinda)">[TEST] Dokter Asesor Medis TAT (BNNK Samarinda)</option>
-                        <option value="[TEST] Dokter Spesialis Kedokteran Jiwa (RSJD)">[TEST] Dokter Spesialis Kedokteran Jiwa (RSJD)</option>
+                        {medisUsers.length === 0 && (
+                          <>
+                            <option value="test-medis-1">[TEST] Dokter Asesor Medis TAT (medis@gmail.com)</option>
+                            <option value="test-medis-2">[TEST] Dokter Spesialis Jiwa RSJD (spesialis.jiwa@rsjd.go.id)</option>
+                          </>
+                        )}
                       </>
                     ) : (
                       <>
                         {hukumUsers.map(u => (
-                          <option key={u.id} value={`${u.name} (${u.agency || 'Instansi Penegak Hukum'})`}>
-                            {u.name} — {u.agency || 'Kejaksaan / BNNP'}
+                          <option key={u.id} value={u.id}>
+                            {u.name} — {u.agency || 'Kejaksaan / BNNP'} ({u.email})
                           </option>
                         ))}
-                        <option value="[TEST] Jaksa Asesor Hukum TAT (Kejaksaan Tinggi Kaltim)">[TEST] Jaksa Asesor Hukum TAT (Kejaksaan Tinggi Kaltim)</option>
-                        <option value="[TEST] Tim Penelaah Hukum BNNP Kaltim">[TEST] Tim Penelaah Hukum BNNP Kaltim</option>
-                        <option value="[TEST] Penyidik Pembantu Satresnarkoba">[TEST] Penyidik Pembantu Satresnarkoba</option>
+                        {hukumUsers.length === 0 && (
+                          <>
+                            <option value="test-hukum-1">[TEST] Jaksa Asesor Hukum TAT (etatsiappulih@gmail.com)</option>
+                            <option value="test-hukum-2">[TEST] Tim Penelaah Hukum BNNP (penelaah.hukum@bnnp.go.id)</option>
+                          </>
+                        )}
                       </>
                     )}
                   </select>
                 </div>
               )}
 
+              {/* Dynamic Notification Target Email (Admin Input/Review) */}
+              <div>
+                <label className="block text-slate-300 font-semibold mb-1 flex items-center justify-between">
+                  <span>Alamat Email Notifikasi Tujuan: *</span>
+                  <span className="text-[10px] text-amber-400 font-normal">Ditetapkan oleh Admin</span>
+                </label>
+                <div className="relative">
+                  <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                  <input
+                    type="text"
+                    value={targetEmailInput}
+                    onChange={(e) => setTargetEmailInput(e.target.value)}
+                    required
+                    placeholder={
+                      modalType === 'pleno'
+                        ? 'dokter@faskes.go.id, jaksa@kejaksaan.go.id, pengaju@polri.go.id'
+                        : 'asesor@instansi.go.id'
+                    }
+                    className="w-full pl-9 pr-3 py-2.5 bg-[#050e1c] border border-[#1b3459] rounded-xl text-white outline-none focus:border-[#D4AF37] font-mono text-xs"
+                  />
+                </div>
+                <p className="text-[10px] text-slate-400 mt-1 flex items-center gap-1">
+                  <Info className="w-3 h-3 text-sky-400 shrink-0" />
+                  <span>
+                    Email pemberitahuan jadwal &amp; akses permohonan dikirimkan ke alamat ini (pisahkan dengan koma jika lebih dari satu akun).
+                  </span>
+                </p>
+              </div>
+
+              {/* Lokasi Pemeriksaan (khusus Medis) */}
               {modalType === 'medis' && (
                 <div>
                   <label className="block text-slate-300 font-semibold mb-1">
@@ -469,8 +650,9 @@ export const TabPenugasanJadwal: React.FC<TabPenugasanJadwalProps> = ({
                   </label>
                   <select
                     name="lokasi"
+                    value={lokasiInput}
+                    onChange={(e) => setLokasiInput(e.target.value)}
                     required
-                    defaultValue={tim?.lokasiPemeriksaan || 'Klinik Pratama BNNP Kaltim'}
                     className="w-full p-2.5 bg-[#050e1c] border border-[#1b3459] rounded-xl text-white outline-none focus:border-[#D4AF37]"
                   >
                     <option value="Klinik Pratama BNNP Kaltim">Klinik Pratama BNNP Kaltim</option>
@@ -478,22 +660,41 @@ export const TabPenugasanJadwal: React.FC<TabPenugasanJadwalProps> = ({
                     <option value="RS Bhayangkara Balikpapan">RS Bhayangkara Balikpapan</option>
                     <option value="RSJD Atma Husada Mahakam">RSJD Atma Husada Mahakam</option>
                     <option value="RSUD AW Sjahranie Samarinda">RSUD AW Sjahranie Samarinda</option>
+                    <option value="Ruang TAT Gedung Ditresnarkoba Polda">Ruang TAT Gedung Ditresnarkoba Polda</option>
                   </select>
                 </div>
               )}
 
+              {/* Tanggal & Waktu Pemeriksaan */}
               <div>
                 <label className="block text-slate-300 font-semibold mb-1">
-                  Pilih Tanggal & Jam Pemeriksaan: *
+                  Pilih Tanggal &amp; Jam Pelaksanaan: *
                 </label>
                 <input
                   type="datetime-local"
                   name="jadwal"
+                  value={jadwalInput}
+                  onChange={(e) => setJadwalInput(e.target.value)}
                   required
                   className="w-full p-2.5 bg-[#050e1c] border border-[#1b3459] rounded-xl text-white outline-none focus:border-[#D4AF37] font-mono [color-scheme:dark]"
                 />
               </div>
 
+              {/* Catatan / Instruksi Tambahan */}
+              <div>
+                <label className="block text-slate-300 font-semibold mb-1">
+                  Catatan / Instruksi Khusus (Opsional):
+                </label>
+                <textarea
+                  rows={2}
+                  value={catatanInput}
+                  onChange={(e) => setCatatanInput(e.target.value)}
+                  placeholder="Contoh: Harap membawa resume medis sebelumnya / Uji skrining 6 parameter..."
+                  className="w-full p-2.5 bg-[#050e1c] border border-[#1b3459] rounded-xl text-white outline-none focus:border-[#D4AF37] text-xs resize-none"
+                />
+              </div>
+
+              {/* Action Buttons */}
               <div className="flex justify-end space-x-2 pt-3 border-t border-[#1b3459]">
                 <button
                   type="button"
@@ -505,9 +706,16 @@ export const TabPenugasanJadwal: React.FC<TabPenugasanJadwalProps> = ({
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-4 py-2 bg-[#D4AF37] hover:bg-amber-400 text-slate-900 rounded-xl text-xs font-bold transition-all shadow cursor-pointer disabled:opacity-50"
+                  className="px-4 py-2 bg-[#D4AF37] hover:bg-amber-400 text-slate-900 rounded-xl text-xs font-bold transition-all shadow cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
                 >
-                  {isSubmitting ? 'Menyimpan...' : 'Simpan Penugasan'}
+                  {isSubmitting ? (
+                    <span>Menyimpan &amp; Mengirim...</span>
+                  ) : (
+                    <>
+                      <Send className="w-3.5 h-3.5" />
+                      <span>Simpan &amp; Kirim Notifikasi</span>
+                    </>
+                  )}
                 </button>
               </div>
             </form>

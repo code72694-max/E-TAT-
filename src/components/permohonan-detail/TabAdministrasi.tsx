@@ -17,7 +17,8 @@ import {
   Printer,
   FileQuestion,
   Check,
-  AlertCircle
+  AlertCircle,
+  X
 } from 'lucide-react';
 import { permohonanApi } from '../../services/api';
 import { sendCorrectionEmailNotification } from '../../services/emailService';
@@ -41,6 +42,8 @@ export const TabAdministrasi: React.FC<TabAdministrasiProps> = ({
 }) => {
   const [showSuratJawaban, setShowSuratJawaban] = useState(false);
   const [previewDocModal, setPreviewDocModal] = useState<DokumenPersyaratan | null>(null);
+  const [koreksiModalDoc, setKoreksiModalDoc] = useState<DokumenPersyaratan | null>(null);
+  const [koreksiNoteInput, setKoreksiNoteInput] = useState<string>('');
   const [emailBanner, setEmailBanner] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   // Tentukan template dokumen berdasarkan jenis pengajuan & keberadaan barang bukti
@@ -435,10 +438,8 @@ export const TabAdministrasi: React.FC<TabAdministrasiProps> = ({
 
                       <button
                         onClick={() => {
-                          const note = prompt(`Masukkan catatan koreksi / kekurangan untuk dokumen '${doc.nama}':`, doc.catatanKoreksi || '');
-                          if (note !== null) {
-                            handleVerifyDocument(doc.id, 'perlu_perbaikan', note);
-                          }
+                          setKoreksiModalDoc(doc);
+                          setKoreksiNoteInput(doc.catatanKoreksi || '');
                         }}
                         className={`p-1.5 rounded-lg border transition-colors cursor-pointer ${
                           isCorrection
@@ -563,6 +564,111 @@ export const TabAdministrasi: React.FC<TabAdministrasiProps> = ({
                 <span>Kirimkan Perintah Perbaikan &amp; Kelengkapan ke Penyidik</span>
               </button>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Modal Catatan Koreksi Berkas */}
+      {koreksiModalDoc && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-[#0b172a] border border-amber-500/40 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl text-slate-100 ring-1 ring-amber-500/20">
+            {/* Header */}
+            <div className="flex items-start justify-between pb-3 border-b border-[#1b3459]">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400">
+                  <AlertTriangle className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-white">Catatan Perbaikan Dokumen</h4>
+                  <p className="text-[11px] text-slate-400">Permintaan perbaikan berkas kepada penyidik pengaju</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setKoreksiModalDoc(null)}
+                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Target Document Info Card */}
+            <div className="bg-[#050e1c] border border-[#1b3459] rounded-xl p-3 space-y-1">
+              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Nama Dokumen Persyaratan:</span>
+              <p className="text-xs font-semibold text-white flex items-center space-x-1.5">
+                <FileText className="w-3.5 h-3.5 text-[#D4AF37]" />
+                <span>{koreksiModalDoc.nama}</span>
+              </p>
+              {koreksiModalDoc.keterangan && (
+                <p className="text-[11px] text-slate-400 italic pt-0.5">{koreksiModalDoc.keterangan}</p>
+              )}
+            </div>
+
+            {/* Quick Suggestions / Rujukan Cepat */}
+            <div>
+              <label className="text-[11px] font-semibold text-slate-300 block mb-1.5">Rujukan Catatan Cepat:</label>
+              <div className="flex flex-wrap gap-1.5">
+                {[
+                  'Dokumen buram / hasil scan tidak terbaca jelas',
+                  'Belum dibubuhi stempel dinas / tanda tangan resmi',
+                  'Identitas terperiksa tidak sesuai / salah ketik NIK atau nama',
+                  'Dokumen tidak lengkap (ada lembar yang terpotong)',
+                  'Format berkas tidak sesuai standar persyaratan formil'
+                ].map((tpl, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => {
+                      setKoreksiNoteInput(prev => (prev && prev.trim() ? `${prev.trim()}. ${tpl}` : tpl));
+                    }}
+                    className="px-2.5 py-1 bg-[#142642] hover:bg-[#1a345a] text-amber-300 border border-amber-500/30 rounded-lg text-[10px] font-medium transition-colors cursor-pointer text-left"
+                  >
+                    + {tpl}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Textarea */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-slate-200 block">
+                Uraian Catatan Koreksi / Kekurangan <span className="text-rose-400">*</span>
+              </label>
+              <textarea
+                rows={4}
+                value={koreksiNoteInput}
+                onChange={(e) => setKoreksiNoteInput(e.target.value)}
+                placeholder="Tuliskan catatan detail kekurangan berkas yang harus diperbaiki oleh penyidik..."
+                className="w-full bg-[#050e1c] border border-[#1b3459] focus:border-amber-500 text-white text-xs p-3 rounded-xl outline-none leading-relaxed resize-none shadow-inner transition-colors"
+                autoFocus
+              />
+              <p className="text-[10px] text-slate-400">Catatan ini akan tersimpan pada status berkas dan dapat dikirimkan langsung ke penyidik pengaju.</p>
+            </div>
+
+            {/* Actions */}
+            <div className="flex items-center justify-end space-x-2 pt-3 border-t border-[#1b3459]">
+              <button
+                type="button"
+                onClick={() => setKoreksiModalDoc(null)}
+                className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-semibold transition-colors cursor-pointer"
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                disabled={!koreksiNoteInput.trim()}
+                onClick={() => {
+                  if (!koreksiModalDoc) return;
+                  handleVerifyDocument(koreksiModalDoc.id, 'perlu_perbaikan', koreksiNoteInput.trim());
+                  setKoreksiModalDoc(null);
+                  setKoreksiNoteInput('');
+                }}
+                className="px-4 py-2 bg-amber-600 hover:bg-amber-500 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl text-xs font-bold transition-all shadow-md flex items-center space-x-1.5 cursor-pointer"
+              >
+                <Check className="w-3.5 h-3.5" />
+                <span>Simpan Catatan Koreksi</span>
+              </button>
+            </div>
           </div>
         </div>
       )}

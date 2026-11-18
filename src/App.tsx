@@ -122,7 +122,7 @@ export const DEFAULT_USERS: UserProfile[] = [
     tipeIdentitas: 'NRP',
     role: 'PENGAJU',
     agency: 'Satresnarkoba Polresta Samarinda',
-    email: 'pengaju@gmail.com',
+    email: 'pengaju.etatsiappulih@gmail.com',
     phone: '081298765432',
     position: 'Penyidik Pemohon Asesmen TAT (Akun Uji)',
     pangkat: 'Inspektur Polisi Dua (Ipda)',
@@ -161,6 +161,14 @@ export const DEFAULT_USERS: UserProfile[] = [
 ];
 
 const DEFAULT_USER: UserProfile = DEFAULT_USERS[0];
+
+export const ROLE_ALLOWED_TABS: Record<string, ActiveTab[]> = {
+  PENGAJU: ['beranda', 'permohonan', 'pengajuan_baru', 'asesmen_aktif', 'dokumen', 'tindak_lanjut', 'tindak_lanjut_jadwal', 'riwayat', 'about', 'profile'],
+  ADMIN: ['beranda', 'permohonan', 'pengajuan_baru', 'asesmen_aktif', 'riwayat', 'verifikasi', 'penugasan', 'pleno', 'tindak_lanjut', 'tindak_lanjut_jadwal', 'verifikasi_akun', 'monitoring', 'about', 'profile'],
+  MEDIS: ['beranda', 'medis', 'riwayat_medis', 'tindak_lanjut', 'pleno', 'about', 'profile'],
+  HUKUM: ['beranda', 'hukum', 'pleno', 'riwayat_hukum', 'about', 'profile'],
+  SEKRETARIAT: ['beranda', 'permohonan', 'pengajuan_baru', 'asesmen_aktif', 'riwayat', 'verifikasi', 'penugasan', 'pleno', 'tindak_lanjut', 'tindak_lanjut_jadwal', 'verifikasi_akun', 'monitoring', 'about', 'profile'],
+};
 
 export default function App() {
   const navigate = useNavigate();
@@ -307,41 +315,77 @@ export default function App() {
     );
 
     if (isKnownRole && dashboardIndex === -1) {
-      const roleSlug = parts[0].toLowerCase();
-      const matchingUser = users.find(u => getRolePath(u.role) === roleSlug);
-      if (matchingUser && getRolePath(currentUser.role) !== roleSlug) {
-        setCurrentUser(matchingUser);
-        tokenStorage.setUser(matchingUser);
+      const token = tokenStorage.getAccessToken();
+      const sessionUser = tokenStorage.getUser();
+      if (!token || !sessionUser) {
+        setAppViewMode('login');
+        navigate('/login', { replace: true });
+        return;
       }
+      const actualRoleSlug = getRolePath(sessionUser.role);
       const rest = parts.slice(1).join('/');
-      const target = rest ? `/${roleSlug}/dashboard/${rest}` : `/${roleSlug}/dashboard`;
+      const target = rest ? `/${actualRoleSlug}/dashboard/${rest}` : `/${actualRoleSlug}/dashboard`;
       navigate(target, { replace: true });
       return;
     }
 
     if (dashboardIndex !== -1) {
+      const token = tokenStorage.getAccessToken();
+      const sessionUser = tokenStorage.getUser();
+
+      // 1. Cek Otentikasi: Jika belum login / tidak ada token JWT valid, tolak dan redirect ke /login
+      if (!token || !sessionUser) {
+        setAppViewMode('login');
+        navigate('/login', { replace: true });
+        return;
+      }
+
       setAppViewMode('dashboard');
 
-      // Check if URL has role prefix before 'dashboard'
-      // Example without role: /dashboard/... (parts = ['dashboard', ...])
+      // 2. Cek Role Authorization (RBAC Guard)
+      const currentRoleUpper = (sessionUser.role || currentUser.role || '').toUpperCase();
+      const actualRoleSlug = getRolePath(currentRoleUpper);
+
+      // Handle legacy /dashboard/... tanpa prefix role
       if (dashboardIndex === 0) {
-        // Redirect legacy /dashboard/... to /:role/dashboard/...
-        const roleSlug = getRolePath(currentUser.role);
-        navigate(`/${roleSlug}${path}`, { replace: true });
+        navigate(`/${actualRoleSlug}${path}`, { replace: true });
         return;
       }
 
       // Role exists before 'dashboard': /:role/dashboard/...
-      const roleInPath = parts[dashboardIndex - 1].toLowerCase();
-      if (getRolePath(currentUser.role) !== roleInPath) {
-        const matchingUser = users.find(u => getRolePath(u.role) === roleInPath);
-        if (matchingUser) {
-          setCurrentUser(matchingUser);
-        }
+      const roleInPath = parts[dashboardIndex - 1]?.toLowerCase();
+      if (roleInPath !== actualRoleSlug) {
+        // PERINGATAN KEAMANAN: Pengguna mencoba mengakses dashboard role lain!
+        // Tolak dan kembalikan ke dashboard role miliknya sendiri.
+        console.warn(`[RBAC Guard] Akses ditolak: Pengguna dengan role '${currentRoleUpper}' tidak diizinkan membuka '/${roleInPath}/dashboard'. Dialihkan ke '/${actualRoleSlug}/dashboard'.`);
+        navigate(`/${actualRoleSlug}/dashboard`, { replace: true });
+        return;
+      }
+
+      // Pastikan state currentUser sinkron dengan sessionUser resmi
+      if (currentUser.id !== sessionUser.id || currentUser.role !== sessionUser.role) {
+        setCurrentUser(sessionUser);
       }
 
       const subParts = parts.slice(dashboardIndex + 1);
       const tabParam = subParts[0];
+
+      // 3. Tab-level Authorization Guard
+      // Cek apakah tab diizinkan untuk role pengguna
+      if (tabParam) {
+        const allowedTabs = ROLE_ALLOWED_TABS[currentRoleUpper] || ['beranda'];
+        const isTabAllowed =
+          allowedTabs.includes(tabParam as ActiveTab) ||
+          (tabParam.startsWith('tindak_lanjut') && allowedTabs.includes('tindak_lanjut')) ||
+          tabParam === 'detail';
+
+        if (!isTabAllowed) {
+          console.warn(`[RBAC Guard] Akses ditolak: Tab '${tabParam}' tidak dapat diakses oleh role ${currentRoleUpper}. Dialihkan ke beranda.`);
+          setCurrentTab('beranda');
+          navigate(`/${actualRoleSlug}/dashboard`, { replace: true });
+          return;
+        }
+      }
 
       if (tabParam === 'pengajuan_baru' || tabParam === 'pengajuan-baru' || (tabParam === 'pengajuan' && subParts[1] === 'baru')) {
         setCurrentTab('pengajuan_baru');
@@ -469,7 +513,6 @@ export default function App() {
           setSelectedScheduleId(null);
         }
       } else if (tabParam && tabParam.startsWith('tindak_lanjut')) {
-        setCurrentTab(tabParam as ActiveTab);
         setSelectedPermohonanId(null);
         setSelectedHukumId(null);
         setSelectedMedisId(null);
@@ -478,12 +521,19 @@ export default function App() {
         setSelectedScheduleCaseId(null);
         setSelectedScheduleId(null);
         setSelectedRegistrasiId(null);
-        if (subParts[1] === 'detail' && subParts[2]) {
-          setSelectedTindakLanjutId(subParts[2]);
-        } else if (subParts[1] && subParts[1] !== 'detail') {
-          setSelectedTindakLanjutId(subParts[1]);
+
+        if (subParts[1] === 'input_jadwal') {
+          setCurrentTab('tindak_lanjut_input_jadwal');
+          setSelectedTindakLanjutId(subParts[2] || null);
         } else {
-          setSelectedTindakLanjutId(null);
+          setCurrentTab(tabParam as ActiveTab);
+          if (subParts[1] === 'detail' && subParts[2]) {
+            setSelectedTindakLanjutId(subParts[2]);
+          } else if (subParts[1] && subParts[1] !== 'detail') {
+            setSelectedTindakLanjutId(subParts[1]);
+          } else {
+            setSelectedTindakLanjutId(null);
+          }
         }
       } else if (tabParam === 'verifikasi_akun') {
         setCurrentTab('verifikasi_akun');
@@ -580,7 +630,7 @@ export default function App() {
     (currentTab === 'riwayat_medis' ? selectedRiwayatMedisPermohonan : null) ||
     (currentTab === 'riwayat_hukum' ? selectedRiwayatHukumPermohonan : null) ||
     (currentTab === 'tindak_lanjut_jadwal' ? selectedSchedulePermohonan : null) ||
-    (currentTab.startsWith('tindak_lanjut') ? selectedTindakLanjutPermohonan : null);
+    (currentTab === 'tindak_lanjut_input_jadwal' ? null : currentTab.startsWith('tindak_lanjut') ? selectedTindakLanjutPermohonan : null);
 
   const isViewingAnyDetail = Boolean(
     selectedPermohonan ||
@@ -590,11 +640,12 @@ export default function App() {
     (currentTab === 'riwayat_medis' && selectedRiwayatMedisId) ||
     (currentTab === 'riwayat_hukum' && selectedRiwayatHukumId) ||
     (currentTab === 'tindak_lanjut_jadwal' && selectedScheduleCaseId) ||
-    (currentTab.startsWith('tindak_lanjut') && selectedTindakLanjutId) ||
+    (currentTab.startsWith('tindak_lanjut') && selectedTindakLanjutId && currentTab !== 'tindak_lanjut_input_jadwal') ||
     (currentTab === 'verifikasi_akun' && selectedRegistrasiId) ||
     currentTab === 'riwayat' ||
     currentTab === 'pengajuan_baru' ||
-    currentTab === 'profile'
+    currentTab === 'profile' ||
+    currentTab === 'tindak_lanjut_input_jadwal'
   );
 
   // Badge calculations for sidebar (menggunakan applicationStatus kanonis)
@@ -964,6 +1015,7 @@ export default function App() {
           <InputJadwalKontrolView
             permohonanList={permohonanList}
             currentUser={currentUser}
+            initialCaseId={selectedTindakLanjutId || undefined}
             onUpdatePermohonan={handleUpdatePermohonan}
             onNavigateToMonitoring={(caseId) => {
               setSelectedTindakLanjutId(caseId);
@@ -971,6 +1023,7 @@ export default function App() {
               navigateToDashboard(`/tindak_lanjut/detail/${caseId}`);
             }}
             onBack={() => {
+              setSelectedTindakLanjutId(null);
               setCurrentTab('tindak_lanjut');
               navigateToDashboard('/tindak_lanjut');
             }}
@@ -994,10 +1047,32 @@ export default function App() {
                 navigateToDashboard('/tindak_lanjut');
               }
             }}
+            onNavigateToInputJadwal={(caseId) => {
+              setSelectedTindakLanjutId(caseId || null);
+              setCurrentTab('tindak_lanjut_input_jadwal');
+              if (caseId) {
+                navigateToDashboard(`/tindak_lanjut/input_jadwal/${caseId}`);
+              } else {
+                navigateToDashboard('/tindak_lanjut/input_jadwal');
+              }
+            }}
           />
         );
 
       case 'verifikasi_akun':
+        if (currentUser.role?.toUpperCase() !== 'ADMIN') {
+          return (
+            <div className="p-8 text-center bg-[#0d1f38] border border-rose-500/40 rounded-2xl max-w-lg mx-auto my-12 shadow-xl">
+              <div className="w-12 h-12 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center mx-auto mb-3 font-bold text-xl">
+                !
+              </div>
+              <h2 className="text-base font-bold text-white mb-1">Akses Ditolak (403 Forbidden)</h2>
+              <p className="text-xs text-slate-300">
+                Menu Verifikasi Akun hanya diperuntukkan bagi personel Admin Sekretariat TAT.
+              </p>
+            </div>
+          );
+        }
         return (
           <VerifikasiAkunView
             registrations={registrations}
@@ -1169,6 +1244,8 @@ export default function App() {
         onNavigateToProfile={() => handleSelectTab('profile')}
         selectedPermohonan={activeDetailPermohonan}
         isPengajuanBaru={currentTab === 'pengajuan_baru'}
+        isInputJadwal={currentTab === 'tindak_lanjut_input_jadwal'}
+        isVerifikasiAkunDetail={currentTab === 'verifikasi_akun' && Boolean(selectedRegistrasiId)}
         isProfilePage={currentTab === 'profile'}
         onBackFromDetail={() => {
           if (currentTab === 'profile') {
@@ -1177,6 +1254,12 @@ export default function App() {
           }
           if (currentTab === 'pengajuan_baru') {
             handleSelectTab('beranda');
+            return;
+          }
+          if (currentTab === 'tindak_lanjut_input_jadwal') {
+            setSelectedTindakLanjutId(null);
+            setCurrentTab('tindak_lanjut');
+            navigateToDashboard('/tindak_lanjut');
             return;
           }
           if (selectedPermohonanId) {
@@ -1222,8 +1305,8 @@ export default function App() {
 
       {/* Main Workspace Layout - Desktop: Sidebar hidden when viewing detail page or pengajuan_baru */}
       <div className="flex-1 flex w-full bg-[#071326]">
-        {/* Sidebar at desktop corner (Hidden on permohonan detail view, pengajuan_baru, and profile) */}
-        {!activeDetailPermohonan && !selectedPermohonan && currentTab !== 'pengajuan_baru' && currentTab !== 'profile' && (
+        {/* Sidebar at desktop corner (Hidden on permohonan detail view, pengajuan_baru, profile, tindak_lanjut_input_jadwal, and verifikasi_akun detail view) */}
+        {!activeDetailPermohonan && !selectedPermohonan && !selectedRegistrasiId && currentTab !== 'pengajuan_baru' && currentTab !== 'profile' && currentTab !== 'tindak_lanjut_input_jadwal' && (
           <Sidebar
             currentTab={currentTab}
             onSelectTab={handleSelectTab}

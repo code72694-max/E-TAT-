@@ -212,29 +212,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </button>
         </div>
 
-        {currentUser && onSelectUser && (
-          <div className="space-y-1.5 pt-1">
-            <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block">
-              Otoritas Jabatan (Role):
-            </label>
-            <div className="relative">
-              <select
-                value={currentUser.id}
-                onChange={(e) => {
-                  const targetUser = (users || [currentUser]).find(u => u.id === e.target.value);
-                  if (targetUser) {
-                    onSelectUser(targetUser);
-                  }
-                }}
-                className="w-full bg-[#142642] text-xs font-semibold text-white border border-[#234475] rounded-xl px-3 py-2 pr-8 appearance-none cursor-pointer focus:outline-none focus:border-blue-500"
-              >
-                {(users && users.length > 0 ? users : [currentUser]).map((user) => (
-                  <option key={user.id} value={user.id} className="bg-[#0b172a] text-slate-200">
-                    {user.name.split(',')[0]} ({user.role.toUpperCase()})
-                  </option>
-                ))}
-              </select>
-              <ChevronDown className="w-4 h-4 text-blue-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+        {currentUser && (
+          <div className="space-y-1 pt-1">
+            <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block">
+              Akun Aktif:
+            </span>
+            <div className="bg-[#142642] px-3 py-2 rounded-xl border border-[#234475] flex items-center justify-between">
+              <div className="truncate pr-2">
+                <p className="font-bold text-white text-xs truncate">{currentUser.name}</p>
+                <p className="text-[10px] text-slate-400 truncate">{currentUser.email || currentUser.agency}</p>
+              </div>
+              <span className="text-[9px] uppercase font-bold text-blue-300 bg-blue-900/40 px-2 py-0.5 rounded border border-blue-500/30 shrink-0">
+                {currentUser.role}
+              </span>
             </div>
           </div>
         )}

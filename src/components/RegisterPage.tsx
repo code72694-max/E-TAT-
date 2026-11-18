@@ -206,23 +206,23 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({
 
   // Demo Autofill Helper
   const handleAutofillSample = () => {
-    setNamaLengkap('AKBP Hendri Gunawan, S.I.K., M.Si.');
-    setPangkat('AKBP');
-    setNrp('79100845');
-    setJabatan('Kapolres');
-    setUnitFungsi('Pimpinan Satwil');
+    setNamaLengkap('AKP Hendri Gunawan, S.I.K.');
+    setPangkat('AKP');
+    setNrp('85100845');
+    setJabatan('Kasat Resnarkoba');
+    setUnitFungsi('Satresnarkoba');
     setInstansi('Polres Kutai Kartanegara');
     setKategoriInstansi('Polres / Polresta');
-    setPeranSistem('pimpinan');
-    setSpesialisasiTugas([]);
+    setPeranSistem('pengaju');
+    setSpesialisasiTugas(['Kasat Resnarkoba']);
     setWilayahHukum('Kabupaten Kutai Kartanegara');
     setAlamatKantor('Jl. Wolter Monginsidi No. 12, Tenggarong, Kutai Kartanegara');
-    setEmail('kapolres.kukar@polri.go.id');
+    setEmail('satnarkoba.kukar@polri.go.id');
     setPhone('081234889977');
     setTeleponKantor('(0541) 661110');
     setNomorSprint('Sprin/142/X/HUK.6.6/2026');
-    setPassword('KapolresKukar2026!');
-    setConfirmPassword('KapolresKukar2026!');
+    setPassword('PenyidikKukar2026!');
+    setConfirmPassword('PenyidikKukar2026!');
     setPaktaIntegritas(true);
     setFotoKtpUrl('https://images.unsplash.com/photo-1544717305-2782549b5136?w=600&auto=format&fit=crop&q=80');
     setFotoKtpName('KTP_AKBP_HendriGunawan.jpg');

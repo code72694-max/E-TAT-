@@ -33,6 +33,7 @@ interface InputJadwalKontrolViewProps {
   onUpdatePermohonan: (updated: PermohonanAsesmen) => void;
   onNavigateToMonitoring: (caseId: string) => void;
   onBack: () => void;
+  initialCaseId?: string;
 }
 
 export const InputJadwalKontrolView: React.FC<InputJadwalKontrolViewProps> = ({
@@ -40,7 +41,8 @@ export const InputJadwalKontrolView: React.FC<InputJadwalKontrolViewProps> = ({
   currentUser,
   onUpdatePermohonan,
   onNavigateToMonitoring,
-  onBack
+  onBack,
+  initialCaseId
 }) => {
   const isPengajuRole = currentUser.role?.toUpperCase() === 'PENGAJU';
   const isMedisRole = currentUser.role?.toUpperCase() === 'MEDIS';
@@ -83,7 +85,14 @@ export const InputJadwalKontrolView: React.FC<InputJadwalKontrolViewProps> = ({
     return isSubmitted && isSidangBeres;
   });
 
-  const [selectedPermohonanId, setSelectedPermohonanId] = useState<string>('');
+  const [selectedPermohonanId, setSelectedPermohonanId] = useState<string>(initialCaseId || '');
+
+  useEffect(() => {
+    if (initialCaseId) {
+      setSelectedPermohonanId(initialCaseId);
+    }
+  }, [initialCaseId]);
+
   const [isSearchModalOpen, setIsSearchModalOpen] = useState<boolean>(false);
   const [clientSearchQuery, setClientSearchQuery] = useState<string>('');
   const [clientFilterCategory, setClientFilterCategory] = useState<'semua' | 'rawat_jalan' | 'rawat_inap'>('semua');
@@ -232,13 +241,6 @@ export const InputJadwalKontrolView: React.FC<InputJadwalKontrolViewProps> = ({
       {/* Clean Header Bar */}
       <div className="flex items-center justify-between gap-4 pb-2 border-b border-[#1e3a5f]">
         <div className="flex items-center gap-3">
-          <button
-            onClick={onBack}
-            className="p-2 bg-[#0c1c38] hover:bg-[#14294d] text-slate-300 hover:text-white border border-[#1e3a5f] rounded-xl text-xs transition-all cursor-pointer shrink-0"
-            title="Kembali"
-          >
-            <ArrowLeft className="w-4 h-4" />
-          </button>
           <div>
             <h1 className="text-lg font-bold text-slate-100 tracking-tight flex items-center gap-2 font-['Roboto',sans-serif]">
               <Calendar className="w-5 h-5 text-blue-400 shrink-0" />

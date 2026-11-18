@@ -441,7 +441,7 @@ export const PermohonanDetail: React.FC<PermohonanDetailProps> = ({
                 <span className="text-slate-400 font-medium">Email Pengaju</span>
                 <span className="text-slate-500 font-medium">:</span>
                 <span className="font-semibold text-slate-100 truncate">
-                  {currentPermohonan.pengajuEmail || 'etatsiappulih@gmail.com'}
+                  {currentPermohonan.pengajuEmail || 'pengaju.etatsiappulih@gmail.com'}
                 </span>
               </>
             )}
