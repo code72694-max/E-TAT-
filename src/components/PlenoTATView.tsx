@@ -133,13 +133,24 @@ export const PlenoTATView: React.FC<PlenoTATViewProps> = ({
       reader.readAsDataURL(file);
     });
 
+    const existing = permohonanList.find(p => p.id === permohonanId);
+
+    // Simpan ke berbagai key localStorage agar persisten lintas refresh (Admin, Hukum, Medis)
     try {
+      localStorage.setItem(`etat_ttd_pleno_${permohonanId}`, fileDataUrl);
+      localStorage.setItem(`etat_ttd_admin_${permohonanId}`, fileDataUrl);
       localStorage.setItem(`etat_ttd_hukum_${permohonanId}`, fileDataUrl);
-      const existing = permohonanList.find(p => p.id === permohonanId);
+      localStorage.setItem(`etat_pleno_signed_${permohonanId}`, 'true');
+
       if (existing) {
+        localStorage.setItem(`etat_ttd_pleno_${existing.nomorPermohonan}`, fileDataUrl);
+        localStorage.setItem(`etat_ttd_admin_${existing.nomorPermohonan}`, fileDataUrl);
         localStorage.setItem(`etat_ttd_hukum_${existing.nomorPermohonan}`, fileDataUrl);
+        localStorage.setItem(`etat_pleno_signed_${existing.nomorPermohonan}`, 'true');
       }
-    } catch {}
+    } catch (e) {
+      console.warn("LocalStorage TTD save notice:", e);
+    }
 
     let uploadedUrl = fileDataUrl;
     try {
@@ -155,33 +166,49 @@ export const PlenoTATView: React.FC<PlenoTATViewProps> = ({
       console.warn("Backend upload notice, using client data URL:", error);
     }
 
-    if (onUpdatePermohonan) {
-      const existing = permohonanList.find(p => p.id === permohonanId);
-      if (existing) {
-        const updatedPermohonan = {
-          ...existing,
-          sidangPleno: {
-            ...(existing.sidangPleno || {
-              id: `pleno-${Date.now()}`,
-              permohonanId,
-              nomorBeritaAcara: `BA-PLENO/TAT/${new Date().getFullYear()}/${existing.nomorPermohonan.replace(/[^0-9]/g, '')}`,
-              tanggalPleno: new Date().toISOString().split('T')[0],
-              statusPleno: 'selesai',
-              kesepakatanRekomendasi: 'Disepakati rekomendasi rehabilitasi medis rawat inap.'
-            }),
-            fileBeritaAcaraSigned: uploadedUrl,
-            ttdHukumUrl: uploadedUrl,
-            statusPleno: 'selesai' as any
-          }
-        };
-        onUpdatePermohonan(updatedPermohonan);
-      }
+    if (onUpdatePermohonan && existing) {
+      const updatedPermohonan = {
+        ...existing,
+        sidangPleno: {
+          ...(existing.sidangPleno || {
+            id: `pleno-${Date.now()}`,
+            permohonanId,
+            nomorBeritaAcara: `BA-PLENO/TAT/${new Date().getFullYear()}/${existing.nomorPermohonan.replace(/[^0-9]/g, '')}`,
+            tanggalPleno: new Date().toISOString().split('T')[0],
+            statusPleno: 'selesai',
+            kesepakatanRekomendasi: 'Disepakati rekomendasi rehabilitasi medis rawat inap.'
+          }),
+          fileBeritaAcaraSigned: uploadedUrl,
+          ttdHukumUrl: uploadedUrl,
+          statusPleno: 'selesai' as any
+        }
+      };
+      onUpdatePermohonan(updatedPermohonan);
     }
     return uploadedUrl;
   };
 
+  const getCaseSignature = (item: PermohonanAsesmen): string | null => {
+    if (item.sidangPleno?.fileBeritaAcaraSigned) return item.sidangPleno.fileBeritaAcaraSigned;
+    if ((item.sidangPleno as any)?.ttdHukumUrl) return (item.sidangPleno as any).ttdHukumUrl;
+    try {
+      return (
+        localStorage.getItem(`etat_ttd_pleno_${item.id}`) ||
+        localStorage.getItem(`etat_ttd_admin_${item.id}`) ||
+        localStorage.getItem(`etat_ttd_hukum_${item.id}`) ||
+        localStorage.getItem(`etat_ttd_pleno_${item.nomorPermohonan}`) ||
+        localStorage.getItem(`etat_ttd_admin_${item.nomorPermohonan}`) ||
+        localStorage.getItem(`etat_ttd_hukum_${item.nomorPermohonan}`) ||
+        null
+      );
+    } catch {
+      return null;
+    }
+  };
+
   const plenoList = permohonanList.filter(p => 
     Boolean(p.sidangPleno) ||
+    Boolean(getCaseSignature(p)) ||
     ['siap_pleno', 'pembahasan_pleno', 'pengesahan_rekomendasi', 'rekomendasi_terbit', 'selesai_tindak_lanjut'].includes(p.statusProsesUtama) ||
     p.applicationStatus === 'READY_FOR_CONFERENCE' ||
     p.applicationStatus === 'CONFERENCE_HELD' ||
@@ -194,8 +221,8 @@ export const PlenoTATView: React.FC<PlenoTATViewProps> = ({
   );
 
   // Tab Filtering: Jika sudah upload TTD maka masuk ke Riwayat (beres)
-  const aktifCases = plenoList.filter(p => !p.sidangPleno?.fileBeritaAcaraSigned);
-  const riwayatCases = plenoList.filter(p => Boolean(p.sidangPleno?.fileBeritaAcaraSigned));
+  const aktifCases = plenoList.filter(p => !getCaseSignature(p));
+  const riwayatCases = plenoList.filter(p => Boolean(getCaseSignature(p)));
 
   const displayedCases = activeTab === 'aktif' ? aktifCases : riwayatCases;
 
@@ -339,7 +366,8 @@ export const PlenoTATView: React.FC<PlenoTATViewProps> = ({
           </div>
         ) : (
           displayedCases.map(item => {
-            const hasSignedBA = Boolean(item.sidangPleno?.fileBeritaAcaraSigned);
+            const signatureUrl = getCaseSignature(item);
+            const hasSignedBA = Boolean(signatureUrl);
             const isDiteruskan = Boolean(item.tindakLanjutDiteruskan || (item as any).statusProsesUtama === 'selesai_tindak_lanjut' || Boolean(item.tindakLanjut));
 
             return (
@@ -470,7 +498,15 @@ export const PlenoTATView: React.FC<PlenoTATViewProps> = ({
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
-                          setBaPermohonan(item);
+                          const fullItem = {
+                            ...item,
+                            sidangPleno: {
+                              ...(item.sidangPleno || {}),
+                              fileBeritaAcaraSigned: signatureUrl || item.sidangPleno?.fileBeritaAcaraSigned,
+                              ttdHukumUrl: signatureUrl || (item.sidangPleno as any)?.ttdHukumUrl,
+                            } as any
+                          };
+                          setBaPermohonan(fullItem);
                         }}
                         className="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-750 text-slate-200 hover:text-white border border-slate-700 flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
                       >
@@ -486,10 +522,23 @@ export const PlenoTATView: React.FC<PlenoTATViewProps> = ({
                         e.stopPropagation();
                         setUploadTtdItem(item);
                       }}
-                      className="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-750 text-slate-200 hover:text-white border border-slate-700 flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
+                      className={
+                        hasSignedBA
+                          ? "px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-950/70 hover:bg-emerald-900/80 text-emerald-300 border border-emerald-500/50 flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
+                          : "px-3.5 py-1.5 rounded-lg text-xs font-bold bg-gradient-to-r from-[#144782] via-[#17549c] to-[#1c64b8] hover:from-[#175194] hover:via-[#1c60b0] hover:to-[#2274d4] text-white border border-[#2d7ad6]/70 shadow-[0_2px_10px_rgba(20,83,154,0.35)] flex items-center gap-1.5 transition-all cursor-pointer hover:scale-[1.02] active:scale-95"
+                      }
                     >
-                      <PenTool className="w-3.5 h-3.5 text-slate-400" />
-                      <span>{hasSignedBA ? 'Ubah TTD' : 'Unggah TTD'}</span>
+                      {hasSignedBA ? (
+                        <>
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                          <span>TTD Sah (Ubah)</span>
+                        </>
+                      ) : (
+                        <>
+                          <PenTool className="w-3.5 h-3.5 text-amber-300" />
+                          <span>Tanda Tangani Digital</span>
+                        </>
+                      )}
                     </button>
 
                     {/* Input Pleno / Revisi */}

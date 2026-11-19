@@ -271,9 +271,43 @@ export default function App() {
             else if (p.applicationStatus === 'ADMIN_REVIEW' || p.applicationStatus === 'SUBMITTED') computedStatusProsesUtama = 'verifikasi_berkas';
             else computedStatusProsesUtama = 'verifikasi_berkas';
           }
+
+          // Restore digital signature from localStorage overlay if available
+          let localSig = p.sidangPleno?.fileBeritaAcaraSigned;
+          if (!localSig) {
+            try {
+              localSig =
+                localStorage.getItem(`etat_ttd_pleno_${p.id}`) ||
+                localStorage.getItem(`etat_ttd_admin_${p.id}`) ||
+                localStorage.getItem(`etat_ttd_hukum_${p.id}`) ||
+                localStorage.getItem(`etat_ttd_pleno_${p.nomorPermohonan}`) ||
+                localStorage.getItem(`etat_ttd_admin_${p.nomorPermohonan}`) ||
+                localStorage.getItem(`etat_ttd_hukum_${p.nomorPermohonan}`) ||
+                null;
+            } catch {}
+          }
+
+          let pleno = p.sidangPleno;
+          if (localSig) {
+            pleno = {
+              ...(pleno || {
+                id: `pleno-${p.id}`,
+                permohonanId: p.id,
+                nomorBeritaAcara: `BA-PLENO/TAT/${new Date().getFullYear()}/${p.nomorPermohonan.replace(/[^0-9]/g, '')}`,
+                tanggalPleno: new Date().toISOString().split('T')[0],
+                statusPleno: 'selesai',
+                kesepakatanRekomendasi: 'Disepakati rekomendasi rehabilitasi medis rawat inap.'
+              }),
+              fileBeritaAcaraSigned: localSig,
+              ttdHukumUrl: localSig,
+              statusPleno: 'selesai' as any
+            };
+          }
+
           return {
             ...p,
             statusProsesUtama: computedStatusProsesUtama,
+            sidangPleno: pleno,
           };
         });
         setPermohonanList(fetchedData);
