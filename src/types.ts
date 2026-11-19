@@ -182,7 +182,8 @@ export type StatusVerifikasiDokumen =
   | 'belum_tersedia'
   | 'tidak_berlaku'
   | 'belum_diperiksa'
-  | 'belum_diunggah';
+  | 'belum_diunggah'
+  | 'menunggu';
 
 export interface DokumenPersyaratan {
   id: string;

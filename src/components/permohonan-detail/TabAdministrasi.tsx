@@ -231,7 +231,7 @@ export const TabAdministrasi: React.FC<TabAdministrasiProps> = ({
       return;
     }
 
-    const effectiveNote = status === 'menunggu' ? '' : (note !== undefined ? note : targetDoc?.catatanKoreksi || '');
+    const effectiveNote = (status === 'belum_diperiksa' || status === 'belum_diunggah' || status === 'menunggu') ? '' : (note !== undefined ? note : targetDoc?.catatanKoreksi || '');
 
     // Simpan status ke LocalStorage agar draft tidak hilang saat berpindah tab atau reload
     const newOverrides = {
@@ -536,7 +536,7 @@ export const TabAdministrasi: React.FC<TabAdministrasiProps> = ({
                             alert(`Peringatan: Dokumen "${doc.nama}" belum dilampirkan oleh penyidik. Berkas fisik/digital wajib diunggah terlebih dahulu sebelum dapat diceklis.`);
                             return;
                           }
-                          const nextStatus: StatusVerifikasiDokumen = isApproved ? 'menunggu' : 'sesuai';
+                          const nextStatus: StatusVerifikasiDokumen = isApproved ? 'belum_diperiksa' : 'sesuai';
                           handleVerifyDocument(doc.id, nextStatus);
                         }}
                         disabled={!hasFile}
@@ -841,7 +841,7 @@ export const TabAdministrasi: React.FC<TabAdministrasiProps> = ({
                   <button
                     type="button"
                     onClick={() => {
-                      handleVerifyDocument(koreksiModalDoc.id, 'menunggu', '');
+                      handleVerifyDocument(koreksiModalDoc.id, 'belum_diperiksa', '');
                       setKoreksiModalDoc(null);
                       setKoreksiNoteInput('');
                     }}
