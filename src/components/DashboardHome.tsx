@@ -102,6 +102,20 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({
     year: 'numeric'
   });
 
+  // Agenda jadwal terkait permohonan pengaju (hanya kasus nyata yang dijadwalkan)
+  const agendaPengajuList = filteredByPeriod.filter(p => {
+    return Boolean(
+      p.timAsesmen?.jadwalPemeriksaanMedis ||
+      p.timAsesmen?.jadwalPemeriksaanHukum ||
+      p.timAsesmen?.jadwalPleno ||
+      p.statusProsesUtama === 'penugasan_jadwal' ||
+      p.statusProsesUtama === 'asesmen_berlangsung' ||
+      p.statusProsesUtama === 'siap_pleno' ||
+      p.statusProsesUtama === 'pembahasan_pleno' ||
+      p.statusProsesUtama === 'rekomendasi_terbit'
+    );
+  });
+
   // Filter cases strictly scheduled for TODAY
   const hukumHariIniList = activeHukumList.filter(item => {
     const jadwalHukum = item.timAsesmen?.jadwalPemeriksaanHukum || '';
@@ -113,8 +127,7 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({
       jadwalHukum.includes(todayLocale) ||
       tanggalTelaah.includes(todayIso) ||
       tanggalTelaah.includes(todayLocale) ||
-      tanggalPengajuan === todayIso ||
-      item.id === 'tat-085'
+      tanggalPengajuan === todayIso
     );
   });
 
@@ -128,8 +141,7 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({
       jadwalMedis.includes(todayLocale) ||
       tanggalPemeriksaan.includes(todayIso) ||
       tanggalPemeriksaan.includes(todayLocale) ||
-      tanggalPengajuan === todayIso ||
-      item.id === 'tat-085'
+      tanggalPengajuan === todayIso
     );
   });
 
@@ -175,33 +187,77 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({
             )}
 
             {/* Jadwal Terdekat */}
-            <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl p-5 shadow-lg shadow-black/20">
-              <h3 className="text-xs font-bold text-white uppercase tracking-wider mb-3 flex items-center space-x-2">
-                <Calendar className="w-4 h-4 text-slate-400" />
-                <span>Jadwal Agenda Terdekat</span>
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div className="p-3.5 rounded-xl border border-[#1b3459] bg-[#081224] space-y-1">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-300 bg-[#0a182f] px-2 py-0.5 rounded border border-[#1b3459]">
-                      Sidang Pleno
-                    </span>
-                    <span className="text-[11px] text-slate-400 font-mono">13:30 WIB</span>
-                  </div>
-                  <p className="text-xs font-bold text-white mt-1">Kasus TAT-082 (Test-3)</p>
-                  <p className="text-xs text-slate-300">8 September 2026 &bull; Ruang Sidang Utama TAT</p>
-                </div>
-                <div className="p-3.5 rounded-xl border border-[#1b3459] bg-[#081224] space-y-1">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-300 bg-[#0a182f] px-2 py-0.5 rounded border border-[#1b3459]">
-                      Rekomendasi Siap
-                    </span>
-                    <span className="text-[11px] text-slate-300 font-mono">Sah TTD</span>
-                  </div>
-                  <p className="text-xs font-bold text-white mt-1">Kasus TAT-074 (Test-5)</p>
-                  <p className="text-xs text-slate-300">Surat Rekomendasi Resmi Ber-QR Telah Diterbitkan</p>
-                </div>
+            <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl p-5 shadow-lg shadow-black/20 space-y-3">
+              <div className="flex items-center justify-between pb-2 border-b border-[#1b3459]">
+                <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center space-x-2">
+                  <Calendar className="w-4 h-4 text-[#d4af37]" />
+                  <span>Jadwal Agenda Terdekat</span>
+                </h3>
+                <span className="text-[11px] text-slate-400 font-medium font-mono">
+                  {agendaPengajuList.length} Agenda
+                </span>
               </div>
+
+              {agendaPengajuList.length === 0 ? (
+                <div className="p-8 text-center text-slate-400 bg-[#081224] border border-[#1b3459] rounded-xl space-y-2">
+                  <Calendar className="w-7 h-7 text-slate-500 mx-auto" />
+                  <p className="text-xs font-semibold text-white">Belum Ada Agenda Jadwal</p>
+                  <p className="text-[11px] text-slate-400 max-w-md mx-auto leading-relaxed">
+                    Jadwal pemeriksaan medis, asesmen hukum, dan sidang pleno TAT akan tampil otomatis di sini setelah berkas pengajuan Anda diverifikasi dan dijadwalkan oleh Sekretariat TAT.
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {agendaPengajuList.slice(0, 4).map(item => {
+                    const isRekomendasi =
+                      item.statusProsesUtama === 'rekomendasi_terbit' ||
+                      item.applicationStatus === 'RESULTS_ISSUED';
+                    const isPleno =
+                      item.statusProsesUtama === 'siap_pleno' ||
+                      item.statusProsesUtama === 'pembahasan_pleno' ||
+                      item.applicationStatus === 'READY_FOR_CONFERENCE' ||
+                      item.applicationStatus === 'CONFERENCE_HELD';
+
+                    const labelBadge = isRekomendasi
+                      ? 'Rekomendasi Siap'
+                      : isPleno
+                      ? 'Sidang Pleno'
+                      : 'Pemeriksaan Asesor';
+
+                    const timeOrStatus = isRekomendasi
+                      ? 'Sah TTD'
+                      : item.timAsesmen?.jadwalPleno
+                      ? item.timAsesmen.jadwalPleno.slice(11, 16) + ' WIB'
+                      : 'Terjadwal';
+
+                    const subtitle = isRekomendasi
+                      ? 'Surat Rekomendasi Resmi Ber-QR Telah Diterbitkan'
+                      : item.timAsesmen?.lokasiPemeriksaan ||
+                        (item.tanggalPengajuan
+                          ? `${item.tanggalPengajuan} • Ruang Sidang Utama TAT`
+                          : 'Ruang Sidang TAT');
+
+                    return (
+                      <div
+                        key={item.id}
+                        onClick={() => onSelectPermohonan(item.id)}
+                        className="p-3.5 rounded-xl border border-[#1b3459] bg-[#081224] hover:bg-[#112340] cursor-pointer space-y-1 transition-all"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-300 bg-[#0a182f] px-2 py-0.5 rounded border border-[#1b3459]">
+                            {labelBadge}
+                          </span>
+                          <span className="text-[11px] text-slate-400 font-mono">{timeOrStatus}</span>
+                        </div>
+                        <p className="text-xs font-bold text-white mt-1">
+                          {item.nomorPermohonan} {item.terperiksa?.namaLengkap ? `(${item.terperiksa.namaLengkap})` : ''}
+                        </p>
+                        <p className="text-xs text-slate-300">{subtitle}</p>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </div>
         );
@@ -557,32 +613,46 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({
       case 'rehabilitasi':
         return (
           <div className="space-y-5">
-            <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl p-5 shadow-lg shadow-black/20">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 pb-2 border-b border-[#1b3459]">
+            <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl p-5 shadow-lg shadow-black/20 space-y-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-[#1b3459]">
                 <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center space-x-2">
-                  <Share2 className="w-4 h-4 text-slate-400" />
-                  <span>Daftar Rujukan Masuk Klien Rehabilitasi</span>
+                  <Share2 className="w-4 h-4 text-[#d4af37]" />
+                  <span>Daftar Rujukan Masuk Klien Rehabilitasi ({terhambatList.length})</span>
                 </h3>
-                <span className="text-xs text-slate-400">Konfirmasi Kuota & Admisi</span>
+                <span className="text-xs text-slate-400">Konfirmasi Kuota &amp; Admisi</span>
               </div>
-              <div 
-                onClick={() => onSelectPermohonan('tat-074')}
-                className="bg-[#081224] hover:bg-[#112340] border border-[#1b3459] rounded-xl p-3.5 sm:p-4 cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-all"
-              >
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center space-x-2 flex-wrap gap-y-1">
-                    <span className="font-mono font-bold text-xs text-white">Rujukan: Dimas Ardiansyah (TAT-074)</span>
-                    <span className="text-[10px] bg-[#142642] text-slate-200 border border-[#234475] px-2 py-0.5 rounded font-bold uppercase">
-                      Kapasitas Penuh
-                    </span>
-                  </div>
-                  <p className="text-xs text-slate-300 mt-1 leading-snug">Usulan: Rawat Inap 6 Bulan di Balai Tanah Merah Samarinda &bull; Ketersediaan Kuota Kamar: 0 slot (Perlu Relokasi)</p>
+              {terhambatList.length === 0 ? (
+                <div className="p-6 text-center text-slate-400 bg-[#081224] border border-[#1b3459] rounded-xl space-y-1">
+                  <p className="text-xs font-semibold text-white">Tidak Ada Kendala Kuota / Rujukan</p>
+                  <p className="text-[11px] text-slate-400">Seluruh rujukan klien rehabilitasi berjalan lancar.</p>
                 </div>
-                <button className="text-xs bg-[#142642] hover:bg-[#1b3459] text-slate-200 font-semibold px-3.5 py-2 rounded-xl flex items-center justify-center space-x-1 shrink-0 transition-colors border border-[#234475] w-full sm:w-auto">
-                  <span>Kelola Slot</span>
-                  <ArrowRight className="w-3.5 h-3.5 text-slate-200" />
-                </button>
-              </div>
+              ) : (
+                <div className="space-y-2">
+                  {terhambatList.map(item => (
+                    <div 
+                      key={item.id}
+                      onClick={() => onSelectPermohonan(item.id)}
+                      className="bg-[#081224] hover:bg-[#112340] border border-[#1b3459] rounded-xl p-3.5 sm:p-4 cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-all"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center space-x-2 flex-wrap gap-y-1">
+                          <span className="font-mono font-bold text-xs text-white">Rujukan: {item.terperiksa?.namaLengkap} ({item.nomorPermohonan})</span>
+                          <span className="text-[10px] bg-[#142642] text-slate-200 border border-[#234475] px-2 py-0.5 rounded font-bold uppercase">
+                            {item.statusTindakLanjut || 'Perlu Koordinasi'}
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-300 mt-1 leading-snug">
+                          {item.tindakLanjut?.lembagaRehab || item.rekomendasiResmi?.rekomendasiBentukLayanan || 'Rujukan Layanan Rehabilitasi'}
+                        </p>
+                      </div>
+                      <button className="text-xs bg-[#142642] hover:bg-[#1b3459] text-slate-200 font-semibold px-3.5 py-2 rounded-xl flex items-center justify-center space-x-1 shrink-0 transition-colors border border-[#234475] w-full sm:w-auto">
+                        <span>Kelola Slot</span>
+                        <ArrowRight className="w-3.5 h-3.5 text-slate-200" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         );
