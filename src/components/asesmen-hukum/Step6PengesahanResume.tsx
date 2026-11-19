@@ -94,9 +94,9 @@ export const Step6PengesahanResume: React.FC<Step6PengesahanResumeProps> = ({
               type="button"
               disabled={isSaving}
               onClick={onFinalize}
-              className="flex-1 sm:flex-none px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-xl text-xs flex items-center justify-center space-x-2 shadow-lg shadow-blue-950/50 transition-all disabled:opacity-50 cursor-pointer"
+              className="flex-1 sm:flex-none px-5 py-2.5 bg-gradient-to-r from-[#144782] via-[#17549c] to-[#1c64b8] hover:from-[#175194] hover:via-[#1c60b0] hover:to-[#2274d4] text-white font-bold rounded-xl text-xs flex items-center justify-center space-x-2 border border-[#2d7ad6]/70 shadow-[0_2px_10px_rgba(20,83,154,0.35)] transition-all disabled:opacity-50 cursor-pointer"
             >
-              <CheckCircle2 className="w-4 h-4 text-emerald-300" />
+              <CheckCircle2 className="w-4 h-4 text-sky-300" />
               <span>Finalisasi &amp; Teruskan ke Pleno</span>
             </button>
           </div>

@@ -113,7 +113,7 @@ export const ModalKonfirmasiFinalisasiHukum: React.FC<ModalKonfirmasiFinalisasiH
             type="button"
             disabled={isSubmitting}
             onClick={onClose}
-            className="px-4 py-2 bg-[#142642] hover:bg-[#1b3459] text-slate-300 border border-[#234475] rounded-xl text-xs font-semibold transition-colors disabled:opacity-50 cursor-pointer"
+            className="px-4 py-2.5 bg-[#142642] hover:bg-[#1b3459] text-slate-300 border border-[#234475] rounded-xl text-xs font-semibold transition-colors disabled:opacity-50 cursor-pointer"
           >
             Batal / Periksa Kembali
           </button>
@@ -122,7 +122,7 @@ export const ModalKonfirmasiFinalisasiHukum: React.FC<ModalKonfirmasiFinalisasiH
             type="button"
             disabled={isSubmitting}
             onClick={onConfirm}
-            className="px-5 py-2 bg-gradient-to-r from-blue-600 via-indigo-600 to-amber-600 hover:from-blue-500 hover:to-amber-500 text-white font-bold rounded-xl text-xs flex items-center space-x-2 shadow-lg shadow-blue-950/50 transition-all disabled:opacity-60 cursor-pointer"
+            className="px-5 py-2.5 bg-gradient-to-r from-[#144782] via-[#17549c] to-[#1c64b8] hover:from-[#175194] hover:via-[#1c60b0] hover:to-[#2274d4] text-white font-bold rounded-xl text-xs flex items-center space-x-2 border border-[#2d7ad6]/70 shadow-[0_2px_12px_rgba(20,83,154,0.4)] transition-all disabled:opacity-60 cursor-pointer"
           >
             {isSubmitting ? (
               <>
@@ -131,9 +131,9 @@ export const ModalKonfirmasiFinalisasiHukum: React.FC<ModalKonfirmasiFinalisasiH
               </>
             ) : (
               <>
-                <CheckCircle2 className="w-4 h-4 text-emerald-300" />
+                <CheckCircle2 className="w-4 h-4 text-sky-300" />
                 <span>Ya, Selesaikan &amp; Finalisasi</span>
-                <ArrowRight className="w-3.5 h-3.5 text-amber-300" />
+                <ArrowRight className="w-3.5 h-3.5 text-sky-200" />
               </>
             )}
           </button>
