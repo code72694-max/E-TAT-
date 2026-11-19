@@ -41,23 +41,56 @@ export const PermohonanList: React.FC<PermohonanListProps> = ({
 
   const role = currentUser?.role || 'sekretariat';
 
+  // Hitung jumlah kasus untuk masing-masing 3 status resmi antrean verifikasi
+  const counts = useMemo(() => {
+    let menungguCount = 0;
+    let perbaikanCount = 0;
+    let disetujuiCount = 0;
+
+    permohonanList.forEach(item => {
+      // Role scope check: Untuk role Pengaju, hanya hitung berkas milik sendiri
+      if ((role || '').toUpperCase() === 'PENGAJU') {
+        const isOwner =
+          (currentUser?.id && item.pengajuId === currentUser.id) ||
+          (item.pengajuId === 'user-pengaju') ||
+          (currentUser?.email && item.pengajuEmail && item.pengajuEmail.toLowerCase() === currentUser.email.toLowerCase()) ||
+          (currentUser?.name && item.pengajuNama && item.pengajuNama.toLowerCase().includes(currentUser.name.toLowerCase())) ||
+          (currentUser?.name && item.perkara?.namaPenyidik && item.perkara.namaPenyidik.toLowerCase().includes(currentUser.name.toLowerCase())) ||
+          (currentUser?.agency && item.instansiPengaju && item.instansiPengaju.toLowerCase().includes(currentUser.agency.toLowerCase())) ||
+          (currentUser?.agency && item.perkara?.instansiPenyidik && item.perkara.instansiPenyidik.toLowerCase().includes(currentUser.agency.toLowerCase()));
+        if (!isOwner) return;
+      }
+
+      const st = item.applicationStatus;
+      const leg = item.statusProsesUtama;
+      if (st === 'NEEDS_CORRECTION' || leg === 'perlu_perbaikan') {
+        perbaikanCount++;
+      } else if (
+        st === 'APPROVED' || 
+        st === 'SCHEDULED' || 
+        st === 'ASSESSMENT_ACTIVE' ||
+        leg === 'penugasan_jadwal' || 
+        leg === 'asesmen_berlangsung'
+      ) {
+        disetujuiCount++;
+      } else {
+        // Default untuk status SUBMITTED, ADMIN_REVIEW, diajukan, verifikasi_berkas, DRAFT
+        menungguCount++;
+      }
+    });
+
+    return {
+      all: menungguCount + perbaikanCount + disetujuiCount,
+      menunggu: menungguCount,
+      perlu_perbaikan: perbaikanCount,
+      disetujui: disetujuiCount,
+    };
+  }, [permohonanList, role, currentUser]);
+
   const filteredList = useMemo(() => {
     return permohonanList.filter(item => {
-      // Hanya tampilkan berkas yang sedang dalam proses verifikasi (belum diverifikasi ke tahap asesmen)
-      const isPendingVerification = 
-        item.applicationStatus === 'SUBMITTED' || 
-        item.applicationStatus === 'ADMIN_REVIEW' || 
-        item.applicationStatus === 'NEEDS_CORRECTION' || 
-        item.applicationStatus === 'DRAFT' || 
-        item.statusProsesUtama === 'diajukan' || 
-        item.statusProsesUtama === 'verifikasi_berkas' || 
-        item.statusProsesUtama === 'perlu_perbaikan' || 
-        item.statusProsesUtama === 'draf' ||
-        (!item.applicationStatus && !item.statusProsesUtama);
-
-      if (!isPendingVerification) {
-        return false;
-      }
+      const st = item.applicationStatus;
+      const leg = item.statusProsesUtama;
 
       // Role-specific scoping: Untuk role Pengaju, hanya tampilkan berkas yang diajukan oleh akun tsb
       const isPengajuRole = (role || '').toUpperCase() === 'PENGAJU';
@@ -77,7 +110,7 @@ export const PermohonanList: React.FC<PermohonanListProps> = ({
       }
 
       if (role === 'rehabilitasi') {
-        if (!item.tindakLanjut && item.statusProsesUtama !== 'rekomendasi_terbit' && item.statusProsesUtama !== 'selesai_tindak_lanjut') {
+        if (!item.tindakLanjut && leg !== 'rekomendasi_terbit' && leg !== 'selesai_tindak_lanjut') {
           return false;
         }
       }
@@ -99,21 +132,29 @@ export const PermohonanList: React.FC<PermohonanListProps> = ({
         (cleanKode && qClean && (cleanKode.includes(qClean) || qClean.includes(cleanKode))) ||
         (item.id && (item.id.toLowerCase().includes(query) || normalizeSearchCode(item.id).includes(qClean)));
 
-      // Stage match (Hanya status sebelum/saat verifikasi)
+      // Stage match (Hanya 3 status resmi: Menunggu, Perlu Perbaikan, Disetujui)
       let matchStage = true;
       if (selectedStage !== 'all') {
         if (selectedStage === 'menunggu') {
           matchStage = 
-            item.applicationStatus === 'SUBMITTED' || 
-            item.applicationStatus === 'ADMIN_REVIEW' || 
-            item.statusProsesUtama === 'diajukan' || 
-            item.statusProsesUtama === 'verifikasi_berkas';
+            st === 'SUBMITTED' || 
+            st === 'ADMIN_REVIEW' || 
+            st === 'DRAFT' ||
+            leg === 'diajukan' || 
+            leg === 'verifikasi_berkas' ||
+            leg === 'draf' ||
+            (!st && !leg);
         } else if (selectedStage === 'perlu_perbaikan') {
           matchStage = 
-            item.applicationStatus === 'NEEDS_CORRECTION' || 
-            item.applicationStatus === 'DRAFT' ||
-            item.statusProsesUtama === 'perlu_perbaikan' ||
-            item.statusProsesUtama === 'draf';
+            st === 'NEEDS_CORRECTION' || 
+            leg === 'perlu_perbaikan';
+        } else if (selectedStage === 'disetujui') {
+          matchStage = 
+            st === 'APPROVED' || 
+            st === 'SCHEDULED' || 
+            st === 'ASSESSMENT_ACTIVE' ||
+            leg === 'penugasan_jadwal' ||
+            leg === 'asesmen_berlangsung';
         }
       }
 
@@ -125,65 +166,43 @@ export const PermohonanList: React.FC<PermohonanListProps> = ({
 
       return matchSearch && matchStage && matchSla;
     });
-  }, [permohonanList, searchQuery, selectedStage, selectedSla, role]);
+  }, [permohonanList, searchQuery, selectedStage, selectedSla, role, currentUser]);
 
   const getStageBadge = (item: PermohonanAsesmen) => {
-    // Prioritas: gunakan applicationStatus kanonis, fallback ke statusProsesUtama lama
     const appStatus = item.applicationStatus;
     const legacyStatus = item.statusProsesUtama;
+    const key = appStatus || legacyStatus || 'SUBMITTED';
 
-    type StatusConfig = { label: string; cls: string };
-
-    const statusMap: Record<string, StatusConfig> = {
-      // Kanonis baru
-      DRAFT: { label: 'Draf', cls: 'bg-slate-800 text-slate-300 border-slate-600' },
-      SUBMITTED: { label: 'Diajukan', cls: 'bg-blue-900/60 text-blue-200 border-blue-700' },
-      ADMIN_REVIEW: { label: 'Verifikasi Admin', cls: 'bg-indigo-900/60 text-indigo-200 border-indigo-700' },
-      NEEDS_CORRECTION: { label: 'Perlu Perbaikan', cls: 'bg-amber-900/60 text-amber-200 border-amber-700' },
-      AWAITING_DISPOSITION: { label: 'Menunggu Keputusan', cls: 'bg-orange-900/60 text-orange-200 border-orange-700' },
-      APPROVED: { label: 'Disetujui', cls: 'bg-emerald-900/60 text-emerald-200 border-emerald-700' },
-      SCHEDULED: { label: 'Dijadwalkan', cls: 'bg-cyan-900/60 text-cyan-200 border-cyan-700' },
-      ASSESSMENT_ACTIVE: { label: 'Asesmen Berlangsung', cls: 'bg-teal-900/60 text-teal-200 border-teal-700' },
-      READY_FOR_CONFERENCE: { label: 'Siap Pleno', cls: 'bg-violet-900/60 text-violet-200 border-violet-700' },
-      CONFERENCE_HELD: { label: 'Pembahasan', cls: 'bg-purple-900/60 text-purple-200 border-purple-700' },
-      CONFERENCE_CLARIFICATION_REQUIRED: { label: 'Klarifikasi Pleno', cls: 'bg-fuchsia-900/60 text-fuchsia-200 border-fuchsia-700' },
-      OUTCOME_RECORDED_FOR_DRAFT: { label: 'Hasil Dicatat', cls: 'bg-pink-900/60 text-pink-200 border-pink-700' },
-      AWAITING_SIGNED_OUTPUTS: { label: 'Menunggu Dok. Resmi', cls: 'bg-rose-900/60 text-rose-200 border-rose-700' },
-      RESULTS_ISSUED: { label: 'Hasil Terbit', cls: 'bg-green-900/60 text-green-200 border-green-700' },
-      REJECTED: { label: 'Ditolak', cls: 'bg-red-900/60 text-red-200 border-red-700' },
-      OUT_OF_SCOPE_REFERRED: { label: 'Dirujuk (Non-TAT)', cls: 'bg-gray-800 text-gray-300 border-gray-600' },
-      // Backward compat lama
-      draf: { label: 'Draf', cls: 'bg-slate-800 text-slate-300 border-slate-600' },
-      diajukan: { label: 'Diajukan', cls: 'bg-blue-900/60 text-blue-200 border-blue-700' },
-      verifikasi_berkas: { label: 'Verifikasi Berkas', cls: 'bg-indigo-900/60 text-indigo-200 border-indigo-700' },
-      perlu_perbaikan: { label: 'Perlu Perbaikan', cls: 'bg-amber-900/60 text-amber-200 border-amber-700' },
-      penugasan_jadwal: { label: 'Penugasan & Jadwal', cls: 'bg-cyan-900/60 text-cyan-200 border-cyan-700' },
-      asesmen_berlangsung: { label: 'Asesmen Berlangsung', cls: 'bg-teal-900/60 text-teal-200 border-teal-700' },
-      siap_pleno: { label: 'Siap Pleno', cls: 'bg-violet-900/60 text-violet-200 border-violet-700' },
-      pembahasan_pleno: { label: 'Pembahasan Pleno', cls: 'bg-purple-900/60 text-purple-200 border-purple-700' },
-      pengesahan_rekomendasi: { label: 'Menunggu Dok. Resmi', cls: 'bg-rose-900/60 text-rose-200 border-rose-700' },
-      rekomendasi_terbit: { label: 'Hasil Terbit', cls: 'bg-green-900/60 text-green-200 border-green-700' },
-      selesai_tindak_lanjut: { label: 'Selesai', cls: 'bg-green-900/80 text-green-100 border-green-600' },
-    };
-
-    const key = appStatus || legacyStatus || 'draf';
-    let config = statusMap[key] || { label: key, cls: 'bg-slate-800 text-slate-300 border-slate-600' };
-
-    // Simplify labels for Admin role to match the tabs
-    if (role === 'sekretariat' || role === 'ADMIN' || role === 'admin') {
-      const verifiedStages = ['penugasan_jadwal', 'asesmen_berlangsung', 'siap_pleno', 'pembahasan_pleno', 'pengesahan_rekomendasi', 'rekomendasi_terbit', 'selesai_tindak_lanjut'];
-      const isVerified = verifiedStages.includes(legacyStatus) || ['APPROVED', 'SCHEDULED', 'ASSESSMENT_ACTIVE', 'READY_FOR_CONFERENCE', 'CONFERENCE_HELD', 'AWAITING_SIGNED_OUTPUTS', 'RESULTS_ISSUED'].includes(appStatus || '');
-      
-      if (isVerified) {
-        config = { label: 'Terverifikasi (Diproses)', cls: 'bg-emerald-900/60 text-emerald-200 border-emerald-700' };
-      } else if (key === 'verifikasi_berkas' || key === 'SUBMITTED' || key === 'diajukan') {
-        config = { label: 'Menunggu Verifikasi', cls: 'bg-indigo-900/60 text-indigo-200 border-indigo-700' };
-      }
+    // 3 Status Kanonis untuk Antrean Verifikasi:
+    if (key === 'NEEDS_CORRECTION' || key === 'perlu_perbaikan') {
+      return (
+        <span className="bg-amber-900/60 text-amber-200 border-amber-700 border px-2.5 py-0.5 rounded text-xs font-mono font-medium">
+          Perlu Perbaikan
+        </span>
+      );
     }
 
+    if (
+      key === 'APPROVED' ||
+      key === 'SCHEDULED' ||
+      key === 'penugasan_jadwal' ||
+      key === 'ASSESSMENT_ACTIVE' ||
+      key === 'READY_FOR_CONFERENCE' ||
+      key === 'CONFERENCE_HELD' ||
+      key === 'RESULTS_ISSUED' ||
+      key === 'selesai_tindak_lanjut'
+    ) {
+      return (
+        <span className="bg-emerald-900/60 text-emerald-200 border-emerald-700 border px-2.5 py-0.5 rounded text-xs font-mono font-medium">
+          Disetujui
+        </span>
+      );
+    }
+
+    // Default untuk permohonan yang menunggu verifikasi
     return (
-      <span className={`${config.cls} border px-2.5 py-0.5 rounded text-xs font-mono font-medium`}>
-        {config.label}
+      <span className="bg-indigo-900/60 text-indigo-200 border-indigo-700 border px-2.5 py-0.5 rounded text-xs font-mono font-medium">
+        Menunggu Verifikasi
       </span>
     );
   };
@@ -306,12 +325,13 @@ export const PermohonanList: React.FC<PermohonanListProps> = ({
       {/* Filter and Search Toolbar */}
       <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl p-4 space-y-4 shadow-lg shadow-black/20">
         
-        {/* Horizontal Status Tabs */}
+        {/* Horizontal Status Tabs (3 Status Resmi: Menunggu, Perlu Perbaikan, Disetujui) */}
         <div className="flex overflow-x-auto pb-2 space-x-2 scrollbar-thin scrollbar-thumb-[#1b3459] scrollbar-track-transparent">
           {[
-            { id: 'all', label: 'Semua Antrean Verifikasi' },
-            { id: 'menunggu', label: 'Menunggu Verifikasi' },
-            { id: 'perlu_perbaikan', label: 'Perlu Perbaikan / Draf' },
+            { id: 'all', label: `Semua Antrean Verifikasi (${counts.all})` },
+            { id: 'menunggu', label: `Menunggu Verifikasi (${counts.menunggu})` },
+            { id: 'perlu_perbaikan', label: `Perlu Perbaikan (${counts.perlu_perbaikan})` },
+            { id: 'disetujui', label: `Disetujui (${counts.disetujui})` },
           ].map(tab => (
             <button
               key={tab.id}

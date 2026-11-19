@@ -13,13 +13,26 @@ export const VerifikasiBerkasView: React.FC<VerifikasiBerkasViewProps> = ({
   currentUser,
   onSelectPermohonan
 }) => {
-  const [filter, setFilter] = useState<'all' | 'verifikasi' | 'perbaikan'>('all');
+  const [filter, setFilter] = useState<'all' | 'menunggu' | 'perbaikan' | 'disetujui'>('all');
 
   const pendingList = permohonanList.filter(p => {
-    if (filter === 'verifikasi') return p.statusProsesUtama === 'verifikasi_berkas' || p.statusProsesUtama === 'diajukan';
-    if (filter === 'perbaikan') return p.statusProsesUtama === 'perlu_perbaikan';
-    return ['verifikasi_berkas', 'diajukan', 'perlu_perbaikan'].includes(p.statusProsesUtama);
+    const st = p.applicationStatus;
+    const leg = p.statusProsesUtama;
+    const isMenunggu = st === 'SUBMITTED' || st === 'ADMIN_REVIEW' || st === 'DRAFT' || leg === 'verifikasi_berkas' || leg === 'diajukan' || leg === 'draf' || (!st && !leg);
+    const isPerbaikan = st === 'NEEDS_CORRECTION' || leg === 'perlu_perbaikan';
+    const isDisetujui = st === 'APPROVED' || st === 'SCHEDULED' || leg === 'penugasan_jadwal';
+
+    if (filter === 'menunggu') return isMenunggu;
+    if (filter === 'perbaikan') return isPerbaikan;
+    if (filter === 'disetujui') return isDisetujui;
+    return isMenunggu || isPerbaikan || isDisetujui;
   });
+
+  const counts = {
+    menunggu: permohonanList.filter(p => p.applicationStatus === 'SUBMITTED' || p.applicationStatus === 'ADMIN_REVIEW' || p.applicationStatus === 'DRAFT' || p.statusProsesUtama === 'verifikasi_berkas' || p.statusProsesUtama === 'diajukan' || p.statusProsesUtama === 'draf' || (!p.applicationStatus && !p.statusProsesUtama)).length,
+    perbaikan: permohonanList.filter(p => p.applicationStatus === 'NEEDS_CORRECTION' || p.statusProsesUtama === 'perlu_perbaikan').length,
+    disetujui: permohonanList.filter(p => p.applicationStatus === 'APPROVED' || p.applicationStatus === 'SCHEDULED' || p.statusProsesUtama === 'penugasan_jadwal').length,
+  };
 
   const isPengaju = currentUser.role === 'pengaju';
 
@@ -43,19 +56,25 @@ export const VerifikasiBerkasView: React.FC<VerifikasiBerkasViewProps> = ({
             onClick={() => setFilter('all')}
             className={`px-3 py-1.5 rounded-lg font-medium transition-colors cursor-pointer whitespace-nowrap ${filter === 'all' ? 'bg-[#142642] text-white font-bold border border-[#234475]' : 'text-slate-400 hover:text-white'}`}
           >
-            Semua ({permohonanList.filter(p => ['verifikasi_berkas', 'diajukan', 'perlu_perbaikan'].includes(p.statusProsesUtama)).length})
+            Semua ({counts.menunggu + counts.perbaikan + counts.disetujui})
           </button>
           <button
-            onClick={() => setFilter('verifikasi')}
-            className={`px-3 py-1.5 rounded-lg font-medium transition-colors cursor-pointer whitespace-nowrap ${filter === 'verifikasi' ? 'bg-[#142642] text-white font-bold border border-[#234475]' : 'text-slate-400 hover:text-white'}`}
+            onClick={() => setFilter('menunggu')}
+            className={`px-3 py-1.5 rounded-lg font-medium transition-colors cursor-pointer whitespace-nowrap ${filter === 'menunggu' ? 'bg-[#142642] text-white font-bold border border-[#234475]' : 'text-slate-400 hover:text-white'}`}
           >
-            Siap Diperiksa
+            Menunggu Verifikasi ({counts.menunggu})
           </button>
           <button
             onClick={() => setFilter('perbaikan')}
             className={`px-3 py-1.5 rounded-lg font-medium transition-colors cursor-pointer whitespace-nowrap ${filter === 'perbaikan' ? 'bg-[#142642] text-white font-bold border border-[#234475]' : 'text-slate-400 hover:text-white'}`}
           >
-            Perlu Perbaikan
+            Perlu Perbaikan ({counts.perbaikan})
+          </button>
+          <button
+            onClick={() => setFilter('disetujui')}
+            className={`px-3 py-1.5 rounded-lg font-medium transition-colors cursor-pointer whitespace-nowrap ${filter === 'disetujui' ? 'bg-[#142642] text-white font-bold border border-[#234475]' : 'text-slate-400 hover:text-white'}`}
+          >
+            Disetujui ({counts.disetujui})
           </button>
         </div>
       </div>
@@ -83,13 +102,17 @@ export const VerifikasiBerkasView: React.FC<VerifikasiBerkasViewProps> = ({
                   <div className="space-y-1 min-w-0 flex-1">
                     <div className="flex items-center space-x-2 flex-wrap gap-y-1">
                       <span className="font-bold text-xs text-[#d4af37] font-mono group-hover:underline">{item.nomorPermohonan}</span>
-                      {item.statusProsesUtama === 'perlu_perbaikan' ? (
-                        <span className="text-[10px] bg-rose-500/10 text-rose-300 font-semibold px-2 py-0.5 rounded border border-rose-500/20">
-                          Perlu Perbaikan Pengaju
+                      {item.applicationStatus === 'NEEDS_CORRECTION' || item.statusProsesUtama === 'perlu_perbaikan' ? (
+                        <span className="text-[10px] bg-amber-500/10 text-amber-300 font-semibold px-2 py-0.5 rounded border border-amber-500/20">
+                          Perlu Perbaikan
+                        </span>
+                      ) : item.applicationStatus === 'APPROVED' || item.applicationStatus === 'SCHEDULED' || item.statusProsesUtama === 'penugasan_jadwal' ? (
+                        <span className="text-[10px] bg-emerald-500/10 text-emerald-300 font-semibold px-2 py-0.5 rounded border border-emerald-500/20">
+                          Disetujui
                         </span>
                       ) : (
-                        <span className="text-[10px] bg-[#142642] text-slate-200 font-semibold px-2 py-0.5 rounded border border-[#234475]">
-                          Menunggu Pemeriksaan Berkas
+                        <span className="text-[10px] bg-indigo-500/10 text-indigo-300 font-semibold px-2 py-0.5 rounded border border-indigo-500/20">
+                          Menunggu Verifikasi
                         </span>
                       )}
                     </div>
