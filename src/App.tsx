@@ -249,7 +249,33 @@ export default function App() {
       const regRes = results[1];
 
       if (permohonanRes && permohonanRes.status === 'fulfilled' && permohonanRes.value?.data) {
-        const fetchedData: PermohonanAsesmen[] = permohonanRes.value.data;
+        const rawList = Array.isArray(permohonanRes.value.data) ? permohonanRes.value.data : [];
+        const fetchedData: PermohonanAsesmen[] = rawList.map((p: any) => {
+          let computedStatusProsesUtama = p.statusProsesUtama;
+          if (!computedStatusProsesUtama) {
+            if (p.applicationStatus === 'RESULTS_ISSUED') computedStatusProsesUtama = 'rekomendasi_terbit';
+            else if (p.applicationStatus === 'AWAITING_SIGNED_OUTPUTS') computedStatusProsesUtama = 'pengesahan_rekomendasi';
+            else if (p.applicationStatus === 'CONFERENCE_HELD' || p.applicationStatus === 'OUTCOME_RECORDED_FOR_DRAFT') computedStatusProsesUtama = 'pembahasan_pleno';
+            else if (
+              p.applicationStatus === 'READY_FOR_CONFERENCE' ||
+              p.legalStatus === 'FINAL' ||
+              p.asesmenHukum?.status === 'FINAL' ||
+              (p.medicalStatus === 'FINAL' && p.legalStatus === 'FINAL') ||
+              Boolean(p.sidangPleno)
+            ) {
+              computedStatusProsesUtama = 'siap_pleno';
+            }
+            else if (p.applicationStatus === 'ASSESSMENT_ACTIVE') computedStatusProsesUtama = 'asesmen_berlangsung';
+            else if (p.applicationStatus === 'SCHEDULED' || p.applicationStatus === 'APPROVED') computedStatusProsesUtama = 'penugasan_jadwal';
+            else if (p.applicationStatus === 'NEEDS_CORRECTION') computedStatusProsesUtama = 'perlu_perbaikan';
+            else if (p.applicationStatus === 'ADMIN_REVIEW' || p.applicationStatus === 'SUBMITTED') computedStatusProsesUtama = 'verifikasi_berkas';
+            else computedStatusProsesUtama = 'verifikasi_berkas';
+          }
+          return {
+            ...p,
+            statusProsesUtama: computedStatusProsesUtama,
+          };
+        });
         setPermohonanList(fetchedData);
       }
 

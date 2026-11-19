@@ -181,8 +181,16 @@ export const PlenoTATView: React.FC<PlenoTATViewProps> = ({
   };
 
   const plenoList = permohonanList.filter(p => 
+    Boolean(p.sidangPleno) ||
     ['siap_pleno', 'pembahasan_pleno', 'pengesahan_rekomendasi', 'rekomendasi_terbit', 'selesai_tindak_lanjut'].includes(p.statusProsesUtama) ||
-    Boolean(p.sidangPleno)
+    p.applicationStatus === 'READY_FOR_CONFERENCE' ||
+    p.applicationStatus === 'CONFERENCE_HELD' ||
+    p.applicationStatus === 'OUTCOME_RECORDED_FOR_DRAFT' ||
+    p.applicationStatus === 'AWAITING_SIGNED_OUTPUTS' ||
+    p.applicationStatus === 'RESULTS_ISSUED' ||
+    p.legalStatus === 'FINAL' ||
+    p.asesmenHukum?.status === 'FINAL' ||
+    (p.medicalStatus === 'FINAL' && p.legalStatus === 'FINAL')
   );
 
   // Tab Filtering: Jika sudah upload TTD maka masuk ke Riwayat (beres)
