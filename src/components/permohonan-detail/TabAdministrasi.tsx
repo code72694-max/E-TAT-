@@ -47,6 +47,11 @@ export const TabAdministrasi: React.FC<TabAdministrasiProps> = ({
   const [koreksiNoteInput, setKoreksiNoteInput] = useState<string>('');
   const [emailBanner, setEmailBanner] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [isSendingCorrection, setIsSendingCorrection] = useState(false);
+  const [successCorrectionModal, setSuccessCorrectionModal] = useState<{
+    isOpen: boolean;
+    totalPerbaikan: number;
+    rincianPerbaikan: string[];
+  } | null>(null);
 
   // Key unik LocalStorage per berkas permohonan agar draft ceklis tidak hilang saat refresh / polling
   const storageKey = useMemo(() => {
@@ -727,7 +732,11 @@ export const TabAdministrasi: React.FC<TabAdministrasiProps> = ({
                       console.warn('Email notify notice:', err);
                     }
 
-                    alert('Perintah perbaikan & kelengkapan berkas berhasil dikirim ke Penyidik!');
+                    setSuccessCorrectionModal({
+                      isOpen: true,
+                      totalPerbaikan: invalidDocsList.length,
+                      rincianPerbaikan: invalidSummary,
+                    });
                   } catch (err: any) {
                     console.error('Gagal mengirim perintah perbaikan:', err);
                     alert(`Gagal mengirim perintah perbaikan: ${err?.message || err}`);
@@ -875,6 +884,86 @@ export const TabAdministrasi: React.FC<TabAdministrasiProps> = ({
                   <span>Simpan Catatan Koreksi</span>
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Sukses Kirim Perintah Perbaikan */}
+      {successCorrectionModal?.isOpen && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in">
+          <div className="bg-[#0b172a] border border-amber-500/40 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl text-slate-100 ring-1 ring-amber-500/20 animate-in zoom-in-95">
+            {/* Header */}
+            <div className="flex items-start justify-between pb-3 border-b border-[#1b3459]">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0">
+                  <CheckCircle2 className="w-6 h-6 text-amber-400" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-white">Perintah Perbaikan Berhasil Dikirim</h4>
+                  <p className="text-[11px] text-slate-400">Instruksi perbaikan &amp; kelengkapan berkas telah diteruskan ke Penyidik</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSuccessCorrectionModal(null)}
+                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Target Information Card */}
+            <div className="bg-[#050e1c] border border-[#1b3459] rounded-xl p-3.5 space-y-2 text-xs">
+              <div className="flex justify-between items-center text-[11px]">
+                <span className="text-slate-400">Nomor Permohonan:</span>
+                <span className="font-mono font-bold text-[#D4AF37]">{permohonan.nomorPermohonan}</span>
+              </div>
+              <div className="flex justify-between items-center text-[11px]">
+                <span className="text-slate-400">Penyidik Pengaju:</span>
+                <span className="text-white font-medium">{permohonan.perkara?.namaPenyidik || permohonan.pemohonNama || '-'}</span>
+              </div>
+              <div className="flex justify-between items-center text-[11px]">
+                <span className="text-slate-400">Instansi Pengaju:</span>
+                <span className="text-white font-medium">{permohonan.perkara?.instansiPenyidik || permohonan.instansiPengaju || '-'}</span>
+              </div>
+              <div className="flex justify-between items-center text-[11px]">
+                <span className="text-slate-400">Status Permohonan:</span>
+                <span className="text-amber-400 font-semibold bg-amber-950/60 border border-amber-800/60 px-2 py-0.5 rounded text-[10px]">
+                  Perlu Perbaikan (NEEDS_CORRECTION)
+                </span>
+              </div>
+            </div>
+
+            {/* Rincian Berkas Perbaikan */}
+            <div className="space-y-1.5">
+              <span className="text-[11px] font-semibold text-slate-300 block">
+                Rincian Berkas yang Harus Diperbaiki ({successCorrectionModal.totalPerbaikan} Dokumen):
+              </span>
+              <div className="max-h-44 overflow-y-auto space-y-1.5 bg-[#050e1c] border border-[#1b3459] p-3 rounded-xl">
+                {successCorrectionModal.rincianPerbaikan.map((item, idx) => (
+                  <p key={idx} className="text-xs text-amber-200 leading-relaxed">
+                    {item}
+                  </p>
+                ))}
+              </div>
+            </div>
+
+            {/* Notification Notice */}
+            <div className="flex items-center space-x-2 text-[11px] text-emerald-400 bg-emerald-950/30 border border-emerald-500/20 px-3 py-2 rounded-xl">
+              <Mail className="w-4 h-4 shrink-0" />
+              <span>Pemberitahuan resmi dan rincian kekurangan telah dikirimkan ke email penyidik.</span>
+            </div>
+
+            {/* Actions */}
+            <div className="flex items-center justify-end pt-3 border-t border-[#1b3459]">
+              <button
+                type="button"
+                onClick={() => setSuccessCorrectionModal(null)}
+                className="px-5 py-2 bg-amber-600 hover:bg-amber-500 text-white rounded-xl text-xs font-bold transition-all shadow-md cursor-pointer"
+              >
+                Mengerti &amp; Tutup
+              </button>
             </div>
           </div>
         </div>
