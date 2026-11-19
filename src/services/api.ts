@@ -82,7 +82,7 @@ async function request<T = any>(
     const data = isJson ? await response.json() : null;
 
     if (!response.ok) {
-      if (response.status === 401 && !options._isRetry) {
+      if (response.status === 401 && !options._isRetry && !endpoint.includes('/auth/login')) {
         const refreshToken = tokenStorage.getRefreshToken();
         if (refreshToken) {
           try {
@@ -104,6 +104,15 @@ async function request<T = any>(
           } catch {
             // refresh failed
           }
+        }
+        // Refresh token gagal atau tidak ada -> sesi telah berakhir
+        tokenStorage.clear();
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(
+            new CustomEvent('etat:session_expired', {
+              detail: { message: data?.message || 'Sesi login Anda telah kedaluwarsa. Silakan masuk kembali.' },
+            })
+          );
         }
       }
       const errorMessage = data?.message || data?.error || `HTTP ${response.status}: ${response.statusText}`;
@@ -628,6 +637,18 @@ export const prasyaratApi = {
 
   save: async (permohonanId: string, payload: Partial<PrasyaratPemeriksaan>) => {
     return request<PrasyaratPemeriksaan>(`/prasyarat-pemeriksaan/${permohonanId}`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  },
+};
+
+// =====================================================================
+// EMAIL NOTIFICATION API (Secure Backend Delivery)
+// =====================================================================
+export const emailApi = {
+  send: async (payload: { to: string | string[]; subject: string; html: string; text?: string }) => {
+    return request<{ id?: string }>('/email/send', {
       method: 'POST',
       body: JSON.stringify(payload),
     });

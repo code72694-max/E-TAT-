@@ -1,4 +1,5 @@
 import { PermohonanAsesmen } from '../types';
+import { emailApi } from './api';
 
 export const RESEND_API_KEY = import.meta.env.VITE_RESEND_API_KEY || '';
 
@@ -36,7 +37,7 @@ export interface SendEmailPayload {
 }
 
 /**
- * Fungsi kirim email dinamis via Resend API
+ * Fungsi kirim email via backend resmi (mencegah error CORS dan menjaga keamanan API key)
  */
 export async function sendEmailDirect(payload: SendEmailPayload): Promise<SendEmailResult> {
   const recipients = normalizeRecipients(payload.to);
@@ -47,41 +48,24 @@ export async function sendEmailDirect(payload: SendEmailPayload): Promise<SendEm
     };
   }
 
-  if (!RESEND_API_KEY) {
-    console.warn('⚠️ RESEND_API_KEY belum disetel (VITE_RESEND_API_KEY). Pengiriman email disimulasikan:', {
+  try {
+    const res = await emailApi.send({
       to: recipients,
       subject: payload.subject,
-    });
-    return {
-      success: true,
-      id: `sim-${Date.now()}`,
-    };
-  }
-
-  try {
-    const fromAddress = import.meta.env.VITE_EMAIL_FROM || 'E-TAT POLRI <noreply@e-tatsiappulih.com>';
-    const response = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${RESEND_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        from: payload.fromName ? `${payload.fromName} <noreply@e-tatsiappulih.com>` : fromAddress,
-        to: recipients,
-        subject: payload.subject,
-        html: payload.html,
-      }),
+      html: payload.html,
     });
 
-    const data = await response.json();
-    if (response.ok && data.id) {
-      return { success: true, id: data.id };
+    if (res.data?.id || res.success) {
+      return { success: true, id: res.data?.id || `sent-${Date.now()}` };
     } else {
-      return { success: false, error: data.message || JSON.stringify(data) };
+      return { success: false, error: res.message || 'Gagal mengirim email melalui server' };
     }
   } catch (error: any) {
-    return { success: false, error: error?.message || 'Gagal terhubung ke layanan Resend API' };
+    console.warn('⚠️ Gagal mengirim email via backend:', error?.message || error);
+    return {
+      success: false,
+      error: error?.message || 'Gagal terhubung ke layanan email backend',
+    };
   }
 }
 

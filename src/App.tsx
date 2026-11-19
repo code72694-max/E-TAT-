@@ -273,6 +273,21 @@ export default function App() {
     }
   }, [fetchBackendData]);
 
+  // Handle session expiration from API 401s
+  useEffect(() => {
+    const handleSessionExpired = (event: any) => {
+      const msg = event?.detail?.message || 'Sesi login Anda telah berakhir. Silakan masuk kembali.';
+      alert(msg);
+      setAppViewMode('login');
+      navigate('/login?expired=1', { replace: true });
+    };
+
+    window.addEventListener('etat:session_expired', handleSessionExpired);
+    return () => {
+      window.removeEventListener('etat:session_expired', handleSessionExpired);
+    };
+  }, [navigate]);
+
   // Modals
   const [qrModalPermohonan, setQrModalPermohonan] = useState<PermohonanAsesmen | null>(null);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
@@ -297,6 +312,19 @@ export default function App() {
     }
     if (path === '/register') {
       setAppViewMode('register');
+      return;
+    }
+    // Handle shortcut URLs like /pengajuan_baru or /pengajuan-baru
+    if (path === '/pengajuan_baru' || path === '/pengajuan-baru') {
+      const token = tokenStorage.getAccessToken();
+      const sessionUser = tokenStorage.getUser();
+      if (!token || !sessionUser) {
+        setAppViewMode('login');
+        navigate('/login', { replace: true });
+        return;
+      }
+      const actualRoleSlug = getRolePath(sessionUser.role);
+      navigate(`/${actualRoleSlug}/dashboard/pengajuan_baru`, { replace: true });
       return;
     }
     if (path === '/' || path === '') {

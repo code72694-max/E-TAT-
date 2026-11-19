@@ -717,31 +717,28 @@ export const PengajuanBaruView: React.FC<PengajuanBaruViewProps> = ({
         } catch (submitErr) {
           console.warn('Auto-submit draft error, using created draft:', submitErr);
           createdPermohonan = { ...createdPermohonan, ...res.data, applicationStatus: 'SUBMITTED' };
+          // Fallback kirim notifikasi via email service jika auto-submit backend gagal
+          sendPengajuanEmailNotification(createdPermohonan).catch((e) =>
+            console.warn('Fallback notifikasi email gagal:', e)
+          );
         }
       }
     } catch (err: any) {
       console.error('Backend permohonan create error:', err);
       const errMsg = err?.response?.data?.message || err?.message || 'Gagal menyimpan pengajuan ke server';
       alert(`Peringatan server: ${errMsg}`);
+      setIsSubmitting(false);
+      setIsSendingEmail(false);
+      return; // Berhenti jika gagal menyimpan ke server agar data form tidak hilang
     }
 
-    // Send email notification
+    setIsSendingEmail(false);
+    isSubmittedRef.current = true;
     try {
-      const result = await sendPengajuanEmailNotification(createdPermohonan);
-      if (result.success) {
-        console.log('Notifikasi email berhasil dikirim via Resend API:', result.id);
-      }
-    } catch (e) {
-      console.error('Error sending notification email:', e);
-    } finally {
-      setIsSendingEmail(false);
-      isSubmittedRef.current = true;
-      try {
-        localStorage.removeItem(DRAFT_STORAGE_KEY);
-      } catch (e) {}
-      onSubmit(createdPermohonan);
-      onBack();
-    }
+      localStorage.removeItem(DRAFT_STORAGE_KEY);
+    } catch (e) {}
+    onSubmit(createdPermohonan);
+    onBack();
   };
 
   return (

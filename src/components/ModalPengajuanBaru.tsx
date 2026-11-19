@@ -400,7 +400,7 @@ export const ModalPengajuanBaru: React.FC<ModalPengajuanBaruProps> = ({
     try {
       const result = await sendPengajuanEmailNotification(createdPermohonan);
       if (result.success) {
-        console.log('Notifikasi email berhasil dikirim via Resend API:', result.id);
+        console.log('Notifikasi email berhasil dikirim via backend:', result.id);
       }
     } catch (e) {
       console.error('Error sending notification email:', e);
