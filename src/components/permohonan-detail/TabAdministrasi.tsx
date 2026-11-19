@@ -48,6 +48,46 @@ export const TabAdministrasi: React.FC<TabAdministrasiProps> = ({
   const [emailBanner, setEmailBanner] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [isSendingCorrection, setIsSendingCorrection] = useState(false);
 
+  // Key unik LocalStorage per berkas permohonan agar draft ceklis tidak hilang saat refresh / polling
+  const storageKey = useMemo(() => {
+    if (permohonan?.id) return `etat_verifikasi_docs_${permohonan.id}`;
+    if (permohonan?.nomorPermohonan) return `etat_verifikasi_docs_${permohonan.nomorPermohonan}`;
+    return null;
+  }, [permohonan?.id, permohonan?.nomorPermohonan]);
+
+  // Load status verifikasi dari LocalStorage saat inisialisasi
+  const [verificationOverrides, setVerificationOverrides] = useState<
+    Record<string, { statusVerifikasi: StatusVerifikasiDokumen; catatanKoreksi?: string }>
+  >(() => {
+    if (typeof window === 'undefined') return {};
+    const key = permohonan?.id
+      ? `etat_verifikasi_docs_${permohonan.id}`
+      : permohonan?.nomorPermohonan
+      ? `etat_verifikasi_docs_${permohonan.nomorPermohonan}`
+      : null;
+    if (!key) return {};
+    try {
+      const raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : {};
+    } catch (e) {
+      return {};
+    }
+  });
+
+  // Sinkronisasi bila berpindah permohonan
+  useEffect(() => {
+    if (typeof window === 'undefined' || !storageKey) {
+      setVerificationOverrides({});
+      return;
+    }
+    try {
+      const raw = localStorage.getItem(storageKey);
+      setVerificationOverrides(raw ? JSON.parse(raw) : {});
+    } catch (e) {
+      setVerificationOverrides({});
+    }
+  }, [storageKey]);
+
   // Tentukan template dokumen berdasarkan jenis pengajuan & keberadaan barang bukti
   const effectiveJenisPengajuan = useMemo(() => {
     if (permohonan.jenisPengajuan) return permohonan.jenisPengajuan;
@@ -134,8 +174,26 @@ export const TabAdministrasi: React.FC<TabAdministrasiProps> = ({
         templateIndex: docTemplates.length + extraIdx + 1,
       }));
 
-    return [...templateMatches, ...extraDocs];
-  }, [permohonan.dokumenList, docTemplates]);
+    const combined = [...templateMatches, ...extraDocs];
+
+    // Terapkan override checklist & catatan dari LocalStorage (agar tidak hilang saat refresh / polling)
+    return combined.map(d => {
+      const override = verificationOverrides[d.id] || (d.kode ? verificationOverrides[d.kode] : undefined);
+      if (!override) return d;
+
+      const hasFile = Boolean(d.fileUrl || d.fileName);
+      // Dokumen tanpa berkas fisik/digital tidak boleh di-override menjadi 'sesuai'
+      if (override.statusVerifikasi === 'sesuai' && !hasFile) {
+        return d;
+      }
+
+      return {
+        ...d,
+        statusVerifikasi: override.statusVerifikasi,
+        catatanKoreksi: override.catatanKoreksi !== undefined ? override.catatanKoreksi : d.catatanKoreksi,
+      };
+    });
+  }, [permohonan.dokumenList, docTemplates, verificationOverrides]);
 
   const docs = normalizedDocs;
 
@@ -164,7 +222,7 @@ export const TabAdministrasi: React.FC<TabAdministrasiProps> = ({
   const isFullyApproved = allMandatoryApproved && isAllReviewed;
   const canSendCorrection = isAllReviewed && hasNeedsCorrection;
 
-  const handleVerifyDocument = async (docId: string, status: StatusVerifikasiDokumen, note?: string) => {
+  const handleVerifyDocument = (docId: string, status: StatusVerifikasiDokumen, note?: string) => {
     const targetDoc = docs.find(d => d.id === docId);
     const hasFile = Boolean(targetDoc?.fileUrl || targetDoc?.fileName);
 
@@ -173,12 +231,39 @@ export const TabAdministrasi: React.FC<TabAdministrasiProps> = ({
       return;
     }
 
+    const effectiveNote = status === 'menunggu' ? '' : (note !== undefined ? note : targetDoc?.catatanKoreksi || '');
+
+    // Simpan status ke LocalStorage agar draft tidak hilang saat berpindah tab atau reload
+    const newOverrides = {
+      ...verificationOverrides,
+      [docId]: {
+        statusVerifikasi: status,
+        catatanKoreksi: effectiveNote,
+      },
+      ...(targetDoc?.kode ? {
+        [targetDoc.kode]: {
+          statusVerifikasi: status,
+          catatanKoreksi: effectiveNote,
+        }
+      } : {})
+    };
+
+    setVerificationOverrides(newOverrides);
+
+    if (typeof window !== 'undefined' && storageKey) {
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(newOverrides));
+      } catch (e) {
+        console.warn('Gagal menyimpan ke localStorage:', e);
+      }
+    }
+
     const updatedDocs = docs.map(doc => {
-      if (doc.id === docId) {
+      if (doc.id === docId || (targetDoc?.kode && doc.kode === targetDoc.kode)) {
         return {
           ...doc,
           statusVerifikasi: status,
-          catatanKoreksi: note !== undefined ? note : doc.catatanKoreksi,
+          catatanKoreksi: effectiveNote,
         };
       }
       return doc;
@@ -198,40 +283,9 @@ export const TabAdministrasi: React.FC<TabAdministrasiProps> = ({
         : allApproved
         ? 'Administrasi lengkap & diverifikasi. Menunggu catatan disposisi dari Ketua TAT.'
         : 'Sedang dalam proses verifikasi berkas oleh Sekretariat.',
-      auditLogs: [
-        {
-          id: 'aud-' + Date.now(),
-          timestamp: new Date().toLocaleDateString('id-ID') + ' ' + new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
-          actorNama: currentUser.name,
-          actorPeran: currentUser.role,
-          aksi: status === 'perlu_perbaikan' ? 'Minta Perbaikan Berkas' : 'Verifikasi Berkas Sesuai',
-          rincian: status === 'perlu_perbaikan'
-            ? `Dokumen '${docId}' perlu perbaikan: ${note || '-'}`
-            : `Dokumen '${docId}' diverifikasi sesuai dan absah.`
-        },
-        ...(permohonan.auditLogs || [])
-      ]
     };
 
     onUpdatePermohonan(updated);
-
-    if (permohonan.id) {
-      if (status === 'perlu_perbaikan') {
-        permohonanApi.mintaPerbaikan(permohonan.id, note || 'Perlu perbaikan berkas').catch(err => {
-          console.warn('Backend mintaPerbaikan notice:', err);
-        });
-      } else if (allApproved) {
-        permohonanApi.verifikasi(permohonan.id, {
-          dokumenStatus: updatedDocs.map(d => ({
-            dokumenId: d.id,
-            statusVerifikasi: d.statusVerifikasi,
-            catatanKoreksi: d.catatanKoreksi
-          }))
-        }).catch(err => {
-          console.warn('Backend verifikasi notice:', err);
-        });
-      }
-    }
   };
 
   return (
@@ -310,6 +364,32 @@ export const TabAdministrasi: React.FC<TabAdministrasiProps> = ({
           <p className="text-[11px] text-slate-400">Verifikator: {currentUser.name} ({currentUser.role})</p>
         </div>
       </div>
+
+      {/* LocalStorage Draft Indicator */}
+      {Object.keys(verificationOverrides).length > 0 && (
+        <div className="bg-sky-950/40 border border-sky-500/30 rounded-xl p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-sky-200 shadow-sm animate-in fade-in">
+          <div className="flex items-center space-x-2">
+            <CheckCircle2 className="w-4 h-4 text-sky-400 shrink-0" />
+            <span>
+              Pemeriksaan sedang berlangsung: <strong className="text-white font-semibold">{Object.keys(verificationOverrides).length} dokumen tersimpan di browser (Local Storage)</strong>. Status ceklis &amp; catatan tidak akan hilang saat reload dan otomatis terhapus saat berkas resmi dikirim.
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              if (confirm('Apakah Anda yakin ingin membatalkan semua tanda ceklis dan catatan draft di browser ini?')) {
+                if (storageKey && typeof window !== 'undefined') {
+                  localStorage.removeItem(storageKey);
+                }
+                setVerificationOverrides({});
+              }
+            }}
+            className="text-[11px] text-sky-300 hover:text-white underline cursor-pointer shrink-0"
+          >
+            Reset Draft Pemeriksaan
+          </button>
+        </div>
+      )}
 
       {/* Checklist List */}
       <div className="space-y-3">
@@ -456,7 +536,8 @@ export const TabAdministrasi: React.FC<TabAdministrasiProps> = ({
                             alert(`Peringatan: Dokumen "${doc.nama}" belum dilampirkan oleh penyidik. Berkas fisik/digital wajib diunggah terlebih dahulu sebelum dapat diceklis.`);
                             return;
                           }
-                          handleVerifyDocument(doc.id, 'sesuai');
+                          const nextStatus: StatusVerifikasiDokumen = isApproved ? 'menunggu' : 'sesuai';
+                          handleVerifyDocument(doc.id, nextStatus);
                         }}
                         disabled={!hasFile}
                         className={`p-1.5 rounded-lg border transition-all ${
@@ -470,7 +551,7 @@ export const TabAdministrasi: React.FC<TabAdministrasiProps> = ({
                           !hasFile
                             ? 'Dokumen belum dilampirkan oleh penyidik - tidak dapat diceklis'
                             : isApproved
-                            ? 'Dokumen telah diverifikasi Sesuai & Sah'
+                            ? 'Dokumen telah diverifikasi Sesuai & Sah (Klik untuk membatalkan)'
                             : 'Tandai Sesuai & Sah'
                         }
                       >
@@ -537,12 +618,23 @@ export const TabAdministrasi: React.FC<TabAdministrasiProps> = ({
                 onClick={() => {
                   const updated: PermohonanAsesmen = {
                     ...permohonan,
+                    dokumenList: docs,
                     applicationStatus: 'AWAITING_DISPOSITION',
                     statusProsesUtama: 'penjadwalan',
                     penanggungJawabBerikutnya: 'Sekretariat / Tim Asesor TAT',
                     tindakanBerikutnyaLabel: 'Administrasi lengkap & diverifikasi. Lanjutkan ke penetapan jadwal & penunjukan tim asesor.',
                   };
                   onUpdatePermohonan(updated);
+
+                  // Hapus draft checklist di LocalStorage karena sudah selesai diverifikasi & dikirim
+                  if (storageKey && typeof window !== 'undefined') {
+                    try {
+                      localStorage.removeItem(storageKey);
+                    } catch (e) {
+                      console.warn('Gagal menghapus localStorage:', e);
+                    }
+                  }
+                  setVerificationOverrides({});
 
                   if (permohonan.id) {
                     permohonanApi.verifikasi(permohonan.id, {
@@ -611,6 +703,16 @@ export const TabAdministrasi: React.FC<TabAdministrasiProps> = ({
                         dokumenPerluDiperbaiki: invalidDocsList,
                       });
                     }
+
+                    // Hapus draft checklist di LocalStorage karena perintah perbaikan sudah resmi terkirim
+                    if (storageKey && typeof window !== 'undefined') {
+                      try {
+                        localStorage.removeItem(storageKey);
+                      } catch (e) {
+                        console.warn('Gagal menghapus localStorage:', e);
+                      }
+                    }
+                    setVerificationOverrides({});
 
                     try {
                       const res = await sendCorrectionEmailNotification(updated, combinedSummary.replace(/\n/g, '<br/>'));
@@ -733,28 +835,45 @@ export const TabAdministrasi: React.FC<TabAdministrasiProps> = ({
             </div>
 
             {/* Actions */}
-            <div className="flex items-center justify-end space-x-2 pt-3 border-t border-[#1b3459]">
-              <button
-                type="button"
-                onClick={() => setKoreksiModalDoc(null)}
-                className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-semibold transition-colors cursor-pointer"
-              >
-                Batal
-              </button>
-              <button
-                type="button"
-                disabled={!koreksiNoteInput.trim()}
-                onClick={() => {
-                  if (!koreksiModalDoc) return;
-                  handleVerifyDocument(koreksiModalDoc.id, 'perlu_perbaikan', koreksiNoteInput.trim());
-                  setKoreksiModalDoc(null);
-                  setKoreksiNoteInput('');
-                }}
-                className="px-4 py-2 bg-amber-600 hover:bg-amber-500 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl text-xs font-bold transition-all shadow-md flex items-center space-x-1.5 cursor-pointer"
-              >
-                <Check className="w-3.5 h-3.5" />
-                <span>Simpan Catatan Koreksi</span>
-              </button>
+            <div className="flex items-center justify-between pt-3 border-t border-[#1b3459]">
+              <div>
+                {koreksiModalDoc.statusVerifikasi === 'perlu_perbaikan' && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleVerifyDocument(koreksiModalDoc.id, 'menunggu', '');
+                      setKoreksiModalDoc(null);
+                      setKoreksiNoteInput('');
+                    }}
+                    className="px-3 py-1.5 bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 border border-rose-800/40 rounded-xl text-xs font-semibold transition-colors cursor-pointer"
+                  >
+                    Hapus Status Perbaikan
+                  </button>
+                )}
+              </div>
+              <div className="flex items-center space-x-2">
+                <button
+                  type="button"
+                  onClick={() => setKoreksiModalDoc(null)}
+                  className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-semibold transition-colors cursor-pointer"
+                >
+                  Batal
+                </button>
+                <button
+                  type="button"
+                  disabled={!koreksiNoteInput.trim()}
+                  onClick={() => {
+                    if (!koreksiModalDoc) return;
+                    handleVerifyDocument(koreksiModalDoc.id, 'perlu_perbaikan', koreksiNoteInput.trim());
+                    setKoreksiModalDoc(null);
+                    setKoreksiNoteInput('');
+                  }}
+                  className="px-4 py-2 bg-amber-600 hover:bg-amber-500 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl text-xs font-bold transition-all shadow-md flex items-center space-x-1.5 cursor-pointer"
+                >
+                  <Check className="w-3.5 h-3.5" />
+                  <span>Simpan Catatan Koreksi</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
