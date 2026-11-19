@@ -727,7 +727,6 @@ export const PengajuanBaruView: React.FC<PengajuanBaruViewProps> = ({
       console.error('Backend permohonan create error:', err);
       const errMsg = err?.response?.data?.message || err?.message || 'Gagal menyimpan pengajuan ke server';
       alert(`Peringatan server: ${errMsg}`);
-      setIsSubmitting(false);
       setIsSendingEmail(false);
       return; // Berhenti jika gagal menyimpan ke server agar data form tidak hilang
     }

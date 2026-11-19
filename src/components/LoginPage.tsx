@@ -407,7 +407,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                   onClick={onGoToRegister}
                   className="text-[#D4AF37] hover:underline font-bold inline-flex items-center space-x-1 cursor-pointer"
                 >
-                  <span>Daftar Akun Baru</span>
+                  <span>Ajukan Akun Baru</span>
                 </button>
               </p>
             </div>
