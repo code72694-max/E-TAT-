@@ -97,10 +97,12 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
     if (isPengajuRole) {
       return (
         p.pengajuId === currentUser.id ||
+        (p.pengajuEmail && currentUser.email && p.pengajuEmail.toLowerCase() === currentUser.email.toLowerCase()) ||
         (p.pengajuNama && p.pengajuNama.toLowerCase().includes((currentUser.name || '').toLowerCase())) ||
         (p.perkara?.namaPenyidik && p.perkara.namaPenyidik.toLowerCase().includes((currentUser.name || '').toLowerCase())) ||
         (p.instansiPengaju && currentUser.agency && p.instansiPengaju.toLowerCase().includes(currentUser.agency.toLowerCase())) ||
-        (p.instansiPengaju && currentUser.instansi && p.instansiPengaju.toLowerCase().includes(currentUser.instansi.toLowerCase()))
+        (p.instansiPengaju && currentUser.instansi && p.instansiPengaju.toLowerCase().includes(currentUser.instansi.toLowerCase())) ||
+        Boolean(p.tindakLanjutDiteruskan)
       );
     }
     if (isMedisRole) {
@@ -115,13 +117,20 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
     const isSubmitted = p.applicationStatus !== 'DRAFT';
     const isSidangBeres = p.sidangPleno?.statusPleno === 'selesai_sepakat' ||
       (p.sidangPleno?.statusPleno as string) === 'SELESAI' ||
+      (p.sidangPleno?.statusPleno as string) === 'selesai' ||
       (p.plenoAssesmen?.statusPleno as string) === 'SELESAI' ||
       Boolean(p.sidangPleno?.nomorBeritaAcara) ||
+      Boolean(p.sidangPleno?.fileBeritaAcaraSigned) ||
+      Boolean(p.tindakLanjutDiteruskan) ||
       !!p.rekomendasiResmi ||
       p.applicationStatus === 'READY_FOR_CONFERENCE' ||
+      p.applicationStatus === 'CONFERENCE_HELD' ||
       p.applicationStatus === 'AWAITING_SIGNED_OUTPUTS' ||
       p.applicationStatus === 'OUTCOME_RECORDED_FOR_DRAFT' ||
+      p.applicationStatus === 'RESULTS_ISSUED' ||
       p.statusProsesUtama === 'pengesahan_rekomendasi' ||
+      p.statusProsesUtama === 'rekomendasi_terbit' ||
+      p.statusProsesUtama === 'selesai_tindak_lanjut' ||
       p.statusProsesUtama === 'siap_pleno' ||
       !!p.monitoringTindakLanjut ||
       !!p.pengawasanKlien;

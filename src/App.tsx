@@ -304,10 +304,49 @@ export default function App() {
             };
           }
 
+          // Restore follow-up & tracking code overlay from localStorage if available
+          let isTlDiteruskan = p.tindakLanjutDiteruskan;
+          let kodeLacak = p.kodeLacakRehab;
+          let storedTl = p.tindakLanjut;
+          let storedPgw = p.pengawasanKlien;
+          let storedMon = p.monitoringTindakLanjut;
+
+          try {
+            if (localStorage.getItem(`etat_tl_diteruskan_${p.id}`) === 'true' || localStorage.getItem(`etat_tl_diteruskan_${p.nomorPermohonan}`) === 'true') {
+              isTlDiteruskan = true;
+            }
+            const localKode = localStorage.getItem(`etat_kode_lacak_${p.id}`) || localStorage.getItem(`etat_kode_lacak_${p.nomorPermohonan}`);
+            if (localKode) {
+              kodeLacak = localKode;
+            }
+            const rawTl = localStorage.getItem(`etat_tl_${p.id}`);
+            if (rawTl) {
+              storedTl = { ...(storedTl || {}), ...JSON.parse(rawTl) };
+            }
+            const rawPgw = localStorage.getItem(`etat_pgw_${p.id}`);
+            if (rawPgw) {
+              storedPgw = { ...(storedPgw || {}), ...JSON.parse(rawPgw) };
+            }
+            const rawMon = localStorage.getItem(`etat_mon_${p.id}`);
+            if (rawMon) {
+              storedMon = JSON.parse(rawMon);
+            }
+          } catch {}
+
+          if (isTlDiteruskan && !kodeLacak) {
+            kodeLacak = `RHB-${p.id.slice(-6).toUpperCase()}`;
+          }
+
           return {
             ...p,
-            statusProsesUtama: computedStatusProsesUtama,
+            statusProsesUtama: isTlDiteruskan ? 'selesai_tindak_lanjut' : computedStatusProsesUtama,
             sidangPleno: pleno,
+            tindakLanjutDiteruskan: isTlDiteruskan,
+            kodeLacakRehab: kodeLacak || p.kodeLacakRehab,
+            nomorSuratPengantarTersangka: p.nomorSuratPengantarTersangka || (storedTl as any)?.nomorSuratRujukan,
+            tindakLanjut: storedTl,
+            pengawasanKlien: storedPgw,
+            monitoringTindakLanjut: storedMon,
           };
         });
         setPermohonanList(fetchedData);

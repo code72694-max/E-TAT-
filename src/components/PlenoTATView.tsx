@@ -88,6 +88,21 @@ export const PlenoTATView: React.FC<PlenoTATViewProps> = ({
       ]
     };
 
+    try {
+      localStorage.setItem(`etat_tl_diteruskan_${item.id}`, 'true');
+      localStorage.setItem(`etat_tl_diteruskan_${item.nomorPermohonan}`, 'true');
+      localStorage.setItem(`etat_kode_lacak_${item.id}`, kodeLacak);
+      localStorage.setItem(`etat_kode_lacak_${item.nomorPermohonan}`, kodeLacak);
+      if (updated.tindakLanjut) {
+        localStorage.setItem(`etat_tl_${item.id}`, JSON.stringify(updated.tindakLanjut));
+      }
+      if (updated.pengawasanKlien) {
+        localStorage.setItem(`etat_pgw_${item.id}`, JSON.stringify(updated.pengawasanKlien));
+      }
+    } catch (e) {
+      console.warn("Storage sync notice:", e);
+    }
+
     if (onUpdatePermohonan) {
       onUpdatePermohonan(updated);
     }
@@ -268,6 +283,11 @@ export const PlenoTATView: React.FC<PlenoTATViewProps> = ({
           peranTitle={currentUser.position || (currentUser.role?.toUpperCase() === 'HUKUM' ? 'Tim Asesor Hukum TAT' : 'Tim Asesor Medis TAT')}
           onSaveSignature={async (file) => {
             await handleUploadBA(uploadTtdItem.id, file);
+          }}
+          onOpenSuratPengantar={() => {
+            const currentItem = permohonanList.find(p => p.id === uploadTtdItem.id) || uploadTtdItem;
+            setUploadTtdItem(null);
+            setSuratPengantarItem(currentItem);
           }}
           onOpenBeritaAcara={() => {
             const currentItem = permohonanList.find(p => p.id === uploadTtdItem.id) || uploadTtdItem;
@@ -453,7 +473,7 @@ export const PlenoTATView: React.FC<PlenoTATViewProps> = ({
                 <div className="flex flex-wrap items-center justify-between gap-2.5 pt-2 border-t border-slate-800/70">
                   {/* Left: Status / Aksi Teruskan ke Tindak Lanjut */}
                   <div>
-                    {hasSignedBA && !isHukum && (
+                    {hasSignedBA && (
                       isDiteruskan ? (
                         <span className="inline-flex items-center gap-1.5 text-xs text-emerald-400 font-medium bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-lg">
                           <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
@@ -478,7 +498,7 @@ export const PlenoTATView: React.FC<PlenoTATViewProps> = ({
                   {/* Right: Unified Action Buttons */}
                   <div className="flex items-center gap-2 flex-wrap">
                     {/* Dokumen Surat Tersangka */}
-                    {hasSignedBA && !isHukum && (
+                    {hasSignedBA && (
                       <button
                         type="button"
                         onClick={(e) => {
@@ -493,27 +513,25 @@ export const PlenoTATView: React.FC<PlenoTATViewProps> = ({
                     )}
 
                     {/* Berita Acara (Satu Tombol Jelas) */}
-                    {!isHukum && (
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          const fullItem = {
-                            ...item,
-                            sidangPleno: {
-                              ...(item.sidangPleno || {}),
-                              fileBeritaAcaraSigned: signatureUrl || item.sidangPleno?.fileBeritaAcaraSigned,
-                              ttdHukumUrl: signatureUrl || (item.sidangPleno as any)?.ttdHukumUrl,
-                            } as any
-                          };
-                          setBaPermohonan(fullItem);
-                        }}
-                        className="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-750 text-slate-200 hover:text-white border border-slate-700 flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
-                      >
-                        <Eye className="w-3.5 h-3.5 text-slate-400" />
-                        <span>{hasSignedBA ? 'Lihat Berita Acara (TTD)' : 'Draft Berita Acara'}</span>
-                      </button>
-                    )}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const fullItem = {
+                          ...item,
+                          sidangPleno: {
+                            ...(item.sidangPleno || {}),
+                            fileBeritaAcaraSigned: signatureUrl || item.sidangPleno?.fileBeritaAcaraSigned,
+                            ttdHukumUrl: signatureUrl || (item.sidangPleno as any)?.ttdHukumUrl,
+                          } as any
+                        };
+                        setBaPermohonan(fullItem);
+                      }}
+                      className="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-750 text-slate-200 hover:text-white border border-slate-700 flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
+                    >
+                      <Eye className="w-3.5 h-3.5 text-slate-400" />
+                      <span>{hasSignedBA ? 'Lihat Berita Acara (TTD)' : 'Draft Berita Acara'}</span>
+                    </button>
 
                     {/* Unggah / Ubah TTD */}
                     <button
@@ -542,23 +560,21 @@ export const PlenoTATView: React.FC<PlenoTATViewProps> = ({
                     </button>
 
                     {/* Input Pleno / Revisi */}
-                    {!isHukum && (
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setFormPlenoItem(item);
-                        }}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer shadow-sm ${
-                          !item.sidangPleno?.kesepakatanRekomendasi
-                            ? 'bg-blue-600 hover:bg-blue-500 text-white border border-blue-500/30'
-                            : 'bg-slate-800 hover:bg-slate-750 text-slate-300 hover:text-white border border-slate-700'
-                        }`}
-                      >
-                        <Edit className="w-3.5 h-3.5" />
-                        <span>{!item.sidangPleno?.kesepakatanRekomendasi ? 'Input Hasil Pleno' : 'Revisi'}</span>
-                      </button>
-                    )}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setFormPlenoItem(item);
+                      }}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer shadow-sm ${
+                        !item.sidangPleno?.kesepakatanRekomendasi
+                          ? 'bg-blue-600 hover:bg-blue-500 text-white border border-blue-500/30'
+                          : 'bg-slate-800 hover:bg-slate-750 text-slate-300 hover:text-white border border-slate-700'
+                      }`}
+                    >
+                      <Edit className="w-3.5 h-3.5" />
+                      <span>{!item.sidangPleno?.kesepakatanRekomendasi ? 'Input Hasil Pleno' : 'Revisi'}</span>
+                    </button>
                   </div>
                 </div>
               </div>

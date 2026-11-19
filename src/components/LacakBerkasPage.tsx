@@ -273,20 +273,24 @@ export const LacakBerkasPage: React.FC<LacakBerkasPageProps> = ({
       return;
     }
 
-    // 2. Jika ada id spesifik dan belum ada di memory, coba ambil dari API backend
-    if (idFromUrl && !idFromUrl.startsWith('riwayat-')) {
+    // 2. Jika belum ada di memory, coba ambil dari API backend
+    const lookupParam = idFromUrl || qFromUrl || nomorFromUrl || trackFromUrl;
+    if (lookupParam && !lookupParam.startsWith('riwayat-')) {
       import('../services/api').then(({ permohonanApi }) => {
-        permohonanApi.getById(idFromUrl).then(res => {
+        const fetcher = idFromUrl ? permohonanApi.getById(idFromUrl) : permohonanApi.lacak(lookupParam);
+        fetcher.then(res => {
           if (res && res.data) {
             setSelectedPermohonan(res.data);
+            setSearchQuery(lookupParam);
+            setHasSearched(true);
           }
         }).catch(() => {
-          setSearchQuery(idFromUrl || nomorFromUrl || trackFromUrl || '');
+          setSearchQuery(lookupParam);
           setHasSearched(true);
         });
       });
     } else {
-      setSearchQuery(nomorFromUrl || trackFromUrl || idFromUrl || '');
+      setSearchQuery(nomorFromUrl || trackFromUrl || idFromUrl || qFromUrl || '');
       setHasSearched(true);
     }
   }, [permohonanList]);
