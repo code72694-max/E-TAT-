@@ -35,7 +35,7 @@ export const ModalKonfirmasiFinalisasiHukum: React.FC<ModalKonfirmasiFinalisasiH
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-[#1b3459] bg-[#0c1a30]/80">
           <div className="flex items-center space-x-3">
-            <div className="p-2 bg-gradient-to-br from-blue-600/30 to-amber-600/30 border border-blue-500/40 rounded-xl text-amber-400">
+            <div className="p-2.5 bg-[#0e213d] border border-[#2d7ad6]/50 rounded-xl text-[#d4af37] shadow-inner">
               <Scale className="w-5 h-5 text-[#d4af37]" />
             </div>
             <div>
