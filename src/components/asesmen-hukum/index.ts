@@ -9,3 +9,4 @@ export * from './Step4SindikatResidivis';
 export * from './Step5RekomendasiPleno';
 export * from './Step6PengesahanResume';
 export * from './HukumCaseList';
+export * from './ModalKonfirmasiFinalisasiHukum';

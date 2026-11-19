@@ -1,7 +1,7 @@
 import React from 'react';
 import { MedisFormData, UrinTestItem } from './types';
 import { UserProfile } from '../../types';
-import { FileSignature, CheckCircle2, Save } from 'lucide-react';
+import { FileSignature, CheckCircle2, Save, Loader2 } from 'lucide-react';
 
 interface Step6PengesahanResumeProps {
   formData: MedisFormData;
@@ -10,6 +10,8 @@ interface Step6PengesahanResumeProps {
   calculatedAssistScore: number;
   assistRiskLevel: string;
   isReadOnlyView: boolean;
+  isSaving?: boolean;
+  savingAction?: 'draft' | 'finalize' | null;
   onCloseCase: () => void;
   onSaveDraft: () => void;
   onFinalize: () => void;
@@ -22,6 +24,8 @@ export const Step6PengesahanResume: React.FC<Step6PengesahanResumeProps> = ({
   calculatedAssistScore,
   assistRiskLevel,
   isReadOnlyView,
+  isSaving = false,
+  savingAction = null,
   onCloseCase,
   onSaveDraft,
   onFinalize
@@ -85,19 +89,39 @@ export const Step6PengesahanResume: React.FC<Step6PengesahanResumeProps> = ({
           <div className="flex items-center space-x-2 w-full sm:w-auto">
             <button
               type="button"
+              disabled={isSaving}
               onClick={onSaveDraft}
-              className="flex-1 sm:flex-none px-4 py-2.5 bg-[#142642] hover:bg-[#1b3459] text-slate-200 border border-[#234475] rounded-xl text-xs font-bold flex items-center justify-center space-x-2 transition-colors cursor-pointer"
+              className="flex-1 sm:flex-none px-4 py-2.5 bg-[#142642] hover:bg-[#1b3459] text-slate-200 border border-[#234475] rounded-xl text-xs font-bold flex items-center justify-center space-x-2 transition-colors disabled:opacity-50 cursor-pointer"
             >
-              <Save className="w-4 h-4 text-slate-300" />
-              <span>Simpan Draf Medis</span>
+              {isSaving && savingAction === 'draft' ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin text-slate-300" />
+                  <span>Menyimpan Draf...</span>
+                </>
+              ) : (
+                <>
+                  <Save className="w-4 h-4 text-slate-300" />
+                  <span>Simpan Draf Medis</span>
+                </>
+              )}
             </button>
             <button
               type="button"
+              disabled={isSaving}
               onClick={onFinalize}
-              className="flex-1 sm:flex-none px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold rounded-xl text-xs flex items-center justify-center space-x-2 shadow-lg shadow-emerald-950/50 transition-all cursor-pointer"
+              className="flex-1 sm:flex-none px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold rounded-xl text-xs flex items-center justify-center space-x-2 shadow-lg shadow-emerald-950/50 transition-all disabled:opacity-50 cursor-pointer"
             >
-              <CheckCircle2 className="w-4 h-4" />
-              <span>Finalisasi &amp; Teruskan ke Pleno</span>
+              {isSaving && savingAction === 'finalize' ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin text-white" />
+                  <span>Memfinalisasi Medis...</span>
+                </>
+              ) : (
+                <>
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>Finalisasi &amp; Teruskan ke Pleno</span>
+                </>
+              )}
             </button>
           </div>
         </div>

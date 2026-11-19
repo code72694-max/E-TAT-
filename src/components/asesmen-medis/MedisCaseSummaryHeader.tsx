@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { PermohonanAsesmen } from '../../types';
-import { Stethoscope, Package, Shield, CheckCircle2 } from 'lucide-react';
+import { Stethoscope, Package, Shield, CheckCircle2, FileText, ChevronDown, ChevronUp } from 'lucide-react';
 
 interface MedisCaseSummaryHeaderProps {
   selectedCase: PermohonanAsesmen;
@@ -17,6 +17,7 @@ export const MedisCaseSummaryHeader: React.FC<MedisCaseSummaryHeaderProps> = ({
   saveFeedback,
   onOpenDokumenModal
 }) => {
+  const [showDetailPerkara, setShowDetailPerkara] = useState<boolean>(false);
   return (
     <div className="space-y-4">
       {/* Top Navigation & Case Summary Header */}
@@ -32,6 +33,15 @@ export const MedisCaseSummaryHeader: React.FC<MedisCaseSummaryHeaderProps> = ({
           </div>
 
           <div className="flex items-center space-x-2">
+            <button
+              type="button"
+              onClick={() => setShowDetailPerkara(!showDetailPerkara)}
+              className="px-3 py-1.5 bg-[#142642] hover:bg-[#1b3459] border border-[#234475] rounded-xl text-xs font-semibold text-slate-200 flex items-center space-x-1.5 transition-colors cursor-pointer"
+            >
+              <FileText className="w-3.5 h-3.5 text-amber-400" />
+              <span>Detail Kasus</span>
+              {showDetailPerkara ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+            </button>
             <button
               type="button"
               onClick={onOpenDokumenModal}
@@ -82,6 +92,34 @@ export const MedisCaseSummaryHeader: React.FC<MedisCaseSummaryHeaderProps> = ({
             </div>
           </div>
         </div>
+
+        {/* Collapsible Detail Perkara Awal */}
+        {showDetailPerkara && (
+          <div className="pt-3 border-t border-[#1b3459] bg-[#050e1c] p-3.5 rounded-xl space-y-2 text-xs animate-in fade-in">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <span className="text-[10px] uppercase font-bold text-slate-400 block">Tempat Kejadian Perkara (TKP)</span>
+                <span className="text-slate-200 text-[11px]">{selectedCase.perkara.tempatKejadianPerkara || '-'}</span>
+              </div>
+              <div>
+                <span className="text-[10px] uppercase font-bold text-slate-400 block">Waktu Penangkapan</span>
+                <span className="text-slate-200 text-[11px] font-mono">{selectedCase.perkara.tanggalWaktuPenangkapan || '-'}</span>
+              </div>
+              <div>
+                <span className="text-[10px] uppercase font-bold text-slate-400 block">Pasal Sangkaan</span>
+                <span className="text-amber-300 text-[11px] font-mono">{selectedCase.perkara.pasalDipersangkakan || '-'}</span>
+              </div>
+            </div>
+            {selectedCase.perkara.kronologiSingkat && (
+              <div className="pt-2 border-t border-[#1b3459]/60">
+                <span className="text-[10px] uppercase font-bold text-slate-400 block mb-0.5">Kronologi Singkat Penangkapan:</span>
+                <p className="text-slate-300 text-[11px] leading-relaxed italic bg-[#081224] p-2.5 rounded-lg border border-[#1b3459]/40">
+                  "{selectedCase.perkara.kronologiSingkat}"
+                </p>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Read-Only Status Banner */}

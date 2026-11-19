@@ -1,5 +1,5 @@
 import React from 'react';
-import { FileSignature, CheckCircle2, Save } from 'lucide-react';
+import { FileSignature, CheckCircle2, Save, Loader2 } from 'lucide-react';
 import { UserProfile } from '../../types';
 import { FormDataHukum, FaktaItem } from './types';
 
@@ -8,6 +8,7 @@ interface Step6PengesahanResumeProps {
   faktaList: FaktaItem[];
   currentUser: UserProfile;
   isReadOnlyView: boolean;
+  isSaving?: boolean;
   onSaveDraft: () => void;
   onFinalize: () => void;
   onCloseCase: () => void;
@@ -18,6 +19,7 @@ export const Step6PengesahanResume: React.FC<Step6PengesahanResumeProps> = ({
   faktaList,
   currentUser,
   isReadOnlyView,
+  isSaving = false,
   onSaveDraft,
   onFinalize,
   onCloseCase,
@@ -81,18 +83,20 @@ export const Step6PengesahanResume: React.FC<Step6PengesahanResumeProps> = ({
           <div className="flex items-center space-x-2 w-full sm:w-auto">
             <button
               type="button"
+              disabled={isSaving}
               onClick={onSaveDraft}
-              className="flex-1 sm:flex-none px-4 py-2.5 bg-[#142642] hover:bg-[#1b3459] text-slate-200 border border-[#234475] rounded-xl text-xs font-bold flex items-center justify-center space-x-2 transition-colors cursor-pointer"
+              className="flex-1 sm:flex-none px-4 py-2.5 bg-[#142642] hover:bg-[#1b3459] text-slate-200 border border-[#234475] rounded-xl text-xs font-bold flex items-center justify-center space-x-2 transition-colors disabled:opacity-50 cursor-pointer"
             >
-              <Save className="w-4 h-4 text-slate-300" />
-              <span>Simpan Draf Hukum</span>
+              {isSaving ? <Loader2 className="w-4 h-4 animate-spin text-slate-300" /> : <Save className="w-4 h-4 text-slate-300" />}
+              <span>{isSaving ? 'Menyimpan...' : 'Simpan Draf Hukum'}</span>
             </button>
             <button
               type="button"
+              disabled={isSaving}
               onClick={onFinalize}
-              className="flex-1 sm:flex-none px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-xl text-xs flex items-center justify-center space-x-2 shadow-lg shadow-blue-950/50 transition-all cursor-pointer"
+              className="flex-1 sm:flex-none px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-xl text-xs flex items-center justify-center space-x-2 shadow-lg shadow-blue-950/50 transition-all disabled:opacity-50 cursor-pointer"
             >
-              <CheckCircle2 className="w-4 h-4" />
+              <CheckCircle2 className="w-4 h-4 text-emerald-300" />
               <span>Finalisasi &amp; Teruskan ke Pleno</span>
             </button>
           </div>

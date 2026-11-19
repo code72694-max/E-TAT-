@@ -18,6 +18,7 @@ import {
   Step5RekomendasiPleno,
   Step6PengesahanResume,
   HukumCaseList,
+  ModalKonfirmasiFinalisasiHukum,
 } from './asesmen-hukum';
 
 export const AsesmenHukumView: React.FC<AsesmenHukumViewProps> = ({
@@ -39,6 +40,8 @@ export const AsesmenHukumView: React.FC<AsesmenHukumViewProps> = ({
   const [validationModal, setValidationModal] = useState<ValidationModalState | null>(null);
   const [customFaktaInput, setCustomFaktaInput] = useState<string>('');
   const [showAddFakta, setShowAddFakta] = useState<boolean>(false);
+  const [showConfirmFinalizeModal, setShowConfirmFinalizeModal] = useState<boolean>(false);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
 
   const selectedCase = permohonanList.find(p => p.id === selectedCaseId);
 
@@ -317,13 +320,17 @@ export const AsesmenHukumView: React.FC<AsesmenHukumViewProps> = ({
       }
     }
 
-    if (window.confirm('Apakah Anda yakin ingin menyelesaikan dan memfinalisasi Asesmen Hukum ini? Berkas akan diteruskan ke Sidang Pleno TAT dan berpindah ke Riwayat Hukum.')) {
-      handleSaveLegalForm(true);
-    }
+    setShowConfirmFinalizeModal(true);
+  };
+
+  const handleConfirmFinalize = async () => {
+    await handleSaveLegalForm(true);
+    setShowConfirmFinalizeModal(false);
   };
 
   const handleSaveLegalForm = async (isFinal: boolean) => {
     if (!selectedCase || isReadOnlyView) return;
+    setIsSaving(true);
 
     let updated: PermohonanAsesmen = { ...selectedCase };
     const now = new Date().toLocaleDateString('id-ID') + ' ' + new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
@@ -435,6 +442,7 @@ export const AsesmenHukumView: React.FC<AsesmenHukumViewProps> = ({
     }
 
     setSaveFeedback(isFinal ? '✅ Asesmen Hukum Berhasil Difinalisasi & Berpindah ke Riwayat Asesmen Hukum!' : '💾 Draf Asesmen Hukum Berhasil Disimpan!');
+    setIsSaving(false);
 
     if (isFinal) {
       setTimeout(() => {
@@ -581,6 +589,7 @@ export const AsesmenHukumView: React.FC<AsesmenHukumViewProps> = ({
             faktaList={faktaList}
             currentUser={currentUser}
             isReadOnlyView={isReadOnlyView}
+            isSaving={isSaving}
             onSaveDraft={() => handleSaveLegalForm(false)}
             onFinalize={handleFinalizeClick}
             onCloseCase={handleCloseCase}
@@ -591,6 +600,19 @@ export const AsesmenHukumView: React.FC<AsesmenHukumViewProps> = ({
         <HukumValidationModal
           modalState={validationModal}
           onClose={() => setValidationModal(null)}
+        />
+
+        {/* Modal: Konfirmasi Finalisasi Berkas Hukum */}
+        <ModalKonfirmasiFinalisasiHukum
+          isOpen={showConfirmFinalizeModal}
+          onClose={() => setShowConfirmFinalizeModal(false)}
+          onConfirm={handleConfirmFinalize}
+          nomorPermohonan={selectedCase.nomorPermohonan}
+          namaTerperiksa={selectedCase.terperiksa.namaLengkap}
+          nomorLp={formData.nomorLp || selectedCase.perkara.nomorLaporanPolisi}
+          analisisPeran={formData.analisisPeran}
+          rekomendasiHukum={formData.rekomendasiHukum}
+          isSubmitting={isSaving}
         />
 
         {/* Modal: Lihat Dokumen & Barang Bukti */}

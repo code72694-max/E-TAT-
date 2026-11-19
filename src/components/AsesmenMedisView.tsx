@@ -46,6 +46,8 @@ export const AsesmenMedisView: React.FC<AsesmenMedisViewProps> = ({
   const [saveFeedback, setSaveFeedback] = useState<string | null>(null);
   const [showDokumenModal, setShowDokumenModal] = useState<boolean>(false);
   const [validationModal, setValidationModal] = useState<ValidationModalState | null>(null);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [savingAction, setSavingAction] = useState<'draft' | 'finalize' | null>(null);
 
   const selectedCase = permohonanList.find(p => p.id === selectedCaseId);
 
@@ -317,6 +319,9 @@ export const AsesmenMedisView: React.FC<AsesmenMedisViewProps> = ({
   const handleSaveMedicalForm = async (isFinal: boolean) => {
     if (!selectedCase) return;
 
+    setIsSaving(true);
+    setSavingAction(isFinal ? 'finalize' : 'draft');
+
     let updated: PermohonanAsesmen = { ...selectedCase };
     const now = new Date().toLocaleDateString('id-ID') + ' ' + new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
 
@@ -435,6 +440,8 @@ export const AsesmenMedisView: React.FC<AsesmenMedisViewProps> = ({
     }
 
     setSaveFeedback(isFinal ? '✅ Asesmen Medis Berhasil Difinalisasi & Berpindah ke Riwayat Asesmen Medis!' : '💾 Draf Asesmen Medis Berhasil Disimpan!');
+    setIsSaving(false);
+    setSavingAction(null);
 
     if (isFinal) {
       setTimeout(() => {
@@ -551,6 +558,8 @@ export const AsesmenMedisView: React.FC<AsesmenMedisViewProps> = ({
             calculatedAssistScore={calculatedAssistScore}
             assistRiskLevel={assistRiskLevel}
             isReadOnlyView={isReadOnlyView || false}
+            isSaving={isSaving}
+            savingAction={savingAction}
             onCloseCase={handleCloseCase}
             onSaveDraft={() => handleSaveMedicalForm(false)}
             onFinalize={handleFinalizeClick}
