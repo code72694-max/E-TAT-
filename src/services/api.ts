@@ -284,10 +284,16 @@ export const permohonanApi = {
     });
   },
 
-  mintaPerbaikan: async (id: string, catatanKoreksi: string) => {
+  mintaPerbaikan: async (
+    id: string,
+    payload: string | { catatanPerbaikan?: string; catatanKoreksi?: string; dokumenPerluDiperbaiki?: { dokumenId: string; catatanKoreksi: string; nama?: string; kode?: string }[] }
+  ) => {
+    const body = typeof payload === 'string'
+      ? { catatanPerbaikan: payload, catatanKoreksi: payload, dokumenPerluDiperbaiki: [] }
+      : payload;
     return request<PermohonanAsesmen>(`/permohonan/${id}/minta-perbaikan`, {
       method: 'POST',
-      body: JSON.stringify({ catatanKoreksi }),
+      body: JSON.stringify(body),
     });
   },
 

@@ -18,7 +18,8 @@ import {
   FileQuestion,
   Check,
   AlertCircle,
-  X
+  X,
+  RefreshCw
 } from 'lucide-react';
 import { permohonanApi } from '../../services/api';
 import { sendCorrectionEmailNotification } from '../../services/emailService';
@@ -45,6 +46,7 @@ export const TabAdministrasi: React.FC<TabAdministrasiProps> = ({
   const [koreksiModalDoc, setKoreksiModalDoc] = useState<DokumenPersyaratan | null>(null);
   const [koreksiNoteInput, setKoreksiNoteInput] = useState<string>('');
   const [emailBanner, setEmailBanner] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [isSendingCorrection, setIsSendingCorrection] = useState(false);
 
   // Tentukan template dokumen berdasarkan jenis pengajuan & keberadaan barang bukti
   const effectiveJenisPengajuan = useMemo(() => {
@@ -139,14 +141,38 @@ export const TabAdministrasi: React.FC<TabAdministrasiProps> = ({
 
   // Statistik kelengkapan berkas
   const mandatoryDocs = docs.filter(d => d.wajib);
-  const validDocsCount = docs.filter(d => d.statusVerifikasi === 'sesuai').length;
+  const validDocsCount = docs.filter(d => d.statusVerifikasi === 'sesuai' && Boolean(d.fileUrl || d.fileName)).length;
   const invalidDocsCount = docs.filter(d => d.statusVerifikasi === 'perlu_perbaikan').length;
-  const missingDocsCount = docs.filter(d => d.statusVerifikasi === 'belum_diunggah' || !d.fileUrl).length;
+  const missingDocsCount = docs.filter(d => d.statusVerifikasi === 'belum_diunggah' || (!d.fileUrl && !d.fileName)).length;
   const totalMandatoryCount = mandatoryDocs.length;
-  const validMandatoryCount = mandatoryDocs.filter(d => d.statusVerifikasi === 'sesuai').length;
+  const validMandatoryCount = mandatoryDocs.filter(d => d.statusVerifikasi === 'sesuai' && Boolean(d.fileUrl || d.fileName)).length;
   const percentComplete = Math.round((validMandatoryCount / (totalMandatoryCount || 1)) * 100);
 
+  // Dokumen yang belum disentuh / belum diperiksa sama sekali (belum diceklis dan belum diberi warning)
+  const unreviewedDocs = docs.filter(
+    d => d.statusVerifikasi !== 'sesuai' && d.statusVerifikasi !== 'perlu_perbaikan'
+  );
+  const isAllReviewed = unreviewedDocs.length === 0;
+
+  // Apakah ada minimal satu dokumen yang butuh perbaikan
+  const hasNeedsCorrection = docs.some(d => d.statusVerifikasi === 'perlu_perbaikan');
+
+  // Apakah semua dokumen wajib sudah sesuai dan benar-benar memiliki file
+  const allMandatoryApproved = mandatoryDocs.length > 0 && mandatoryDocs.every(
+    d => d.statusVerifikasi === 'sesuai' && Boolean(d.fileUrl || d.fileName)
+  );
+  const isFullyApproved = allMandatoryApproved && isAllReviewed;
+  const canSendCorrection = isAllReviewed && hasNeedsCorrection;
+
   const handleVerifyDocument = async (docId: string, status: StatusVerifikasiDokumen, note?: string) => {
+    const targetDoc = docs.find(d => d.id === docId);
+    const hasFile = Boolean(targetDoc?.fileUrl || targetDoc?.fileName);
+
+    if (status === 'sesuai' && !hasFile) {
+      alert(`Peringatan: Dokumen "${targetDoc?.nama || 'ini'}" belum dilampirkan oleh penyidik. Berkas fisik/digital wajib diunggah terlebih dahulu sebelum dapat diceklis.`);
+      return;
+    }
+
     const updatedDocs = docs.map(doc => {
       if (doc.id === docId) {
         return {
@@ -159,7 +185,7 @@ export const TabAdministrasi: React.FC<TabAdministrasiProps> = ({
     });
 
     const hasErrors = updatedDocs.some(d => d.wajib && d.statusVerifikasi === 'perlu_perbaikan');
-    const allApproved = updatedDocs.filter(d => d.wajib).every(d => d.statusVerifikasi === 'sesuai');
+    const allApproved = updatedDocs.filter(d => d.wajib).every(d => d.statusVerifikasi === 'sesuai' && Boolean(d.fileUrl || d.fileName));
 
     const updated: PermohonanAsesmen = {
       ...permohonan,
@@ -425,13 +451,28 @@ export const TabAdministrasi: React.FC<TabAdministrasiProps> = ({
                   {!effectiveReadonly && (
                     <div className="flex items-center space-x-1.5 pl-2 border-l border-[#1b3459]">
                       <button
-                        onClick={() => handleVerifyDocument(doc.id, 'sesuai')}
-                        className={`p-1.5 rounded-lg border transition-colors cursor-pointer ${
-                          isApproved
-                            ? 'bg-emerald-600 text-white border-emerald-500'
-                            : 'bg-slate-800 hover:bg-emerald-950/40 text-slate-300 hover:text-emerald-300 border-slate-700'
+                        onClick={() => {
+                          if (!hasFile) {
+                            alert(`Peringatan: Dokumen "${doc.nama}" belum dilampirkan oleh penyidik. Berkas fisik/digital wajib diunggah terlebih dahulu sebelum dapat diceklis.`);
+                            return;
+                          }
+                          handleVerifyDocument(doc.id, 'sesuai');
+                        }}
+                        disabled={!hasFile}
+                        className={`p-1.5 rounded-lg border transition-all ${
+                          !hasFile
+                            ? 'opacity-25 cursor-not-allowed bg-slate-900 border-slate-800 text-slate-600'
+                            : isApproved
+                            ? 'bg-emerald-600 text-white border-emerald-500 shadow-md shadow-emerald-900/30 cursor-pointer'
+                            : 'bg-slate-800 hover:bg-emerald-950/40 text-slate-300 hover:text-emerald-300 border-slate-700 cursor-pointer'
                         }`}
-                        title="Tandai Sesuai & Sah"
+                        title={
+                          !hasFile
+                            ? 'Dokumen belum dilampirkan oleh penyidik - tidak dapat diceklis'
+                            : isApproved
+                            ? 'Dokumen telah diverifikasi Sesuai & Sah'
+                            : 'Tandai Sesuai & Sah'
+                        }
                       >
                         <CheckCircle2 className="w-4 h-4" />
                       </button>
@@ -446,7 +487,11 @@ export const TabAdministrasi: React.FC<TabAdministrasiProps> = ({
                             ? 'bg-amber-600 text-white border-amber-500'
                             : 'bg-slate-800 hover:bg-amber-950/40 text-slate-300 hover:text-amber-300 border-slate-700'
                         }`}
-                        title="Minta Perbaikan / Koreksi Berkas"
+                        title={
+                          !hasFile
+                            ? 'Minta penyidik mengunggah berkas ini'
+                            : 'Minta Perbaikan / Koreksi Berkas'
+                        }
                       >
                         <AlertTriangle className="w-4 h-4" />
                       </button>
@@ -463,18 +508,24 @@ export const TabAdministrasi: React.FC<TabAdministrasiProps> = ({
       {!effectiveReadonly && (
         <div className="p-4 bg-[#081224] border border-[#1b3459] rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xl">
           <div className="text-xs text-slate-400">
-            {percentComplete === 100 ? (
+            {isFullyApproved ? (
               <span className="text-emerald-400 font-semibold flex items-center space-x-1.5">
-                <CheckCircle2 className="w-4 h-4" />
-                <span>Seluruh berkas persyaratan formil ({percentComplete}%) dinyatakan lengkap &amp; valid. Siap disposisi ke penunjukan tim.</span>
+                <CheckCircle2 className="w-4 h-4 shrink-0" />
+                <span>Seluruh berkas persyaratan formil (100%) dinyatakan lengkap &amp; valid. Siap disposisi ke penunjukan tim.</span>
+              </span>
+            ) : !isAllReviewed ? (
+              <span className="text-slate-300 font-medium flex items-center space-x-1.5">
+                <AlertCircle className="w-4 h-4 text-amber-400 shrink-0" />
+                <span>
+                  Masih ada <strong className="text-amber-300 font-bold">{unreviewedDocs.length} dokumen</strong> yang belum diperiksa.
+                  Berikan tanda <strong className="text-emerald-400">ceklis (Sesuai)</strong> atau <strong className="text-amber-400">warning (Perlu Perbaikan)</strong> pada setiap berkas sebelum mengirim perintah perbaikan.
+                </span>
               </span>
             ) : (
               <span className="text-amber-400 font-semibold flex items-center space-x-1.5">
-                <AlertTriangle className="w-4 h-4" />
+                <AlertTriangle className="w-4 h-4 shrink-0" />
                 <span>
-                  Kelengkapan berkas baru {percentComplete}%.
-                  {invalidDocsCount > 0 && ` Terdapat ${invalidDocsCount} dokumen butuh perbaikan.`}
-                  {missingDocsCount > 0 && ` ${missingDocsCount} dokumen belum dilampirkan penyidik.`}
+                  Seluruh berkas selesai ditinjau. Terdapat {invalidDocsCount} dokumen yang butuh perbaikan oleh penyidik.
                 </span>
               </span>
             )}
@@ -495,11 +546,13 @@ export const TabAdministrasi: React.FC<TabAdministrasiProps> = ({
 
                   if (permohonan.id) {
                     permohonanApi.verifikasi(permohonan.id, {
-                      dokumenStatus: docs.map(d => ({
-                        dokumenId: d.id,
-                        statusVerifikasi: 'sesuai',
-                        catatanKoreksi: '',
-                      }))
+                      dokumenStatus: docs
+                        .filter(d => Boolean(d.fileUrl || d.fileName))
+                        .map(d => ({
+                          dokumenId: d.id,
+                          statusVerifikasi: 'sesuai',
+                          catatanKoreksi: '',
+                        }))
                     }).catch(err => console.warn('Backend verifikasi notice:', err));
 
                     permohonanApi.disposisi(permohonan.id, {
@@ -519,49 +572,83 @@ export const TabAdministrasi: React.FC<TabAdministrasiProps> = ({
               </button>
             ) : (
               <button
+                disabled={!canSendCorrection || isSendingCorrection}
                 onClick={async () => {
-                  const invalidSummary = docs
-                    .filter(d => d.statusVerifikasi === 'perlu_perbaikan')
-                    .map(d => `• [Perbaikan] ${d.nama}: ${d.catatanKoreksi || 'Perlu dilengkapi/diunggah ulang'}`);
-
-                  const missingSummary = docs
-                    .filter(d => d.wajib && (d.statusVerifikasi === 'belum_diunggah' || !d.fileUrl))
-                    .map(d => `• [Belum Ada] ${d.nama}: Wajib diunggah penyidik (${d.keterangan || 'Persyaratan formil'})`);
-
-                  const combinedSummary = [...invalidSummary, ...missingSummary].join('\n');
-
-                  const updated: PermohonanAsesmen = {
-                    ...permohonan,
-                    applicationStatus: 'NEEDS_CORRECTION',
-                    statusProsesUtama: 'perlu_perbaikan',
-                    penanggungJawabBerikutnya: 'Penyidik Pengaju',
-                    tindakanBerikutnyaLabel: `Perlu Perbaikan / Kelengkapan Berkas Permohonan ${permohonan.nomorPermohonan}`,
-                  };
-
-                  onUpdatePermohonan(updated);
-
-                  if (permohonan.id) {
-                    permohonanApi.mintaPerbaikan(permohonan.id, combinedSummary || 'Silakan lengkapi berkas formil persyaratan.').catch(err => {
-                      console.warn('Backend mintaPerbaikan notice:', err);
-                    });
-                  }
-
+                  if (!canSendCorrection) return;
+                  setIsSendingCorrection(true);
                   try {
-                    const res = await sendCorrectionEmailNotification(updated, combinedSummary.replace(/\n/g, '<br/>'));
-                    if (res.success) {
-                      setEmailBanner({
-                        type: 'success',
-                        message: `Perintah perbaikan & kelengkapan berkas telah dikirim ke penyidik via email resmi! (ID: ${res.id})`
+                    const invalidDocsList = docs
+                      .filter(d => d.statusVerifikasi === 'perlu_perbaikan')
+                      .map(d => ({
+                        id: d.id,
+                        nama: d.nama,
+                        kode: d.kode,
+                        catatanKoreksi: d.catatanKoreksi || 'Perlu dilengkapi / diunggah ulang sesuai ketentuan.',
+                      }));
+
+                    const invalidSummary = invalidDocsList
+                      .map(d => `• [Perbaikan] ${d.nama}: ${d.catatanKoreksi}`);
+
+                    const missingSummary = docs
+                      .filter(d => d.wajib && (d.statusVerifikasi === 'belum_diunggah' || (!d.fileUrl && !d.fileName)))
+                      .map(d => `• [Belum Ada] ${d.nama}: Wajib diunggah penyidik (${d.keterangan || 'Persyaratan formil'})`);
+
+                    const combinedSummary = [...invalidSummary, ...missingSummary].join('\n');
+
+                    const updated: PermohonanAsesmen = {
+                      ...permohonan,
+                      applicationStatus: 'NEEDS_CORRECTION',
+                      statusProsesUtama: 'perlu_perbaikan',
+                      penanggungJawabBerikutnya: 'Penyidik Pengaju',
+                      tindakanBerikutnyaLabel: `Perlu Perbaikan / Kelengkapan Berkas Permohonan ${permohonan.nomorPermohonan}`,
+                    };
+
+                    onUpdatePermohonan(updated);
+
+                    if (permohonan.id) {
+                      await permohonanApi.mintaPerbaikan(permohonan.id, {
+                        catatanPerbaikan: combinedSummary || 'Silakan lengkapi berkas formil persyaratan.',
+                        dokumenPerluDiperbaiki: invalidDocsList,
                       });
                     }
-                  } catch (err) {
-                    console.warn('Email notify notice:', err);
+
+                    try {
+                      const res = await sendCorrectionEmailNotification(updated, combinedSummary.replace(/\n/g, '<br/>'));
+                      if (res.success) {
+                        setEmailBanner({
+                          type: 'success',
+                          message: `Perintah perbaikan & kelengkapan berkas telah dikirim ke penyidik via email resmi! (ID: ${res.id})`
+                        });
+                      }
+                    } catch (err) {
+                      console.warn('Email notify notice:', err);
+                    }
+
+                    alert('Perintah perbaikan & kelengkapan berkas berhasil dikirim ke Penyidik!');
+                  } catch (err: any) {
+                    console.error('Gagal mengirim perintah perbaikan:', err);
+                    alert(`Gagal mengirim perintah perbaikan: ${err?.message || err}`);
+                  } finally {
+                    setIsSendingCorrection(false);
                   }
                 }}
-                className="bg-amber-700 hover:bg-amber-600 text-white font-bold text-xs px-4 py-2.5 rounded-xl border border-amber-500 shadow flex items-center space-x-2 cursor-pointer transition-all"
+                className={`font-bold text-xs px-4 py-2.5 rounded-xl border flex items-center space-x-2 transition-all ${
+                  canSendCorrection && !isSendingCorrection
+                    ? 'bg-amber-600 hover:bg-amber-500 text-white border-amber-400 shadow cursor-pointer'
+                    : 'bg-slate-800 text-slate-500 border-slate-700 cursor-not-allowed opacity-50'
+                }`}
               >
-                <Send className="w-4 h-4" />
-                <span>Kirimkan Perintah Perbaikan &amp; Kelengkapan ke Penyidik</span>
+                {isSendingCorrection ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 animate-spin" />
+                    <span>Mengirim Perintah Perbaikan...</span>
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-4 h-4" />
+                    <span>Kirimkan Perintah Perbaikan &amp; Kelengkapan ke Penyidik</span>
+                  </>
+                )}
               </button>
             )}
           </div>
