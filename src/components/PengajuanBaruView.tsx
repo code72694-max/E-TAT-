@@ -13,6 +13,7 @@ import { Step5KonfirmasiPengajuan } from './pengajuan-baru/Step5KonfirmasiPengaj
 import { PengajuanFooterNav } from './pengajuan-baru/PengajuanFooterNav';
 import { ModalValidasiPengajuan } from './pengajuan-baru/ModalValidasiPengajuan';
 import { ModalResetPengajuan } from './pengajuan-baru/ModalResetPengajuan';
+import { ModalSuksesPengajuan } from './pengajuan-baru/ModalSuksesPengajuan';
 
 const DRAFT_STORAGE_KEY = 'etat_pengajuan_baru_draft_v1';
 
@@ -195,6 +196,7 @@ export const PengajuanBaruView: React.FC<PengajuanBaruViewProps> = ({
   const [uploadedDocNames, setUploadedDocNames] = useState<Record<string, string>>(initialDraft?.uploadedDocNames || {});
   const [uploadingDocId, setUploadingDocId] = useState<string | null>(null);
   const [isSendingEmail, setIsSendingEmail] = useState(false);
+  const [successCreatedPermohonan, setSuccessCreatedPermohonan] = useState<PermohonanAsesmen | null>(null);
 
   // Cegah refresh / close browser saat ada file yang sedang di-upload
   useEffect(() => {
@@ -737,7 +739,7 @@ export const PengajuanBaruView: React.FC<PengajuanBaruViewProps> = ({
       localStorage.removeItem(DRAFT_STORAGE_KEY);
     } catch (e) {}
     onSubmit(createdPermohonan);
-    onBack();
+    setSuccessCreatedPermohonan(createdPermohonan);
   };
 
   return (
@@ -892,6 +894,16 @@ export const PengajuanBaruView: React.FC<PengajuanBaruViewProps> = ({
         isOpen={showResetConfirmModal}
         onConfirm={handleConfirmReset}
         onCancel={() => setShowResetConfirmModal(false)}
+      />
+
+      {/* Success Submission Modal */}
+      <ModalSuksesPengajuan
+        isOpen={Boolean(successCreatedPermohonan)}
+        permohonan={successCreatedPermohonan}
+        onClose={() => {
+          setSuccessCreatedPermohonan(null);
+          onBack();
+        }}
       />
     </div>
   );
