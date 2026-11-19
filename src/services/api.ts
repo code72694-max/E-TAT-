@@ -286,11 +286,27 @@ export const permohonanApi = {
 
   mintaPerbaikan: async (
     id: string,
-    payload: string | { catatanPerbaikan?: string; catatanKoreksi?: string; dokumenPerluDiperbaiki?: { dokumenId: string; catatanKoreksi: string; nama?: string; kode?: string }[] }
+    payload: string | {
+      catatanPerbaikan?: string;
+      catatanKoreksi?: string;
+      dokumenPerluDiperbaiki?: { dokumenId?: string; id?: string; catatanKoreksi: string; nama?: string; kode?: string }[];
+    }
   ) => {
-    const body = typeof payload === 'string'
-      ? { catatanPerbaikan: payload, catatanKoreksi: payload, dokumenPerluDiperbaiki: [] }
-      : payload;
+    let body: any;
+    if (typeof payload === 'string') {
+      body = { catatanPerbaikan: payload, catatanKoreksi: payload, dokumenPerluDiperbaiki: [] };
+    } else {
+      const formattedDocs = (payload.dokumenPerluDiperbaiki || []).map(d => ({
+        dokumenId: d.dokumenId || d.id || '',
+        catatanKoreksi: d.catatanKoreksi,
+        nama: d.nama,
+        kode: d.kode,
+      }));
+      body = {
+        ...payload,
+        dokumenPerluDiperbaiki: formattedDocs,
+      };
+    }
     return request<PermohonanAsesmen>(`/permohonan/${id}/minta-perbaikan`, {
       method: 'POST',
       body: JSON.stringify(body),

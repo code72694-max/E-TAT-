@@ -672,6 +672,7 @@ export const TabAdministrasi: React.FC<TabAdministrasiProps> = ({
                     const invalidDocsList = docs
                       .filter(d => d.statusVerifikasi === 'perlu_perbaikan')
                       .map(d => ({
+                        dokumenId: d.id,
                         id: d.id,
                         nama: d.nama,
                         kode: d.kode,
