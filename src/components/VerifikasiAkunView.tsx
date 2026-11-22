@@ -80,7 +80,7 @@ export const VerifikasiAkunView: React.FC<VerifikasiAkunViewProps> = ({
 
   const loadActiveUsers = useCallback(async () => {
     try {
-      const res = await authApi.getUsers();
+      const res = await authApi.getAllUsers();
       if (res && Array.isArray(res.data)) {
         setActiveUsers(res.data);
       }
@@ -1158,7 +1158,7 @@ export const VerifikasiAkunView: React.FC<VerifikasiAkunViewProps> = ({
                   statusFilter === 'all' ? 'bg-[#142642] text-white font-semibold' : 'text-slate-400 hover:text-slate-200'
                 }`}
               >
-                Semua ({registrations.length})
+                Semua ({allAccounts.length})
               </button>
               <button
                 onClick={() => setStatusFilter('approved')}
@@ -1166,7 +1166,7 @@ export const VerifikasiAkunView: React.FC<VerifikasiAkunViewProps> = ({
                   statusFilter === 'approved' ? 'bg-[#142642] text-emerald-300 font-semibold' : 'text-slate-400 hover:text-slate-200'
                 }`}
               >
-                Disetujui ({approvedRegistrations.length})
+                Disetujui ({allAccounts.filter(r => r.status === 'approved').length})
               </button>
               <button
                 onClick={() => setStatusFilter('pending')}
