@@ -105,6 +105,12 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({
   });
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [errorModal, setErrorModal] = useState<{ title: string; items: string[] } | null>(null);
+
+  const showErrorModal = (title: string, items: string[]) => {
+    setErrorMessage(items[0] || null);
+    setErrorModal({ title, items });
+  };
 
   // Sinkronkan data dari localStorage saat mount
   useEffect(() => {
@@ -137,21 +143,21 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({
 
     if (type === 'ktp' || type === 'kta') {
       if (!file.type.startsWith('image/')) {
-        setErrorMessage(`File ${type.toUpperCase()} harus berupa gambar (JPG, PNG, atau WEBP).`);
+        showErrorModal('Format Berkas Tidak Valid', [`File ${type.toUpperCase()} harus berupa gambar (JPG, PNG, atau WEBP).`]);
         return;
       }
       if (file.size > maxImgSize) {
-        setErrorMessage(`Ukuran file ${type.toUpperCase()} melebihi batas maksimal 5MB (${(file.size / (1024 * 1024)).toFixed(1)}MB).`);
+        showErrorModal('Ukuran Berkas Terlalu Besar', [`Ukuran file ${type.toUpperCase()} melebihi batas maksimal 5MB (${(file.size / (1024 * 1024)).toFixed(1)}MB).`]);
         return;
       }
     } else if (type === 'surat') {
       const allowedDoc = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'];
       if (!allowedDoc.includes(file.type) && !file.name.toLowerCase().endsWith('.pdf')) {
-        setErrorMessage('File Surat Tugas harus berformat PDF atau Gambar (JPG/PNG).');
+        showErrorModal('Format Berkas Tidak Valid', ['File Surat Tugas harus berformat PDF atau Gambar (JPG/PNG).']);
         return;
       }
       if (file.size > maxDocSize) {
-        setErrorMessage(`Ukuran Surat Tugas melebihi batas maksimal 10MB (${(file.size / (1024 * 1024)).toFixed(1)}MB).`);
+        showErrorModal('Ukuran Berkas Terlalu Besar', [`Ukuran Surat Tugas melebihi batas maksimal 10MB (${(file.size / (1024 * 1024)).toFixed(1)}MB).`]);
         return;
       }
     }
@@ -269,76 +275,69 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
+    setErrorModal(null);
+
+    const validationErrors: string[] = [];
 
     if (namaLengkap.trim().length < 2) {
-      setErrorMessage('Nama lengkap & gelar wajib diisi minimal 2 karakter.');
-      return;
+      validationErrors.push('Nama Lengkap & Gelar wajib diisi (minimal 2 karakter).');
     }
 
     const cleanNrp = nrp.trim();
     if (!cleanNrp) {
-      setErrorMessage('NRP / NIP kedinasan wajib diisi.');
-      return;
-    }
-    if (cleanNrp.length < 6) {
-      setErrorMessage('NRP / NIP kedinasan harus minimal 6 digit angka.');
-      return;
+      validationErrors.push('NRP / NIP Kedinasan wajib diisi.');
+    } else if (cleanNrp.length < 6) {
+      validationErrors.push('NRP / NIP Kedinasan harus minimal 6 digit angka.');
     }
 
     if (jabatan.trim().length < 2) {
-      setErrorMessage('Jabatan resmi kedinasan wajib diisi.');
-      return;
+      validationErrors.push('Jabatan Resmi Kedinasan wajib diisi.');
     }
     if (instansi.trim().length < 2) {
-      setErrorMessage('Nama satuan kerja / instansi wajib diisi.');
-      return;
+      validationErrors.push('Nama Satuan Kerja / Instansi wajib diisi.');
     }
     if (alamatKantor.trim().length < 5) {
-      setErrorMessage('Alamat Markas / Kantor wajib diisi lengkap.');
-      return;
+      validationErrors.push('Alamat Markas / Kantor wajib diisi lengkap (minimal 5 karakter).');
     }
 
     const cleanPhone = phone.trim();
     if (!cleanPhone) {
-      setErrorMessage('Nomor Handphone / WhatsApp aktif wajib diisi.');
-      return;
-    }
-    if (!cleanPhone.startsWith('08') && !cleanPhone.startsWith('628')) {
-      setErrorMessage('Nomor Handphone harus diawali dengan 08 atau 628.');
-      return;
-    }
-    if (cleanPhone.length < 10 || cleanPhone.length > 14) {
-      setErrorMessage('Nomor Handphone harus antara 10 hingga 14 digit angka.');
-      return;
+      validationErrors.push('Nomor Handphone / WhatsApp aktif wajib diisi.');
+    } else {
+      if (!cleanPhone.startsWith('08') && !cleanPhone.startsWith('628')) {
+        validationErrors.push('Nomor Handphone harus diawali dengan 08 atau 628.');
+      }
+      if (cleanPhone.length < 10 || cleanPhone.length > 14) {
+        validationErrors.push('Nomor Handphone harus antara 10 hingga 14 digit angka.');
+      }
     }
 
     const cleanEmail = email.trim().toLowerCase();
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!cleanEmail || !emailRegex.test(cleanEmail)) {
-      setErrorMessage('Format email kedinasan tidak valid. Gunakan format nama@instansi.go.id');
-      return;
+      validationErrors.push('Email Kedinasan tidak valid (contoh: nama@instansi.go.id).');
     }
 
     if (!fotoKtpUrl) {
-      setErrorMessage('Foto KTP Pendaftar wajib diunggah untuk verifikasi identitas resmi.');
-      return;
+      validationErrors.push('Foto KTP Pendaftar wajib diunggah.');
     }
     if (!fotoKtaUrl) {
-      setErrorMessage('Foto KTA Polri / BNN / Kartu Pegawai wajib diunggah untuk verifikasi dinas.');
-      return;
+      validationErrors.push('Foto KTA Polri / BNN / Kartu Pegawai wajib diunggah.');
     }
 
     if (password.length < 8) {
-      setErrorMessage('Kata sandi wajib minimal 8 karakter demi keamanan akses kedinasan.');
-      return;
+      validationErrors.push('Kata Sandi wajib diisi minimal 8 karakter.');
     }
     if (password !== confirmPassword) {
-      setErrorMessage('Konfirmasi kata sandi tidak cocok dengan kata sandi yang dimasukkan!');
-      return;
+      validationErrors.push('Konfirmasi Kata Sandi tidak cocok dengan Kata Sandi yang dimasukkan.');
     }
 
     if (!paktaIntegritas) {
-      setErrorMessage('Anda wajib mencentang dan menyetujui Pakta Integritas Kedinasan!');
+      validationErrors.push('Pakta Integritas Kedinasan wajib dicentang & disetujui.');
+    }
+
+    if (validationErrors.length > 0) {
+      showErrorModal('Data Pendaftaran Belum Lengkap / Valid', validationErrors);
       return;
     }
 
@@ -398,7 +397,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({
     } catch (err: any) {
       console.warn('Backend registrasi error:', err);
       const msg = err.message || 'Terjadi kendala saat menghubungkan ke server. Silakan periksa kembali data Anda.';
-      setErrorMessage(msg);
+      showErrorModal('Pengajuan Pendaftaran Gagal', [msg]);
     } finally {
       setIsSubmitting(false);
     }
@@ -478,7 +477,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} noValidate className="space-y-6">
               {/* SECTION 1: DATA PEJABAT & KREDENSIAL */}
               <Section1DataPejabat
                 namaLengkap={namaLengkap}
@@ -580,6 +579,69 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({
           </div>
         )}
       </main>
+
+      {/* Modal Validasi / Peringatan Kekurangan Data Pendaftaran */}
+      {errorModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200"
+          onClick={() => setErrorModal(null)}
+        >
+          <div
+            className="relative w-full max-w-lg bg-[#081224] border border-[#1b3459] rounded-2xl shadow-2xl overflow-hidden flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-[#1b3459] bg-[#0c1a30]/90">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-rose-500/15 border border-rose-500/40 rounded-xl text-rose-400">
+                  <AlertCircle className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-white tracking-wide">
+                    {errorModal.title}
+                  </h3>
+                  <p className="text-[11px] text-slate-400">
+                    Silakan periksa dan lengkapi bagian berikut sebelum mengirim:
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setErrorModal(null)}
+                className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Body: Daftar Kekurangan */}
+            <div className="p-6 max-h-[60vh] overflow-y-auto space-y-2.5 text-xs">
+              {errorModal.items.map((item, idx) => (
+                <div
+                  key={idx}
+                  className="flex items-start space-x-3 p-3 bg-rose-500/10 border border-rose-500/25 rounded-xl text-rose-200"
+                >
+                  <span className="w-5 h-5 rounded-full bg-rose-500/20 border border-rose-400/40 text-rose-300 font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">
+                    {idx + 1}
+                  </span>
+                  <span className="leading-relaxed font-medium">{item}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Footer */}
+            <div className="flex items-center justify-end px-6 py-4 border-t border-[#1b3459] bg-[#0c1a30]/90">
+              <button
+                type="button"
+                onClick={() => setErrorModal(null)}
+                className="px-5 py-2.5 bg-gradient-to-r from-[#144782] via-[#17549c] to-[#1c64b8] hover:from-[#175194] hover:via-[#1c60b0] hover:to-[#2274d4] text-white font-bold rounded-xl text-xs border border-[#2d7ad6]/70 shadow-[0_2px_12px_rgba(20,83,154,0.4)] transition-all cursor-pointer"
+              >
+                Mengerti, Perbaiki Data
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

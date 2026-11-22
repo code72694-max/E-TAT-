@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Lock, Mail, Eye, EyeOff } from 'lucide-react';
+import { Lock, Mail, Eye, EyeOff, Check, ShieldCheck } from 'lucide-react';
 import { getPasswordStrength } from './constants';
 
 interface Section5KeamananAkunProps {
@@ -142,22 +142,50 @@ export const Section5KeamananAkun: React.FC<Section5KeamananAkunProps> = ({
       </div>
 
       {/* Pakta Integritas */}
-      <div className="pt-3 border-t border-[#1b3459] space-y-3">
-        <label className="flex items-start space-x-3 cursor-pointer select-none">
+      <div className="pt-4 border-t border-[#1b3459]">
+        <label
+          className={`flex items-start space-x-3.5 p-4 rounded-xl border-2 transition-all cursor-pointer select-none ${
+            paktaIntegritas
+              ? 'bg-emerald-950/25 border-emerald-500/60 shadow-[0_0_20px_rgba(16,185,129,0.12)]'
+              : 'bg-[#0c1a30]/80 border-[#D4AF37]/45 hover:border-[#D4AF37] hover:bg-[#112442]'
+          }`}
+        >
           <input
             type="checkbox"
-            required
             checked={paktaIntegritas}
             onChange={e => setPaktaIntegritas(e.target.checked)}
-            className="w-4 h-4 rounded border-[#1b3459] bg-[#081224] text-[#D4AF37] focus:ring-0 focus:ring-offset-0 cursor-pointer mt-0.5"
+            className="sr-only"
           />
-          <div className="text-xs text-slate-300 leading-relaxed">
-            <strong className="text-white block font-semibold">
-              Pakta Integritas Kedinasan Tim Asesmen Terpadu (e-TAT)
-            </strong>
-            Saya menyatakan bahwa seluruh data identitas, jabatan kedinasan, serta lampiran dokumen KTP
-            dan KTA yang saya unggah adalah sah, benar, dan dapat dipertanggungjawabkan secara hukum
-            kedinasan di Kepolisian Negara Republik Indonesia & BNN.
+          <div
+            className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center shrink-0 mt-0.5 transition-all ${
+              paktaIntegritas
+                ? 'bg-emerald-500 border-emerald-400 text-slate-950 shadow-md shadow-emerald-950/50'
+                : 'bg-[#081224] border-[#D4AF37] text-transparent hover:border-[#f3e5ab]'
+            }`}
+          >
+            <Check className="w-4 h-4 stroke-[3]" />
+          </div>
+          <div className="text-xs text-slate-300 leading-relaxed flex-1">
+            <div className="flex flex-wrap items-center gap-2 mb-1">
+              <strong className="text-white font-bold text-xs sm:text-sm flex items-center gap-1.5">
+                <ShieldCheck className={`w-4 h-4 ${paktaIntegritas ? 'text-emerald-400' : 'text-[#D4AF37]'}`} />
+                <span>Pakta Integritas Kedinasan Tim Asesmen Terpadu (e-TAT)</span>
+              </strong>
+              <span
+                className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
+                  paktaIntegritas
+                    ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/40'
+                    : 'bg-[#D4AF37]/15 text-[#D4AF37] border-[#D4AF37]/40'
+                }`}
+              >
+                {paktaIntegritas ? 'Sudah Disetujui' : 'Wajib Dicentang'}
+              </span>
+            </div>
+            <p className="text-slate-300/95">
+              Saya menyatakan bahwa seluruh data identitas, jabatan kedinasan, serta lampiran dokumen KTP
+              dan KTA yang saya unggah adalah sah, benar, dan dapat dipertanggungjawabkan secara hukum
+              kedinasan di Kepolisian Negara Republik Indonesia &amp; BNN.
+            </p>
           </div>
         </label>
       </div>
