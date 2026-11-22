@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { RegistrasiPengguna, UserProfile, UserRole, PermohonanAsesmen } from '../types';
 import { registrasiApi, authApi } from '../services/api';
 import {
@@ -75,7 +75,69 @@ export const VerifikasiAkunView: React.FC<VerifikasiAkunViewProps> = ({
     }
   };
 
-  const selectedRegDetail = registrations.find(r => r.id === activeSelectedRegId) || null;
+  // Active users from backend /api/auth/users (Admin, Medis, Hukum, Satwil, dll)
+  const [activeUsers, setActiveUsers] = useState<UserProfile[]>([]);
+
+  const loadActiveUsers = useCallback(async () => {
+    try {
+      const res = await authApi.getUsers();
+      if (res && Array.isArray(res.data)) {
+        setActiveUsers(res.data);
+      }
+    } catch (err) {
+      console.warn('Gagal memuat daftar pengguna aktif:', err);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadActiveUsers();
+  }, [loadActiveUsers]);
+
+  // Gabungkan data registrasi (pendaftaran mandiri) + akun aktif dari tabel users
+  const allAccounts = useMemo<RegistrasiPengguna[]>(() => {
+    const regEmails = new Set(registrations.map(r => (r.email || '').toLowerCase().trim()));
+    const mappedActiveUsers: RegistrasiPengguna[] = activeUsers
+      .filter(u => u.email && !regEmails.has(u.email.toLowerCase().trim()))
+      .map(u => {
+        const roleUpper = (u.role || 'PENGAJU').toUpperCase();
+        const roleLabel =
+          roleUpper === 'ADMIN' ? 'Admin / Sekretariat TAT' :
+          roleUpper === 'MEDIS' ? 'Tim Asesmen Medis TAT' :
+          roleUpper === 'HUKUM' ? 'Tim Asesmen Hukum TAT' :
+          'Penyidik / Pengaju Asesmen';
+        const kategori =
+          roleUpper === 'MEDIS' ? 'BNNK_BNNP' :
+          roleUpper === 'HUKUM' ? 'Kejaksaan' :
+          'Polres_Polresta';
+        return {
+          id: u.id,
+          nomorRegistrasi: `AKUN-${roleUpper}-${u.id.slice(0, 6).toUpperCase()}`,
+          namaLengkap: u.name || u.email,
+          pangkat: '',
+          nrp: u.nip || '-',
+          jabatan: u.position || roleLabel,
+          instansi: u.agency || 'Tim Asesmen Terpadu (TAT)',
+          kategoriInstansi: kategori as any,
+          wilayahHukum: 'Nasional / Wilayah Hukum Terdaftar',
+          alamatKantor: u.agency || '-',
+          email: u.email,
+          phone: u.phone || '-',
+          fotoKtpUrl: u.avatarUrl || '',
+          fotoKtpName: '-',
+          fotoKtaUrl: u.avatarUrl || '',
+          fotoKtaName: '-',
+          status: 'approved',
+          tanggalDaftar: (u as any).createdAt || new Date().toISOString(),
+          approvedAt: (u as any).createdAt || new Date().toISOString(),
+          approvedBy: 'Sistem / Admin TAT',
+          peranSistem: (u.role || 'pengaju').toLowerCase() as any,
+        };
+      });
+
+    return [...registrations, ...mappedActiveUsers];
+  }, [registrations, activeUsers]);
+
+  const selectedRegDetail = allAccounts.find(r => r.id === activeSelectedRegId) || null;
   const [modalSubTab, setModalSubTab] = useState<'profile' | 'activity'>('profile');
   const [rejectModalTarget, setRejectModalTarget] = useState<RegistrasiPengguna | null>(null);
   const [rejectReasonInput, setRejectReasonInput] = useState('');
@@ -250,6 +312,7 @@ export const VerifikasiAkunView: React.FC<VerifikasiAkunViewProps> = ({
 
       if (res.data) {
         showToast(`Akun ${res.data.name} (${res.data.role}) BERHASIL DIBUAT di database!`);
+        loadActiveUsers();
         setIsCreateModalOpen(false);
         setNewUserName('');
         setNewUserEmail('');
@@ -317,7 +380,7 @@ export const VerifikasiAkunView: React.FC<VerifikasiAkunViewProps> = ({
   };
 
   // Filtered List for "Daftar Akun" tab
-  const filteredDaftarAkun = registrations.filter(reg => {
+  const filteredDaftarAkun = allAccounts.filter(reg => {
     if (statusFilter !== 'all' && reg.status !== statusFilter) return false;
     if (instansiFilter !== 'all' && reg.kategoriInstansi !== instansiFilter) return false;
     if (searchQuery.trim()) {
@@ -334,7 +397,7 @@ export const VerifikasiAkunView: React.FC<VerifikasiAkunViewProps> = ({
     return true;
   });
 
-  const categoryOptions = Array.from(new Set(registrations.map(r => r.kategoriInstansi).filter(Boolean)));
+  const categoryOptions = Array.from(new Set(allAccounts.map(r => r.kategoriInstansi).filter(Boolean)));
 
   // =========================================================
   // IF A USER IS SELECTED -> RENDER FULL DEDICATED PAGE DETAIL VIEW
@@ -932,7 +995,7 @@ export const VerifikasiAkunView: React.FC<VerifikasiAkunViewProps> = ({
             <User className="w-3.5 h-3.5 text-slate-400" />
             <span>Daftar Akun</span>
             <span className="px-1.5 py-0.2 text-[10px] font-medium rounded-full bg-[#142642] text-slate-400 border border-[#1a2e4c]">
-              {registrations.length}
+              {allAccounts.length}
             </span>
           </button>
         </div>
