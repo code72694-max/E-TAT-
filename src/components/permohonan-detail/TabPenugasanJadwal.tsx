@@ -624,31 +624,31 @@ export const TabPenugasanJadwal: React.FC<TabPenugasanJadwalProps> = ({
                 </div>
               )}
 
-              {/* Dynamic Notification Target Email (Admin Input/Review) */}
+              {/* Notification Target Email (Read-only based on selected assessor/participants) */}
               <div>
                 <label className="block text-slate-300 font-semibold mb-1 flex items-center justify-between">
                   <span>Alamat Email Notifikasi Tujuan: *</span>
-                  <span className="text-[10px] text-amber-400 font-normal">Ditetapkan oleh Admin</span>
+                  <span className="text-[10px] text-sky-400 font-normal">Otomatis (Read-Only)</span>
                 </label>
                 <div className="relative">
                   <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
                   <input
                     type="text"
                     value={targetEmailInput}
-                    onChange={(e) => setTargetEmailInput(e.target.value)}
+                    readOnly
                     required
                     placeholder={
                       modalType === 'pleno'
-                        ? 'dokter@faskes.go.id, jaksa@kejaksaan.go.id, pengaju@polri.go.id'
-                        : 'asesor@instansi.go.id'
+                        ? 'Otomatis: Email Tim Medis, Tim Hukum & Pengaju'
+                        : 'Otomatis sesuai asesor yang dipilih'
                     }
-                    className="w-full pl-9 pr-3 py-2.5 bg-[#050e1c] border border-[#1b3459] rounded-xl text-white outline-none focus:border-[#D4AF37] font-mono text-xs"
+                    className="w-full pl-9 pr-3 py-2.5 bg-[#060f1e]/80 border border-[#1b3459]/80 rounded-xl text-slate-300 outline-none font-mono text-xs cursor-not-allowed select-all"
                   />
                 </div>
                 <p className="text-[10px] text-slate-400 mt-1 flex items-center gap-1">
                   <Info className="w-3 h-3 text-sky-400 shrink-0" />
                   <span>
-                    Email pemberitahuan jadwal &amp; akses permohonan dikirimkan ke alamat ini (pisahkan dengan koma jika lebih dari satu akun).
+                    Email pemberitahuan jadwal &amp; akses permohonan otomatis dikirimkan ke alamat email akun yang dipilih.
                   </span>
                 </p>
               </div>
