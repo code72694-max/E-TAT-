@@ -1807,7 +1807,7 @@ const getDetailTabFromProp = (tab?: string): 'pelaksanaan' | 'laporan' | 'wajib_
   if (tab === 'tindak_lanjut_wajib_lapor') return 'wajib_lapor';
   if (tab === 'tindak_lanjut_rujukan') return 'akhir';
   if (tab === 'tindak_lanjut_pelaksanaan') return 'pelaksanaan';
-  return 'laporan'; // Default ke rekam kontrol & uji urin agar saat card diklik langsung terlihat riwayatnya
+  return 'pelaksanaan'; // Default ke Tahap 1: Admisi & Serah Terima agar urutan pelaporan jelas (1 -> 2 -> 3 -> 4)
 };
 
 export const TindakLanjutDetailView: React.FC<Props> = ({
@@ -1927,10 +1927,10 @@ export const TindakLanjutDetailView: React.FC<Props> = ({
   const noSuratRekom = rekom?.nomorSurat || pleno?.nomorBeritaAcara || `R-TAT/2026/${permohonan.id.slice(-4)}`;
 
   const tabs = [
-    { id: 'laporan' as const, label: '1. Rekam Toksikologi Urin', icon: <Syringe className="w-3.5 h-3.5" /> },
-    { id: 'wajib_lapor' as const, label: '2. Jurnal Wajib Lapor', icon: <CheckSquare className="w-3.5 h-3.5" /> },
-    { id: 'pelaksanaan' as const, label: '3. Admisi & Serah Terima', icon: <Building2 className="w-3.5 h-3.5" /> },
-    { id: 'akhir' as const, label: '4. Output Surat SKSR', icon: <Award className="w-3.5 h-3.5" /> },
+    { id: 'pelaksanaan' as const, label: '1. Admisi & Serah Terima', roleTag: 'Input Pengaju', icon: <Building2 className="w-3.5 h-3.5" /> },
+    { id: 'laporan' as const, label: '2. Rekam Medis & Tes Urin', roleTag: 'Input Medis', icon: <Syringe className="w-3.5 h-3.5" /> },
+    { id: 'wajib_lapor' as const, label: '3. Jurnal Wajib Lapor', roleTag: 'Input Pengaju', icon: <CheckSquare className="w-3.5 h-3.5" /> },
+    { id: 'akhir' as const, label: '4. Output Surat SKSR', roleTag: 'Medis / Admin', icon: <Award className="w-3.5 h-3.5" /> },
   ];
 
   const progress = {
@@ -2199,8 +2199,22 @@ export const TindakLanjutDetailView: React.FC<Props> = ({
         </div>
       </div>
 
+      {/* Panduan Urutan Pelaporan Tersangka (Pengaju & Medis) */}
+      <div className="bg-[#091529] border border-[#1b3459] rounded-2xl p-4 text-xs space-y-2">
+        <div className="flex items-center gap-2 font-bold text-[#D4AF37]">
+          <Info className="w-4 h-4 shrink-0" />
+          <span>Alur Urutan Pelaporan Tindak Lanjut (1 → 4)</span>
+        </div>
+        <p className="text-[11px] text-slate-300 leading-relaxed">
+          <strong className="text-sky-300">1. Pengaju (Polsek/Polres)</strong> melakukan <em>Admisi &amp; Serah Terima</em> tersangka ke fasilitas rehab terlebih dahulu &rarr;{' '}
+          <strong className="text-emerald-300">2. Tim Medis</strong> menginput hasil kontrol klinis &amp; tes urin toksikologi &rarr;{' '}
+          <strong className="text-sky-300">3. Tersangka Wajib Lapor ke Pengaju (Polsek/Polres)</strong> membawa bukti kontrol medis untuk dicatat di <em>Jurnal Wajib Lapor</em> &rarr;{' '}
+          <strong className="text-amber-300">4. Output SKSR</strong> diterbitkan setelah program selesai.
+        </p>
+      </div>
+
       {/* Navigation Tabs Header */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 pt-2">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 pt-1">
         {tabs.map((tab) => {
           const isDone = progress[tab.id];
           const isActive = activeTab === tab.id;
@@ -2217,9 +2231,14 @@ export const TindakLanjutDetailView: React.FC<Props> = ({
                   : 'bg-slate-950/30 border-slate-800/60 text-slate-400 hover:bg-slate-900/40 hover:text-slate-200'
               }`}
             >
-              <div className="flex items-center gap-2 text-xs truncate">
-                {tab.icon}
-                <span className="truncate">{tab.label}</span>
+              <div className="min-w-0 space-y-0.5">
+                <div className="flex items-center gap-2 text-xs truncate">
+                  {tab.icon}
+                  <span className="truncate">{tab.label}</span>
+                </div>
+                <span className="block text-[10px] font-medium text-sky-400/90 pl-5">
+                  {tab.roleTag}
+                </span>
               </div>
               {isDone && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />}
             </button>
