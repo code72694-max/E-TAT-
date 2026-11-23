@@ -73,22 +73,26 @@ export const TabPenugasanJadwal: React.FC<TabPenugasanJadwalProps> = ({
       const existing = medisUsers.find(u => u.name === tim?.asesorMedisNama || u.id === tim?.asesorMedisId);
       const chosen = existing || medisUsers[0];
       setSelectedAssessorId(chosen?.id || '');
-      setTargetEmailInput(tim?.asesorMedisEmail || chosen?.email || 'medis@gmail.com');
+      setTargetEmailInput(tim?.asesorMedisEmail || (tim as any)?.asesorMedis?.email || chosen?.email || '');
       setLokasiInput(tim?.lokasiPemeriksaan || 'Klinik Pratama BNNP Kaltim');
       setJadwalInput(tim?.jadwalPemeriksaanMedis ? tim.jadwalPemeriksaanMedis.replace(' WIB', '') : '');
     } else if (type === 'hukum') {
       const existing = hukumUsers.find(u => u.name === tim?.asesorHukumNama || u.id === tim?.asesorHukumId);
       const chosen = existing || hukumUsers[0];
       setSelectedAssessorId(chosen?.id || '');
-      setTargetEmailInput(tim?.asesorHukumEmail || chosen?.email || 'etatsiappulih@gmail.com');
+      setTargetEmailInput(tim?.asesorHukumEmail || (tim as any)?.asesorHukum?.email || chosen?.email || '');
       setJadwalInput(tim?.jadwalPemeriksaanHukum ? tim.jadwalPemeriksaanHukum.replace(' WIB', '') : '');
     } else {
-      // Pleno: gabungkan email asesor medis, asesor hukum, dan pengaju
-      const defaultTargets = [
-        tim?.asesorMedisEmail,
-        tim?.asesorHukumEmail,
-        permohonan.pengajuEmail
-      ].filter(Boolean) as string[];
+      // Pleno: otomatis gabungkan email asesor medis, asesor hukum, dan pengaju
+      const defaultTargets = Array.from(
+        new Set(
+          [
+            tim?.asesorMedisEmail || (tim as any)?.asesorMedis?.email || medisUsers[0]?.email,
+            tim?.asesorHukumEmail || (tim as any)?.asesorHukum?.email || hukumUsers[0]?.email,
+            permohonan.pengajuEmail || (permohonan as any)?.pengaju?.email,
+          ].filter(Boolean) as string[]
+        )
+      );
       setTargetEmailInput(defaultTargets.join(', '));
       setJadwalInput(tim?.jadwalPleno ? tim.jadwalPleno.replace(' WIB', '') : '');
     }
@@ -242,16 +246,25 @@ export const TabPenugasanJadwal: React.FC<TabPenugasanJadwalProps> = ({
       minute: '2-digit'
     }) + ' WIB';
 
-    const defaultMedis = tim?.asesorMedisNama || '[TEST] Dokter Asesor Medis TAT';
-    const defaultHukum = tim?.asesorHukumNama || '[TEST] Jaksa Asesor Hukum TAT';
+    const defaultMedis = tim?.asesorMedisNama || medisUsers[0]?.name || '[TEST] Dokter Asesor Medis TAT';
+    const defaultHukum = tim?.asesorHukumNama || hukumUsers[0]?.name || '[TEST] Jaksa Asesor Hukum TAT';
+    const defaultMedisId = tim?.asesorMedisId || medisUsers[0]?.id;
+    const defaultHukumId = tim?.asesorHukumId || hukumUsers[0]?.id;
+    const defaultMedisEmail = tim?.asesorMedisEmail || (tim as any)?.asesorMedis?.email || medisUsers[0]?.email;
+    const defaultHukumEmail = tim?.asesorHukumEmail || (tim as any)?.asesorHukum?.email || hukumUsers[0]?.email;
+    const defaultPengajuEmail = permohonan.pengajuEmail || (permohonan as any)?.pengaju?.email;
     const defaultLokasi = tim?.lokasiPemeriksaan || 'Klinik Pratama BNNP Kaltim';
     const defaultJadwalMedis = tim?.jadwalPemeriksaanMedis || `${new Date().toISOString().split('T')[0]} 09:30 WIB`;
     const defaultJadwalHukum = tim?.jadwalPemeriksaanHukum || `${new Date().toISOString().split('T')[0]} 13:30 WIB`;
 
     const updatedTim = {
       ...(tim as any),
+      asesorMedisId: defaultMedisId,
       asesorMedisNama: defaultMedis,
+      asesorMedisEmail: defaultMedisEmail,
+      asesorHukumId: defaultHukumId,
       asesorHukumNama: defaultHukum,
+      asesorHukumEmail: defaultHukumEmail,
       lokasiPemeriksaan: defaultLokasi,
       jadwalPemeriksaanMedis: defaultJadwalMedis,
       jadwalPemeriksaanHukum: defaultJadwalHukum,
@@ -279,12 +292,10 @@ export const TabPenugasanJadwal: React.FC<TabPenugasanJadwalProps> = ({
 
     onUpdatePermohonan(updated);
 
-    // Kirim notifikasi email dinamis ke tim yang ditugaskan & pengaju
-    const targets = [
-      tim?.asesorMedisEmail,
-      tim?.asesorHukumEmail,
-      permohonan.pengajuEmail
-    ].filter(Boolean) as string[];
+    // Kirim notifikasi email dinamis ke tim medis, hukum, dan pengaju
+    const targets = Array.from(
+      new Set([defaultMedisEmail, defaultHukumEmail, defaultPengajuEmail].filter(Boolean) as string[])
+    );
 
     if (targets.length > 0) {
       sendPenjadwalanEmailNotification({
@@ -292,7 +303,7 @@ export const TabPenugasanJadwal: React.FC<TabPenugasanJadwalProps> = ({
         tipe: 'medis',
         targetRecipients: targets,
         asesorNama: defaultMedis,
-        asesorEmail: tim?.asesorMedisEmail,
+        asesorEmail: defaultMedisEmail,
         jadwal: defaultJadwalMedis,
         lokasi: defaultLokasi,
         catatan: 'Pelimpahan berkas perkara resmi dari Admin Sekretariat TAT. Formulir pemeriksaan klinis kini dapat diakses.',
@@ -302,9 +313,9 @@ export const TabPenugasanJadwal: React.FC<TabPenugasanJadwalProps> = ({
     if (permohonan.id) {
       try {
         await permohonanApi.tugaskan(permohonan.id, {
-          asesorMedisId: tim?.asesorMedisId,
+          asesorMedisId: defaultMedisId,
           asesorMedisNama: defaultMedis,
-          asesorHukumId: tim?.asesorHukumId,
+          asesorHukumId: defaultHukumId,
           asesorHukumNama: defaultHukum,
           lokasiPemeriksaan: defaultLokasi,
           jadwalPemeriksaanMedis: new Date().toISOString(),
