@@ -367,6 +367,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({
       fotoKtaName: fotoKtaName || 'KTA_' + cleanNrp + '.jpg',
       suratPenunjukanUrl: suratPenunjukanUrl || undefined,
       suratPenunjukanName: suratPenunjukanName || undefined,
+      password,
     };
 
     try {
