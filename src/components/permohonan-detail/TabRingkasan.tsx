@@ -108,13 +108,15 @@ export const TabRingkasan: React.FC<TabRingkasanProps> = ({
               <span>Verifikasi QR</span>
             </button>
           )}
-          <button
-            onClick={() => onNavigateTab('administrasi')}
-            className="bg-[#D4AF37] hover:bg-amber-400 text-slate-900 font-bold px-4 py-2 rounded-xl text-xs transition-all flex items-center space-x-1.5 shadow-lg shadow-amber-950/30 cursor-pointer"
-          >
-            <span>Lanjut Proses</span>
-            <ChevronRight className="w-3.5 h-3.5" />
-          </button>
+          {currentUser.role?.toUpperCase() !== 'PENGAJU' && (
+            <button
+              onClick={() => onNavigateTab('administrasi')}
+              className="bg-[#D4AF37] hover:bg-amber-400 text-slate-900 font-bold px-4 py-2 rounded-xl text-xs transition-all flex items-center space-x-1.5 shadow-lg shadow-amber-950/30 cursor-pointer"
+            >
+              <span>Lanjut Proses</span>
+              <ChevronRight className="w-3.5 h-3.5" />
+            </button>
+          )}
         </div>
       </div>
 
