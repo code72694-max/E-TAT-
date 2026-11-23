@@ -141,6 +141,7 @@ export const VerifikasiAkunView: React.FC<VerifikasiAkunViewProps> = ({
   const [modalSubTab, setModalSubTab] = useState<'profile' | 'activity'>('profile');
   const [rejectModalTarget, setRejectModalTarget] = useState<RegistrasiPengguna | null>(null);
   const [rejectReasonInput, setRejectReasonInput] = useState('');
+  const [approveModalTarget, setApproveModalTarget] = useState<RegistrasiPengguna | null>(null);
   const [previewImage, setPreviewImage] = useState<{ url: string; title: string } | null>(null);
   const [successToast, setSuccessToast] = useState<string | null>(null);
 
@@ -229,6 +230,7 @@ export const VerifikasiAkunView: React.FC<VerifikasiAkunViewProps> = ({
     }
 
     showToast(`Akun ${getFormattedOfficerName(reg.pangkat, reg.namaLengkap)} (${reg.instansi}) BERHASIL DISETUJUI!`);
+    setApproveModalTarget(null);
   };
 
   const handleOpenRejectModal = (reg: RegistrasiPengguna) => {
@@ -399,6 +401,100 @@ export const VerifikasiAkunView: React.FC<VerifikasiAkunViewProps> = ({
 
   const categoryOptions = Array.from(new Set(allAccounts.map(r => r.kategoriInstansi).filter(Boolean)));
 
+  const renderApproveConfirmModal = () => {
+    if (!approveModalTarget) return null;
+    const isApprovingThis = actionLoading?.id === approveModalTarget.id && actionLoading.action === 'approve';
+    const isReactivate = approveModalTarget.status === 'rejected';
+    return (
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-150"
+        onClick={() => !isApprovingThis && setApproveModalTarget(null)}
+      >
+        <div
+          className="relative w-full max-w-md bg-[#081224] border border-[#1b3459] rounded-2xl shadow-2xl overflow-hidden flex flex-col"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="flex items-center justify-between px-6 py-4 border-b border-[#1b3459] bg-[#0c1a30]/90">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-emerald-500/15 border border-emerald-500/40 rounded-xl text-emerald-400">
+                <ShieldCheck className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-white tracking-wide">
+                  {isReactivate ? 'Konfirmasi Aktivasi Ulang Akun' : 'Konfirmasi Persetujuan Akun'}
+                </h3>
+                <p className="text-[11px] text-slate-400">Verifikasi Pendaftaran Petugas e-TAT</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              disabled={isApprovingThis}
+              onClick={() => setApproveModalTarget(null)}
+              className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors cursor-pointer disabled:opacity-50"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+
+          <div className="p-6 space-y-4 text-xs">
+            <p className="text-slate-200 leading-relaxed">
+              Apakah Anda yakin ingin {isReactivate ? 'mengaktifkan kembali' : 'menyetujui'} pendaftaran akun kedinasan ini? Akun akan langsung aktif dan dapat login ke sistem.
+            </p>
+            <div className="bg-[#050e1c] border border-[#1b3459] rounded-xl p-3.5 space-y-2 text-[11px]">
+              <div className="flex justify-between gap-2">
+                <span className="text-slate-400">Nama Petugas</span>
+                <span className="font-bold text-white text-right">
+                  {getFormattedOfficerName(approveModalTarget.pangkat, approveModalTarget.namaLengkap)}
+                </span>
+              </div>
+              <div className="flex justify-between gap-2">
+                <span className="text-slate-400">NRP / NIP</span>
+                <span className="font-mono text-slate-200">{approveModalTarget.nrp || '-'}</span>
+              </div>
+              <div className="flex justify-between gap-2">
+                <span className="text-slate-400">Instansi</span>
+                <span className="text-slate-200 text-right">{approveModalTarget.instansi || '-'}</span>
+              </div>
+              <div className="flex justify-between gap-2">
+                <span className="text-slate-400">Email</span>
+                <span className="font-mono text-[#d4af37] text-right">{approveModalTarget.email}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-end space-x-2.5 px-6 py-4 border-t border-[#1b3459] bg-[#0c1a30]/90">
+            <button
+              type="button"
+              disabled={isApprovingThis}
+              onClick={() => setApproveModalTarget(null)}
+              className="px-4 py-2.5 bg-[#142642] hover:bg-[#1b3459] text-slate-300 border border-[#234475] rounded-xl text-xs font-semibold transition-colors disabled:opacity-50 cursor-pointer"
+            >
+              Batal
+            </button>
+            <button
+              type="button"
+              disabled={isApprovingThis}
+              onClick={() => handleApprove(approveModalTarget)}
+              className="px-5 py-2.5 bg-gradient-to-r from-[#144782] via-[#17549c] to-[#1c64b8] hover:from-[#175194] hover:via-[#1c60b0] hover:to-[#2274d4] text-white font-bold rounded-xl text-xs flex items-center space-x-2 border border-[#2d7ad6]/70 shadow-[0_2px_12px_rgba(20,83,154,0.4)] transition-all disabled:opacity-60 cursor-pointer"
+            >
+              {isApprovingThis ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin text-white" />
+                  <span>Memproses Persetujuan...</span>
+                </>
+              ) : (
+                <>
+                  <CheckCircle2 className="w-4 h-4 text-sky-300" />
+                  <span>Ya, Setujui Akun</span>
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   // =========================================================
   // IF A USER IS SELECTED -> RENDER FULL DEDICATED PAGE DETAIL VIEW
   // =========================================================
@@ -465,7 +561,7 @@ export const VerifikasiAkunView: React.FC<VerifikasiAkunViewProps> = ({
             {selectedRegDetail.status === 'pending' && (
               <>
                 <button
-                  onClick={() => handleApprove(selectedRegDetail)}
+                  onClick={() => setApproveModalTarget(selectedRegDetail)}
                   disabled={Boolean(actionLoading)}
                   className="px-4 py-2 bg-[#17382d] hover:bg-[#1e473a] text-emerald-300 hover:text-emerald-200 rounded-xl text-xs font-semibold border border-emerald-700/50 cursor-pointer flex items-center space-x-1.5 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                 >
@@ -495,7 +591,7 @@ export const VerifikasiAkunView: React.FC<VerifikasiAkunViewProps> = ({
             {/* For REJECTED / NONAKTIF Accounts: Show "Aktifkan Kembali" */}
             {selectedRegDetail.status === 'rejected' && (
               <button
-                onClick={() => handleApprove(selectedRegDetail)}
+                onClick={() => setApproveModalTarget(selectedRegDetail)}
                 disabled={Boolean(actionLoading)}
                 className="px-4 py-2 bg-[#17382d] hover:bg-[#1e473a] text-emerald-300 hover:text-emerald-200 rounded-xl text-xs font-semibold border border-emerald-700/50 cursor-pointer flex items-center space-x-1.5 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all"
               >
@@ -941,6 +1037,7 @@ export const VerifikasiAkunView: React.FC<VerifikasiAkunViewProps> = ({
             </div>
           </div>
         )}
+        {renderApproveConfirmModal()}
       </div>
     );
   }
@@ -1111,7 +1208,7 @@ export const VerifikasiAkunView: React.FC<VerifikasiAkunViewProps> = ({
                     </button>
 
                     <button
-                      onClick={() => handleApprove(reg)}
+                      onClick={() => setApproveModalTarget(reg)}
                       disabled={Boolean(actionLoading)}
                       className="px-3 py-1.5 bg-[#17382d] hover:bg-[#1e473a] text-emerald-300 hover:text-emerald-200 text-xs font-semibold rounded-lg border border-emerald-700/50 transition-colors cursor-pointer flex items-center space-x-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
@@ -1599,6 +1696,7 @@ export const VerifikasiAkunView: React.FC<VerifikasiAkunViewProps> = ({
           </div>
         </div>
       )}
+      {renderApproveConfirmModal()}
     </div>
   );
 };
