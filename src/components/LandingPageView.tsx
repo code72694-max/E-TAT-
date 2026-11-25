@@ -845,110 +845,152 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
           </div>
         </div>
       </footer>
-      {/* MODAL POPUP FOR SOP 8 STEPS DETAIL */}
+      {/* MODAL POPUP FOR SOP STEPS DETAIL */}
       {selectedSopStep && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
           <div
             className="fixed inset-0"
             onClick={() => setSelectedSopStep(null)}
           />
-          <div className={`relative z-10 w-full bg-[#0b172a] border border-[#234b7d] rounded-2xl p-6 sm:p-7 shadow-2xl space-y-5 text-slate-200 ${selectedSopStep.step === '03' ? 'max-w-2xl' : 'max-w-lg'}`}>
+          <div className={`relative z-10 w-full max-h-[92vh] overflow-y-auto bg-[#0b172a] border border-[#234b7d] rounded-2xl shadow-2xl text-slate-200 ${selectedSopStep.step === '03' ? 'max-w-5xl p-4 sm:p-6 space-y-3.5' : 'max-w-lg p-6 sm:p-7 space-y-5'}`}>
             {/* Modal Header */}
-            <div className="flex items-start justify-between pb-3 border-b border-[#1b3459] gap-3">
+            <div className="flex items-start justify-between pb-2.5 border-b border-[#1b3459] gap-3">
               <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 rounded-xl bg-[#071326] border border-[#234b7d] flex items-center justify-center shrink-0 shadow-inner">
+                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#071326] border border-[#234b7d] flex items-center justify-center shrink-0 shadow-inner">
                   {selectedSopStep.icon}
                 </div>
                 <div>
-                  <div className="flex items-center space-x-2">
-                    <span className="font-mono text-xs font-bold text-[#D4AF37] bg-[#071326] px-2 py-0.5 rounded border border-[#1b3459]">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="font-mono text-[11px] font-bold text-[#D4AF37] bg-[#071326] px-2 py-0.5 rounded border border-[#1b3459]">
                       TAHAP {selectedSopStep.step}
                     </span>
-                    <span className="text-[10px] text-slate-400 font-semibold">{selectedSopStep.actor}</span>
+                    <span className="text-[11px] text-slate-400 font-semibold">{selectedSopStep.actor}</span>
+                    {selectedSopStep.step === '03' && (
+                      <span className="font-mono text-[10px] font-bold text-[#D4AF37] bg-[#0d1f38] px-2 py-0.5 rounded border border-[#1b3459] flex items-center space-x-1">
+                        <Clock className="w-3 h-3" />
+                        <span>{selectedSopStep.sla}</span>
+                      </span>
+                    )}
                   </div>
-                  <h3 className="text-base sm:text-lg font-bold text-white mt-1">{selectedSopStep.title}</h3>
+                  <h3 className="text-base sm:text-lg font-bold text-white mt-0.5">{selectedSopStep.title}</h3>
                 </div>
               </div>
               <button
                 onClick={() => setSelectedSopStep(null)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-[#132d54] transition-colors cursor-pointer"
+                className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-[#132d54] transition-colors cursor-pointer shrink-0"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            {/* SLA Badge */}
-            <div className="p-3 bg-[#071326] border border-[#1b3459] rounded-xl flex items-center justify-between text-xs">
-              <span className="text-slate-400 font-semibold flex items-center space-x-1.5">
-                <Clock className="w-4 h-4 text-[#D4AF37]" />
-                <span>Estimasi SLA Operasional:</span>
-              </span>
-              <span className="font-mono font-bold text-[#D4AF37] bg-[#0d1f38] px-2.5 py-1 rounded border border-[#1b3459]">
-                {selectedSopStep.sla}
-              </span>
-            </div>
-
-            {/* Khusus Step 03: Tampilkan Gambar / Infografis Timeline Resmi */}
-            {selectedSopStep.step === '03' && (
-              <div className="space-y-2.5">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-[#D4AF37] uppercase tracking-wider flex items-center space-x-1.5">
-                    <Clock className="w-4 h-4" />
-                    <span>Infografis Linimasa Resmi Penangkapan:</span>
-                  </span>
-                  <span className="text-[10px] text-slate-400 font-mono">Batas Max: Hari ke-6</span>
-                </div>
-                <div className="rounded-xl overflow-hidden border border-[#234b7d] bg-white p-2 shadow-lg">
-                  <img
-                    src="/images/timeline-penangkapan.jpg"
-                    alt="Timeline Permohonan Asesmen Terpadu pada Masa Penangkapan"
-                    className="w-full h-auto object-contain rounded"
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-2 text-[11px] pt-1">
-                  <div className="p-2.5 bg-[#071326] border border-[#1b3459] rounded-lg">
-                    <span className="text-[#D4AF37] font-bold block mb-0.5">Hari ke-0 s.d. Hari ke-3:</span>
-                    <p className="text-slate-300 text-[10px] leading-relaxed">
-                      Masa Penangkapan Pertama (3×24 Jam). Batas akhir penyidik pengaju mengirim permohonan asesmen & revisi dokumen perbaikan.
-                    </p>
+            {selectedSopStep.step === '03' ? (
+              /* LAYOUT 2 KOLOM PROPORSIONAL UNTUK TIMELINE AGAR TERLIHAT 1 HALAMAN PENUH */
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
+                {/* Kolom Kiri: Infografis + Ringkasan Fase */}
+                <div className="lg:col-span-6 flex flex-col justify-between space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-bold text-[#D4AF37] uppercase tracking-wider flex items-center space-x-1.5">
+                      <Clock className="w-3.5 h-3.5" />
+                      <span>Infografis Linimasa Resmi Penangkapan</span>
+                    </span>
+                    <span className="text-[10px] text-slate-400 font-mono">Batas Max: Hari ke-6</span>
                   </div>
-                  <div className="p-2.5 bg-[#071326] border border-[#1b3459] rounded-lg">
-                    <span className="text-emerald-400 font-bold block mb-0.5">Hari ke-3 s.d. Hari ke-6:</span>
-                    <p className="text-slate-300 text-[10px] leading-relaxed">
-                      Masa Pelaksanaan Asesmen Terpadu (Medis, Hukum &amp; Pleno). Hari ke-6 batas akhir penerbitan Surat Rekomendasi Resmi.
+                  <div className="rounded-xl overflow-hidden border border-[#234b7d] bg-white p-2 shadow-lg flex items-center justify-center">
+                    <img
+                      src="/images/timeline-penangkapan.jpg"
+                      alt="Timeline Permohonan Asesmen Terpadu pada Masa Penangkapan"
+                      className="w-full max-h-[245px] object-contain rounded"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="p-2.5 bg-[#071326] border border-[#1b3459] rounded-xl">
+                      <span className="text-[#D4AF37] font-bold text-[11px] block mb-0.5">Hari ke-0 s.d. Hari ke-3</span>
+                      <p className="text-slate-300 text-[10px] leading-snug">
+                        Masa Penangkapan Pertama (3×24 Jam). Batas akhir pengajuan asesmen &amp; revisi dokumen oleh Pengaju.
+                      </p>
+                    </div>
+                    <div className="p-2.5 bg-[#071326] border border-[#1b3459] rounded-xl">
+                      <span className="text-emerald-400 font-bold text-[11px] block mb-0.5">Hari ke-3 s.d. Hari ke-6</span>
+                      <p className="text-slate-300 text-[10px] leading-snug">
+                        Masa Pelaksanaan Asesmen (Medis, Hukum &amp; Pleno). Hari ke-6 batas akhir terbit Surat Rekomendasi.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Kolom Kanan: Summary & Rincian SOP */}
+                <div className="lg:col-span-6 flex flex-col justify-between space-y-3 bg-[#071326]/60 border border-[#1b3459] rounded-xl p-3.5 sm:p-4">
+                  <div className="space-y-3">
+                    <p className="text-[11px] sm:text-xs text-slate-300 italic bg-[#0d1f38]/70 p-2.5 rounded-lg border-l-2 border-[#D4AF37] leading-relaxed">
+                      "{selectedSopStep.summary}"
                     </p>
+
+                    <div className="space-y-2">
+                      <span className="text-[11px] font-bold text-white uppercase tracking-wider block">
+                        Rincian Prosedur Operasional (SOP):
+                      </span>
+                      <ul className="space-y-2 text-[11px] text-slate-300">
+                        {selectedSopStep.details.map((detail, idx) => (
+                          <li key={idx} className="flex items-start space-x-2">
+                            <span className="w-4 h-4 rounded-full bg-[#132d54] text-[#D4AF37] font-mono font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5 border border-[#2d5289]">
+                              {idx + 1}
+                            </span>
+                            <span className="leading-snug">{detail}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+
+                  <div className="pt-2.5 border-t border-[#1b3459] flex items-center justify-between gap-2 text-[10px] text-slate-400">
+                    <span>Landasan:</span>
+                    <span className="font-semibold text-slate-200 text-right">{selectedSopStep.legalBasis}</span>
                   </div>
                 </div>
               </div>
+            ) : (
+              /* LAYOUT STANDAR UNTUK STEP LAINNYA */
+              <>
+                {/* SLA Badge */}
+                <div className="p-3 bg-[#071326] border border-[#1b3459] rounded-xl flex items-center justify-between text-xs">
+                  <span className="text-slate-400 font-semibold flex items-center space-x-1.5">
+                    <Clock className="w-4 h-4 text-[#D4AF37]" />
+                    <span>Estimasi SLA Operasional:</span>
+                  </span>
+                  <span className="font-mono font-bold text-[#D4AF37] bg-[#0d1f38] px-2.5 py-1 rounded border border-[#1b3459]">
+                    {selectedSopStep.sla}
+                  </span>
+                </div>
+
+                {/* Summary */}
+                <p className="text-xs text-slate-300 italic bg-[#0d1f38]/60 p-3 rounded-lg border-l-2 border-[#D4AF37]">
+                  "{selectedSopStep.summary}"
+                </p>
+
+                {/* Rincian Langkah SOP */}
+                <div className="space-y-2">
+                  <span className="text-xs font-bold text-white uppercase tracking-wider block">
+                    Rincian Prosedur Operasional (SOP):
+                  </span>
+                  <ul className="space-y-2 text-xs text-slate-300">
+                    {selectedSopStep.details.map((detail, idx) => (
+                      <li key={idx} className="flex items-start space-x-2.5">
+                        <span className="w-4 h-4 rounded-full bg-[#132d54] text-[#D4AF37] font-mono font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5 border border-[#2d5289]">
+                          {idx + 1}
+                        </span>
+                        <span className="leading-relaxed">{detail}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Legal Basis */}
+                <div className="pt-3 border-t border-[#1b3459] flex items-center justify-between text-[11px] text-slate-400">
+                  <span>Landasan Regulasi:</span>
+                  <span className="font-semibold text-slate-200">{selectedSopStep.legalBasis}</span>
+                </div>
+              </>
             )}
-
-            {/* Summary */}
-            <p className="text-xs text-slate-300 italic bg-[#0d1f38]/60 p-3 rounded-lg border-l-2 border-[#D4AF37]">
-              "{selectedSopStep.summary}"
-            </p>
-
-            {/* Rincian Langkah SOP */}
-            <div className="space-y-2">
-              <span className="text-xs font-bold text-white uppercase tracking-wider block">
-                Rincian Prosedur Operasional (SOP):
-              </span>
-              <ul className="space-y-2 text-xs text-slate-300">
-                {selectedSopStep.details.map((detail, idx) => (
-                  <li key={idx} className="flex items-start space-x-2.5">
-                    <span className="w-4 h-4 rounded-full bg-[#132d54] text-[#D4AF37] font-mono font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5 border border-[#2d5289]">
-                      {idx + 1}
-                    </span>
-                    <span className="leading-relaxed">{detail}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Legal Basis */}
-            <div className="pt-3 border-t border-[#1b3459] flex items-center justify-between text-[11px] text-slate-400">
-              <span>Landasan Regulasi:</span>
-              <span className="font-semibold text-slate-200">{selectedSopStep.legalBasis}</span>
-            </div>
 
             {/* Close Button */}
             <button

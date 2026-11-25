@@ -406,6 +406,8 @@ export interface SidangPleno {
   fasilitasRujukanUsulan?: string;
   statusPleno: 'terjadwal' | 'berlangsung' | 'selesai_sepakat' | 'butuh_klarifikasi_tambahan';
   fileBeritaAcaraSigned?: string;
+  fotoKehadiranUrl?: string;
+  fotoKehadiranKeterangan?: string;
 }
 
 // Pengesahan Multi-Pihak

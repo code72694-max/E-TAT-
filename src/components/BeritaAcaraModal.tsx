@@ -218,6 +218,21 @@ export const BeritaAcaraModal: React.FC<BeritaAcaraModalProps> = ({ permohonan, 
   // URL verifikasi resmi e-TAT untuk barcode dan scan publik
   const verificationUrl = buildLacakVerificationUrl(p, 'pleno');
 
+  // Resolve Lampiran Foto Bukti Kehadiran Pleno
+  const fotoKehadiranUrl = (() => {
+    if (pleno?.fotoKehadiranUrl) return pleno.fotoKehadiranUrl;
+    try {
+      return (
+        localStorage.getItem(`etat_pleno_foto_kehadiran_${p.id}`) ||
+        (p.nomorPermohonan ? localStorage.getItem(`etat_pleno_foto_kehadiran_${p.nomorPermohonan}`) : '') ||
+        ''
+      );
+    } catch {
+      return '';
+    }
+  })();
+  const fotoKehadiranKeterangan = pleno?.fotoKehadiranKeterangan || 'Dokumentasi Kehadiran Peserta Sidang Pleno Tim Asesmen Terpadu (TAT)';
+
   // Evidence & Substance
   const bb = Array.isArray(pk?.barangBuktiList) ? pk.barangBuktiList : [];
   const riwayatZat = Array.isArray(medis?.riwayatZat) ? medis.riwayatZat : [];
@@ -812,6 +827,95 @@ export const BeritaAcaraModal: React.FC<BeritaAcaraModalProps> = ({ permohonan, 
                   </tbody>
                 </table>
               </div>
+
+              {/* ===== LEMBAR LAMPIRAN BUKTI KEHADIRAN SIDANG PLENO ===== */}
+              {fotoKehadiranUrl && (
+                <div style={{ pageBreakBefore: 'always', breakBefore: 'page', marginTop: '36px', paddingTop: '24px', borderTop: '2px dashed #94a3b8' }}>
+                  <div style={{ textAlign: 'center', borderBottom: '2px solid #000', paddingBottom: '10px', marginBottom: '18px' }}>
+                    <div style={{ fontSize: '12pt', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
+                      LAMPIRAN BERITA ACARA SIDANG PLENO
+                    </div>
+                    <div style={{ fontSize: '10.5pt', fontWeight: 'bold', marginTop: '3px', textTransform: 'uppercase' }}>
+                      BUKTI KEHADIRAN &amp; DOKUMENTASI RAPAT TIM ASESMEN TERPADU (TAT)
+                    </div>
+                    <div style={{ fontSize: '9.5pt', marginTop: '2px' }}>
+                      Nomor Berita Acara: <strong>{nomorBA}</strong>
+                    </div>
+                  </div>
+
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '10pt', marginBottom: '18px' }}>
+                    <tbody>
+                      <tr>
+                        <td style={{ width: '26%', padding: '3px 0', fontWeight: 'bold' }}>Nomor Permohonan</td>
+                        <td style={{ width: '3%' }}>:</td>
+                        <td>{p.nomorPermohonan}</td>
+                      </tr>
+                      <tr>
+                        <td style={{ padding: '3px 0', fontWeight: 'bold' }}>Nama Terperiksa</td>
+                        <td>:</td>
+                        <td>{namaTersangka}</td>
+                      </tr>
+                      <tr>
+                        <td style={{ padding: '3px 0', fontWeight: 'bold' }}>Hari / Tanggal Pleno</td>
+                        <td>:</td>
+                        <td>{hariPleno}, {tanggalPlenoFormat} (Pukul {waktuPleno})</td>
+                      </tr>
+                      <tr>
+                        <td style={{ padding: '3px 0', fontWeight: 'bold' }}>Tempat Pelaksanaan</td>
+                        <td>:</td>
+                        <td>{tempatPleno}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+
+                  <div style={{ border: '1.5px solid #000', borderRadius: '6px', padding: '14px', background: '#fff', textAlign: 'center', marginBottom: '14px' }}>
+                    <img
+                      src={fotoKehadiranUrl}
+                      alt="Bukti Kehadiran Sidang Pleno"
+                      style={{ maxHeight: '440px', maxWidth: '100%', objectFit: 'contain', display: 'block', margin: '0 auto' }}
+                    />
+                    <div style={{ fontSize: '9.5pt', fontStyle: 'italic', marginTop: '10px', color: '#1e293b' }}>
+                      {fotoKehadiranKeterangan}
+                    </div>
+                  </div>
+
+                  {Array.isArray(pleno?.daftarHadir) && pleno.daftarHadir.length > 0 && (
+                    <div style={{ marginTop: '14px' }}>
+                      <div style={{ fontSize: '10pt', fontWeight: 'bold', marginBottom: '6px' }}>
+                        Ringkasan Daftar Hadir Peserta Sidang Pleno:
+                      </div>
+                      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '9.5pt' }}>
+                        <thead>
+                          <tr style={{ background: '#f1f5f9' }}>
+                            <th style={{ border: '1px solid #000', padding: '5px 8px', textAlign: 'center', width: '6%' }}>No</th>
+                            <th style={{ border: '1px solid #000', padding: '5px 8px', textAlign: 'left' }}>Nama Lengkap</th>
+                            <th style={{ border: '1px solid #000', padding: '5px 8px', textAlign: 'left' }}>Peran</th>
+                            <th style={{ border: '1px solid #000', padding: '5px 8px', textAlign: 'left' }}>Instansi</th>
+                            <th style={{ border: '1px solid #000', padding: '5px 8px', textAlign: 'center', width: '14%' }}>Kehadiran</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {pleno.daftarHadir.map((dh, i) => (
+                            <tr key={i}>
+                              <td style={{ border: '1px solid #000', padding: '4px 8px', textAlign: 'center' }}>{i + 1}</td>
+                              <td style={{ border: '1px solid #000', padding: '4px 8px' }}>{dh.nama || '-'}</td>
+                              <td style={{ border: '1px solid #000', padding: '4px 8px' }}>{dh.peran || '-'}</td>
+                              <td style={{ border: '1px solid #000', padding: '4px 8px' }}>{dh.instansi || '-'}</td>
+                              <td style={{ border: '1px solid #000', padding: '4px 8px', textAlign: 'center', fontWeight: 'bold' }}>
+                                {dh.hadir ? 'Hadir' : 'Tidak Hadir'}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+
+                  <div style={{ marginTop: '16px', fontSize: '8.5pt', color: '#475569', fontStyle: 'italic', textAlign: 'center' }}>
+                    Lembar lampiran bukti kehadiran ini merupakan bagian yang tidak terpisahkan dari Berita Acara Sidang Pleno Nomor {nomorBA}.
+                  </div>
+                </div>
+              )}
 
             </div>
 

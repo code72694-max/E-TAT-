@@ -121,7 +121,11 @@ export const PlenoTATView: React.FC<PlenoTATViewProps> = ({
         if (existing) {
           const updatedPermohonan = {
             ...existing,
-            sidangPleno: response.data,
+            sidangPleno: {
+              ...response.data,
+              fotoKehadiranUrl: payload.fotoKehadiranUrl || response.data?.fotoKehadiranUrl,
+              fotoKehadiranKeterangan: payload.fotoKehadiranKeterangan || response.data?.fotoKehadiranKeterangan,
+            },
             statusProsesUtama: payload.statusPleno === 'selesai_sepakat' 
               ? 'pengesahan_rekomendasi' 
               : existing.statusProsesUtama,
