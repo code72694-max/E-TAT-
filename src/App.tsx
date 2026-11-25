@@ -1155,6 +1155,14 @@ export default function App() {
             permohonanList={permohonanList}
             currentUser={currentUser}
             initialCaseId={selectedTindakLanjutId || undefined}
+            onSelectCase={(caseId) => {
+              setSelectedTindakLanjutId(caseId);
+              if (caseId) {
+                navigateToDashboard(`/tindak_lanjut/pasca_rehab/${caseId}`);
+              } else {
+                navigateToDashboard('/tindak_lanjut_pasca_rehab');
+              }
+            }}
             onUpdatePermohonan={handleUpdatePermohonan}
             onBack={() => {
               setSelectedTindakLanjutId(null);
@@ -1389,8 +1397,14 @@ export default function App() {
         isPengajuanBaru={currentTab === 'pengajuan_baru'}
         isInputJadwal={currentTab === 'tindak_lanjut_input_jadwal'}
         isVerifikasiAkunDetail={currentTab === 'verifikasi_akun' && Boolean(selectedRegistrasiId)}
+        isPascaRehabDetail={currentTab === 'tindak_lanjut_pasca_rehab' && Boolean(selectedTindakLanjutId)}
         isProfilePage={currentTab === 'profile'}
         onBackFromDetail={() => {
+          if (currentTab === 'tindak_lanjut_pasca_rehab' && selectedTindakLanjutId) {
+            setSelectedTindakLanjutId(null);
+            navigateToDashboard('/tindak_lanjut_pasca_rehab');
+            return;
+          }
           if (currentTab === 'profile') {
             handleSelectTab('beranda');
             return;
@@ -1448,8 +1462,8 @@ export default function App() {
 
       {/* Main Workspace Layout - Desktop: Sidebar hidden when viewing detail page or pengajuan_baru */}
       <div className="flex-1 flex w-full bg-[#071326]">
-        {/* Sidebar at desktop corner (Hidden on permohonan detail view, pengajuan_baru, profile, tindak_lanjut_input_jadwal, and verifikasi_akun detail view) */}
-        {!activeDetailPermohonan && !selectedPermohonan && !selectedRegistrasiId && currentTab !== 'pengajuan_baru' && currentTab !== 'profile' && currentTab !== 'tindak_lanjut_input_jadwal' && (
+        {/* Sidebar at desktop corner (Hidden on permohonan detail view, pengajuan_baru, profile, tindak_lanjut_input_jadwal, verifikasi_akun detail, and pasca_rehab detail) */}
+        {!activeDetailPermohonan && !selectedPermohonan && !selectedRegistrasiId && currentTab !== 'pengajuan_baru' && currentTab !== 'profile' && currentTab !== 'tindak_lanjut_input_jadwal' && !(currentTab === 'tindak_lanjut_pasca_rehab' && Boolean(selectedTindakLanjutId)) && (
           <Sidebar
             currentTab={currentTab}
             onSelectTab={handleSelectTab}

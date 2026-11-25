@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Activity,
   Calendar,
@@ -70,6 +70,7 @@ interface Props {
   permohonanList: PermohonanAsesmen[];
   currentUser: UserProfile;
   initialCaseId?: string;
+  onSelectCase?: (caseId: string | null) => void;
   onUpdatePermohonan?: (updated: PermohonanAsesmen) => void;
   onBack: () => void;
 }
@@ -78,6 +79,7 @@ export const RehabilitasiPascaRehabView: React.FC<Props> = ({
   permohonanList,
   currentUser,
   initialCaseId,
+  onSelectCase,
   onUpdatePermohonan,
   onBack,
 }) => {
@@ -91,6 +93,10 @@ export const RehabilitasiPascaRehabView: React.FC<Props> = ({
   const [selectedCaseId, setSelectedCaseId] = useState<string>(initialCaseId || '');
   const [savedNotice, setSavedNotice] = useState<string | null>(null);
   const [refreshTick, setRefreshTick] = useState(0);
+
+  useEffect(() => {
+    setSelectedCaseId(initialCaseId || '');
+  }, [initialCaseId]);
 
   // Filter cases examined by this Medis user that have completed Pleno / Rehab
   const allEligibleCases = useMemo(() => {
@@ -160,6 +166,7 @@ export const RehabilitasiPascaRehabView: React.FC<Props> = ({
 
   const handleOpenDetail = (c: PermohonanAsesmen) => {
     setSelectedCaseId(c.id);
+    onSelectCase?.(c.id);
     setSavedNotice(null);
     const sched = getPascaRehabSchedule(c.id);
     setTanggal(sched?.tanggal || new Date().toISOString().slice(0, 10));
@@ -332,6 +339,7 @@ export const RehabilitasiPascaRehabView: React.FC<Props> = ({
             type="button"
             onClick={() => {
               setSelectedCaseId('');
+              onSelectCase?.(null);
               setSavedNotice(null);
             }}
             className="px-3.5 py-2 bg-[#142642] hover:bg-[#1a345a] text-slate-200 border border-[#234475] rounded-xl text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-all"

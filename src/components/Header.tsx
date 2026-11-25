@@ -36,6 +36,7 @@ interface HeaderProps {
   isPengajuanBaru?: boolean;
   isInputJadwal?: boolean;
   isVerifikasiAkunDetail?: boolean;
+  isPascaRehabDetail?: boolean;
   isProfilePage?: boolean;
   onBackFromDetail?: () => void;
   onOpenQrModal?: (permohonan: PermohonanAsesmen) => void;
@@ -55,6 +56,7 @@ export const Header: React.FC<HeaderProps> = ({
   isPengajuanBaru,
   isInputJadwal,
   isVerifikasiAkunDetail,
+  isPascaRehabDetail,
   isProfilePage,
   onBackFromDetail,
   onOpenQrModal
@@ -128,7 +130,7 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   // Dedicated Sticky Detail / Form View Header Bar
-  if ((selectedPermohonan || isPengajuanBaru || isInputJadwal || isVerifikasiAkunDetail) && onBackFromDetail) {
+  if ((selectedPermohonan || isPengajuanBaru || isInputJadwal || isVerifikasiAkunDetail || isPascaRehabDetail) && onBackFromDetail) {
     return (
       <header className="bg-[#0b172a] text-slate-100 border-b border-[#1b3459] sticky top-0 z-30 shadow-md">
         <div className="w-full px-3 sm:px-6 lg:px-8">
@@ -155,6 +157,8 @@ export const Header: React.FC<HeaderProps> = ({
                   ? 'Input Jadwal Kontrol & Wajib Lapor Klien'
                   : isVerifikasiAkunDetail
                   ? 'Detail Verifikasi Akun Pengguna'
+                  : isPascaRehabDetail
+                  ? 'Detail Rehabilitasi Pasca Rehab'
                   : 'Detail Permohonan Asesmen TAT'}
               </span>
             </div>
