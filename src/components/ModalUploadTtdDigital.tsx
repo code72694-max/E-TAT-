@@ -513,18 +513,7 @@ export const ModalUploadTtdDigital: React.FC<ModalUploadTtdDigitalProps> = ({
                   <ArrowRight className="w-4 h-4" />
                 </button>
               )}
-              {onOpenSuratPengantar && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    onOpenSuratPengantar();
-                  }}
-                  className="w-full sm:w-auto px-5 py-2.5 bg-gradient-to-r from-[#144782] via-[#17549c] to-[#1c64b8] hover:from-[#175194] hover:to-[#2274d4] text-white font-bold text-xs rounded-xl transition-all flex items-center justify-center space-x-2 border border-[#2d7ad6]/70 shadow-lg shadow-blue-950/50 cursor-pointer"
-                >
-                  <FileCheck className="w-4 h-4 text-sky-300" />
-                  <span>Dokumen Surat Tersangka (Lacak)</span>
-                </button>
-              )}
+              {/* Tombol Dokumen Surat Tersangka (Lacak) disembunyikan sesuai alur Pleno */}
               <button
                 type="button"
                 onClick={onClose}

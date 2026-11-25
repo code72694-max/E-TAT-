@@ -502,41 +502,30 @@ export const PlenoTATView: React.FC<PlenoTATViewProps> = ({
 
                   {/* Right: Unified Action Buttons (Alur berurutan: 1. Input Hasil Pleno -> 2. Tanda Tangani Digital) */}
                   <div className="flex items-center gap-2 flex-wrap">
-                    {/* Dokumen Surat Tersangka (disembunyikan pada tampilan Hukum Pleno) */}
-                    {!isHukum && hasSignedBA && (
+                    {/* Dokumen Surat Tersangka disembunyikan sementara pada card Pleno */}
+
+                    {/* Berita Acara (Tampil setelah Input Hasil Pleno diisi) */}
+                    {Boolean(item.sidangPleno?.kesepakatanRekomendasi) && (
                       <button
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
-                          setSuratPengantarItem(item);
+                          const fullItem = {
+                            ...item,
+                            sidangPleno: {
+                              ...(item.sidangPleno || {}),
+                              fileBeritaAcaraSigned: signatureUrl || item.sidangPleno?.fileBeritaAcaraSigned,
+                              ttdHukumUrl: signatureUrl || (item.sidangPleno as any)?.ttdHukumUrl,
+                            } as any
+                          };
+                          setBaPermohonan(fullItem);
                         }}
                         className="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-750 text-slate-200 hover:text-white border border-slate-700 flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
                       >
-                        <FileText className="w-3.5 h-3.5 text-slate-400" />
-                        <span>Dokumen Surat Tersangka</span>
+                        <Eye className="w-3.5 h-3.5 text-slate-400" />
+                        <span>{hasSignedBA ? 'Lihat Berita Acara (TTD)' : 'Draft Berita Acara'}</span>
                       </button>
                     )}
-
-                    {/* Berita Acara (Satu Tombol Jelas) */}
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        const fullItem = {
-                          ...item,
-                          sidangPleno: {
-                            ...(item.sidangPleno || {}),
-                            fileBeritaAcaraSigned: signatureUrl || item.sidangPleno?.fileBeritaAcaraSigned,
-                            ttdHukumUrl: signatureUrl || (item.sidangPleno as any)?.ttdHukumUrl,
-                          } as any
-                        };
-                        setBaPermohonan(fullItem);
-                      }}
-                      className="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-750 text-slate-200 hover:text-white border border-slate-700 flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
-                    >
-                      <Eye className="w-3.5 h-3.5 text-slate-400" />
-                      <span>{hasSignedBA ? 'Lihat Berita Acara (TTD)' : 'Draft Berita Acara'}</span>
-                    </button>
 
                     {/* Step 1: Input Hasil Pleno / Revisi */}
                     <button
