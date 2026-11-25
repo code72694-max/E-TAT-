@@ -498,9 +498,12 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
                     {/* Direct Clean Acronym Subtitles - Centered */}
                     <div className="space-y-1.5 pt-1 text-slate-200 text-center max-w-2xl mx-auto">
                       <p className="text-sm sm:text-base md:text-lg font-bold tracking-wide text-white drop-shadow-md">
+                        Elektronik Tim Asesmen Terpadu
+                      </p>
+                      <p className="text-xs sm:text-sm md:text-base font-semibold text-slate-200 drop-shadow-md">
                         Sistem Integrasi Asesmen dan Pemantauan Pemulihan
                       </p>
-                      <p className="text-xs sm:text-sm md:text-base font-medium italic text-teal-300 drop-shadow-md">
+                      <p className="text-xs sm:text-sm font-medium italic text-teal-300 drop-shadow-md">
                         Asesmen Tepat, Pemulihan Terpantau
                       </p>
                     </div>
@@ -593,6 +596,9 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
                 <h3 className="text-lg sm:text-xl font-extrabold text-white font-['Cinzel',serif] tracking-wide">
                   E-TAT <span className="text-[#D4AF37]">SIAP PULIH</span>
                 </h3>
+                <p className="text-xs sm:text-sm font-bold text-[#D4AF37] leading-snug max-w-xs mx-auto">
+                  Elektronik Tim Asesmen Terpadu
+                </p>
                 <p className="text-xs sm:text-sm font-semibold text-slate-200 leading-snug max-w-xs mx-auto">
                   Sistem Integrasi Asesmen dan Pemantauan Pemulihan
                 </p>
