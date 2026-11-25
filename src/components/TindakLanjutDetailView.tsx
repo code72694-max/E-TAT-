@@ -254,16 +254,24 @@ const FieldGroup: React.FC<{ label: string; required?: boolean; hint?: string; c
 // =====================================================================
 // Step 1: Input Admisi & Rekam Medis Component
 // =====================================================================
+interface SaveConfirmInfo {
+  title: string;
+  description: string;
+  nextStepLabel?: string;
+  nextTab?: 'pelaksanaan' | 'laporan' | 'wajib_lapor' | 'akhir';
+}
+
 const PelaksanaanRehabSection: React.FC<{
   monitoring: MonitoringTindakLanjut;
   permohonan: PermohonanAsesmen;
   userRole: UserRole;
   readOnly?: boolean;
   onUpdate: (updated: MonitoringTindakLanjut) => void;
-}> = ({ monitoring, permohonan, userRole, readOnly, onUpdate }) => {
+  onSaveSuccess?: (info: SaveConfirmInfo) => void;
+}> = ({ monitoring, permohonan, userRole, readOnly, onUpdate, onSaveSuccess }) => {
   const existing = monitoring.pelaksanaanRehab;
   const [mode, setMode] = useState<'view' | 'edit' | 'new'>(!existing && !readOnly ? 'new' : 'view');
-  const canEdit = !readOnly && ['PENGAJU', 'ADMIN', 'MEDIS'].includes(userRole);
+  const canEdit = !readOnly && ['PENGAJU', 'ADMIN', 'SEKRETARIAT'].includes((userRole || '').toUpperCase());
   const [showBaModal, setShowBaModal] = useState(false);
   const baPrintRef = useRef<HTMLDivElement>(null);
 
@@ -311,6 +319,12 @@ const PelaksanaanRehabSection: React.FC<{
     };
     onUpdate({ ...monitoring, pelaksanaanRehab: saved, terakhirDiperbarui: today() });
     setMode('view');
+    onSaveSuccess?.({
+      title: 'Admisi & Serah Terima Tersimpan',
+      description: 'Data admisi dan serah terima tersangka telah disimpan. Tahap selanjutnya diteruskan ke Tim Medis untuk input Rekam Medis & Tes Urin.',
+      nextTab: 'laporan',
+      nextStepLabel: 'Lanjut ke Tab 2: Rekam Medis & Tes Urin',
+    });
   };
 
   const setF = (key: keyof PelaksanaanRehab, val: unknown) => setForm(p => ({ ...p, [key]: val }));
@@ -319,11 +333,24 @@ const PelaksanaanRehabSection: React.FC<{
     <div className="space-y-4">
       <SectionHeader
         icon={<Building2 className="w-4 h-4 text-slate-300" />}
-        title="1. Input Admisi & Serah Terima Rehabilitasi (Penerimaan Klinis)"
-        subtitle="Data koordinasi awal penerimaan medis, DPJP penerima, fasilitas rujukan, serta BA Serah Terima resmi."
+        title="1. Input Admisi & Serah Terima Rehabilitasi (Input Pengaju)"
+        subtitle="Diisi oleh Pengaju (Polsek/Polres) atau Admin untuk mencatat serah terima tersangka ke fasilitas rehabilitasi dan meneruskan ke Tim Medis."
       />
 
-      {(mode === 'view' && existing) ? (
+      {readOnly && (
+        <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-slate-900/80 border border-slate-800 text-xs text-slate-300">
+          <Info className="w-4 h-4 text-sky-400 shrink-0" />
+          <span>Mode Hanya Baca (Read-Only): Tahap Admisi &amp; Serah Terima diinput oleh Pengaju (Polsek/Polres) atau Admin.</span>
+        </div>
+      )}
+
+      {!existing && readOnly ? (
+        <div className="p-8 text-center bg-[#081224] border border-[#1b3459] rounded-xl text-xs text-slate-400 space-y-1.5">
+          <Building2 className="w-8 h-8 text-slate-600 mx-auto mb-2" />
+          <p className="font-semibold text-slate-300">Menunggu Input Admisi &amp; Serah Terima dari Pengaju</p>
+          <p>Pengaju (Polsek/Polres) belum mengonfirmasi serah terima tersangka ke fasilitas rehabilitasi.</p>
+        </div>
+      ) : (mode === 'view' && existing) ? (
         <div className="space-y-3.5">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 bg-slate-950/50 p-4 rounded-xl border border-slate-800/80">
             <div>
@@ -612,8 +639,8 @@ const PelaksanaanRehabSection: React.FC<{
           )}
 
           {canEdit && (
-            <button className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700/80 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 cursor-pointer shadow-sm" onClick={() => setMode('edit')}>
-              <Edit3 className="w-3.5 h-3.5 text-slate-400" /> Edit Input Admisi Medis
+            <button className="px-4 py-2 bg-slate-800/90 hover:bg-slate-700 text-slate-100 border border-slate-700/80 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 cursor-pointer shadow-sm" onClick={() => setMode('edit')}>
+              <Edit3 className="w-3.5 h-3.5 text-sky-400" /> Edit Input Admisi &amp; Serah Terima
             </button>
           )}
         </div>
@@ -638,9 +665,9 @@ const PelaksanaanRehabSection: React.FC<{
             <textarea className="w-full bg-slate-950/60 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-100 focus:border-slate-600 outline-none resize-y" rows={2} value={form.hasilKoordinasiPenerimaan ?? ''} onChange={e => setF('hasilKoordinasiPenerimaan', e.target.value)} />
           </FieldGroup>
 
-          <div className="flex gap-2 pt-2">
-            <button className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-100 border border-slate-600 font-medium rounded-lg text-xs shadow-sm transition-all flex items-center gap-1.5 cursor-pointer" onClick={handleSave}>
-              <Check className="w-3.5 h-3.5 text-emerald-400" /> Simpan Admisi Medis
+          <div className="flex flex-wrap gap-2 pt-2">
+            <button className="px-4 py-2 bg-gradient-to-r from-[#144782] to-[#1c64b8] hover:from-[#17549c] hover:to-[#2272d1] text-white border border-sky-400/20 font-semibold rounded-lg text-xs shadow-sm transition-all flex items-center gap-1.5 cursor-pointer" onClick={handleSave}>
+              <Check className="w-3.5 h-3.5 text-emerald-300" /> Simpan &amp; Konfirmasi ke Tim Medis
             </button>
             {mode === 'edit' && (
               <button className="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 font-medium rounded-lg text-xs transition-all cursor-pointer" onClick={() => setMode('view')}>
@@ -663,7 +690,8 @@ const EvaluasiKlinisSection: React.FC<{
   userRole: UserRole;
   readOnly?: boolean;
   onUpdate: (updated: MonitoringTindakLanjut) => void;
-}> = ({ monitoring, permohonan, userRole, readOnly, onUpdate }) => {
+  onSaveSuccess?: (info: SaveConfirmInfo) => void;
+}> = ({ monitoring, permohonan, userRole, readOnly, onUpdate, onSaveSuccess }) => {
   const [showUrineModal, setShowUrineModal] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
 
@@ -704,6 +732,12 @@ const EvaluasiKlinisSection: React.FC<{
       terakhirDiperbarui: today()
     });
     setShowUrineModal(false);
+    onSaveSuccess?.({
+      title: 'Hasil Tes Urin Tersimpan',
+      description: 'Hasil uji toksikologi urin telah disimpan. Tahap selanjutnya masuk ke Pengaju (Polsek/Polres) pada Tab 3: Jurnal Wajib Lapor.',
+      nextTab: 'wajib_lapor',
+      nextStepLabel: 'Lanjut ke Tab 3: Jurnal Wajib Lapor',
+    });
   };
 
   const handleAddReport = (e: React.FormEvent) => {
@@ -713,7 +747,7 @@ const EvaluasiKlinisSection: React.FC<{
       jenisLaporan: jenisLaporan,
       tanggalKegiatanSebenarnya: today(),
       namaFasilitasPelapor: monitoring.pelaksanaanRehab?.namaFasilitasTujuan || 'Balai Rehab BNN',
-      namaPenerbitLaporan: '[TEST] Dokter DPJP Fasilitas',
+      namaPenerbitLaporan: permohonan.timAsesmen?.asesorMedisNama || 'Tim Medis TAT',
       kapasitasPenerbit: 'Dokter Penanggung Jawab Pasien (DPJP)',
       statusPelaksanaanBerdasarkanBukti: 'terlaksana',
       ringkasanAdministratif: ringkasanKlinis,
@@ -732,32 +766,45 @@ const EvaluasiKlinisSection: React.FC<{
       terakhirDiperbarui: today()
     });
     setShowReportModal(false);
+    onSaveSuccess?.({
+      title: 'Evaluasi Klinis Medis Tersimpan',
+      description: 'Catatan evaluasi klinis medis telah disimpan. Tahap selanjutnya masuk ke Pengaju (Polsek/Polres) pada Tab 3: Jurnal Wajib Lapor.',
+      nextTab: 'wajib_lapor',
+      nextStepLabel: 'Lanjut ke Tab 3: Jurnal Wajib Lapor',
+    });
   };
 
   return (
     <div className="space-y-4">
       <SectionHeader
         icon={<Stethoscope className="w-4 h-4 text-slate-300" />}
-        title="2. Input Evaluasi Klinis & Uji Toksikologi Urin Berkala (Medis)"
+        title="2. Input Evaluasi Klinis & Uji Toksikologi Urin Berkala (Input Medis)"
         subtitle="Rekam medis kontrol periodik, skrining tes urin berkala/acak (toksikologi), dan catatan perkembangan pasien."
       />
+
+      {readOnly && (
+        <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-slate-900/80 border border-slate-800 text-xs text-slate-300">
+          <Info className="w-4 h-4 text-sky-400 shrink-0" />
+          <span>Mode Hanya Baca (Read-Only): Data rekam medis &amp; hasil tes urin diinput oleh Tim Medis. Pengaju dapat memantau hasilnya di sini sebelum mencatat Wajib Lapor.</span>
+        </div>
+      )}
 
       {/* Action Input Buttons */}
       {!readOnly && (
         <div className="flex flex-wrap gap-2.5">
           <button
             onClick={() => setShowUrineModal(true)}
-            className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700/80 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
+            className="px-4 py-2 bg-gradient-to-r from-[#144782] to-[#1c64b8] hover:from-[#17549c] hover:to-[#2272d1] text-white border border-sky-400/20 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
           >
-            <Syringe className="w-3.5 h-3.5 text-slate-400" />
+            <Syringe className="w-3.5 h-3.5 text-sky-200" />
             <span>+ Input Hasil Tes Urin</span>
           </button>
 
           <button
             onClick={() => setShowReportModal(true)}
-            className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700/80 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
+            className="px-4 py-2 bg-slate-800/90 hover:bg-slate-700 text-slate-100 border border-slate-700/80 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
           >
-            <FilePlus className="w-3.5 h-3.5 text-slate-400" />
+            <FilePlus className="w-3.5 h-3.5 text-sky-400" />
             <span>+ Input Evaluasi Klinis Medis</span>
           </button>
         </div>
@@ -787,8 +834,8 @@ const EvaluasiKlinisSection: React.FC<{
             <input className="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-slate-100 outline-none focus:border-slate-600" value={urinKet} onChange={e => setUrinKet(e.target.value)} />
           </FieldGroup>
           <div className="flex gap-2 pt-1">
-            <button type="submit" className="px-3.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-100 border border-slate-600 rounded-lg text-xs font-medium cursor-pointer shadow-sm">Simpan Hasil Uji</button>
-            <button type="button" className="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 rounded-lg text-xs font-medium cursor-pointer" onClick={() => setShowUrineModal(false)}>Batal</button>
+            <button type="submit" className="px-4 py-2 bg-gradient-to-r from-[#144782] to-[#1c64b8] hover:from-[#17549c] hover:to-[#2272d1] text-white border border-sky-400/20 rounded-lg text-xs font-semibold cursor-pointer shadow-sm">Simpan Hasil Uji</button>
+            <button type="button" className="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 rounded-lg text-xs font-medium cursor-pointer" onClick={() => setShowUrineModal(false)}>Batal</button>
           </div>
         </form>
       )}
@@ -808,8 +855,8 @@ const EvaluasiKlinisSection: React.FC<{
             <textarea className="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-slate-100 outline-none focus:border-slate-600" rows={3} value={ringkasanKlinis} onChange={e => setRingkasanKlinis(e.target.value)} />
           </FieldGroup>
           <div className="flex gap-2 pt-1">
-            <button type="submit" className="px-3.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-100 border border-slate-600 rounded-lg text-xs font-medium cursor-pointer shadow-sm">Simpan Evaluasi Medis</button>
-            <button type="button" className="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 rounded-lg text-xs font-medium cursor-pointer" onClick={() => setShowReportModal(false)}>Batal</button>
+            <button type="submit" className="px-4 py-2 bg-gradient-to-r from-[#144782] to-[#1c64b8] hover:from-[#17549c] hover:to-[#2272d1] text-white border border-sky-400/20 rounded-lg text-xs font-semibold cursor-pointer shadow-sm">Simpan Evaluasi Medis</button>
+            <button type="button" className="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 rounded-lg text-xs font-medium cursor-pointer" onClick={() => setShowReportModal(false)}>Batal</button>
           </div>
         </form>
       )}
@@ -877,7 +924,8 @@ const WajibLaporSection: React.FC<{
   userRole: UserRole;
   readOnly?: boolean;
   onUpdate: (updated: MonitoringTindakLanjut) => void;
-}> = ({ monitoring, permohonan, userRole, readOnly, onUpdate }) => {
+  onSaveSuccess?: (info: SaveConfirmInfo) => void;
+}> = ({ monitoring, permohonan, userRole, readOnly, onUpdate, onSaveSuccess }) => {
   const [showForm, setShowForm] = useState(false);
   const [formMode, setFormMode] = useState<'aktual' | 'rencana'>('aktual');
   const [showSpModal, setShowSpModal] = useState(false);
@@ -941,6 +989,12 @@ const WajibLaporSection: React.FC<{
       terakhirDiperbarui: today()
     });
     setShowForm(false);
+    onSaveSuccess?.({
+      title: formMode === 'aktual' ? 'Wajib Lapor Aktual Tersimpan' : 'Rencana Wajib Lapor Tersimpan',
+      description: 'Catatan Jurnal Wajib Lapor telah berhasil disimpan ke sistem e-TAT.',
+      nextTab: 'akhir',
+      nextStepLabel: 'Lihat Tab 4: Output Surat SKSR',
+    });
   };
 
   const handleVerifyAdmin = (wlId: string) => {
@@ -987,15 +1041,26 @@ const WajibLaporSection: React.FC<{
       terakhirDiperbarui: today()
     });
     setShowSpModal(false);
+    onSaveSuccess?.({
+      title: `Surat Peringatan (${spTingkat}) Diterbitkan`,
+      description: 'Catatan Surat Peringatan (SP) telah disimpan dan tercatat dalam riwayat monitoring klien.',
+    });
   };
 
   return (
     <div className="space-y-4">
       <SectionHeader
         icon={<CheckSquare className="w-4 h-4 text-slate-300" />}
-        title="3. Jurnal Pengawasan & Catatan Wajib Lapor Penyidik"
-        subtitle="Menu Pengaju (Penyidik/JPU Berwenang) untuk mencatat tanggal kejadian aktual wajib lapor."
+        title="3. Jurnal Pengawasan & Catatan Wajib Lapor Penyidik (Input Pengaju)"
+        subtitle="Menu Pengaju (Penyidik/JPU Berwenang) untuk mencatat tanggal kejadian aktual wajib lapor setelah tersangka melapor."
       />
+
+      {readOnly && (
+        <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-slate-900/80 border border-slate-800 text-xs text-slate-300">
+          <Info className="w-4 h-4 text-sky-400 shrink-0" />
+          <span>Mode Hanya Baca (Read-Only): Jurnal Wajib Lapor diisi oleh Pengaju (Polsek/Polres) atau Admin.</span>
+        </div>
+      )}
 
       {/* Notice Banner Rule JUKNIS */}
       <div className="bg-slate-950/40 border border-slate-800/80 rounded-xl p-3.5 text-xs text-slate-300 space-y-1.5">
@@ -1011,27 +1076,27 @@ const WajibLaporSection: React.FC<{
       </div>
 
       {!readOnly && (
-        <div className="flex flex-wrap gap-2.5">
+        <div className="flex flex-wrap items-center gap-2.5">
           <button
             onClick={() => { setShowForm(true); setFormMode('aktual'); }}
-            className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700/80 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
+            className="px-4 py-2 bg-gradient-to-r from-[#144782] to-[#1c64b8] hover:from-[#17549c] hover:to-[#2272d1] text-white border border-sky-400/20 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
           >
-            <Plus className="w-3.5 h-3.5 text-slate-400" />
-            <span>+ Catat Pelaporan Aktual</span>
+            <Plus className="w-3.5 h-3.5 text-sky-200" />
+            <span>Catat Pelaporan Aktual</span>
           </button>
 
           <button
             onClick={() => { setShowForm(true); setFormMode('rencana'); }}
-            className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700/80 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
+            className="px-4 py-2 bg-slate-800/90 hover:bg-slate-700 text-slate-100 border border-slate-700/80 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
           >
-            <Calendar className="w-3.5 h-3.5 text-slate-400" />
-            <span>+ Buat Rencana Wajib Lapor</span>
+            <Calendar className="w-3.5 h-3.5 text-sky-400" />
+            <span>Buat Rencana Wajib Lapor</span>
           </button>
 
           <button
             type="button"
             onClick={() => setShowLembarKendaliModal(true)}
-            className="px-3.5 py-2 bg-[#142642] hover:bg-[#1a345a] text-[#D4AF37] border border-[#234b7d] rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
+            className="px-4 py-2 bg-[#142642] hover:bg-[#1a345a] text-[#D4AF37] border border-[#234b7d] rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
           >
             <Printer className="w-3.5 h-3.5 text-[#D4AF37]" />
             <span>Cetak Rekap Wajib Lapor</span>
@@ -1039,7 +1104,7 @@ const WajibLaporSection: React.FC<{
 
           <button
             onClick={() => setShowSpModal(true)}
-            className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-rose-400 hover:text-rose-300 border border-rose-500/30 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer ml-auto"
+            className="px-4 py-2 bg-rose-950/50 hover:bg-rose-900/60 text-rose-300 hover:text-rose-200 border border-rose-500/30 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer sm:ml-auto"
           >
             <BadgeAlert className="w-3.5 h-3.5 text-rose-400" />
             <span>Terbitkan SP</span>
@@ -1524,7 +1589,8 @@ const AkhirLayananSection: React.FC<{
   userRole: UserRole;
   readOnly?: boolean;
   onUpdate: (updated: MonitoringTindakLanjut) => void;
-}> = ({ monitoring, permohonan, userRole, readOnly, onUpdate }) => {
+  onSaveSuccess?: (info: SaveConfirmInfo) => void;
+}> = ({ monitoring, permohonan, userRole, readOnly, onUpdate, onSaveSuccess }) => {
   const existing = monitoring.akhirLayanan;
   const [showCertPreview, setShowCertPreview] = useState(false);
   const sksrPrintRef = useRef<HTMLDivElement>(null);
@@ -1559,6 +1625,10 @@ const AkhirLayananSection: React.FC<{
       statusVerifikasiAdmin: 'terverifikasi',
     };
     onUpdate({ ...monitoring, akhirLayanan: saved, statusMonitoring: 'selesai', terakhirDiperbarui: today() });
+    onSaveSuccess?.({
+      title: 'Output Surat SKSR Difinalkan',
+      description: 'Surat Keterangan Selesai Rehabilitasi (SKSR) telah disimpan dan status monitoring tindak lanjut dinyatakan selesai.',
+    });
   };
 
   return (
@@ -1568,6 +1638,13 @@ const AkhirLayananSection: React.FC<{
         title="4. Output Resmi: Surat Keterangan Selesai Rehabilitasi (SKSR)"
         subtitle="Pengeluaran resmi hasil rehabilitasi, kelulusan, hasil uji toksikologi, dan rekomendasi status hukum."
       />
+
+      {readOnly && (
+        <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-slate-900/80 border border-slate-800 text-xs text-slate-300">
+          <Info className="w-4 h-4 text-sky-400 shrink-0" />
+          <span>Mode Hanya Baca (Read-Only): Finalisasi Output Surat SKSR dilakukan oleh Tim Medis / Admin. Pengaju dapat meninjau &amp; mencetak SKSR.</span>
+        </div>
+      )}
 
       {/* Output Document Preview & Action Card */}
       <div className="bg-slate-950/50 border border-slate-800/80 rounded-xl p-4 sm:p-5 space-y-4 shadow-sm">
@@ -1781,8 +1858,8 @@ const AkhirLayananSection: React.FC<{
             <FieldGroup label="Ringkasan Hasil Evaluasi Selesai Rehabilitasi" required>
               <textarea className="w-full bg-slate-900 border border-slate-800 rounded-lg p-3 text-xs text-slate-100 focus:border-slate-600 outline-none" rows={3} value={form.hasilSesuaiDokumenFasilitas ?? ''} onChange={e => setF('hasilSesuaiDokumenFasilitas', e.target.value)} />
             </FieldGroup>
-            <button className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-emerald-400 hover:text-emerald-300 border border-emerald-500/40 rounded-lg text-xs font-medium flex items-center gap-1.5 cursor-pointer shadow-sm transition-all" onClick={handleSave}>
-              <Check className="w-3.5 h-3.5" /> Simpan &amp; Finalkan Output Surat SKSR
+            <button className="px-4 py-2 bg-gradient-to-r from-[#144782] to-[#1c64b8] hover:from-[#17549c] hover:to-[#2272d1] text-white border border-sky-400/20 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-sm transition-all" onClick={handleSave}>
+              <Check className="w-3.5 h-3.5 text-emerald-300" /> Simpan &amp; Finalkan Output Surat SKSR
             </button>
           </div>
         )}
@@ -1899,30 +1976,52 @@ export const TindakLanjutDetailView: React.FC<Props> = ({
     pgw?.tanggalMulai ||
     monitoring?.pelaksanaanRehab?.tanggalMasukLayananTerkonfirmasi ||
     tl?.tanggalMulaiLayanan ||
-    '15 September 2026';
+    'Belum Dimulai';
 
   const tanggalTargetSelesai =
     pgw?.tanggalTargetSelesai ||
-    '15 Desember 2026';
+    (monitoring?.akhirLayanan?.tanggalAkhirLayananAktual ? monitoring.akhirLayanan.tanggalAkhirLayananAktual : 'Menunggu Jadwal Rehab');
 
   // Jadwal Kontrol Berikutnya
   const tanggalKontrolBerikutnya =
     pgw?.tanggalKontrolBerikutnya ||
-    monitoring?.buktiWajibLaporList?.[0]?.tanggalRencanaWajibLapor ||
-    '28 Oktober 2026';
+    monitoring?.buktiWajibLaporList?.find(w => w.tanggalRencanaWajibLapor)?.tanggalRencanaWajibLapor ||
+    'Belum Dijadwalkan';
 
-  const waktuKontrolBerikutnya = pgw?.waktuKontrolBerikutnya || '09:30 WITA';
+  const waktuKontrolBerikutnya =
+    pgw?.waktuKontrolBerikutnya ||
+    (tanggalKontrolBerikutnya === 'Belum Dijadwalkan' ? 'Menunggu jadwal wajib lapor' : '09:30 WITA');
 
   const catatanKontrolBerikutnya =
     pgw?.catatanKontrolBerikutnya ||
     'Wajib didampingi keluarga penjamin, membawa kartu kontrol klien, serta menjalani evaluasi skrining toksikologi urin berkala.';
 
-  // Sesi & Kepatuhan
+  // Sesi, Toksikologi & Kepatuhan (100% Dinamis dari Data Aktual)
   const totalSesi = pgw?.totalSesiWajib || 12;
+  const sesiAktual = (monitoring?.laporanKontrolList?.length || 0) + (monitoring?.buktiWajibLaporList?.length || 0);
   const sesiSelesai = isSelesaiRehab
     ? totalSesi
-    : (pgw?.sesiTerselesaikan || (monitoring?.laporanKontrolList?.length ? monitoring.laporanKontrolList.length * 2 : 4));
+    : (pgw?.sesiTerselesaikan ?? sesiAktual);
   const persenSelesai = Math.min(100, Math.round((sesiSelesai / totalSesi) * 100));
+
+  const riwayatUrinList = getMonitoringUrineHistory(monitoring, permohonan);
+  const negUrineCount = riwayatUrinList.filter(u => u.hasil?.toLowerCase() !== 'positif').length;
+  const posUrineCount = riwayatUrinList.filter(u => u.hasil?.toLowerCase() === 'positif').length;
+
+  const hasSpRecord = monitoring?.laporanKontrolList?.some(
+    l => l.jenisLaporan === 'Laporan Kejadian Khusus' || l.ringkasanAdministratif?.includes('SURAT PERINGATAN')
+  );
+  const jumlahWajibLapor = monitoring?.buktiWajibLaporList?.length || 0;
+  const kepatuhanStatus = hasSpRecord
+    ? 'Dalam Peringatan (SP)'
+    : jumlahWajibLapor > 0
+    ? 'Patuh Wajib Lapor'
+    : 'Menunggu Pelaporan';
+  const kepatuhanSub = hasSpRecord
+    ? 'Terdapat catatan Surat Peringatan'
+    : jumlahWajibLapor > 0
+    ? `✓ ${jumlahWajibLapor}x Wajib Lapor Tercatat`
+    : 'Belum ada catatan wajib lapor';
 
   const noSuratRekom = rekom?.nomorSurat || pleno?.nomorBeritaAcara || `R-TAT/2026/${permohonan.id.slice(-4)}`;
 
@@ -1940,8 +2039,23 @@ export const TindakLanjutDetailView: React.FC<Props> = ({
     akhir: !!monitoring.akhirLayanan,
   };
 
-  const isMedisRole = currentUser.role?.toUpperCase() === 'MEDIS';
+  const [saveConfirmModal, setSaveConfirmModal] = useState<SaveConfirmInfo | null>(null);
+
+  const userRoleUpper = (currentUser.role || '').toUpperCase();
+  const isPengajuRole = userRoleUpper === 'PENGAJU';
+  const isAdminRole = userRoleUpper === 'ADMIN' || userRoleUpper === 'SEKRETARIAT';
+  const isMedisRole = userRoleUpper === 'MEDIS';
   const isMedisAuthorized = isMedisRole ? isSuspectExaminedByMedis(permohonan, currentUser) : true;
+
+  // Hak Akses Edit per Tab sesuai Alur:
+  // Tab 1 (Admisi & Serah Terima): Input Pengaju / Admin (Medis Read-Only)
+  const readOnlyTab1 = !(isPengajuRole || isAdminRole);
+  // Tab 2 (Rekam Medis & Tes Urin): Input Medis (terotorisasi) / Admin (Pengaju STRICTLY Read-Only)
+  const readOnlyTab2 = isPengajuRole || (isMedisRole && !isMedisAuthorized) || (!isMedisRole && !isAdminRole);
+  // Tab 3 (Jurnal Wajib Lapor): Input Pengaju / Admin (Medis Read-Only)
+  const readOnlyTab3 = !(isPengajuRole || isAdminRole);
+  // Tab 4 (Output SKSR): Input Medis (terotorisasi) / Admin (Pengaju Read-Only)
+  const readOnlyTab4 = isPengajuRole || (isMedisRole && !isMedisAuthorized) || (!isMedisRole && !isAdminRole);
   const doctorName =
     permohonan.timAsesmen?.asesorMedisNama ||
     permohonan.asesmenMedis?.asesorNama ||
@@ -2067,19 +2181,47 @@ export const TindakLanjutDetailView: React.FC<Props> = ({
 
           <div className="bg-slate-950/50 border border-slate-800 rounded-xl p-3.5 space-y-1">
             <span className="text-[10px] font-semibold uppercase text-slate-400 tracking-wider block">Hasil Toksikologi</span>
-            <span className="text-base font-bold text-emerald-400 flex items-center gap-1 font-mono">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span>{isSelesaiRehab ? '3x NEGATIF' : '2x NEGATIF'}</span>
-            </span>
-            <span className="text-[10px] text-slate-400 block truncate">
-              {isSelesaiRehab ? 'Lulus Uji Toksikologi' : 'Non-Reaktif (Bebas Zat)'}
-            </span>
+            {riwayatUrinList.length === 0 ? (
+              <>
+                <span className="text-base font-bold text-slate-300 flex items-center gap-1 font-mono">
+                  <Clock className="w-4 h-4 text-slate-400 shrink-0" />
+                  <span>Belum Ada Tes</span>
+                </span>
+                <span className="text-[10px] text-slate-400 block truncate">
+                  Menunggu input Tim Medis
+                </span>
+              </>
+            ) : posUrineCount > 0 ? (
+              <>
+                <span className="text-base font-bold text-rose-400 flex items-center gap-1 font-mono">
+                  <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+                  <span>{posUrineCount}x POSITIF</span>
+                </span>
+                <span className="text-[10px] text-rose-300 block truncate">
+                  Terdeteksi Zat ({riwayatUrinList.length}x Uji)
+                </span>
+              </>
+            ) : (
+              <>
+                <span className="text-base font-bold text-emerald-400 flex items-center gap-1 font-mono">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>{negUrineCount}x NEGATIF</span>
+                </span>
+                <span className="text-[10px] text-slate-400 block truncate">
+                  {isSelesaiRehab ? 'Lulus Uji Toksikologi' : 'Non-Reaktif (Bebas Zat)'}
+                </span>
+              </>
+            )}
           </div>
 
           <div className="bg-slate-950/50 border border-slate-800 rounded-xl p-3.5 space-y-1">
             <span className="text-[10px] font-semibold uppercase text-slate-400 tracking-wider block">Kepatuhan Klien</span>
-            <span className="text-base font-bold text-slate-200 block">Sangat Patuh</span>
-            <span className="text-[10px] text-emerald-400 block">✓ Nihil Mangkir Sesi</span>
+            <span className={`text-base font-bold block ${hasSpRecord ? 'text-rose-400' : jumlahWajibLapor > 0 ? 'text-slate-100' : 'text-slate-300'}`}>
+              {kepatuhanStatus}
+            </span>
+            <span className={`text-[10px] block ${hasSpRecord ? 'text-rose-300' : jumlahWajibLapor > 0 ? 'text-emerald-400' : 'text-slate-400'}`}>
+              {kepatuhanSub}
+            </span>
           </div>
 
           <div className="bg-slate-950/50 border border-slate-800 rounded-xl p-3.5 space-y-1">
@@ -2089,8 +2231,8 @@ export const TindakLanjutDetailView: React.FC<Props> = ({
             <span className="text-sm font-bold text-slate-200 font-mono block truncate">
               {isSelesaiRehab ? 'Program Selesai' : tanggalKontrolBerikutnya}
             </span>
-            <span className="text-[10px] text-slate-400 block">
-              {isSelesaiRehab ? 'Tuntas 100% Seluruh Sesi' : `${waktuKontrolBerikutnya} WITA`}
+            <span className="text-[10px] text-slate-400 block truncate">
+              {isSelesaiRehab ? 'Tuntas 100% Seluruh Sesi' : waktuKontrolBerikutnya}
             </span>
           </div>
         </div>
@@ -2249,18 +2391,61 @@ export const TindakLanjutDetailView: React.FC<Props> = ({
       {/* Active Sub View */}
       <div className="pt-1">
         {activeTab === 'laporan' && (
-          <EvaluasiKlinisSection monitoring={monitoring} permohonan={permohonan} userRole={currentUser.role} readOnly={!isMedisAuthorized} onUpdate={handleMonitoringUpdate} />
+          <EvaluasiKlinisSection monitoring={monitoring} permohonan={permohonan} userRole={currentUser.role} readOnly={readOnlyTab2} onUpdate={handleMonitoringUpdate} onSaveSuccess={setSaveConfirmModal} />
         )}
         {activeTab === 'wajib_lapor' && (
-          <WajibLaporSection monitoring={monitoring} permohonan={permohonan} userRole={currentUser.role} readOnly={!isMedisAuthorized} onUpdate={handleMonitoringUpdate} />
+          <WajibLaporSection monitoring={monitoring} permohonan={permohonan} userRole={currentUser.role} readOnly={readOnlyTab3} onUpdate={handleMonitoringUpdate} onSaveSuccess={setSaveConfirmModal} />
         )}
         {activeTab === 'pelaksanaan' && (
-          <PelaksanaanRehabSection monitoring={monitoring} permohonan={permohonan} userRole={currentUser.role} readOnly={!isMedisAuthorized} onUpdate={handleMonitoringUpdate} />
+          <PelaksanaanRehabSection monitoring={monitoring} permohonan={permohonan} userRole={currentUser.role} readOnly={readOnlyTab1} onUpdate={handleMonitoringUpdate} onSaveSuccess={setSaveConfirmModal} />
         )}
         {activeTab === 'akhir' && (
-          <AkhirLayananSection monitoring={monitoring} permohonan={permohonan} userRole={currentUser.role} readOnly={!isMedisAuthorized} onUpdate={handleMonitoringUpdate} />
+          <AkhirLayananSection monitoring={monitoring} permohonan={permohonan} userRole={currentUser.role} readOnly={readOnlyTab4} onUpdate={handleMonitoringUpdate} onSaveSuccess={setSaveConfirmModal} />
         )}
       </div>
+
+      {/* Modal Konfirmasi Simpan */}
+      {saveConfirmModal && (
+        <div
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+          style={{ background: 'rgba(2, 6, 23, 0.8)', backdropFilter: 'blur(4px)' }}
+        >
+          <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl shadow-2xl w-full max-w-md p-5 space-y-4">
+            <div className="flex items-start gap-3">
+              <div className="p-2.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 shrink-0">
+                <CheckCircle2 className="w-5 h-5" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-sm font-bold text-white">{saveConfirmModal.title}</h3>
+                <p className="text-xs text-slate-300 leading-relaxed">{saveConfirmModal.description}</p>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center justify-end gap-2 pt-2 border-t border-slate-800/80">
+              <button
+                type="button"
+                onClick={() => setSaveConfirmModal(null)}
+                className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg text-xs font-medium cursor-pointer transition-all"
+              >
+                Tutup
+              </button>
+              {saveConfirmModal.nextTab && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const next = saveConfirmModal.nextTab!;
+                    setSaveConfirmModal(null);
+                    setActiveTab(next);
+                  }}
+                  className="px-4 py-2 bg-gradient-to-r from-[#144782] to-[#1c64b8] hover:from-[#17549c] hover:to-[#2272d1] text-white border border-sky-400/20 rounded-lg text-xs font-semibold cursor-pointer shadow-sm transition-all"
+                >
+                  {saveConfirmModal.nextStepLabel || 'Lanjut Tahap Berikutnya'}
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {showLembarKendali && (
         <LembarKendaliModal

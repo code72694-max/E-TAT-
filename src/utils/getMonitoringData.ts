@@ -46,112 +46,32 @@ export const resolveMonitoringData = (permohonan: PermohonanAsesmen): Monitoring
   return {
     id: 'mon-' + permohonan.id,
     nomorRekomendasi: permohonan.rekomendasiResmi?.nomorSurat || permohonan.nomorPermohonan,
-    pelaksanaanRehab: {
-      id: 'pel-' + permohonan.id,
-      nomorRekomendasiTAT:
-        permohonan.rekomendasiResmi?.nomorSurat ||
-        `REK-TAT/2026/${permohonan.id.slice(-4)}`,
-      jenisLayananSesuaiRekomendasi: isRawatInap
-        ? 'Rehabilitasi Medis Rawat Inap Intensif (3 Bulan)'
-        : 'Rehabilitasi Rawat Jalan Kontrol Berkala (8 Sesi)',
-      namaFasilitasTujuan: fasilitas,
-      alamatFasilitas:
-        'Jl. Poros Samarinda-Bontang Km. 24, Tanah Merah, Samarinda, Kaltim',
-      namaPenanggungJawabFasilitas: dpjp,
-      kontakPenanggungJawabFasilitas: '0812-555-9821 / (0541) 743201',
-      tanggalKoordinasiPenerimaan: '2026-09-15',
-      hasilKoordinasiPenerimaan: `Fasilitas ${fasilitas} mengonfirmasi kesediaan tempat & tim medis penerima sesuai kuota rekomendasi TAT.`,
-      catatanKoordinasi:
-        'Persyaratan administratif awal dan hasil uji toksikologi dinyatakan lengkap.',
-      tanggalSerahTerimaAktual: '2026-09-16',
-      identitasPihakMenyerahkan: penyidik,
-      identitasPihakMenerima: `${dpjp} (Tim Medis Balai Rehab)`,
-      fileBaSerahTerimaUrl: 'internal://ba-serah-terima',
-      tanggalMasukLayananTerkonfirmasi: '2026-09-16',
-      adaKendala: false,
-      statusPelaksanaan: 'serah_terima_selesai',
-      diisiOleh: penyidik,
-      kapasitasPengisi: 'Penyidik Pengaju TAT',
-      tanggalDiisi: '2026-09-16',
-      statusVerifikasiAdmin: 'terverifikasi',
-      catatanVerifikasiAdmin:
-        'Dokumen BA serah terima & syarat admisi terverifikasi valid oleh Sekretariat TAT.',
-      diverifikasiOleh: '[TEST] Admin Sekretariat TAT',
-      tanggalVerifikasiAdmin: '2026-09-17'
-    },
-    laporanKontrolList: [
-      {
-        id: 'lap-1-' + permohonan.id,
-        jenisLaporan: 'Laporan Kemajuan Periodik',
-        tanggalKegiatanSebenarnya: '2026-09-25',
-        namaFasilitasPelapor: fasilitas,
-        nomorLaporanFasilitas: `LAP-KLINIK/2026/09/${permohonan.id.slice(-3)}`,
-        tanggalLaporanFasilitas: '2026-09-26',
-        namaPenerbitLaporan: dpjp,
-        kapasitasPenerbit: 'Dokter Penanggung Jawab Pasien (DPJP)',
-        statusPelaksanaanBerdasarkanBukti: 'terlaksana',
-        ringkasanAdministratif:
-          'Pasien telah menjalani program detoksifikasi dan konseling medis. Menunjukkan kemajuan kognitif signifikan dan kooperatif dalam sesi terapi harian.',
-        rencanaBerdasarkanLaporan:
-          'Melanjutkan ke fase terapi kelompok (Therapeutic Community) dan pemeriksaan toksikologi urin berkala.',
-        fileBuktiUrl: 'internal://laporan-kontrol-minggu-2',
-        diunggahOleh: penyidik,
-        kapasitasPengunggah: 'Pengaju / Penyidik Pendamping',
-        tanggalDiunggah: '2026-09-27',
-        statusAdmin: 'terverifikasi',
-        catatanAdmin: 'Laporan perkembangan periodik terverifikasi lengkap.',
-        diverifikasiOleh: '[TEST] Admin Sekretariat TAT',
-        tanggalVerifikasi: '2026-09-28',
-        perluTelaahKlinis: true,
-        statusTelaahKlinis: 'selesai',
-        catatanTelaahKlinis:
-          'Hasil review medis TAT: Perkembangan klinis sesuai dengan target intervensi. Rekomendasi dilanjutkan.',
-        tanggalTelaahKlinis: '2026-09-29',
-        penugasanMedis: '[TEST] Dokter Asesor Medis TAT'
-      }
-    ],
-    buktiWajibLaporList: [
-      {
-        id: 'wl-1-' + permohonan.id,
-        tanggalRencanaWajibLapor: '2026-09-22',
-        tanggalPelaporanAktual: '2026-09-22',
-        tanggalWajibLapor: '2026-09-22',
-        waktuInputSistem: '2026-09-22 14:15:00 WIB',
-        namaPenyidikPenerima: penyidik,
-        instansiPenyidik: 'Satresnarkoba Polresta Samarinda (Tatap Muka)',
-        kegiatanRehabTerkait: 'Pelaporan Wajib Lapor Mingguan Ke-1',
-        kanal: 'langsung',
-        buktiPenerimaanUrl: 'internal://bukti-wajib-lapor-1',
-        statusKonfirmasi: 'dikonfirmasi_penyidik',
-        statusVerifikasiAdmin: 'terverifikasi',
-        catatanAdmin:
-          'Telah diverifikasi Admin: Tanggal pelaporan aktual dan bukti fisik lengkap.',
-        diunggahOleh: penyidik,
-        tanggalDiunggah: '2026-09-22'
-      }
-    ],
-    // HANYA ada akhirLayanan jika kasus memang sudah selesai seluruh tahapan rehabilitasi!
+    pelaksanaanRehab: undefined,
+    laporanKontrolList: [],
+    buktiWajibLaporList: [],
     akhirLayanan: isFinished
       ? {
           id: 'akr-' + permohonan.id,
-          tanggalAkhirLayananAktual: '2026-10-01',
+          tanggalAkhirLayananAktual: new Date().toISOString().slice(0, 10),
           statusAkhir: 'selesai_program',
           namaFasilitas: fasilitas,
           pihakPenerbitKeterangan: dpjp,
           hasilSesuaiDokumenFasilitas:
-            'Klien telah menyelesaikan seluruh rangkaian program rehabilitasi medis dan sosial dengan hasil Evaluasi Klinis Selesai Baik (Pulih & Produktif). Tidak ditemukan indikasi relapse (kekambuhan).',
+            'Program rehabilitasi telah dinyatakan selesai berdasarkan rekam tindak lanjut sistem TAT.',
           rencanaLanjutanDariFasilitas:
-            'Direkomendasikan mengikuti Program Wajib Lapor Bina Lanjut Pascarehab selama 3 bulan.',
+            'Direkomendasikan mengikuti Program Wajib Lapor Bina Lanjut Pascarehab.',
           fileSuratAkhirLayananUrl: 'internal://surat-keterangan-selesai-rehab',
           diisiOleh: penyidik,
-          kapasitasPengisi: 'Pengaju TAT / Penyidik Satresnarkoba',
-          tanggalDiisi: '2026-10-02',
+          kapasitasPengisi: 'Tim Medis / Admin TAT',
+          tanggalDiisi: new Date().toISOString().slice(0, 10),
           statusVerifikasiAdmin: 'terverifikasi'
         }
       : undefined,
-    statusMonitoring: isFinished ? 'selesai' : 'berjalan',
+    statusMonitoring: isFinished ? 'selesai' : 'menunggu_pelaksanaan',
     dibuatOleh: 'ADMIN',
-    tanggalDibuat: '2026-09-15',
+    tanggalDibuat: permohonan.tanggalPengajuan
+      ? permohonan.tanggalPengajuan.slice(0, 10)
+      : new Date().toISOString().slice(0, 10),
     terakhirDiperbarui: new Date().toISOString().slice(0, 10)
   };
 };
@@ -230,12 +150,12 @@ export const getMonitoringUrineHistory = (
     const hasPositive = permohonan.asesmenMedis.hasilUrin.some(h => h.hasil?.toLowerCase() === 'positif');
     result.push({
       id: `urin-admisi-${permohonan.id}`,
-      tanggalTes: permohonan.tanggalPengajuan ? permohonan.tanggalPengajuan.slice(0, 10) : '2026-09-16',
+      tanggalTes: permohonan.tanggalPengajuan ? permohonan.tanggalPengajuan.slice(0, 10) : new Date().toISOString().slice(0, 10),
       tahapKe: 1,
       jenisPemeriksaan: 'Terjadwal (Admisi Awal TAT)',
       parameter: params.length > 0 ? params : ['AMP', 'MET', 'THC', 'BZO', 'MOP'],
       hasil: hasPositive ? 'Positif' : 'Negatif',
-      petugasPemeriksa: permohonan.asesmenMedis.asesorNama || permohonan.timAsesmen?.asesorMedisNama || '[TEST] Dokter DPJP Fasilitas',
+      petugasPemeriksa: permohonan.asesmenMedis.asesorNama || permohonan.timAsesmen?.asesorMedisNama || 'Tim Medis TAT',
       keterangan: 'Skrining toksikologi awal saat klien admisi ke sistem TAT.'
     });
   }
