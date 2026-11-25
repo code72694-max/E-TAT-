@@ -290,13 +290,13 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
     },
     {
       id: 1,
-      titlePart1: 'KOLABORASI PENEGAK HUKUM,',
-      titleHighlight: 'TEKNIS PELAKSANAAN ASESMEN TERPADU (TAT),',
-      titlePart2: 'KAJI PERKARA SECARA KOMPREHENSIF.',
+      titlePart1: 'MAKNA SIMBOL E-TAT SIAP PULIH',
+      titleHighlight: 'INTERPRETASI KONSEPTUAL LOGO',
+      titlePart2: 'ASESMEN TEPAT, PEMULIHAN TERPANTAU.',
       description:
-        'Sinergi penyidik, jaksa, dan tim medis BNNP Kaltim dalam melaksanakan sidang pleno untuk memberikan rekomendasi hukum dan rehabilitasi yang obyektif.',
-      image: '/images/hero/slide-rehabilitasi.jpg',
-      imageAlt: 'Sidang Pleno Tim Asesmen Terpadu BNNP Kaltim'
+        'Sistem Integrasi Asesmen dan Pemantauan Pemulihan — Sinergi tim medis, tim hukum, dan layanan pemulihan.',
+      image: '/kantor.png',
+      imageAlt: 'Makna Simbol E-TAT SIAP PULIH'
     },
     {
       id: 2,
@@ -435,7 +435,7 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
                 }`}
                 style={{ 
                   backgroundImage: `url('${slide.image}')`,
-                  backgroundPosition: slide.id === 0 ? 'center bottom' : 'center right'
+                  backgroundPosition: slide.id === 0 || slide.id === 1 ? 'center bottom' : 'center right'
                 }}
                 role="img"
                 aria-label={slide.imageAlt}
@@ -443,8 +443,8 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
 
               {/* Dark Gradient Overlays for High Contrast & Clean Text Legibility */}
               <div className={`absolute inset-0 transition-all duration-1000 ${
-                idx === 0
-                  ? 'bg-gradient-to-b from-[#071326]/90 via-[#071326]/75 to-[#071326]/90'
+                idx === 0 || idx === 1
+                  ? 'bg-gradient-to-b from-[#071326]/90 via-[#071326]/80 to-[#071326]/92'
                   : 'bg-gradient-to-r from-[#071326] via-[#071326]/85 to-[#071326]/30 lg:to-transparent'
               }`} />
               <div className="absolute inset-0 bg-gradient-to-t from-[#071326] via-transparent to-[#071326]/70" />
@@ -453,12 +453,12 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
           );
         })}
 
-        {/* Content Container - Tailored Slide 0 Branding (Centered) vs Regular Slides */}
-        <div className={`relative z-20 max-w-7xl w-full mx-auto px-6 sm:px-6 lg:px-8 -translate-y-8 sm:-translate-y-8 lg:-translate-y-10 ${
+        {/* Content Container - Tailored Slide 0 & 1 Branding vs Regular Slides */}
+        <div className={`relative z-20 max-w-7xl w-full mx-auto px-6 sm:px-6 lg:px-8 -translate-y-4 sm:-translate-y-6 lg:-translate-y-8 ${
           currentSlide === 0 ? 'text-center' : ''
         }`}>
           <div className={`${
-            currentSlide === 0 ? 'max-w-4xl mx-auto text-center' : 'max-w-3xl'
+            currentSlide === 0 ? 'max-w-4xl mx-auto text-center' : currentSlide === 1 ? 'max-w-5xl mx-auto' : 'max-w-3xl'
           } space-y-4`}>
             {/* Animated Slide Content Box */}
             <div key={currentSlide} className="space-y-4 animate-in fade-in slide-in-from-bottom-3 duration-500">
@@ -509,8 +509,104 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
                     </div>
                   </div>
                 </div>
+              ) : currentSlide === 1 ? (
+                /* SLIDE 2: MAKNA SIMBOL E-TAT SIAP PULIH */
+                <div className="space-y-4">
+                  <div className="text-center space-y-1">
+                    <h2 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-white tracking-wider font-['Cinzel',serif] uppercase drop-shadow-lg">
+                      MAKNA SIMBOL E-TAT <span className="text-[#D4AF37]">SIAP PULIH</span>
+                    </h2>
+                    <p className="text-xs sm:text-sm text-teal-300 font-medium tracking-wide">
+                      Interpretasi konseptual logo
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 items-center bg-[#081224]/85 backdrop-blur-md border border-[#1b3459] rounded-2xl p-4 sm:p-6 shadow-2xl">
+                    {/* Left: Logo + Kepanjangan + Tagline */}
+                    <div className="lg:col-span-5 flex flex-col items-center text-center space-y-2 lg:border-r lg:border-[#1b3459]/70 lg:pr-5">
+                      <img
+                        src="/logo_etat.png"
+                        alt="Logo E-TAT SIAP PULIH"
+                        className="h-24 sm:h-32 w-auto object-contain drop-shadow-[0_8px_24px_rgba(212,175,55,0.45)]"
+                      />
+                      <div className="space-y-0.5">
+                        <h3 className="text-base sm:text-lg font-extrabold text-white font-['Cinzel',serif] tracking-wide">
+                          E-TAT <span className="text-[#D4AF37]">SIAP PULIH</span>
+                        </h3>
+                        <p className="text-[11px] sm:text-xs font-bold text-[#D4AF37]">
+                          Elektronik Tim Asesmen Terpadu
+                        </p>
+                        <p className="text-[11px] sm:text-xs font-semibold text-slate-200 leading-snug max-w-xs mx-auto">
+                          Sistem Integrasi Asesmen dan Pemantauan Pemulihan
+                        </p>
+                        <p className="text-[11px] font-medium italic text-teal-300 pt-0.5">
+                          Asesmen Tepat, Pemulihan Terpantau
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Right: 5 Makna Simbol Cards */}
+                    <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2">
+                      {[
+                        {
+                          icon: <Shield className="w-4 h-4 text-sky-300" />,
+                          bg: 'bg-sky-500/10 border-sky-500/25',
+                          title: 'PERISAI',
+                          desc: 'Perlindungan dan kepastian layanan.',
+                        },
+                        {
+                          icon: <User className="w-4 h-4 text-teal-300" />,
+                          bg: 'bg-teal-500/10 border-teal-500/25',
+                          title: 'FIGUR MANUSIA',
+                          desc: 'Pemulihan, harapan, dan keberdayaan.',
+                        },
+                        {
+                          icon: <HeartHandshake className="w-4 h-4 text-blue-400" />,
+                          bg: 'bg-blue-500/10 border-blue-500/25',
+                          title: 'TANGAN MENOPANG',
+                          desc: 'Kepedulian, pendampingan, dan rehabilitasi humanis.',
+                        },
+                        {
+                          icon: <Share2 className="w-4 h-4 text-[#D4AF37]" />,
+                          bg: 'bg-amber-500/10 border-amber-500/25',
+                          title: 'TIGA SIMPUL TERHUBUNG',
+                          desc: 'Sinergi tim medis, tim hukum, dan layanan pemulihan.',
+                        },
+                      ].map((item) => (
+                        <div
+                          key={item.title}
+                          className="flex items-center gap-3 p-2.5 rounded-xl bg-[#0b172a]/90 border border-[#1b3459]"
+                        >
+                          <div className={`p-2 rounded-lg border shrink-0 ${item.bg}`}>
+                            {item.icon}
+                          </div>
+                          <div className="min-w-0">
+                            <h4 className="text-xs font-bold text-white tracking-wide">{item.title}</h4>
+                            <p className="text-[11px] text-slate-300 truncate sm:whitespace-normal">{item.desc}</p>
+                          </div>
+                        </div>
+                      ))}
+
+                      <div className="flex items-center gap-3 p-2.5 rounded-xl bg-[#0b172a]/90 border border-[#1b3459] sm:col-span-2 lg:col-span-1">
+                        <div className="flex items-center gap-1 p-1.5 rounded-lg bg-slate-900 border border-slate-700/80 shrink-0">
+                          <span className="w-2.5 h-2.5 rounded-full bg-blue-500 inline-block" />
+                          <span className="w-2.5 h-2.5 rounded-full bg-teal-400 inline-block" />
+                          <span className="w-2.5 h-2.5 rounded-full bg-[#D4AF37] inline-block" />
+                        </div>
+                        <div className="min-w-0">
+                          <h4 className="text-xs font-bold text-white tracking-wide">WARNA</h4>
+                          <p className="text-[11px] text-slate-300">
+                            <span className="text-blue-400 font-medium">Biru:</span> kepercayaan &bull;{' '}
+                            <span className="text-teal-300 font-medium">Hijau toska:</span> pemulihan &bull;{' '}
+                            <span className="text-[#D4AF37] font-medium">Emas:</span> harapan.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               ) : (
-                /* REGULAR SLIDES (SLIDE 2 & ONWARDS) - ROBOTO FONT & UNIFORM FONT SIZE */
+                /* SLIDE 3 - ROBOTO FONT & UNIFORM FONT SIZE */
                 <div className="space-y-2 font-['Roboto',sans-serif]">
                   <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-wide leading-snug drop-shadow-lg space-y-1">
                     <span className="block text-slate-100">
@@ -568,105 +664,6 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
                 />
               );
             })}
-          </div>
-        </div>
-      </section>
-
-      {/* MAKNA SIMBOL E-TAT SIAP PULIH */}
-      <section id="makna-simbol" className="py-14 sm:py-20 bg-[#071326] border-b border-[#1b3459]/60">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-10 space-y-1.5">
-            <h2 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-white tracking-wider font-['Cinzel',serif] uppercase">
-              MAKNA SIMBOL E-TAT <span className="text-[#D4AF37]">SIAP PULIH</span>
-            </h2>
-            <p className="text-xs sm:text-sm text-teal-300 font-medium tracking-wide">
-              Interpretasi konseptual logo
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center bg-[#081224] border border-[#1b3459] rounded-2xl p-6 sm:p-8 shadow-xl">
-            {/* Left: Logo + Kepanjangan + Tagline */}
-            <div className="lg:col-span-5 flex flex-col items-center text-center space-y-3 lg:border-r lg:border-[#1b3459]/70 lg:pr-6">
-              <img
-                src="/logo_etat.png"
-                alt="Logo E-TAT SIAP PULIH"
-                className="h-36 sm:h-44 w-auto object-contain drop-shadow-[0_8px_24px_rgba(212,175,55,0.45)]"
-              />
-              <div className="space-y-1">
-                <h3 className="text-lg sm:text-xl font-extrabold text-white font-['Cinzel',serif] tracking-wide">
-                  E-TAT <span className="text-[#D4AF37]">SIAP PULIH</span>
-                </h3>
-                <p className="text-xs sm:text-sm font-bold text-[#D4AF37] leading-snug max-w-xs mx-auto">
-                  Elektronik Tim Asesmen Terpadu
-                </p>
-                <p className="text-xs sm:text-sm font-semibold text-slate-200 leading-snug max-w-xs mx-auto">
-                  Sistem Integrasi Asesmen dan Pemantauan Pemulihan
-                </p>
-                <p className="text-xs font-medium italic text-teal-300 pt-0.5">
-                  Asesmen Tepat, Pemulihan Terpantau
-                </p>
-              </div>
-            </div>
-
-            {/* Right: 5 Makna Simbol Cards */}
-            <div className="lg:col-span-7 space-y-3">
-              {[
-                {
-                  icon: <Shield className="w-5 h-5 text-sky-300" />,
-                  bg: 'bg-sky-500/10 border-sky-500/25',
-                  title: 'PERISAI',
-                  desc: 'Perlindungan dan kepastian layanan.',
-                },
-                {
-                  icon: <User className="w-5 h-5 text-teal-300" />,
-                  bg: 'bg-teal-500/10 border-teal-500/25',
-                  title: 'FIGUR MANUSIA',
-                  desc: 'Pemulihan, harapan, dan keberdayaan.',
-                },
-                {
-                  icon: <HeartHandshake className="w-5 h-5 text-blue-400" />,
-                  bg: 'bg-blue-500/10 border-blue-500/25',
-                  title: 'TANGAN MENOPANG',
-                  desc: 'Kepedulian, pendampingan, dan rehabilitasi humanis.',
-                },
-                {
-                  icon: <Share2 className="w-5 h-5 text-[#D4AF37]" />,
-                  bg: 'bg-amber-500/10 border-amber-500/25',
-                  title: 'TIGA SIMPUL TERHUBUNG',
-                  desc: 'Sinergi tim medis, tim hukum, dan layanan pemulihan.',
-                },
-              ].map((item) => (
-                <div
-                  key={item.title}
-                  className="flex items-start gap-3.5 p-3.5 rounded-xl bg-[#0b172a] border border-[#1b3459] hover:border-[#2c528c] transition-colors"
-                >
-                  <div className={`p-2.5 rounded-xl border shrink-0 ${item.bg}`}>
-                    {item.icon}
-                  </div>
-                  <div>
-                    <h4 className="text-xs sm:text-sm font-bold text-white tracking-wide">{item.title}</h4>
-                    <p className="text-xs text-slate-300 mt-0.5">{item.desc}</p>
-                  </div>
-                </div>
-              ))}
-
-              {/* Warna */}
-              <div className="flex items-start gap-3.5 p-3.5 rounded-xl bg-[#0b172a] border border-[#1b3459] hover:border-[#2c528c] transition-colors">
-                <div className="flex items-center gap-1 p-2 rounded-xl bg-slate-900 border border-slate-700/80 shrink-0 mt-0.5">
-                  <span className="w-3 h-3 rounded-full bg-blue-500 inline-block" />
-                  <span className="w-3 h-3 rounded-full bg-teal-400 inline-block" />
-                  <span className="w-3 h-3 rounded-full bg-[#D4AF37] inline-block" />
-                </div>
-                <div>
-                  <h4 className="text-xs sm:text-sm font-bold text-white tracking-wide">WARNA</h4>
-                  <p className="text-xs text-slate-300 mt-0.5">
-                    <span className="text-blue-400 font-medium">Biru:</span> kepercayaan &bull;{' '}
-                    <span className="text-teal-300 font-medium">Hijau toska:</span> pemulihan &bull;{' '}
-                    <span className="text-[#D4AF37] font-medium">Emas:</span> harapan.
-                  </p>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </section>
