@@ -163,9 +163,9 @@ export const Header: React.FC<HeaderProps> = ({
               </span>
             </div>
 
-            {/* Right: Quick QR Button if available */}
+            {/* Right: Quick QR Button if available (hidden on Pasca Rehab detail) */}
             <div className="flex items-center space-x-2 sm:space-x-3 shrink-0 z-10">
-              {selectedPermohonan?.rekomendasiResmi && onOpenQrModal && (
+              {!isPascaRehabDetail && selectedPermohonan?.rekomendasiResmi && onOpenQrModal && (
                 <button
                   type="button"
                   onClick={() => onOpenQrModal(selectedPermohonan)}

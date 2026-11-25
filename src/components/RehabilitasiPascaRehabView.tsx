@@ -334,19 +334,6 @@ export const RehabilitasiPascaRehabView: React.FC<Props> = ({
               </p>
             </div>
           </div>
-
-          <button
-            type="button"
-            onClick={() => {
-              setSelectedCaseId('');
-              onSelectCase?.(null);
-              setSavedNotice(null);
-            }}
-            className="px-3.5 py-2 bg-[#142642] hover:bg-[#1a345a] text-slate-200 border border-[#234475] rounded-xl text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-all"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            <span>Kembali ke Daftar Pasca Rehab</span>
-          </button>
         </div>
 
         {isReadOnly && (
@@ -365,7 +352,55 @@ export const RehabilitasiPascaRehabView: React.FC<Props> = ({
           </div>
         )}
 
-        {/* Grid 2 Kolom: Kiri Penjadwalan, Kanan Input Laporan Dokter */}
+        {isReadOnly ? (
+          /* TAMPILAN READ-ONLY (PENGAJU & ADMIN): HANYA DATA JADWAL & RIWAYAT LAPORAN */
+          <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl p-5 shadow-lg space-y-4">
+            <div className="pb-3 border-b border-[#1b3459] flex items-center justify-between">
+              <h2 className="text-sm font-bold text-[#D4AF37] uppercase tracking-wider flex items-center gap-2">
+                <Calendar className="w-4 h-4" />
+                <span>Data Jadwal Pasca Rehabilitasi</span>
+              </h2>
+              <span className="text-[11px] font-mono text-slate-400">
+                Diinput oleh Tim Medis
+              </span>
+            </div>
+
+            {activeSchedule ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+                <div className="p-3 bg-[#050e1c] border border-[#1b3459] rounded-xl">
+                  <span className="text-[10px] uppercase font-semibold text-slate-400 block">Tanggal &amp; Waktu</span>
+                  <span className="font-mono font-bold text-emerald-300 mt-1 block">
+                    {activeSchedule.tanggal} &bull; {activeSchedule.waktu}
+                  </span>
+                </div>
+                <div className="p-3 bg-[#050e1c] border border-[#1b3459] rounded-xl">
+                  <span className="text-[10px] uppercase font-semibold text-slate-400 block">Jenis Program</span>
+                  <span className="font-semibold text-white mt-1 block">{activeSchedule.jenisProgram}</span>
+                </div>
+                <div className="p-3 bg-[#050e1c] border border-[#1b3459] rounded-xl">
+                  <span className="text-[10px] uppercase font-semibold text-slate-400 block">Fasilitas / Lokasi</span>
+                  <span className="font-semibold text-white mt-1 block">{activeSchedule.fasilitas}</span>
+                </div>
+                <div className="p-3 bg-[#050e1c] border border-[#1b3459] rounded-xl">
+                  <span className="text-[10px] uppercase font-semibold text-slate-400 block">Dokter / Petugas Medis</span>
+                  <span className="font-semibold text-sky-300 mt-1 block">{activeSchedule.dokterPenanggungJawab || activeSchedule.diinputOleh}</span>
+                </div>
+                {activeSchedule.catatan && (
+                  <div className="sm:col-span-2 lg:col-span-4 p-3 bg-[#050e1c] border border-[#1b3459] rounded-xl">
+                    <span className="text-[10px] uppercase font-semibold text-slate-400 block mb-1">Catatan / Instruksi Medis</span>
+                    <p className="text-slate-200 leading-relaxed">{activeSchedule.catatan}</p>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="p-5 bg-[#050e1c] border border-dashed border-[#1b3459] rounded-xl text-xs text-slate-400 flex items-center gap-2.5">
+                <Clock className="w-4 h-4 text-amber-400 shrink-0" />
+                <span>Jadwal pasca rehabilitasi belum diinput oleh Tim Medis.</span>
+              </div>
+            )}
+          </div>
+        ) : (
+        /* Grid 2 Kolom (KHUSUS MEDIS): Kiri Penjadwalan, Kanan Input Laporan Dokter */
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
           {/* Section 1: Jadwal Pasca Rehab */}
           <div className="lg:col-span-5 bg-[#0b172a] border border-[#1b3459] rounded-2xl p-5 shadow-lg space-y-4">
@@ -388,10 +423,9 @@ export const RehabilitasiPascaRehabView: React.FC<Props> = ({
                   <input
                     type="date"
                     required
-                    disabled={isReadOnly}
                     value={tanggal}
                     onChange={(e) => setTanggal(e.target.value)}
-                    className="w-full bg-[#050e1c] border border-[#1b3459] rounded-lg px-3 py-2 text-xs text-slate-100 font-mono focus:border-[#D4AF37] outline-none disabled:opacity-70 disabled:cursor-not-allowed"
+                    className="w-full bg-[#050e1c] border border-[#1b3459] rounded-lg px-3 py-2 text-xs text-slate-100 font-mono focus:border-[#D4AF37] outline-none"
                   />
                 </div>
 
@@ -402,11 +436,10 @@ export const RehabilitasiPascaRehabView: React.FC<Props> = ({
                   <input
                     type="text"
                     required
-                    disabled={isReadOnly}
                     placeholder="contoh: 09:00 WITA"
                     value={waktu}
                     onChange={(e) => setWaktu(e.target.value)}
-                    className="w-full bg-[#050e1c] border border-[#1b3459] rounded-lg px-3 py-2 text-xs text-slate-100 focus:border-[#D4AF37] outline-none disabled:opacity-70 disabled:cursor-not-allowed"
+                    className="w-full bg-[#050e1c] border border-[#1b3459] rounded-lg px-3 py-2 text-xs text-slate-100 focus:border-[#D4AF37] outline-none"
                   />
                 </div>
               </div>
@@ -416,10 +449,9 @@ export const RehabilitasiPascaRehabView: React.FC<Props> = ({
                   Jenis Program Pasca Rehab <span className="text-rose-400">*</span>
                 </label>
                 <select
-                  disabled={isReadOnly}
                   value={jenisProgram}
                   onChange={(e) => setJenisProgram(e.target.value)}
-                  className="w-full bg-[#050e1c] border border-[#1b3459] rounded-lg px-3 py-2 text-xs text-slate-100 focus:border-[#D4AF37] outline-none disabled:opacity-70 disabled:cursor-not-allowed"
+                  className="w-full bg-[#050e1c] border border-[#1b3459] rounded-lg px-3 py-2 text-xs text-slate-100 focus:border-[#D4AF37] outline-none"
                 >
                   <option value="Bina Lanjut & Konseling Pasca Rehab">Bina Lanjut &amp; Konseling Pasca Rehab</option>
                   <option value="Tes Urin Berkala Pasca Rehab">Tes Urin Berkala Pasca Rehab</option>
@@ -437,10 +469,9 @@ export const RehabilitasiPascaRehabView: React.FC<Props> = ({
                   <input
                     type="text"
                     required
-                    disabled={isReadOnly}
                     value={fasilitas}
                     onChange={(e) => setFasilitas(e.target.value)}
-                    className="w-full bg-[#050e1c] border border-[#1b3459] rounded-lg pl-8 pr-3 py-2 text-xs text-slate-100 focus:border-[#D4AF37] outline-none disabled:opacity-70 disabled:cursor-not-allowed"
+                    className="w-full bg-[#050e1c] border border-[#1b3459] rounded-lg pl-8 pr-3 py-2 text-xs text-slate-100 focus:border-[#D4AF37] outline-none"
                   />
                 </div>
               </div>
@@ -451,28 +482,19 @@ export const RehabilitasiPascaRehabView: React.FC<Props> = ({
                 </label>
                 <textarea
                   rows={3}
-                  disabled={isReadOnly}
                   value={catatan}
                   onChange={(e) => setCatatan(e.target.value)}
-                  className="w-full bg-[#050e1c] border border-[#1b3459] rounded-lg p-3 text-xs text-slate-100 focus:border-[#D4AF37] outline-none disabled:opacity-70 disabled:cursor-not-allowed"
+                  className="w-full bg-[#050e1c] border border-[#1b3459] rounded-lg p-3 text-xs text-slate-100 focus:border-[#D4AF37] outline-none"
                 />
               </div>
 
-              {!isReadOnly ? (
-                <button
-                  type="submit"
-                  className="w-full py-2.5 bg-gradient-to-r from-[#144782] to-[#1c64b8] hover:from-[#17549c] hover:to-[#2272d1] text-white border border-sky-400/20 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-sm transition-all"
-                >
-                  <Save className="w-3.5 h-3.5 text-emerald-300" />
-                  <span>{activeSchedule ? 'Perbarui Jadwal Pasca Rehab' : 'Simpan Jadwal Pasca Rehab'}</span>
-                </button>
-              ) : (
-                <div className="text-[11px] text-slate-400 italic pt-1 border-t border-[#1b3459]">
-                  {activeSchedule
-                    ? `Diinput oleh Tim Medis (${activeSchedule.diinputOleh}) pada ${activeSchedule.tanggalInput}.`
-                    : 'Jadwal pasca rehabilitasi belum diinput oleh Tim Medis.'}
-                </div>
-              )}
+              <button
+                type="submit"
+                className="w-full py-2.5 bg-gradient-to-r from-[#144782] to-[#1c64b8] hover:from-[#17549c] hover:to-[#2272d1] text-white border border-sky-400/20 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-sm transition-all"
+              >
+                <Save className="w-3.5 h-3.5 text-emerald-300" />
+                <span>{activeSchedule ? 'Perbarui Jadwal Pasca Rehab' : 'Simpan Jadwal Pasca Rehab'}</span>
+              </button>
             </form>
           </div>
 
@@ -481,34 +503,13 @@ export const RehabilitasiPascaRehabView: React.FC<Props> = ({
             <div className="pb-3 border-b border-[#1b3459] flex items-center justify-between">
               <h2 className="text-sm font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-2">
                 <PlusCircle className="w-4 h-4" />
-                <span>2. {isReadOnly ? 'Status Laporan Pemantauan Dokter' : 'Input Laporan & Hasil Pemantauan Dokter'}</span>
+                <span>2. Input Laporan &amp; Hasil Pemantauan Dokter</span>
               </h2>
               <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#050e1c] border border-[#1b3459] text-slate-300">
-                {isReadOnly ? `${activeReports.length} Laporan Masuk` : `Laporan ke-${activeReports.length + 1}`}
+                Laporan ke-{activeReports.length + 1}
               </span>
             </div>
 
-            {isReadOnly ? (
-              <div className="p-6 bg-[#050e1c] border border-[#1b3459] rounded-xl space-y-3 text-xs text-slate-300">
-                <div className="flex items-center gap-2 text-sky-300 font-semibold">
-                  <Stethoscope className="w-4 h-4" />
-                  <span>Khusus Input Dokter / Tim Medis</span>
-                </div>
-                <p className="leading-relaxed text-slate-400">
-                  Pengisian laporan berkala, hasil tes urin, dan evaluasi kondisi klinis pasca rehabilitasi hanya dapat dilakukan oleh <strong className="text-slate-200">Tim Medis</strong>. Anda dapat memantau seluruh riwayat laporan yang telah diinput pada bagian di bawah ini.
-                </p>
-                {latestReport && (
-                  <div className="pt-2 border-t border-[#1b3459] flex flex-wrap items-center gap-2 text-[11px]">
-                    <span className="text-slate-400">Hasil Terakhir:</span>
-                    <span className="font-semibold text-emerald-300">{latestReport.kondisiKlinis}</span>
-                    <span className="text-slate-500">&bull;</span>
-                    <span className="font-mono text-slate-200">Urin {latestReport.hasilTesUrin}</span>
-                    <span className="text-slate-500">&bull;</span>
-                    <span className="text-slate-400">{latestReport.tanggalPemantauan}</span>
-                  </div>
-                )}
-              </div>
-            ) : (
             <form onSubmit={handleSaveReport} className="space-y-3.5">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1">
@@ -597,16 +598,16 @@ export const RehabilitasiPascaRehabView: React.FC<Props> = ({
                 </button>
               </div>
             </form>
-            )}
           </div>
         </div>
+        )}
 
         {/* Section 3: Riwayat Laporan Pemantauan Pasca Rehab */}
         <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl p-5 shadow-lg space-y-4">
           <div className="flex items-center justify-between pb-3 border-b border-[#1b3459]">
             <h2 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
               <FileText className="w-4 h-4 text-[#D4AF37]" />
-              <span>3. Riwayat Laporan Pemantauan Pasca Rehab ({activeReports.length} Laporan)</span>
+              <span>{isReadOnly ? `Riwayat Laporan Pemantauan Pasca Rehab (${activeReports.length} Laporan)` : `3. Riwayat Laporan Pemantauan Pasca Rehab (${activeReports.length} Laporan)`}</span>
             </h2>
           </div>
 
