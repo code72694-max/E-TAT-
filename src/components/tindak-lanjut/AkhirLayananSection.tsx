@@ -16,6 +16,7 @@ import type {
 import { printLegalDocument } from '../../utils/printLegalDoc';
 import { QrCodeImg, buildLacakVerificationUrl } from '../QrCodeComponent';
 import { getKetuaTAT } from '../../utils/getKetuaTAT';
+import { getMonitoringUrineHistory } from '../../utils/getMonitoringData';
 import {
   genId,
   today,
@@ -36,6 +37,12 @@ export const AkhirLayananSection: React.FC<{
   const [showCertPreview, setShowCertPreview] = useState(false);
   const sksrPrintRef = useRef<HTMLDivElement>(null);
   const ketuaInfo = getKetuaTAT(null, permohonan);
+
+  // Riwayat kronologis (Laporan Ke-1, Ke-2, dst.) untuk ditampilkan di dokumen SKSR
+  const riwayatUrinChronological = [...getMonitoringUrineHistory(monitoring, permohonan)].reverse();
+  const riwayatWajibLaporChronological = [...(monitoring.buktiWajibLaporList || [])].reverse();
+  const negCount = riwayatUrinChronological.filter(u => u.hasil?.toLowerCase() !== 'positif').length;
+  const posCount = riwayatUrinChronological.filter(u => u.hasil?.toLowerCase() === 'positif').length;
 
   const [form, setForm] = useState<Partial<AkhirLayananRehab>>(existing ?? {
     tanggalAkhirLayananAktual: today(),
@@ -77,13 +84,13 @@ export const AkhirLayananSection: React.FC<{
       <SectionHeader
         icon={<Award className="w-4 h-4 text-slate-300" />}
         title="4. Output Resmi: Surat Keterangan Selesai Rehabilitasi (SKSR)"
-        subtitle="Pengeluaran resmi hasil rehabilitasi, kelulusan, hasil uji toksikologi, dan rekomendasi status hukum."
+        subtitle="Diterbitkan oleh Pengaju (Polsek/Polres) / Admin dengan rekap lengkap riwayat laporan ke Pengaju, pemeriksaan Medis, dan hasilnya."
       />
 
       {readOnly && (
         <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-slate-900/80 border border-slate-800 text-xs text-slate-300">
           <Info className="w-4 h-4 text-sky-400 shrink-0" />
-          <span>Mode Hanya Baca (Read-Only): Finalisasi Output Surat SKSR dilakukan oleh Tim Medis / Admin. Pengaju dapat meninjau &amp; mencetak SKSR.</span>
+          <span>Mode Hanya Baca (Read-Only): Finalisasi Output Surat SKSR dilakukan oleh Pengaju (Polsek/Polres) atau Admin. Tim Medis hanya dapat meninjau &amp; mencetak SKSR.</span>
         </div>
       )}
 
@@ -238,14 +245,96 @@ export const AkhirLayananSection: React.FC<{
 
                   <div style={{ margin: '12px 0' }}>
                     <div style={{ fontWeight: 'bold', fontSize: '10.5pt', marginBottom: '4px', textDecoration: 'underline' }}>
+                      RIWAYAT PELAPORAN KE TIM MEDIS &amp; HASIL PEMERIKSAAN:
+                    </div>
+                    {riwayatUrinChronological.length === 0 ? (
+                      <p style={{ fontSize: '9.5pt', fontStyle: 'italic', color: '#444', margin: '4px 0 10px 0' }}>
+                        Belum ada riwayat pemeriksaan medis / tes urin yang tercatat.
+                      </p>
+                    ) : (
+                      <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '10px', fontSize: '9.5pt' }}>
+                        <thead>
+                          <tr style={{ background: '#f1f5f9' }}>
+                            <th style={{ border: '1px solid #333', padding: '4px 6px', textAlign: 'left', width: '95px' }}>Laporan</th>
+                            <th style={{ border: '1px solid #333', padding: '4px 6px', textAlign: 'left', width: '90px' }}>Tanggal</th>
+                            <th style={{ border: '1px solid #333', padding: '4px 6px', textAlign: 'left' }}>Jenis Pemeriksaan</th>
+                            <th style={{ border: '1px solid #333', padding: '4px 6px', textAlign: 'left', width: '85px' }}>Hasil</th>
+                            <th style={{ border: '1px solid #333', padding: '4px 6px', textAlign: 'left' }}>Catatan / Keterangan</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {riwayatUrinChronological.map((u, idx) => (
+                            <tr key={u.id}>
+                              <td style={{ border: '1px solid #333', padding: '4px 6px', fontWeight: 'bold' }}>Laporan Ke-{idx + 1}</td>
+                              <td style={{ border: '1px solid #333', padding: '4px 6px', fontFamily: 'monospace' }}>{u.tanggalTes || '-'}</td>
+                              <td style={{ border: '1px solid #333', padding: '4px 6px' }}>{u.jenisPemeriksaan}</td>
+                              <td style={{ border: '1px solid #333', padding: '4px 6px', fontWeight: 'bold', color: u.hasil?.toLowerCase() === 'positif' ? '#991b1b' : '#166534' }}>
+                                {u.hasil?.toUpperCase() || 'NEGATIF'}
+                              </td>
+                              <td style={{ border: '1px solid #333', padding: '4px 6px' }}>{u.keterangan || '-'}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    )}
+                  </div>
+
+                  <div style={{ margin: '12px 0' }}>
+                    <div style={{ fontWeight: 'bold', fontSize: '10.5pt', marginBottom: '4px', textDecoration: 'underline' }}>
+                      RIWAYAT WAJIB LAPOR KE PENGAJU (POLSEK / POLRES) &amp; HASILNYA:
+                    </div>
+                    {riwayatWajibLaporChronological.length === 0 ? (
+                      <p style={{ fontSize: '9.5pt', fontStyle: 'italic', color: '#444', margin: '4px 0 10px 0' }}>
+                        Belum ada riwayat wajib lapor ke Pengaju yang tercatat.
+                      </p>
+                    ) : (
+                      <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '10px', fontSize: '9.5pt' }}>
+                        <thead>
+                          <tr style={{ background: '#f1f5f9' }}>
+                            <th style={{ border: '1px solid #333', padding: '4px 6px', textAlign: 'left', width: '95px' }}>Laporan</th>
+                            <th style={{ border: '1px solid #333', padding: '4px 6px', textAlign: 'left', width: '90px' }}>Tanggal Lapor</th>
+                            <th style={{ border: '1px solid #333', padding: '4px 6px', textAlign: 'left' }}>Penyidik Penerima</th>
+                            <th style={{ border: '1px solid #333', padding: '4px 6px', textAlign: 'left', width: '85px' }}>Kanal</th>
+                            <th style={{ border: '1px solid #333', padding: '4px 6px', textAlign: 'left' }}>Hasil / Status</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {riwayatWajibLaporChronological.map((wl, idx) => (
+                            <tr key={wl.id}>
+                              <td style={{ border: '1px solid #333', padding: '4px 6px', fontWeight: 'bold' }}>Laporan Ke-{idx + 1}</td>
+                              <td style={{ border: '1px solid #333', padding: '4px 6px', fontFamily: 'monospace' }}>
+                                {wl.tanggalPelaporanAktual || wl.tanggalRencanaWajibLapor || wl.tanggalWajibLapor || '-'}
+                              </td>
+                              <td style={{ border: '1px solid #333', padding: '4px 6px' }}>{wl.namaPenyidikPenerima || '-'}</td>
+                              <td style={{ border: '1px solid #333', padding: '4px 6px', textTransform: 'capitalize' }}>{wl.kanal || '-'}</td>
+                              <td style={{ border: '1px solid #333', padding: '4px 6px', fontWeight: 'bold', color: wl.tanggalPelaporanAktual ? '#166534' : '#92400e' }}>
+                                {wl.tanggalPelaporanAktual ? 'Hadir / Terlaksana' : 'Terjadwal'}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    )}
+                  </div>
+
+                  <div style={{ margin: '12px 0' }}>
+                    <div style={{ fontWeight: 'bold', fontSize: '10.5pt', marginBottom: '4px', textDecoration: 'underline' }}>
                       HASIL EVALUASI KLINIS &amp; KEHADIRAN:
                     </div>
                     <p style={{ textAlign: 'justify', marginBottom: '6px' }}>
                       {form.hasilSesuaiDokumenFasilitas}
                     </p>
-                    <div style={{ border: '1.5px solid #166534', background: '#f0fdf4', padding: '8px 12px', borderRadius: '4px' }}>
-                      <span style={{ color: '#166534', fontWeight: 'bold' }}>✓ Status Toksikologi: BEBAS ZAT NARKOTIKA (NEGATIF)</span>
-                      <span style={{ marginLeft: '14px', fontWeight: 'bold', color: '#14532d' }}>&bull; Predikat: PULIH &amp; PRODUKTIF</span>
+                    <div style={{ border: posCount > 0 ? '1.5px solid #991b1b' : '1.5px solid #166534', background: posCount > 0 ? '#fef2f2' : '#f0fdf4', padding: '8px 12px', borderRadius: '4px' }}>
+                      <span style={{ color: posCount > 0 ? '#991b1b' : '#166534', fontWeight: 'bold' }}>
+                        {riwayatUrinChronological.length === 0
+                          ? '• Status Toksikologi: Menunggu Data Uji Urin'
+                          : posCount > 0
+                          ? `⚠ Status Toksikologi: ${posCount}x POSITIF (Perlu Evaluasi Lanjut)`
+                          : `✓ Status Toksikologi: ${negCount}x NEGATIF (Bebas Zat Narkotika)`}
+                      </span>
+                      <span style={{ marginLeft: '14px', fontWeight: 'bold', color: '#14532d' }}>
+                        &bull; Total Wajib Lapor: {riwayatWajibLaporChronological.length}x Tercatat
+                      </span>
                     </div>
                   </div>
 

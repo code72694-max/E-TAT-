@@ -190,7 +190,7 @@ export const TindakLanjutDetailView: React.FC<Props> = ({
     { id: 'pelaksanaan' as const, label: '1. Admisi & Serah Terima', roleTag: 'Input Pengaju • Laporan Ke-1', icon: <Building2 className="w-3.5 h-3.5" /> },
     { id: 'laporan' as const, label: '2. Rekam Medis & Tes Urin', roleTag: `Input Medis • Laporan Ke-${nextMedisKe}`, icon: <Syringe className="w-3.5 h-3.5" /> },
     { id: 'wajib_lapor' as const, label: '3. Jurnal Wajib Lapor', roleTag: `Input Pengaju • Laporan Ke-${nextWajibLaporKe}`, icon: <CheckSquare className="w-3.5 h-3.5" /> },
-    { id: 'akhir' as const, label: '4. Output Surat SKSR', roleTag: 'Medis / Admin', icon: <Award className="w-3.5 h-3.5" /> },
+    { id: 'akhir' as const, label: '4. Output Surat SKSR', roleTag: 'Input Pengaju', icon: <Award className="w-3.5 h-3.5" /> },
   ];
 
   const progress = {
@@ -210,7 +210,8 @@ export const TindakLanjutDetailView: React.FC<Props> = ({
   const readOnlyTab1 = !(isPengajuRole || isAdminRole);
   const readOnlyTab2 = isPengajuRole || (isMedisRole && !isMedisAuthorized) || (!isMedisRole && !isAdminRole);
   const readOnlyTab3 = !(isPengajuRole || isAdminRole);
-  const readOnlyTab4 = isPengajuRole || (isMedisRole && !isMedisAuthorized) || (!isMedisRole && !isAdminRole);
+  // Tab 4 (Output SKSR): Hanya Pengaju / Admin (Medis Read-Only)
+  const readOnlyTab4 = !(isPengajuRole || isAdminRole);
 
   const doctorName =
     permohonan.timAsesmen?.asesorMedisNama ||
