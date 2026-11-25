@@ -140,7 +140,7 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
     {
       step: '01',
       title: 'Registrasi & Pengajuan',
-      actor: 'Penyidik Polri / BNN',
+      actor: 'Pengaju / Hukum / Medis',
       sla: 'Maks. 1×24 Jam Penangkapan',
       icon: <FileCheck className="w-5 h-5 text-[#D4AF37]" />,
       summary: 'Pendaftaran perkara awal & upload 7 berkas formil persyaratan.',
@@ -169,34 +169,50 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
     },
     {
       step: '03',
-      title: 'Surat Perintah Penugasan',
-      actor: 'Sekretariat & Koordinator',
-      sla: 'Maks. 1 Hari Kerja',
-      icon: <Calendar className="w-5 h-5 text-[#D4AF37]" />,
-      summary: 'Penerbitan Sprint Tim Terpadu & penjadwalan pemeriksaan.',
+      title: 'Timeline',
+      actor: 'Sekretariat TAT & Penyidik',
+      sla: 'SLA Maks. 6 Hari Kerja (3x24 Jam Penangkapan)',
+      icon: <Clock className="w-5 h-5 text-[#D4AF37]" />,
+      summary: 'Pemantauan linimasa permohonan asesmen terpadu pada masa penangkapan (maks. 3×24 jam) hingga penerbitan rekomendasi (hari ke-6).',
       details: [
-        'Penerbitan Surat Perintah Penugasan Tim Asesmen Terpadu.',
-        'Penetapan jadwal & lokasi pemeriksaan klinis medis dan analisis hukum.',
-        'Pengiriman pemberitahuan agenda resmi kepada penyidik & tim pemeriksa.'
+        'Masa Penangkapan Pertama (Hari ke-0 s.d. Hari ke-3): Maksimal batas pengajuan asesmen terpadu adalah 3×24 jam pasca penangkapan.',
+        'Batas Waktu Perbaikan Berkas: Apabila terdapat catatan perbaikan/koreksi administrasi dari verifikator, role Pengaju wajib melengkapi dalam waktu maksimal 3×24 jam sesuai timeline penangkapan.',
+        'Penjadwalan Otomatis: Saat Pengaju submit permohonan, estimasi jadwal pemeriksaan terpadu (Medis, Hukum, Pleno) langsung otomatis ter-generate dan tampil di Admin TAT namun tanggal tetap dapat dikustomisasi/disesuaikan.',
+        'Masa Pelaksanaan Asesmen Terpadu (Hari ke-3 s.d. Hari ke-6): Pemeriksaan medis klinis, analisis yuridis hukum, dan pelaksanaan Sidang Pleno TAT.',
+        'Hari ke-6: Batas akhir pengesahan dan pengeluaran Surat Rekomendasi Resmi TAT.'
       ],
-      legalBasis: 'Peraturan Bersama 7 Lembaga/Kementerian'
+      legalBasis: 'Juknis Terpadu BNN & Polri (Masa Penangkapan 3x24 Jam & SLA TAT)'
     },
     {
       step: '04',
-      title: 'Forensik & Yuridis',
-      actor: 'Tim Medis & Asesor Hukum',
-      sla: 'Maks. 2 Hari Kerja (Paralel)',
+      title: 'Medis',
+      actor: 'Tim Medis TAT',
+      sla: 'Maks. 2 Hari Kerja',
       icon: <Stethoscope className="w-5 h-5 text-[#D4AF37]" />,
-      summary: 'Skrining klinis ASSIST & analisis kualifikasi perkara hukum.',
+      summary: 'Pemeriksaan klinis, tes urin, dan skrining tingkat ketergantungan (ASSIST).',
       details: [
-        'Asesmen Medis: Tes klinis, skrining ASSIST (skor 0-39), diagnosis ketergantungan, usulan terapi.',
-        'Asesmen Hukum: Analisis BAP, legalitas penangkapan, kualifikasi pengedar vs korban.',
-        'Pengujian barang bukti di bawah ambang batas SEMA No. 04 Tahun 2010.'
+        'Pemeriksaan fisik, tanda vital, dan riwayat penggunaan zat narkotika.',
+        'Skrining klinis WHO-ASSIST (skor 0-39) dan uji toksikologi urin.',
+        'Penentuan diagnosis klinis (ICD-10) serta usulan modalitas dan durasi rehabilitasi.'
+      ],
+      legalBasis: 'UU No. 35/2009 & Permenkes No. 4/2020'
+    },
+    {
+      step: '05',
+      title: 'Hukum',
+      actor: 'Tim Asesor Hukum TAT',
+      sla: 'Maks. 2 Hari Kerja',
+      icon: <Scale className="w-5 h-5 text-[#D4AF37]" />,
+      summary: 'Analisis yuridis BAP, peran tersangka, barang bukti, dan rekam residivisme.',
+      details: [
+        'Analisis BAP, legalitas penangkapan, dan kualifikasi peran (penyalahguna vs pengedar).',
+        'Pengujian berat barang bukti terhadap ambang batas SEMA No. 04 Tahun 2010.',
+        'Verifikasi riwayat residivisme dan rekomendasi aspek hukum untuk Sidang Pleno.'
       ],
       legalBasis: 'UU No. 35/2009 & SEMA No. 04/2010'
     },
     {
-      step: '05',
+      step: '06',
       title: 'Sidang Pleno TAT',
       actor: 'Koordinator & Asesor Terpadu',
       sla: 'Maks. 1 Hari Kerja',
@@ -207,51 +223,49 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
         'Pencatatan notulensi sidang dan daftar hadir anggota pleno.',
         'Penyusunan Draf Berita Acara Pleno untuk merumuskan simpulan rekomendasi final.'
       ],
-      legalBasis: 'Pedoman Penanganan Perkara TAT BNNP Kaltim'
-    },
-    {
-      step: '06',
-      title: 'Pengesahan QR & TTE',
-      actor: '4 Penanda Tangan Resmi',
-      sla: 'Maks. 1 Hari Kerja (Total SLA 6 Hari)',
-      icon: <FileSignature className="w-5 h-5 text-[#D4AF37]" />,
-      summary: 'Penerbitan Surat Rekomendasi Resmi 3-Panel & TTE Multi-Pihak.',
-      details: [
-        'Penerbitan dokumen dalam format 3-Panel (Acuan Visual 8).',
-        'Tanda Tangan Elektronik (TTE) berjenjang oleh 4 Pengesah (Medis, Hukum, Penyidik, Ketua TAT).',
-        'Penerbitan Barcode QR Code Verifikasi keaslian dokumen resmi.',
-        'Penyidik menandatangani lembar konfirmasi tanda terima berkas resmi.'
-      ],
-      legalBasis: 'Sistem TTE Tersertifikasi & Barcode Verification'
+      legalBasis: 'Pedoman Penanganan Perkara TAT BNN Kota Samarinda'
     },
     {
       step: '07',
+      title: 'Pengesahan',
+      actor: '4 Penanda Tangan Resmi',
+      sla: 'Maks. 1 Hari Kerja (Total SLA 6 Hari)',
+      icon: <FileSignature className="w-5 h-5 text-[#D4AF37]" />,
+      summary: 'Pengesahan Surat Rekomendasi Resmi & Verifikasi Dokumen.',
+      details: [
+        'Pengesahan surat rekomendasi resmi oleh Ketua TAT dan tim terkait.',
+        'Penerbitan QR Code verifikasi keaslian dokumen resmi e-TAT SIAP PULIH.',
+        'Dokumen siap diunduh oleh Penyidik sebagai kelengkapan berkas perkara.'
+      ],
+      legalBasis: 'Sistem Verifikasi Dokumen e-TAT SIAP PULIH'
+    },
+    {
+      step: '08',
       title: 'Rujukan & Eksekusi',
       actor: 'Balai Rehabilitasi & Penyidik',
       sla: 'Sesuai Rencana Eksekusi',
       icon: <Share2 className="w-5 h-5 text-[#D4AF37]" />,
-      summary: 'Penerbitan rujukan balai rehab & penyerahan lembar rekomendasi.',
+      summary: 'Penerbitan rujukan balai rehab & serah terima pelaksanaan tindak lanjut.',
       details: [
-        'Penerbitan surat rujukan resmi ke Balai Besar BNN (Tanah Merah/Lido) atau Klinik Pratama.',
-        'Penyidik melampirkan rekomendasi resmi ke berkas perkara penyidikan (BAP / P-21).',
-        'Konfirmasi admisi penerimaan klien oleh fasilitas rehabilitasi.'
+        'Serah terima tersangka oleh Pengaju ke fasilitas rehabilitasi tujuan.',
+        'Pelaksanaan kontrol medis berkala, tes urin, dan jurnal wajib lapor.',
+        'Penerbitan Surat Keterangan Selesai Rehabilitasi (SKSR) setelah program tuntas.'
       ],
       legalBasis: 'Perja No. 15/2020 & Perpol No. 08/2021'
     },
     {
-      step: '08',
-      title: 'Pengawasan & SKSP',
-      actor: 'Konselor & Penyidik Pengawas',
-      sla: '3 s.d. 6 Bulan Pemantauan',
+      step: '09',
+      title: 'Pasca Rehab',
+      actor: 'Tim Medis / Konselor',
+      sla: 'Pemantauan Pascarehab',
       icon: <Activity className="w-5 h-5 text-[#D4AF37]" />,
-      summary: 'Pemantauan kepatuhan rehabilitasi, tes urin berkala & penerbitan SKSP.',
+      summary: 'Penjadwalan dan pemantauan program bina lanjut pasca rehabilitasi oleh Tim Medis.',
       details: [
-        'Pencatatan Jurnal Kegiatan Konseling dan absensi kepatuhan.',
-        'Skrining Tes Urin Periodik (5 Parameter: AMP, MET, THC, BZO, MOP).',
-        'Penerbitan Surat Peringatan (SP-1/2/3) jika terdapat pelanggaran mangkir.',
-        'Penerbitan Surat Keterangan Selesai Program (SKSP) bagi klien yang lulus.'
+        'Tim Medis menginput jadwal layanan bina lanjut pasca rehabilitasi.',
+        'Pemantauan berkala kondisi pemulihan dan tes urin lanjutan klien.',
+        'Mendukung keberlanjutan pemulihan agar klien tetap pulih, produktif, dan bebas relapse.'
       ],
-      legalBasis: 'Modul Monitoring Pengawasan Pasca TAT BNNP Kaltim'
+      legalBasis: 'Perban BNN No. 6 Tahun 2022 tentang Rehabilitasi Berkelanjutan'
     }
   ];
 
@@ -496,14 +510,16 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
                     </h1>
 
                     {/* Direct Clean Acronym Subtitles - Centered */}
-                    <div className="space-y-1.5 pt-1 text-slate-200 text-center max-w-2xl mx-auto">
-                      <p className="text-sm sm:text-base md:text-lg font-bold tracking-wide text-white drop-shadow-md">
-                        Elektronik Tim Asesmen Terpadu
-                      </p>
-                      <p className="text-xs sm:text-sm md:text-base font-semibold text-slate-200 drop-shadow-md">
-                        Sistem Integrasi Asesmen dan Pemantauan Pemulihan
-                      </p>
-                      <p className="text-xs sm:text-sm font-medium italic text-teal-300 drop-shadow-md">
+                    <div className="pt-1 text-slate-200 text-center max-w-2xl mx-auto">
+                      <div className="space-y-0 leading-tight">
+                        <p className="text-sm sm:text-base md:text-lg font-bold tracking-wide text-white drop-shadow-md">
+                          (Elektronik Tim Asesmen Terpadu
+                        </p>
+                        <p className="text-sm sm:text-base md:text-lg font-bold tracking-wide text-white drop-shadow-md -mt-0.5 sm:-mt-1">
+                          Sistem Integrasi Asesmen dan Pemantauan Pemulihan)
+                        </p>
+                      </div>
+                      <p className="text-xs sm:text-sm font-medium italic text-teal-300 drop-shadow-md pt-2 sm:pt-2.5">
                         Asesmen Tepat, Pemulihan Terpantau
                       </p>
                     </div>
@@ -521,25 +537,27 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
                     </p>
                   </div>
 
-                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 items-center bg-[#081224]/85 backdrop-blur-md border border-[#1b3459] rounded-2xl p-4 sm:p-6 shadow-2xl">
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 items-center">
                     {/* Left: Logo + Kepanjangan + Tagline */}
-                    <div className="lg:col-span-5 flex flex-col items-center text-center space-y-2 lg:border-r lg:border-[#1b3459]/70 lg:pr-5">
+                    <div className="lg:col-span-5 flex flex-col items-center text-center space-y-3 lg:border-r lg:border-white/15 lg:pr-6">
                       <img
                         src="/logo_etat.png"
                         alt="Logo E-TAT SIAP PULIH"
-                        className="h-24 sm:h-32 w-auto object-contain drop-shadow-[0_8px_24px_rgba(212,175,55,0.45)]"
+                        className="h-32 sm:h-44 lg:h-52 w-auto object-contain drop-shadow-[0_8px_28px_rgba(212,175,55,0.5)]"
                       />
-                      <div className="space-y-0.5">
-                        <h3 className="text-base sm:text-lg font-extrabold text-white font-['Cinzel',serif] tracking-wide">
+                      <div>
+                        <h3 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-white font-['Cinzel',serif] tracking-wide pb-1">
                           E-TAT <span className="text-[#D4AF37]">SIAP PULIH</span>
                         </h3>
-                        <p className="text-[11px] sm:text-xs font-bold text-[#D4AF37]">
-                          Elektronik Tim Asesmen Terpadu
-                        </p>
-                        <p className="text-[11px] sm:text-xs font-semibold text-slate-200 leading-snug max-w-xs mx-auto">
-                          Sistem Integrasi Asesmen dan Pemantauan Pemulihan
-                        </p>
-                        <p className="text-[11px] font-medium italic text-teal-300 pt-0.5">
+                        <div className="space-y-0 leading-tight">
+                          <p className="text-xs sm:text-sm lg:text-base font-bold text-white leading-tight">
+                            (Elektronik Tim Asesmen Terpadu
+                          </p>
+                          <p className="text-xs sm:text-sm lg:text-base font-bold text-white leading-tight -mt-0.5 sm:-mt-1">
+                            Sistem Integrasi Asesmen dan Pemantauan Pemulihan)
+                          </p>
+                        </div>
+                        <p className="text-xs sm:text-sm font-medium italic text-teal-300 pt-2 sm:pt-2.5">
                           Asesmen Tepat, Pemulihan Terpantau
                         </p>
                       </div>
@@ -759,37 +777,37 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
       </section>
 
       {/* ALUR SOP */}
-      <section id="alur-layanan" className="py-20 sm:py-24 bg-[#071326] border-b border-[#1b3459]/60">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+      <section id="alur-layanan" className="py-12 sm:py-16 bg-[#071326] border-b border-[#1b3459]/60">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-7">
           <div className="text-center reveal-on-scroll">
-            <span className="text-[11px] sm:text-xs font-semibold uppercase tracking-[0.2em] text-[#D4AF37] block mb-2.5">Alur Terpadu SIAP PULIH</span>
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-white tracking-wide">8 Tahapan SOP Layanan</h2>
-            <p className="text-xs sm:text-sm text-slate-400 mt-2.5 max-w-md mx-auto leading-relaxed">
+            <span className="text-[11px] sm:text-xs font-semibold uppercase tracking-[0.2em] text-[#D4AF37] block mb-1.5">Alur Terpadu SIAP PULIH</span>
+            <h2 className="text-2xl sm:text-3xl font-semibold text-white tracking-wide">9 Tahapan SOP Layanan</h2>
+            <p className="text-xs sm:text-sm text-slate-400 mt-1.5 max-w-md mx-auto leading-relaxed">
               Klik pada salah satu tahapan di bawah untuk melihat rincian alur kerja, pelaksana, dan batas waktu SLA operasional.
             </p>
           </div>
 
-          {/* SOP Cards Grid (Clean & Proportional on Mobile) */}
-          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4.5">
+          {/* SOP Cards Grid (2 rows on desktop: 5 + 4, 2 columns on mobile) */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-3.5">
             {SOP_8_STEPS.map((item, i) => (
               <div
                 key={item.step}
                 onClick={() => setSelectedSopStep(item)}
-                className={`reveal-on-scroll reveal-delay-${Math.min(i + 1, 8)} group bg-[#0d1f38] border border-[#1b3459]/80 hover:border-[#D4AF37] rounded-xl p-4 sm:p-4.5 flex flex-col justify-between space-y-3 cursor-pointer transition-all duration-300 hover:-translate-y-1.5 shadow-lg hover:shadow-[#D4AF37]/10 min-h-[175px]`}
+                className={`reveal-on-scroll reveal-delay-${Math.min(i + 1, 8)} group bg-[#0d1f38] border border-[#1b3459]/80 hover:border-[#D4AF37] rounded-xl p-3.5 sm:p-4 flex flex-col justify-between space-y-2.5 cursor-pointer transition-all duration-300 hover:-translate-y-1 shadow-lg hover:shadow-[#D4AF37]/10 min-h-[145px]`}
               >
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="w-8 h-8 rounded-xl bg-[#071326] border border-[#1b3459] flex items-center justify-center shrink-0 group-hover:border-[#D4AF37]/50 transition-colors">
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <div className="w-7 h-7 rounded-lg bg-[#071326] border border-[#1b3459] flex items-center justify-center shrink-0 group-hover:border-[#D4AF37]/50 transition-colors">
                       {item.icon}
                     </div>
-                    <span className="font-mono text-xs sm:text-sm font-bold text-slate-400 group-hover:text-[#D4AF37] transition-colors">
+                    <span className="font-mono text-xs font-bold text-slate-400 group-hover:text-[#D4AF37] transition-colors">
                       {item.step}
                     </span>
                   </div>
-                  <h3 className="text-xs sm:text-sm font-bold text-white group-hover:text-[#D4AF37] transition-colors leading-snug min-h-[36px] flex items-center">
+                  <h3 className="text-xs sm:text-sm font-bold text-white group-hover:text-[#D4AF37] transition-colors leading-snug">
                     {item.title}
                   </h3>
-                  <p className="text-[11px] text-slate-400 font-medium truncate pt-0.5">
+                  <p className="text-[11px] text-slate-400 font-medium truncate">
                     {item.actor}
                   </p>
                 </div>
@@ -834,7 +852,7 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
             className="fixed inset-0"
             onClick={() => setSelectedSopStep(null)}
           />
-          <div className="relative z-10 max-w-lg w-full bg-[#0b172a] border border-[#234b7d] rounded-2xl p-6 sm:p-7 shadow-2xl space-y-5 text-slate-200">
+          <div className={`relative z-10 w-full bg-[#0b172a] border border-[#234b7d] rounded-2xl p-6 sm:p-7 shadow-2xl space-y-5 text-slate-200 ${selectedSopStep.step === '03' ? 'max-w-2xl' : 'max-w-lg'}`}>
             {/* Modal Header */}
             <div className="flex items-start justify-between pb-3 border-b border-[#1b3459] gap-3">
               <div className="flex items-center space-x-3">
@@ -869,6 +887,40 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
                 {selectedSopStep.sla}
               </span>
             </div>
+
+            {/* Khusus Step 03: Tampilkan Gambar / Infografis Timeline Resmi */}
+            {selectedSopStep.step === '03' && (
+              <div className="space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-[#D4AF37] uppercase tracking-wider flex items-center space-x-1.5">
+                    <Clock className="w-4 h-4" />
+                    <span>Infografis Linimasa Resmi Penangkapan:</span>
+                  </span>
+                  <span className="text-[10px] text-slate-400 font-mono">Batas Max: Hari ke-6</span>
+                </div>
+                <div className="rounded-xl overflow-hidden border border-[#234b7d] bg-white p-2 shadow-lg">
+                  <img
+                    src="/images/timeline-penangkapan.jpg"
+                    alt="Timeline Permohonan Asesmen Terpadu pada Masa Penangkapan"
+                    className="w-full h-auto object-contain rounded"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-[11px] pt-1">
+                  <div className="p-2.5 bg-[#071326] border border-[#1b3459] rounded-lg">
+                    <span className="text-[#D4AF37] font-bold block mb-0.5">Hari ke-0 s.d. Hari ke-3:</span>
+                    <p className="text-slate-300 text-[10px] leading-relaxed">
+                      Masa Penangkapan Pertama (3×24 Jam). Batas akhir penyidik pengaju mengirim permohonan asesmen & revisi dokumen perbaikan.
+                    </p>
+                  </div>
+                  <div className="p-2.5 bg-[#071326] border border-[#1b3459] rounded-lg">
+                    <span className="text-emerald-400 font-bold block mb-0.5">Hari ke-3 s.d. Hari ke-6:</span>
+                    <p className="text-slate-300 text-[10px] leading-relaxed">
+                      Masa Pelaksanaan Asesmen Terpadu (Medis, Hukum &amp; Pleno). Hari ke-6 batas akhir penerbitan Surat Rekomendasi Resmi.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Summary */}
             <p className="text-xs text-slate-300 italic bg-[#0d1f38]/60 p-3 rounded-lg border-l-2 border-[#D4AF37]">

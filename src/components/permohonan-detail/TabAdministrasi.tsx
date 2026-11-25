@@ -19,7 +19,8 @@ import {
   Check,
   AlertCircle,
   X,
-  RefreshCw
+  RefreshCw,
+  Clock
 } from 'lucide-react';
 import { permohonanApi } from '../../services/api';
 import { sendCorrectionEmailNotification } from '../../services/emailService';
@@ -841,7 +842,12 @@ export const TabAdministrasi: React.FC<TabAdministrasiProps> = ({
                 className="w-full bg-[#050e1c] border border-[#1b3459] focus:border-amber-500 text-white text-xs p-3 rounded-xl outline-none leading-relaxed resize-none shadow-inner transition-colors"
                 autoFocus
               />
-              <p className="text-[10px] text-slate-400">Catatan ini akan tersimpan pada status berkas dan dapat dikirimkan langsung ke penyidik pengaju.</p>
+              <div className="flex items-center space-x-1.5 p-2 bg-amber-950/40 border border-amber-800/40 rounded-lg text-[10px] text-amber-200">
+                <Clock className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                <span>
+                  <strong>Batas Waktu Revisi:</strong> Pengaju wajib melengkapi perbaikan dokumen dalam batas maksimal <strong>3×24 jam</strong> sesuai linimasa masa penangkapan TAT.
+                </span>
+              </div>
             </div>
 
             {/* Actions */}

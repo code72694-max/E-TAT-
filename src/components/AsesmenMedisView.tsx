@@ -371,7 +371,10 @@ export const AsesmenMedisView: React.FC<AsesmenMedisViewProps> = ({
 
     if (isFinal) {
       updated.medicalStatus = 'FINAL';
-      const isHukumFinal = updated.asesmenHukum?.status === 'FINAL' || updated.legalStatus === 'FINAL';
+      const isHukumFinal =
+        updated.asesmenHukum?.status === 'siap_dibahas' ||
+        String(updated.asesmenHukum?.status || '').toUpperCase() === 'FINAL' ||
+        updated.legalStatus === 'FINAL';
       if (isHukumFinal) {
         if (updated.statusProsesUtama === 'asesmen_berlangsung' || updated.statusProsesUtama === 'penugasan_jadwal') {
           updated.statusProsesUtama = 'siap_pleno';

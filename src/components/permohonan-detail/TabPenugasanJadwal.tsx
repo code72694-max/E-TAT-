@@ -69,19 +69,31 @@ export const TabPenugasanJadwal: React.FC<TabPenugasanJadwalProps> = ({
     setModalType(type);
     setCatatanInput('');
 
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    const baseDate = permohonan.tanggalPengajuan ? new Date(permohonan.tanggalPengajuan) : new Date();
+    const defaultTglMedis = new Date(baseDate.getTime() + 3 * 24 * 60 * 60 * 1000);
+    const defaultTglHukum = new Date(baseDate.getTime() + 3 * 24 * 60 * 60 * 1000);
+    const defaultTglPleno = new Date(baseDate.getTime() + 5 * 24 * 60 * 60 * 1000);
+
+    const fallbackJadwalMedis = `${defaultTglMedis.getFullYear()}-${pad(defaultTglMedis.getMonth() + 1)}-${pad(defaultTglMedis.getDate())}T09:00`;
+    const fallbackJadwalHukum = `${defaultTglHukum.getFullYear()}-${pad(defaultTglHukum.getMonth() + 1)}-${pad(defaultTglHukum.getDate())}T13:30`;
+    const fallbackJadwalPleno = `${defaultTglPleno.getFullYear()}-${pad(defaultTglPleno.getMonth() + 1)}-${pad(defaultTglPleno.getDate())}T10:00`;
+
     if (type === 'medis') {
       const existing = medisUsers.find(u => u.name === tim?.asesorMedisNama || u.id === tim?.asesorMedisId);
       const chosen = existing || medisUsers[0];
       setSelectedAssessorId(chosen?.id || '');
       setTargetEmailInput(tim?.asesorMedisEmail || (tim as any)?.asesorMedis?.email || chosen?.email || '');
       setLokasiInput(tim?.lokasiPemeriksaan || 'Klinik Pratama BNNP Kaltim');
-      setJadwalInput(tim?.jadwalPemeriksaanMedis ? tim.jadwalPemeriksaanMedis.replace(' WIB', '') : '');
+      const curJadwal = tim?.jadwalPemeriksaanMedis ? tim.jadwalPemeriksaanMedis.replace(' WIB', '').replace(' ', 'T') : fallbackJadwalMedis;
+      setJadwalInput(curJadwal);
     } else if (type === 'hukum') {
       const existing = hukumUsers.find(u => u.name === tim?.asesorHukumNama || u.id === tim?.asesorHukumId);
       const chosen = existing || hukumUsers[0];
       setSelectedAssessorId(chosen?.id || '');
       setTargetEmailInput(tim?.asesorHukumEmail || (tim as any)?.asesorHukum?.email || chosen?.email || '');
-      setJadwalInput(tim?.jadwalPemeriksaanHukum ? tim.jadwalPemeriksaanHukum.replace(' WIB', '') : '');
+      const curJadwal = tim?.jadwalPemeriksaanHukum ? tim.jadwalPemeriksaanHukum.replace(' WIB', '').replace(' ', 'T') : fallbackJadwalHukum;
+      setJadwalInput(curJadwal);
     } else {
       // Pleno: otomatis gabungkan email asesor medis, asesor hukum, dan pengaju
       const defaultTargets = Array.from(
@@ -94,7 +106,8 @@ export const TabPenugasanJadwal: React.FC<TabPenugasanJadwalProps> = ({
         )
       );
       setTargetEmailInput(defaultTargets.join(', '));
-      setJadwalInput(tim?.jadwalPleno ? tim.jadwalPleno.replace(' WIB', '') : '');
+      const curJadwal = tim?.jadwalPleno ? tim.jadwalPleno.replace(' WIB', '').replace(' ', 'T') : fallbackJadwalPleno;
+      setJadwalInput(curJadwal);
     }
   };
 

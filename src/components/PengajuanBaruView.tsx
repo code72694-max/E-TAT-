@@ -654,6 +654,17 @@ export const PengajuanBaruView: React.FC<PengajuanBaruViewProps> = ({
       barangBuktiList: barangBuktiList
     };
 
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    const now = new Date();
+    // Timeline SOP: Hari ke-3 / Hari ke-4 untuk pemeriksaan medis & hukum, Hari ke-5 / 6 untuk Pleno
+    const tglMedis = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
+    const tglHukum = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
+    const tglPleno = new Date(now.getTime() + 5 * 24 * 60 * 60 * 1000);
+
+    const autoJadwalMedis = `${tglMedis.getFullYear()}-${pad(tglMedis.getMonth() + 1)}-${pad(tglMedis.getDate())} 09:00 WIB`;
+    const autoJadwalHukum = `${tglHukum.getFullYear()}-${pad(tglHukum.getMonth() + 1)}-${pad(tglHukum.getDate())} 13:30 WIB`;
+    const autoJadwalPleno = `${tglPleno.getFullYear()}-${pad(tglPleno.getMonth() + 1)}-${pad(tglPleno.getDate())} 10:00 WIB`;
+
     let createdPermohonan: PermohonanAsesmen = {
       id: `tat-${Date.now()}`,
       nomorPermohonan: `TAT/${new Date().getFullYear()}/${new Date().getMonth() + 1}/${Math.floor(100 + Math.random() * 900)}`,
@@ -671,7 +682,7 @@ export const PengajuanBaruView: React.FC<PengajuanBaruViewProps> = ({
       statusHukum: 'belum_dimulai',
       statusDokumen: 'draf',
       statusTindakLanjut: 'belum_dikonfirmasi',
-      tenggatSlaTanggal: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
+      tenggatSlaTanggal: new Date(Date.now() + 6 * 24 * 60 * 60 * 1000).toISOString(),
       isMendekatiTenggat: false,
       isMelewatiTenggat: false,
       pengajuId: currentUser.id,
@@ -683,6 +694,13 @@ export const PengajuanBaruView: React.FC<PengajuanBaruViewProps> = ({
       terperiksa: terperiksaData,
       perkara: perkaraData,
       dokumenList: fullDokumen,
+      timAsesmen: {
+        sekretariatNama: 'Sekretariat TAT BNNP Kaltim',
+        jadwalPemeriksaanMedis: autoJadwalMedis,
+        jadwalPemeriksaanHukum: autoJadwalHukum,
+        jadwalPleno: autoJadwalPleno,
+        lokasiPemeriksaan: 'Klinik Pratama BNNP Kaltim'
+      },
       klarifikasiList: [],
       auditLogs: [
         {
