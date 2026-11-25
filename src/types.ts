@@ -408,6 +408,7 @@ export interface SidangPleno {
   fileBeritaAcaraSigned?: string;
   fotoKehadiranUrl?: string;
   fotoKehadiranKeterangan?: string;
+  fotoKehadiranList?: { url: string; keterangan?: string }[];
 }
 
 // Pengesahan Multi-Pihak

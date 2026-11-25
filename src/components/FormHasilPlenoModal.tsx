@@ -30,55 +30,85 @@ export const FormHasilPlenoModal: React.FC<FormHasilPlenoModalProps> = ({
       : [{ id: Date.now().toString(), nama: '', peran: '', instansi: '', hadir: true }]
   );
 
-  const getInitialFotoKehadiran = () => {
-    if (pleno?.fotoKehadiranUrl) return pleno.fotoKehadiranUrl;
-    try {
-      return (
-        localStorage.getItem(`etat_pleno_foto_kehadiran_${permohonan.id}`) ||
-        localStorage.getItem(`etat_pleno_foto_kehadiran_${permohonan.nomorPermohonan}`) ||
-        ''
-      );
-    } catch {
-      return '';
+  const getInitialFotoList = (): { url: string; keterangan?: string }[] => {
+    if (Array.isArray(pleno?.fotoKehadiranList) && pleno.fotoKehadiranList.length > 0) {
+      return pleno.fotoKehadiranList;
     }
+    try {
+      const rawList =
+        localStorage.getItem(`etat_pleno_foto_list_${permohonan.id}`) ||
+        (permohonan.nomorPermohonan
+          ? localStorage.getItem(`etat_pleno_foto_list_${permohonan.nomorPermohonan}`)
+          : null);
+      if (rawList) {
+        const parsed = JSON.parse(rawList);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+      const legacyUrl =
+        pleno?.fotoKehadiranUrl ||
+        localStorage.getItem(`etat_pleno_foto_kehadiran_${permohonan.id}`) ||
+        (permohonan.nomorPermohonan
+          ? localStorage.getItem(`etat_pleno_foto_kehadiran_${permohonan.nomorPermohonan}`)
+          : '');
+      if (legacyUrl) {
+        return [{ url: legacyUrl, keterangan: pleno?.fotoKehadiranKeterangan || 'Dokumentasi Kehadiran Peserta Sidang Pleno TAT' }];
+      }
+    } catch {}
+    return [];
   };
 
-  const [fotoKehadiranUrl, setFotoKehadiranUrl] = useState<string>(getInitialFotoKehadiran);
-  const [fotoKehadiranKeterangan, setFotoKehadiranKeterangan] = useState<string>(
-    pleno?.fotoKehadiranKeterangan || 'Dokumentasi Kehadiran Peserta Sidang Pleno TAT'
-  );
+  const [fotoKehadiranList, setFotoKehadiranList] = useState<{ url: string; keterangan?: string }[]>(getInitialFotoList);
   const [isUploadingFoto, setIsUploadingFoto] = useState(false);
 
-  const handleUploadFotoKehadiran = async (file: File) => {
-    const ext = '.' + file.name.split('.').pop()?.toLowerCase();
-    if (!['.jpg', '.jpeg', '.png', '.webp'].includes(ext)) {
-      alert('Harap unggah file foto berformat JPG, JPEG, PNG, atau WEBP.');
-      return;
-    }
-    if (file.size > 10 * 1024 * 1024) {
-      alert('Ukuran foto maksimal 10 MB.');
-      return;
-    }
+  const handleUploadFotoKehadiran = async (files: FileList | File[]) => {
+    const fileArray = Array.from(files);
+    if (fileArray.length === 0) return;
 
     setIsUploadingFoto(true);
-    const localDataUrl = await new Promise<string>((resolve) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = () => resolve(URL.createObjectURL(file));
-      reader.readAsDataURL(file);
-    });
-    setFotoKehadiranUrl(localDataUrl);
-
     try {
-      const res = await uploadToCloudinary(file, 'pleno-kehadiran');
-      if (res?.url) {
-        setFotoKehadiranUrl(res.url);
+      for (const file of fileArray) {
+        const ext = '.' + file.name.split('.').pop()?.toLowerCase();
+        if (!['.jpg', '.jpeg', '.png', '.webp'].includes(ext)) {
+          alert(`File "${file.name}" ditolak. Gunakan format JPG, JPEG, PNG, atau WEBP.`);
+          continue;
+        }
+        if (file.size > 10 * 1024 * 1024) {
+          alert(`Ukuran "${file.name}" melebihi 10 MB.`);
+          continue;
+        }
+
+        let uploadedUrl = await new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result as string);
+          reader.onerror = () => resolve(URL.createObjectURL(file));
+          reader.readAsDataURL(file);
+        });
+
+        try {
+          const res = await uploadToCloudinary(file, 'pleno-kehadiran');
+          if (res?.url) {
+            uploadedUrl = res.url;
+          }
+        } catch (err) {
+          console.warn('Upload Cloudinary foto kehadiran fallback ke lokal:', err);
+        }
+
+        setFotoKehadiranList((prev) => [
+          ...prev,
+          { url: uploadedUrl, keterangan: 'Dokumentasi Kehadiran Sidang Pleno TAT' },
+        ]);
       }
-    } catch (err) {
-      console.warn('Upload Cloudinary foto kehadiran fallback ke lokal:', err);
     } finally {
       setIsUploadingFoto(false);
     }
+  };
+
+  const handleRemoveFoto = (idx: number) => {
+    setFotoKehadiranList((prev) => prev.filter((_, i) => i !== idx));
+  };
+
+  const handleUpdateFotoKeterangan = (idx: number, keterangan: string) => {
+    setFotoKehadiranList((prev) => prev.map((item, i) => (i === idx ? { ...item, keterangan } : item)));
   };
 
   const handleAddHadir = () => {
@@ -100,14 +130,18 @@ export const FormHasilPlenoModal: React.FC<FormHasilPlenoModalProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      if (fotoKehadiranUrl) {
-        localStorage.setItem(`etat_pleno_foto_kehadiran_${permohonan.id}`, fotoKehadiranUrl);
+      if (fotoKehadiranList.length > 0) {
+        localStorage.setItem(`etat_pleno_foto_list_${permohonan.id}`, JSON.stringify(fotoKehadiranList));
+        localStorage.setItem(`etat_pleno_foto_kehadiran_${permohonan.id}`, fotoKehadiranList[0].url);
         if (permohonan.nomorPermohonan) {
-          localStorage.setItem(`etat_pleno_foto_kehadiran_${permohonan.nomorPermohonan}`, fotoKehadiranUrl);
+          localStorage.setItem(`etat_pleno_foto_list_${permohonan.nomorPermohonan}`, JSON.stringify(fotoKehadiranList));
+          localStorage.setItem(`etat_pleno_foto_kehadiran_${permohonan.nomorPermohonan}`, fotoKehadiranList[0].url);
         }
       } else {
+        localStorage.removeItem(`etat_pleno_foto_list_${permohonan.id}`);
         localStorage.removeItem(`etat_pleno_foto_kehadiran_${permohonan.id}`);
         if (permohonan.nomorPermohonan) {
+          localStorage.removeItem(`etat_pleno_foto_list_${permohonan.nomorPermohonan}`);
           localStorage.removeItem(`etat_pleno_foto_kehadiran_${permohonan.nomorPermohonan}`);
         }
       }
@@ -122,8 +156,9 @@ export const FormHasilPlenoModal: React.FC<FormHasilPlenoModalProps> = ({
       fasilitasRujukanUsulan,
       statusPleno,
       daftarHadir,
-      fotoKehadiranUrl: fotoKehadiranUrl || undefined,
-      fotoKehadiranKeterangan: fotoKehadiranKeterangan.trim() || undefined
+      fotoKehadiranList,
+      fotoKehadiranUrl: fotoKehadiranList[0]?.url || undefined,
+      fotoKehadiranKeterangan: fotoKehadiranList[0]?.keterangan || undefined
     });
   };
 
@@ -273,86 +308,79 @@ export const FormHasilPlenoModal: React.FC<FormHasilPlenoModalProps> = ({
               </div>
             </div>
 
-            {/* Section 4: Lampiran Foto Bukti Kehadiran */}
+            {/* Section 4: Lampiran Foto Bukti Kehadiran (Multi-Upload) */}
             <div className="space-y-3">
               <div className="flex items-center justify-between border-b border-[#1b3459] pb-2">
                 <h3 className="text-sm font-semibold text-[#d4af37] uppercase tracking-wider flex items-center gap-2">
                   <Camera className="w-4 h-4" />
                   <span>4. Lampiran Foto Bukti Kehadiran Pleno</span>
                 </h3>
-                <span className="text-[10px] text-slate-400">Opsional • Ditampilkan sebagai lembar lampiran Berita Acara</span>
+                <span className="text-[10px] text-slate-400">Bisa upload beberapa foto • Lembar lampiran Berita Acara</span>
               </div>
 
-              {!fotoKehadiranUrl ? (
-                <label className="flex flex-col items-center justify-center border-2 border-dashed border-[#234475] hover:border-[#d4af37]/70 bg-[#081224] rounded-xl p-6 cursor-pointer transition-colors group">
-                  <div className="w-11 h-11 rounded-full bg-[#142642] border border-[#234475] flex items-center justify-center mb-2 group-hover:scale-105 transition-transform">
-                    <Upload className="w-5 h-5 text-[#d4af37]" />
-                  </div>
-                  <span className="text-xs font-semibold text-white">
-                    {isUploadingFoto ? 'Mengunggah foto...' : 'Klik untuk Upload Foto Kehadiran / Dokumentasi Pleno'}
-                  </span>
-                  <span className="text-[11px] text-slate-400 mt-1">
-                    Format JPG, PNG, WEBP (Maks. 10 MB)
-                  </span>
-                  <input
-                    type="file"
-                    accept="image/jpeg,image/png,image/webp"
-                    className="hidden"
-                    disabled={isUploadingFoto}
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) handleUploadFotoKehadiran(file);
-                    }}
-                  />
-                </label>
-              ) : (
-                <div className="bg-[#081224] border border-[#1b3459] rounded-xl p-4 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-emerald-400 flex items-center gap-1.5">
-                      <ImageIcon className="w-4 h-4" />
-                      <span>Foto Bukti Kehadiran Terlampir</span>
-                    </span>
-                    <div className="flex items-center gap-2">
-                      <label className="text-xs bg-[#142642] hover:bg-[#1a345a] text-sky-300 border border-[#234475] px-3 py-1 rounded-lg cursor-pointer transition-colors">
-                        Ganti Foto
-                        <input
-                          type="file"
-                          accept="image/jpeg,image/png,image/webp"
-                          className="hidden"
-                          onChange={(e) => {
-                            const file = e.target.files?.[0];
-                            if (file) handleUploadFotoKehadiran(file);
-                          }}
+              {fotoKehadiranList.length > 0 && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {fotoKehadiranList.map((foto, idx) => (
+                    <div key={idx} className="bg-[#081224] border border-[#1b3459] rounded-xl p-3 space-y-2.5">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] font-semibold text-emerald-400 flex items-center gap-1.5">
+                          <ImageIcon className="w-3.5 h-3.5" />
+                          <span>Foto Lampiran #{idx + 1}</span>
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveFoto(idx)}
+                          className="text-[11px] bg-rose-950/50 hover:bg-rose-900/60 text-rose-300 border border-rose-800/40 px-2.5 py-0.5 rounded-lg cursor-pointer transition-colors flex items-center gap-1"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                          <span>Hapus</span>
+                        </button>
+                      </div>
+                      <div className="rounded-lg overflow-hidden border border-[#1b3459] bg-[#050e1c] flex items-center justify-center p-1.5 h-40">
+                        <img
+                          src={foto.url}
+                          alt={`Bukti Kehadiran ${idx + 1}`}
+                          className="max-h-full w-auto object-contain rounded"
                         />
-                      </label>
-                      <button
-                        type="button"
-                        onClick={() => setFotoKehadiranUrl('')}
-                        className="text-xs bg-rose-950/50 hover:bg-rose-900/60 text-rose-300 border border-rose-800/40 px-3 py-1 rounded-lg cursor-pointer transition-colors"
-                      >
-                        Hapus
-                      </button>
+                      </div>
+                      <input
+                        type="text"
+                        value={foto.keterangan || ''}
+                        onChange={(e) => handleUpdateFotoKeterangan(idx, e.target.value)}
+                        placeholder={`Keterangan foto #${idx + 1}...`}
+                        className="w-full bg-[#142642] border border-[#234475] rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-[#d4af37]"
+                      />
                     </div>
-                  </div>
-                  <div className="rounded-lg overflow-hidden border border-[#1b3459] bg-[#050e1c] flex items-center justify-center p-2">
-                    <img
-                      src={fotoKehadiranUrl}
-                      alt="Bukti Kehadiran Sidang Pleno"
-                      className="max-h-56 w-auto object-contain rounded"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-semibold text-slate-400 mb-1">Keterangan Lampiran Foto</label>
-                    <input
-                      type="text"
-                      value={fotoKehadiranKeterangan}
-                      onChange={(e) => setFotoKehadiranKeterangan(e.target.value)}
-                      placeholder="Contoh: Dokumentasi kehadiran tim medis, hukum, dan penyidik saat pleno"
-                      className="w-full bg-[#142642] border border-[#234475] rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-[#d4af37]"
-                    />
-                  </div>
+                  ))}
                 </div>
               )}
+
+              <label className="flex flex-col items-center justify-center border-2 border-dashed border-[#234475] hover:border-[#d4af37]/70 bg-[#081224] rounded-xl p-5 cursor-pointer transition-colors group">
+                <div className="w-10 h-10 rounded-full bg-[#142642] border border-[#234475] flex items-center justify-center mb-2 group-hover:scale-105 transition-transform">
+                  <Upload className="w-5 h-5 text-[#d4af37]" />
+                </div>
+                <span className="text-xs font-semibold text-white">
+                  {isUploadingFoto
+                    ? 'Mengunggah foto...'
+                    : fotoKehadiranList.length > 0
+                    ? 'Tambah Foto Kehadiran Lainnya (Bisa pilih beberapa sekaligus)'
+                    : 'Klik untuk Upload Foto Kehadiran / Dokumentasi Pleno (Bisa beberapa foto)'}
+                </span>
+                <span className="text-[11px] text-slate-400 mt-1">
+                  Format JPG, PNG, WEBP (Maks. 10 MB per foto)
+                </span>
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  multiple
+                  className="hidden"
+                  disabled={isUploadingFoto}
+                  onChange={(e) => {
+                    if (e.target.files) handleUploadFotoKehadiran(e.target.files);
+                    e.target.value = '';
+                  }}
+                />
+              </label>
             </div>
 
           </form>

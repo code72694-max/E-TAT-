@@ -125,6 +125,7 @@ export const PlenoTATView: React.FC<PlenoTATViewProps> = ({
               ...response.data,
               fotoKehadiranUrl: payload.fotoKehadiranUrl || response.data?.fotoKehadiranUrl,
               fotoKehadiranKeterangan: payload.fotoKehadiranKeterangan || response.data?.fotoKehadiranKeterangan,
+              fotoKehadiranList: payload.fotoKehadiranList || response.data?.fotoKehadiranList,
             },
             statusProsesUtama: payload.statusPleno === 'selesai_sepakat' 
               ? 'pengesahan_rekomendasi' 
@@ -499,7 +500,7 @@ export const PlenoTATView: React.FC<PlenoTATViewProps> = ({
                     )}
                   </div>
 
-                  {/* Right: Unified Action Buttons */}
+                  {/* Right: Unified Action Buttons (Alur berurutan: 1. Input Hasil Pleno -> 2. Tanda Tangani Digital) */}
                   <div className="flex items-center gap-2 flex-wrap">
                     {/* Dokumen Surat Tersangka (disembunyikan pada tampilan Hukum Pleno) */}
                     {!isHukum && hasSignedBA && (
@@ -537,15 +538,41 @@ export const PlenoTATView: React.FC<PlenoTATViewProps> = ({
                       <span>{hasSignedBA ? 'Lihat Berita Acara (TTD)' : 'Draft Berita Acara'}</span>
                     </button>
 
-                    {/* Unggah / Ubah TTD */}
+                    {/* Step 1: Input Hasil Pleno / Revisi */}
                     <button
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
+                        setFormPlenoItem(item);
+                      }}
+                      className={`px-3.5 py-1.5 rounded-lg text-xs flex items-center gap-1.5 transition-all cursor-pointer shadow-sm ${
+                        !item.sidangPleno?.kesepakatanRekomendasi
+                          ? 'font-bold bg-gradient-to-r from-[#144782] via-[#17549c] to-[#1c64b8] hover:from-[#175194] hover:via-[#1c60b0] hover:to-[#2274d4] text-white border border-[#2d7ad6]/70 shadow-[0_2px_10px_rgba(20,83,154,0.35)] hover:scale-[1.02] active:scale-95'
+                          : 'font-medium bg-slate-800 hover:bg-slate-750 text-slate-300 hover:text-white border border-slate-700'
+                      }`}
+                    >
+                      <Edit className="w-3.5 h-3.5" />
+                      <span>{!item.sidangPleno?.kesepakatanRekomendasi ? '1. Input Hasil Pleno' : 'Revisi Hasil Pleno'}</span>
+                    </button>
+
+                    {/* Step 2: Unggah / Ubah TTD (hanya aktif setelah hasil pleno diisi) */}
+                    <button
+                      type="button"
+                      disabled={!item.sidangPleno?.kesepakatanRekomendasi}
+                      title={
+                        !item.sidangPleno?.kesepakatanRekomendasi
+                          ? 'Isi hasil pleno terlebih dahulu sebelum melakukan tanda tangan digital'
+                          : 'Tanda Tangani Digital Berita Acara Pleno'
+                      }
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (!item.sidangPleno?.kesepakatanRekomendasi) return;
                         setUploadTtdItem(item);
                       }}
                       className={
-                        hasSignedBA
+                        !item.sidangPleno?.kesepakatanRekomendasi
+                          ? "px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-900/70 text-slate-500 border border-slate-800 flex items-center gap-1.5 cursor-not-allowed opacity-60"
+                          : hasSignedBA
                           ? "px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-950/70 hover:bg-emerald-900/80 text-emerald-300 border border-emerald-500/50 flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
                           : "px-3.5 py-1.5 rounded-lg text-xs font-bold bg-gradient-to-r from-[#144782] via-[#17549c] to-[#1c64b8] hover:from-[#175194] hover:via-[#1c60b0] hover:to-[#2274d4] text-white border border-[#2d7ad6]/70 shadow-[0_2px_10px_rgba(20,83,154,0.35)] flex items-center gap-1.5 transition-all cursor-pointer hover:scale-[1.02] active:scale-95"
                       }
@@ -558,26 +585,9 @@ export const PlenoTATView: React.FC<PlenoTATViewProps> = ({
                       ) : (
                         <>
                           <PenTool className="w-3.5 h-3.5 text-amber-300" />
-                          <span>Tanda Tangani Digital</span>
+                          <span>2. Tanda Tangani Digital</span>
                         </>
                       )}
-                    </button>
-
-                    {/* Input Pleno / Revisi */}
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setFormPlenoItem(item);
-                      }}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer shadow-sm ${
-                        !item.sidangPleno?.kesepakatanRekomendasi
-                          ? 'bg-blue-600 hover:bg-blue-500 text-white border border-blue-500/30'
-                          : 'bg-slate-800 hover:bg-slate-750 text-slate-300 hover:text-white border border-slate-700'
-                      }`}
-                    >
-                      <Edit className="w-3.5 h-3.5" />
-                      <span>{!item.sidangPleno?.kesepakatanRekomendasi ? 'Input Hasil Pleno' : 'Revisi'}</span>
                     </button>
                   </div>
                 </div>

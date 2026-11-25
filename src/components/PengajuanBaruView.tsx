@@ -14,6 +14,7 @@ import { PengajuanFooterNav } from './pengajuan-baru/PengajuanFooterNav';
 import { ModalValidasiPengajuan } from './pengajuan-baru/ModalValidasiPengajuan';
 import { ModalResetPengajuan } from './pengajuan-baru/ModalResetPengajuan';
 import { ModalSuksesPengajuan } from './pengajuan-baru/ModalSuksesPengajuan';
+import { ModalPeringatanPengajuan } from './pengajuan-baru/ModalPeringatanPengajuan';
 
 const DRAFT_STORAGE_KEY = 'etat_pengajuan_baru_draft_v1';
 
@@ -197,6 +198,16 @@ export const PengajuanBaruView: React.FC<PengajuanBaruViewProps> = ({
   const [uploadingDocId, setUploadingDocId] = useState<string | null>(null);
   const [isSendingEmail, setIsSendingEmail] = useState(false);
   const [successCreatedPermohonan, setSuccessCreatedPermohonan] = useState<PermohonanAsesmen | null>(null);
+  const [alertModal, setAlertModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    variant?: 'warning' | 'error';
+  } | null>(null);
+
+  const showAlertModal = (title: string, message: string, variant: 'warning' | 'error' = 'warning') => {
+    setAlertModal({ isOpen: true, title, message, variant });
+  };
 
   // Cegah refresh / close browser saat ada file yang sedang di-upload
   useEffect(() => {
@@ -449,12 +460,15 @@ export const PengajuanBaruView: React.FC<PengajuanBaruViewProps> = ({
 
   const handleAddBb = () => {
     if (!newJenisZat.trim()) {
-      alert('Mohon isi jenis narkotika/zat barang bukti');
+      showAlertModal('Data Barang Bukti Belum Lengkap', 'Mohon isi jenis narkotika/zat barang bukti.');
       return;
     }
     const parsedBerat = parseFloat(newBerat);
     if (!newBerat || isNaN(parsedBerat) || parsedBerat <= 0) {
-      alert('Mohon isi berat barang bukti dengan angka desimal positif lebih dari 0 (contoh: 0.25)');
+      showAlertModal(
+        'Berat Barang Bukti Tidak Valid',
+        'Mohon isi berat barang bukti dengan angka desimal positif lebih dari 0 (contoh: 0.25).'
+      );
       return;
     }
     const newEntry = {
@@ -516,11 +530,19 @@ export const PengajuanBaruView: React.FC<PengajuanBaruViewProps> = ({
     const ext = '.' + file.name.split('.').pop()?.toLowerCase();
     const allowed = ['.pdf', '.jpg', '.jpeg', '.png'];
     if (!allowed.includes(ext)) {
-      alert(`Format file "${ext}" tidak diizinkan! Harap unggah dokumen dengan format PDF, JPG, atau PNG.`);
+      showAlertModal(
+        'Format File Tidak Diizinkan',
+        `Format file "${ext}" tidak diizinkan! Harap unggah dokumen dengan format PDF, JPG, atau PNG.`,
+        'error'
+      );
       return;
     }
     if (file.size > 10 * 1024 * 1024) {
-      alert(`Ukuran file "${file.name}" melebihi batas 10 MB (${(file.size / (1024 * 1024)).toFixed(1)} MB). Silakan kompres dokumen terlebih dahulu.`);
+      showAlertModal(
+        'Ukuran File Terlalu Besar',
+        `Ukuran file "${file.name}" melebihi batas 10 MB (${(file.size / (1024 * 1024)).toFixed(1)} MB). Silakan kompres dokumen terlebih dahulu.`,
+        'error'
+      );
       return;
     }
 
@@ -746,7 +768,7 @@ export const PengajuanBaruView: React.FC<PengajuanBaruViewProps> = ({
     } catch (err: any) {
       console.error('Backend permohonan create error:', err);
       const errMsg = err?.response?.data?.message || err?.message || 'Gagal menyimpan pengajuan ke server';
-      alert(`Peringatan server: ${errMsg}`);
+      showAlertModal('Peringatan Server', errMsg, 'error');
       setIsSendingEmail(false);
       return; // Berhenti jika gagal menyimpan ke server agar data form tidak hilang
     }
@@ -922,6 +944,15 @@ export const PengajuanBaruView: React.FC<PengajuanBaruViewProps> = ({
           setSuccessCreatedPermohonan(null);
           onBack();
         }}
+      />
+
+      {/* Themed Alert / Warning Modal */}
+      <ModalPeringatanPengajuan
+        isOpen={Boolean(alertModal && alertModal.isOpen)}
+        title={alertModal?.title || ''}
+        message={alertModal?.message || ''}
+        variant={alertModal?.variant || 'warning'}
+        onClose={() => setAlertModal(null)}
       />
     </div>
   );

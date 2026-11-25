@@ -218,20 +218,29 @@ export const BeritaAcaraModal: React.FC<BeritaAcaraModalProps> = ({ permohonan, 
   // URL verifikasi resmi e-TAT untuk barcode dan scan publik
   const verificationUrl = buildLacakVerificationUrl(p, 'pleno');
 
-  // Resolve Lampiran Foto Bukti Kehadiran Pleno
-  const fotoKehadiranUrl = (() => {
-    if (pleno?.fotoKehadiranUrl) return pleno.fotoKehadiranUrl;
-    try {
-      return (
-        localStorage.getItem(`etat_pleno_foto_kehadiran_${p.id}`) ||
-        (p.nomorPermohonan ? localStorage.getItem(`etat_pleno_foto_kehadiran_${p.nomorPermohonan}`) : '') ||
-        ''
-      );
-    } catch {
-      return '';
+  // Resolve Lampiran Foto Bukti Kehadiran Pleno (Mendukung multiple foto)
+  const fotoKehadiranList: { url: string; keterangan?: string }[] = (() => {
+    if (Array.isArray(pleno?.fotoKehadiranList) && pleno.fotoKehadiranList.length > 0) {
+      return pleno.fotoKehadiranList;
     }
+    try {
+      const rawList =
+        localStorage.getItem(`etat_pleno_foto_list_${p.id}`) ||
+        (p.nomorPermohonan ? localStorage.getItem(`etat_pleno_foto_list_${p.nomorPermohonan}`) : null);
+      if (rawList) {
+        const parsed = JSON.parse(rawList);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+      const legacyUrl =
+        pleno?.fotoKehadiranUrl ||
+        localStorage.getItem(`etat_pleno_foto_kehadiran_${p.id}`) ||
+        (p.nomorPermohonan ? localStorage.getItem(`etat_pleno_foto_kehadiran_${p.nomorPermohonan}`) : '');
+      if (legacyUrl) {
+        return [{ url: legacyUrl, keterangan: pleno?.fotoKehadiranKeterangan || 'Dokumentasi Kehadiran Peserta Sidang Pleno Tim Asesmen Terpadu (TAT)' }];
+      }
+    } catch {}
+    return [];
   })();
-  const fotoKehadiranKeterangan = pleno?.fotoKehadiranKeterangan || 'Dokumentasi Kehadiran Peserta Sidang Pleno Tim Asesmen Terpadu (TAT)';
 
   // Evidence & Substance
   const bb = Array.isArray(pk?.barangBuktiList) ? pk.barangBuktiList : [];
@@ -829,7 +838,7 @@ export const BeritaAcaraModal: React.FC<BeritaAcaraModalProps> = ({ permohonan, 
               </div>
 
               {/* ===== LEMBAR LAMPIRAN BUKTI KEHADIRAN SIDANG PLENO ===== */}
-              {fotoKehadiranUrl && (
+              {fotoKehadiranList.length > 0 && (
                 <div style={{ pageBreakBefore: 'always', breakBefore: 'page', marginTop: '36px', paddingTop: '24px', borderTop: '2px dashed #94a3b8' }}>
                   <div style={{ textAlign: 'center', borderBottom: '2px solid #000', paddingBottom: '10px', marginBottom: '18px' }}>
                     <div style={{ fontSize: '12pt', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
@@ -868,15 +877,19 @@ export const BeritaAcaraModal: React.FC<BeritaAcaraModalProps> = ({ permohonan, 
                     </tbody>
                   </table>
 
-                  <div style={{ border: '1.5px solid #000', borderRadius: '6px', padding: '14px', background: '#fff', textAlign: 'center', marginBottom: '14px' }}>
-                    <img
-                      src={fotoKehadiranUrl}
-                      alt="Bukti Kehadiran Sidang Pleno"
-                      style={{ maxHeight: '440px', maxWidth: '100%', objectFit: 'contain', display: 'block', margin: '0 auto' }}
-                    />
-                    <div style={{ fontSize: '9.5pt', fontStyle: 'italic', marginTop: '10px', color: '#1e293b' }}>
-                      {fotoKehadiranKeterangan}
-                    </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: fotoKehadiranList.length === 1 ? '1fr' : '1fr 1fr', gap: '12px', marginBottom: '14px' }}>
+                    {fotoKehadiranList.map((foto, idx) => (
+                      <div key={idx} style={{ border: '1.5px solid #000', borderRadius: '6px', padding: '10px', background: '#fff', textAlign: 'center', pageBreakInside: 'avoid', breakInside: 'avoid' }}>
+                        <img
+                          src={foto.url}
+                          alt={`Bukti Kehadiran Sidang Pleno ${idx + 1}`}
+                          style={{ maxHeight: fotoKehadiranList.length === 1 ? '420px' : '240px', maxWidth: '100%', objectFit: 'contain', display: 'block', margin: '0 auto' }}
+                        />
+                        <div style={{ fontSize: '9pt', fontStyle: 'italic', marginTop: '8px', color: '#1e293b' }}>
+                          {fotoKehadiranList.length > 1 ? `Foto ${idx + 1}: ` : ''}{foto.keterangan || 'Dokumentasi Kehadiran Sidang Pleno TAT'}
+                        </div>
+                      </div>
+                    ))}
                   </div>
 
                   {Array.isArray(pleno?.daftarHadir) && pleno.daftarHadir.length > 0 && (

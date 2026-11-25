@@ -13,7 +13,10 @@ import {
   Activity,
   Layers,
   FileCheck2,
-  AlertCircle
+  AlertCircle,
+  Loader2,
+  X,
+  ArrowRight
 } from 'lucide-react';
 import { asesmenHukumApi } from '../../services/api';
 
@@ -61,11 +64,13 @@ export const TabAsesmenHukum: React.FC<TabAsesmenHukumProps> = ({
     }
   }, [permohonan.asesmenHukum]);
 
-  const [isSaving, setIsSaving] = useState(false);
+  const [savingAction, setSavingAction] = useState<'draft' | 'final' | null>(null);
+  const isSaving = Boolean(savingAction);
   const [feedback, setFeedback] = useState<string | null>(null);
+  const [showFinalSuccessModal, setShowFinalSuccessModal] = useState(false);
 
   const handleSave = async (isFinal: boolean) => {
-    setIsSaving(true);
+    setSavingAction(isFinal ? 'final' : 'draft');
     const now = new Date().toLocaleDateString('id-ID') + ' ' + new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
 
     const updatedHukum = {
@@ -115,6 +120,7 @@ export const TabAsesmenHukum: React.FC<TabAsesmenHukumProps> = ({
         if (isFinal) {
           await asesmenHukumApi.finalisasi(permohonan.id, payload);
           setFeedback('Asesmen Hukum Berhasil Difinalisasi & Disimpan di Database!');
+          setShowFinalSuccessModal(true);
         } else {
           await asesmenHukumApi.saveDraft(permohonan.id, payload);
           setFeedback('Draf Asesmen Hukum Berhasil Disimpan di Database!');
@@ -122,10 +128,15 @@ export const TabAsesmenHukum: React.FC<TabAsesmenHukumProps> = ({
       } catch (err) {
         console.warn('Backend asesmenHukumApi notice:', err);
         setFeedback(isFinal ? 'Asesmen Hukum disimpan secara lokal (Backend fallback).' : 'Draf tersimpan secara lokal.');
+        if (isFinal) {
+          setShowFinalSuccessModal(true);
+        }
       }
+    } else if (isFinal) {
+      setShowFinalSuccessModal(true);
     }
 
-    setIsSaving(false);
+    setSavingAction(null);
     setTimeout(() => setFeedback(null), 4000);
   };
 
@@ -309,23 +320,114 @@ export const TabAsesmenHukum: React.FC<TabAsesmenHukumProps> = ({
               type="button"
               disabled={isSaving}
               onClick={() => handleSave(false)}
-              className="px-4 py-2.5 bg-[#142642] hover:bg-[#1a345a] text-slate-200 border border-[#234475] rounded-xl text-xs font-bold transition-all flex items-center space-x-1.5 cursor-pointer disabled:opacity-50"
+              className="px-4 py-2.5 bg-[#142642] hover:bg-[#1a345a] text-slate-200 border border-[#234475] rounded-xl text-xs font-bold transition-all flex items-center space-x-1.5 cursor-pointer disabled:opacity-60 disabled:cursor-wait"
             >
-              <Save className="w-4 h-4 text-sky-400" />
-              <span>{isSaving ? 'Menyimpan...' : 'Simpan Draf Hukum'}</span>
+              {savingAction === 'draft' ? (
+                <Loader2 className="w-4 h-4 text-sky-400 animate-spin" />
+              ) : (
+                <Save className="w-4 h-4 text-sky-400" />
+              )}
+              <span>{savingAction === 'draft' ? 'Menyimpan Draf...' : 'Simpan Draf Hukum'}</span>
             </button>
             <button
               type="button"
               disabled={isSaving}
               onClick={() => handleSave(true)}
-              className="px-5 py-2.5 bg-amber-600 hover:bg-amber-500 text-white rounded-xl text-xs font-bold transition-all shadow-lg shadow-amber-950/40 flex items-center space-x-1.5 cursor-pointer disabled:opacity-50"
+              className="px-5 py-2.5 bg-amber-600 hover:bg-amber-500 text-white rounded-xl text-xs font-bold transition-all shadow-lg shadow-amber-950/40 flex items-center space-x-1.5 cursor-pointer disabled:opacity-60 disabled:cursor-wait"
             >
-              <CheckCircle2 className="w-4 h-4 text-amber-200" />
-              <span>{isSaving ? 'Menyimpan...' : 'Finalisasi Asesmen Hukum'}</span>
+              {savingAction === 'final' ? (
+                <Loader2 className="w-4 h-4 text-amber-200 animate-spin" />
+              ) : (
+                <CheckCircle2 className="w-4 h-4 text-amber-200" />
+              )}
+              <span>{savingAction === 'final' ? 'Memproses Finalisasi...' : 'Finalisasi Asesmen Hukum'}</span>
             </button>
           </div>
         )}
       </div>
+
+      {/* Modal Sukses Finalisasi Asesmen Hukum */}
+      {showFinalSuccessModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-xs animate-in fade-in duration-150"
+          onClick={() => setShowFinalSuccessModal(false)}
+        >
+          <div
+            className="bg-[#0b172a] border border-[#1b3459] rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-5 text-white animate-in zoom-in-95 duration-150"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex items-start justify-between pb-3.5 border-b border-[#1b3459] gap-3">
+              <div className="flex items-center space-x-3">
+                <div className="p-2.5 bg-emerald-950/60 text-emerald-400 rounded-xl border border-emerald-500/40 shrink-0">
+                  <CheckCircle2 className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-white">Asesmen Hukum Difinalisasi</h3>
+                  <p className="text-[11px] text-slate-400 mt-0.5">Telaah Yuridis Tim Asesmen Terpadu (TAT)</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowFinalSuccessModal(false)}
+                className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-[#142642] transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="space-y-3 text-xs">
+              <div className="bg-[#071326] border border-[#1b3459]/80 rounded-xl p-4 space-y-2.5">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-slate-400">Nomor Permohonan</span>
+                  <span className="font-mono font-bold text-[#d4af37]">{permohonan.nomorPermohonan}</span>
+                </div>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-slate-400">Nama Terperiksa</span>
+                  <span className="font-semibold text-white text-right">{permohonan.terperiksa?.namaLengkap || '-'}</span>
+                </div>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-slate-400">Status Tahap Berikutnya</span>
+                  <span className="font-semibold text-emerald-300 text-right">
+                    {permohonan.asesmenMedis?.status === 'FINAL' || permohonan.medicalStatus === 'FINAL'
+                      ? 'Siap Sidang Pleno TAT'
+                      : 'Menunggu Asesmen Medis'}
+                  </span>
+                </div>
+                {form.rekomendasiHukum && (
+                  <div className="pt-2 border-t border-[#1b3459]/70 space-y-1">
+                    <span className="text-[10px] uppercase font-bold text-slate-400 block">Rekomendasi Hukum:</span>
+                    <p className="text-slate-200 leading-relaxed">{form.rekomendasiHukum}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex items-center justify-end gap-2.5 pt-1">
+              <button
+                type="button"
+                onClick={() => setShowFinalSuccessModal(false)}
+                className="px-4 py-2.5 bg-[#142642] hover:bg-[#1b3459] text-slate-200 border border-[#234475] rounded-xl text-xs font-semibold transition-colors cursor-pointer"
+              >
+                Tutup
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowFinalSuccessModal(false);
+                  onNavigateTab('pleno');
+                }}
+                className="px-4 py-2.5 bg-[#d4af37] hover:bg-[#e8c84a] text-[#0b172a] rounded-xl text-xs font-bold transition-colors flex items-center space-x-1.5 cursor-pointer shadow-md"
+              >
+                <span>Ke Tab Sidang Pleno</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

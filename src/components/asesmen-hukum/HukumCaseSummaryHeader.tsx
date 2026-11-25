@@ -18,6 +18,39 @@ export const HukumCaseSummaryHeader: React.FC<HukumCaseSummaryHeaderProps> = ({
   const medis = selectedCase.asesmenMedis;
   const isMedisFinal = medis?.status === 'FINAL' || selectedCase.medicalStatus === 'FINAL';
 
+  const hukum = selectedCase.asesmenHukum;
+  const statusResidivisRaw = (selectedCase as any)?.statusResidivis as string | undefined;
+  const isResidivis =
+    hukum?.riwayatResidivisme?.pernahDitangkap ??
+    (statusResidivisRaw ? statusResidivisRaw.startsWith('residivis') : false);
+
+  const residivisLabel =
+    statusResidivisRaw === 'residivis_berulang'
+      ? 'Residivis Berulang'
+      : isResidivis
+      ? 'Pernah Ditangkap / Residivis'
+      : 'Belum Pernah Ditangkap';
+
+  const jenisPengajuanMap: Record<string, string> = {
+    penangkapan_dengan_bb: 'Penangkapan + BB',
+    penangkapan_tanpa_bb: 'Penangkapan Tanpa BB',
+    p19: 'Tahap P-19',
+    penuntutan: 'Tahap Penuntutan',
+    persidangan: 'Tahap Persidangan',
+  };
+  const jenisLabel = jenisPengajuanMap[selectedCase.jenisPengajuan || ''] || 'Pengajuan TAT';
+
+  const metodeLabel = selectedCase.metodePelaksanaan
+    ? selectedCase.metodePelaksanaan.charAt(0).toUpperCase() + selectedCase.metodePelaksanaan.slice(1)
+    : null;
+
+  const khususLabel =
+    selectedCase.terperiksa?.statusIdentitasKhusus === 'anak_berhadapan_hukum'
+      ? 'Anak Berhadapan Hukum (ABH)'
+      : selectedCase.terperiksa?.statusIdentitasKhusus === 'perlu_penerjemah'
+      ? 'Perlu Penerjemah'
+      : null;
+
   return (
     <div className="space-y-3">
       <div className="bg-[#0b172a] border border-[#1b3459] rounded-2xl p-4 sm:p-5 shadow-lg space-y-4">
@@ -72,6 +105,30 @@ export const HukumCaseSummaryHeader: React.FC<HukumCaseSummaryHeaderProps> = ({
             <p className="text-slate-400 text-[11px]">
               NIK: <span className="font-mono text-slate-200">{selectedCase.terperiksa.nik}</span> • Usia: {selectedCase.terperiksa.usia} th • Pasal: <span className="text-amber-300 font-mono">{selectedCase.perkara.pasalDipersangkakan}</span>
             </p>
+            <div className="flex flex-wrap items-center gap-1.5 pt-1.5">
+              <span
+                className={`text-[10px] font-semibold px-2 py-0.5 rounded-md border ${
+                  isResidivis
+                    ? 'bg-rose-950/60 text-rose-300 border-rose-500/40'
+                    : 'bg-emerald-950/60 text-emerald-300 border-emerald-500/40'
+                }`}
+              >
+                {residivisLabel}
+              </span>
+              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-sky-950/60 text-sky-300 border border-sky-500/40">
+                {jenisLabel}
+              </span>
+              {metodeLabel && (
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-[#142642] text-slate-200 border border-[#234475]">
+                  Metode: {metodeLabel}
+                </span>
+              )}
+              {khususLabel && (
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-amber-950/60 text-amber-300 border border-amber-500/40">
+                  {khususLabel}
+                </span>
+              )}
+            </div>
           </div>
 
           <div className="space-y-1 border-t md:border-t-0 md:border-l border-[#1b3459] md:pl-4 pt-2 md:pt-0">
