@@ -183,13 +183,13 @@ export const TindakLanjutDetailView: React.FC<Props> = ({
 
   const noSuratRekom = rekom?.nomorSurat || pleno?.nomorBeritaAcara || `R-TAT/2026/${permohonan.id.slice(-4)}`;
 
-  const nextMedisKe = Math.max(monitoring.laporanKontrolList.length, riwayatUrinList.length) + 1;
-  const nextWajibLaporKe = monitoring.buktiWajibLaporList.length + 1;
+  // Batch aktif tetap sama (mis. Laporan Ke-1) mulai dari Admisi -> Medis -> sampai Wajib Lapor selesai dicatat
+  const activeBatchKe = monitoring.buktiWajibLaporList.length + 1;
 
   const tabs = [
     { id: 'pelaksanaan' as const, label: '1. Admisi & Serah Terima', roleTag: 'Input Pengaju • Laporan Ke-1', icon: <Building2 className="w-3.5 h-3.5" /> },
-    { id: 'laporan' as const, label: '2. Rekam Medis & Tes Urin', roleTag: `Input Medis • Laporan Ke-${nextMedisKe}`, icon: <Syringe className="w-3.5 h-3.5" /> },
-    { id: 'wajib_lapor' as const, label: '3. Jurnal Wajib Lapor', roleTag: `Input Pengaju • Laporan Ke-${nextWajibLaporKe}`, icon: <CheckSquare className="w-3.5 h-3.5" /> },
+    { id: 'laporan' as const, label: '2. Rekam Medis & Tes Urin', roleTag: `Input Medis • Laporan Ke-${activeBatchKe}`, icon: <Syringe className="w-3.5 h-3.5" /> },
+    { id: 'wajib_lapor' as const, label: '3. Jurnal Wajib Lapor', roleTag: `Input Pengaju • Laporan Ke-${activeBatchKe}`, icon: <CheckSquare className="w-3.5 h-3.5" /> },
     { id: 'akhir' as const, label: '4. Output Surat SKSR', roleTag: 'Input Pengaju', icon: <Award className="w-3.5 h-3.5" /> },
   ];
 
@@ -496,21 +496,26 @@ export const TindakLanjutDetailView: React.FC<Props> = ({
       </div>
 
       {/* Panduan Urutan Pelaporan Tersangka (Pengaju & Medis) */}
-      <div className="bg-[#091529] border border-[#1b3459] rounded-2xl p-4 text-xs space-y-2">
-        <div className="flex items-center gap-2 font-bold text-[#D4AF37]">
-          <Info className="w-4 h-4 shrink-0" />
-          <span>Alur Urutan Pelaporan Tindak Lanjut (1 → 4)</span>
+      <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 text-xs space-y-2">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 font-bold text-[#D4AF37]">
+            <Info className="w-4 h-4 shrink-0" />
+            <span>Alur Urutan Pelaporan Tindak Lanjut (1 → 4)</span>
+          </div>
+          <span className="px-2.5 py-0.5 rounded-md font-mono font-semibold text-[11px] bg-[#144782] text-white border border-sky-400/25">
+            Batch Aktif: Laporan Ke-{activeBatchKe}
+          </span>
         </div>
         <p className="text-[11px] text-slate-300 leading-relaxed">
           <strong className="text-sky-300">1. Pengaju (Polsek/Polres)</strong> melakukan <em>Admisi &amp; Serah Terima</em> tersangka ke fasilitas rehab terlebih dahulu &rarr;{' '}
           <strong className="text-emerald-300">2. Tim Medis</strong> menginput hasil kontrol klinis &amp; tes urin toksikologi &rarr;{' '}
           <strong className="text-sky-300">3. Tersangka Wajib Lapor ke Pengaju (Polsek/Polres)</strong> membawa bukti kontrol medis untuk dicatat di <em>Jurnal Wajib Lapor</em> &rarr;{' '}
-          <strong className="text-amber-300">4. Output SKSR</strong> diterbitkan setelah program selesai.
+          <strong className="text-amber-300">4. Output SKSR</strong> diterbitkan oleh Pengaju setelah program selesai.
         </p>
       </div>
 
       {/* Navigation Tabs Header */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 pt-1">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 pt-1">
         {tabs.map((tab) => {
           const isDone = progress[tab.id];
           const isActive = activeTab === tab.id;
@@ -519,20 +524,20 @@ export const TindakLanjutDetailView: React.FC<Props> = ({
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`p-3 rounded-xl border text-left transition-all flex items-center justify-between cursor-pointer ${
+              className={`p-3.5 rounded-xl border text-left transition-all flex items-center justify-between gap-2 cursor-pointer ${
                 isActive
-                  ? 'bg-slate-800 border-slate-600 text-white font-semibold shadow-sm'
+                  ? 'bg-slate-800/90 border-sky-500/50 text-white font-semibold shadow-sm'
                   : isDone
-                  ? 'bg-slate-950/50 border-slate-800 text-slate-300 hover:bg-slate-900/60'
-                  : 'bg-slate-950/30 border-slate-800/60 text-slate-400 hover:bg-slate-900/40 hover:text-slate-200'
+                  ? 'bg-slate-900/50 border-slate-800 text-slate-200 hover:bg-slate-800/60'
+                  : 'bg-slate-950/40 border-slate-800/70 text-slate-400 hover:bg-slate-900/50 hover:text-slate-200'
               }`}
             >
-              <div className="min-w-0 space-y-0.5">
+              <div className="min-w-0 space-y-1">
                 <div className="flex items-center gap-2 text-xs truncate">
                   {tab.icon}
                   <span className="truncate">{tab.label}</span>
                 </div>
-                <span className="block text-[10px] font-medium text-sky-400/90 pl-5">
+                <span className="block text-[10px] font-medium text-sky-400/90 pl-5 truncate">
                   {tab.roleTag}
                 </span>
               </div>
@@ -543,7 +548,7 @@ export const TindakLanjutDetailView: React.FC<Props> = ({
       </div>
 
       {/* Active Sub View */}
-      <div className="pt-1">
+      <div className="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-4 sm:p-5">
         {activeTab === 'pelaksanaan' && (
           <PelaksanaanRehabSection
             monitoring={monitoring}
@@ -559,6 +564,7 @@ export const TindakLanjutDetailView: React.FC<Props> = ({
             monitoring={monitoring}
             permohonan={permohonan}
             userRole={currentUser.role}
+            activeBatchKe={activeBatchKe}
             readOnly={readOnlyTab2}
             onUpdate={handleMonitoringUpdate}
             onSaveSuccess={setSaveConfirmModal}
@@ -569,6 +575,7 @@ export const TindakLanjutDetailView: React.FC<Props> = ({
             monitoring={monitoring}
             permohonan={permohonan}
             userRole={currentUser.role}
+            activeBatchKe={activeBatchKe}
             readOnly={readOnlyTab3}
             onUpdate={handleMonitoringUpdate}
             onSaveSuccess={setSaveConfirmModal}

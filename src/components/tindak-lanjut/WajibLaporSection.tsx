@@ -34,10 +34,11 @@ export const WajibLaporSection: React.FC<{
   monitoring: MonitoringTindakLanjut;
   permohonan: PermohonanAsesmen;
   userRole: UserRole;
+  activeBatchKe: number;
   readOnly?: boolean;
   onUpdate: (updated: MonitoringTindakLanjut) => void;
   onSaveSuccess?: (info: SaveConfirmInfo) => void;
-}> = ({ monitoring, permohonan, userRole, readOnly, onUpdate, onSaveSuccess }) => {
+}> = ({ monitoring, permohonan, userRole, activeBatchKe, readOnly, onUpdate, onSaveSuccess }) => {
   const [showForm, setShowForm] = useState(false);
   const [formMode, setFormMode] = useState<'aktual' | 'rencana'>('aktual');
   const [showSpModal, setShowSpModal] = useState(false);
@@ -63,7 +64,7 @@ export const WajibLaporSection: React.FC<{
     buktiPenerimaanUrl: 'internal://bukti-wajib-lapor-aktual'
   });
 
-  const nextWajibLaporKe = monitoring.buktiWajibLaporList.length + 1;
+  const nextWajibLaporKe = activeBatchKe;
 
   const setF = (k: keyof BuktiWajibLapor, v: unknown) => setForm(p => ({ ...p, [k]: v }));
 
@@ -170,17 +171,17 @@ export const WajibLaporSection: React.FC<{
         subtitle="Menu Pengaju (Penyidik/JPU Berwenang) untuk mencatat tanggal kejadian aktual wajib lapor setelah tersangka melapor."
       />
 
-      <div className="flex flex-wrap items-center justify-between gap-2 px-3.5 py-2.5 rounded-xl bg-[#091529] border border-[#1b3459] text-xs">
-        <div className="flex items-center gap-2">
-          <span className="px-2.5 py-0.5 rounded-md font-mono font-bold bg-[#144782] text-white border border-sky-400/30">
-            Laporan Ke-{nextWajibLaporKe}
+      <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-2.5 rounded-xl bg-slate-900/70 border border-slate-800 text-xs">
+        <div className="flex items-center gap-2.5">
+          <span className="px-2.5 py-0.5 rounded-md font-mono font-semibold bg-[#144782] text-white border border-sky-400/25">
+            Batch Aktif: Laporan Ke-{nextWajibLaporKe}
           </span>
           <span className="text-slate-300">
             {readOnly
               ? monitoring.buktiWajibLaporList.length > 0
-                ? `Tercatat ${monitoring.buktiWajibLaporList.length} laporan wajib lapor. Berikutnya: Laporan Ke-${nextWajibLaporKe}.`
-                : 'Menunggu Pengaju (Polsek/Polres) mencatat Wajib Lapor untuk Laporan Ke-1.'
-              : `Input berikutnya akan dicatat sebagai Laporan Ke-${nextWajibLaporKe} (kemudian periode selanjutnya menjadi Laporan Ke-${nextWajibLaporKe + 1}).`}
+                ? `Tercatat ${monitoring.buktiWajibLaporList.length} laporan wajib lapor. Batch aktif: Laporan Ke-${nextWajibLaporKe}.`
+                : `Menunggu Pengaju (Polsek/Polres) mencatat Wajib Lapor untuk Laporan Ke-${nextWajibLaporKe}.`
+              : `Catat Wajib Lapor untuk menutup Laporan Ke-${nextWajibLaporKe}. Setelah tersimpan, periode berikutnya otomatis menjadi Laporan Ke-${nextWajibLaporKe + 1}.`}
           </span>
         </div>
       </div>
@@ -407,9 +408,9 @@ export const WajibLaporSection: React.FC<{
       )}
 
       {/* List of Wajib Lapor Records */}
-      <div className="space-y-2.5">
+      <div className="space-y-3">
         {monitoring.buktiWajibLaporList.length === 0 ? (
-          <div className="p-8 text-center bg-[#081224] border border-[#1b3459] rounded-xl text-xs text-slate-400 space-y-1.5">
+          <div className="p-8 text-center bg-slate-950/50 border border-slate-800/80 rounded-xl text-xs text-slate-400 space-y-1.5">
             <CheckSquare className="w-6 h-6 text-slate-500 mx-auto" />
             <p className="font-semibold text-slate-300">Belum Ada Catatan Wajib Lapor</p>
             <p className="text-[11px] text-slate-400">
@@ -424,10 +425,10 @@ export const WajibLaporSection: React.FC<{
             const laporanKeNum = monitoring.buktiWajibLaporList.length - idx;
 
             return (
-              <div key={wl.id} className="bg-slate-950/50 border border-slate-800/80 rounded-xl p-3.5 space-y-3">
+              <div key={wl.id} className="bg-slate-950/50 border border-slate-800/80 rounded-xl p-4 space-y-3 hover:border-slate-700 transition-all">
                 <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-2.5">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="font-mono font-bold text-white bg-[#144782] border border-sky-400/30 px-2.5 py-0.5 rounded text-[11px]">
+                    <span className="font-mono font-semibold text-white bg-[#144782] border border-sky-400/25 px-2.5 py-0.5 rounded-md text-[11px]">
                       Laporan Ke-{laporanKeNum}
                     </span>
                     {isAktualExist ? (

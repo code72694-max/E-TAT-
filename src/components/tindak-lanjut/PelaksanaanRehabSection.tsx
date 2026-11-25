@@ -102,10 +102,10 @@ export const PelaksanaanRehabSection: React.FC<{
         subtitle="Diisi oleh Pengaju (Polsek/Polres) atau Admin untuk mencatat serah terima tersangka ke fasilitas rehabilitasi dan meneruskan ke Tim Medis."
       />
 
-      <div className="flex flex-wrap items-center justify-between gap-2 px-3.5 py-2.5 rounded-xl bg-[#091529] border border-[#1b3459] text-xs">
-        <div className="flex items-center gap-2">
-          <span className="px-2.5 py-0.5 rounded-md font-mono font-bold bg-[#144782] text-white border border-sky-400/30">
-            Laporan Ke-1 (Admisi Awal)
+      <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-2.5 rounded-xl bg-slate-900/70 border border-slate-800 text-xs">
+        <div className="flex items-center gap-2.5">
+          <span className="px-2.5 py-0.5 rounded-md font-mono font-semibold bg-[#144782] text-white border border-sky-400/25">
+            Laporan Ke-1
           </span>
           <span className="text-slate-300">
             {existing
@@ -116,14 +116,14 @@ export const PelaksanaanRehabSection: React.FC<{
       </div>
 
       {readOnly && (
-        <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-slate-900/80 border border-slate-800 text-xs text-slate-300">
+        <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900/60 border border-slate-800 text-xs text-slate-300">
           <Info className="w-4 h-4 text-sky-400 shrink-0" />
           <span>Mode Hanya Baca (Read-Only): Tahap Admisi &amp; Serah Terima diinput oleh Pengaju (Polsek/Polres) atau Admin.</span>
         </div>
       )}
 
       {!existing && readOnly ? (
-        <div className="p-8 text-center bg-[#081224] border border-[#1b3459] rounded-xl text-xs text-slate-400 space-y-1.5">
+        <div className="p-8 text-center bg-slate-950/50 border border-slate-800/80 rounded-xl text-xs text-slate-400 space-y-1.5">
           <Building2 className="w-8 h-8 text-slate-600 mx-auto mb-2" />
           <p className="font-semibold text-slate-300">Menunggu Input Admisi &amp; Serah Terima dari Pengaju</p>
           <p>Pengaju (Polsek/Polres) belum mengonfirmasi serah terima tersangka ke fasilitas rehabilitasi.</p>
