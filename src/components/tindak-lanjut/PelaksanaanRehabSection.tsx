@@ -7,6 +7,7 @@ import {
   ExternalLink,
   Info,
   Printer,
+  Plus,
   X,
 } from 'lucide-react';
 import type {
@@ -95,25 +96,50 @@ export const PelaksanaanRehabSection: React.FC<{
 
   const setF = (key: keyof PelaksanaanRehab, val: unknown) => setForm(p => ({ ...p, [key]: val }));
 
+  const handleStartNewReport = () => {
+    setForm({
+      nomorRekomendasiTAT: existing?.nomorRekomendasiTAT ?? monitoring.nomorRekomendasi,
+      jenisLayananSesuaiRekomendasi: existing?.jenisLayananSesuaiRekomendasi ?? '',
+      namaFasilitasTujuan: existing?.namaFasilitasTujuan ?? '',
+      namaPenanggungJawabFasilitas: existing?.namaPenanggungJawabFasilitas ?? '',
+      hasilKoordinasiPenerimaan: '',
+      adaKendala: false,
+      statusPelaksanaan: 'serah_terima_selesai',
+      tanggalKoordinasiPenerimaan: today(),
+      diisiOleh: '',
+      kapasitasPengisi: '',
+      tanggalDiisi: today(),
+    });
+    setMode('new');
+  };
+
   return (
     <div className="space-y-4">
-      <SectionHeader
-        icon={<Building2 className="w-4 h-4 text-slate-300" />}
-        title="1. Input Admisi & Serah Terima Rehabilitasi (Input Pengaju)"
-        subtitle="Diisi oleh Pengaju (Polsek/Polres) atau Admin untuk mencatat serah terima tersangka ke fasilitas rehabilitasi dan meneruskan ke Tim Medis."
-      />
-
-      <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-2.5 rounded-xl bg-slate-900/70 border border-slate-800 text-xs">
-        <div className="flex items-center gap-2.5">
-          <span className="px-2.5 py-0.5 rounded-md font-mono font-semibold bg-[#144782] text-white border border-sky-400/25">
-            Batch Aktif: Laporan Ke-{activeBatchKe}
-          </span>
-          <span className="text-slate-300">
-            {existing
-              ? `Admisi & Serah Terima selesai — diteruskan ke Tim Medis (Laporan Ke-${activeBatchKe}).`
-              : `Tahap awal sebelum Tim Medis menginput Rekam Medis & Tes Urin (Laporan Ke-${activeBatchKe}).`}
-          </span>
+      <div className="flex flex-wrap items-center justify-between gap-3 pb-3.5 border-b border-slate-800/80">
+        <div className="flex items-start gap-3">
+          <div className="p-2 bg-slate-800/80 border border-slate-700/60 text-slate-300 rounded-lg shrink-0 mt-0.5">
+            <Building2 className="w-4 h-4 text-slate-300" />
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold text-slate-100 tracking-tight">
+              1. Admisi &amp; Serah Terima (Input Pengaju)
+            </h3>
+            <p className="text-xs text-slate-400 mt-0.5">
+              Batch Aktif: <span className="text-sky-300 font-semibold">Laporan Ke-{activeBatchKe}</span>
+            </p>
+          </div>
         </div>
+
+        {canEdit && mode === 'view' && (
+          <button
+            type="button"
+            onClick={handleStartNewReport}
+            className="px-3.5 py-2 bg-gradient-to-r from-[#144782] to-[#1c64b8] hover:from-[#17549c] hover:to-[#2272d1] text-white border border-sky-400/20 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
+          >
+            <Plus className="w-3.5 h-3.5 text-sky-200" />
+            <span>Input Laporan Baru</span>
+          </button>
+        )}
       </div>
 
       {readOnly && (
@@ -130,66 +156,58 @@ export const PelaksanaanRehabSection: React.FC<{
           <p>Pengaju (Polsek/Polres) belum mengonfirmasi serah terima tersangka ke fasilitas rehabilitasi.</p>
         </div>
       ) : (mode === 'view' && existing) ? (
-        <div className="space-y-3.5">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 bg-slate-950/50 p-4 rounded-xl border border-slate-800/80">
+        <div className="space-y-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 bg-slate-950/50 p-4 rounded-xl border border-slate-800/80">
             <div>
               <span className="text-[10px] font-semibold uppercase text-slate-400 tracking-wider block">Fasilitas Tujuan</span>
               <span className="text-xs font-semibold text-slate-100 mt-1 block">{existing.namaFasilitasTujuan}</span>
             </div>
             <div>
-              <span className="text-[10px] font-semibold uppercase text-slate-400 tracking-wider block">Jenis Layanan Medis</span>
+              <span className="text-[10px] font-semibold uppercase text-slate-400 tracking-wider block">Jenis Layanan</span>
               <span className="text-xs text-slate-200 mt-1 block">{existing.jenisLayananSesuaiRekomendasi || '—'}</span>
             </div>
             <div>
-              <span className="text-[10px] font-semibold uppercase text-slate-400 tracking-wider block">Dokter / DPJP Penanggung Jawab</span>
+              <span className="text-[10px] font-semibold uppercase text-slate-400 tracking-wider block">Dokter / DPJP</span>
               <span className="text-xs text-slate-200 mt-1 block">{existing.namaPenanggungJawabFasilitas || '—'}</span>
             </div>
             <div>
-              <span className="text-[10px] font-semibold uppercase text-slate-400 tracking-wider block">Kontak Darurat / Telepon</span>
-              <span className="text-xs font-mono text-slate-300 mt-1 block">{existing.kontakPenanggungJawabFasilitas || '—'}</span>
+              <span className="text-[10px] font-semibold uppercase text-slate-400 tracking-wider block">Tanggal Mulai / Serah Terima</span>
+              <span className="text-xs text-emerald-400 font-medium mt-1 block font-mono">
+                {existing.tanggalMasukLayananTerkonfirmasi || existing.tanggalSerahTerimaAktual || existing.tanggalKoordinasiPenerimaan || '—'}
+              </span>
             </div>
-            <div>
-              <span className="text-[10px] font-semibold uppercase text-slate-400 tracking-wider block">Tgl Koordinasi</span>
-              <span className="text-xs text-slate-300 mt-1 block font-mono">{existing.tanggalKoordinasiPenerimaan}</span>
-            </div>
-            <div>
-              <span className="text-[10px] font-semibold uppercase text-slate-400 tracking-wider block">Tgl Serah Terima</span>
-              <span className="text-xs text-slate-300 mt-1 block font-mono">{existing.tanggalSerahTerimaAktual || '—'}</span>
-            </div>
-            <div>
-              <span className="text-[10px] font-semibold uppercase text-slate-400 tracking-wider block">Tgl Mulai Program</span>
-              <span className="text-xs text-emerald-400 font-medium mt-1 block font-mono">{existing.tanggalMasukLayananTerkonfirmasi || '—'}</span>
-            </div>
-            <div>
-              <span className="text-[10px] font-semibold uppercase text-slate-400 tracking-wider block">Penyidik Menyerahkan</span>
-              <span className="text-xs text-slate-300 mt-1 block">{existing.identitasPihakMenyerahkan || '—'}</span>
-            </div>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2">
-            <InfoBadge label={STATUS_PELAKSANAAN_LABELS[existing.statusPelaksanaan]} color="green" />
-            <InfoBadge label="✓ Terverifikasi Sekretariat & Tim Medis" color="slate" />
           </div>
 
           <div className="bg-slate-950/40 p-3.5 rounded-xl border border-slate-800/80 text-xs text-slate-300 space-y-1">
-            <span className="font-semibold text-slate-400 block uppercase text-[10px] tracking-wider">Hasil Koordinasi & Konfirmasi Admisi</span>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <span className="font-semibold text-slate-400 uppercase text-[10px] tracking-wider">Catatan Koordinasi &amp; Admisi</span>
+              <InfoBadge label={STATUS_PELAKSANAAN_LABELS[existing.statusPelaksanaan]} color="green" />
+            </div>
             <p className="text-xs text-slate-200">{existing.hasilKoordinasiPenerimaan}</p>
-            {existing.catatanKoordinasi && <p className="text-slate-400 italic mt-1 text-xs">{existing.catatanKoordinasi}</p>}
           </div>
 
-          {existing.fileBaSerahTerimaUrl && (
-            <div className="flex items-center gap-2.5 p-2 bg-slate-950/60 rounded-xl border border-slate-800 w-fit">
-              <FileText className="w-4 h-4 text-[#D4AF37]" />
+          <div className="flex flex-wrap items-center gap-2 pt-0.5">
+            {existing.fileBaSerahTerimaUrl && (
               <button
                 type="button"
                 onClick={() => setShowBaModal(true)}
-                className="text-xs font-semibold text-slate-200 hover:text-white flex items-center gap-1.5 cursor-pointer transition-colors"
+                className="px-3.5 py-2 bg-slate-950/70 hover:bg-slate-800 text-slate-200 border border-slate-800 rounded-lg text-xs font-medium flex items-center gap-1.5 cursor-pointer transition-colors"
               >
-                <span>Berita Acara (BA) Serah Terima Klien</span>
+                <FileText className="w-3.5 h-3.5 text-[#D4AF37]" />
+                <span>Berita Acara (BA) Serah Terima</span>
                 <ExternalLink className="w-3 h-3 text-[#D4AF37]" />
               </button>
-            </div>
-          )}
+            )}
+            {canEdit && (
+              <button
+                type="button"
+                className="px-3.5 py-2 bg-slate-800/90 hover:bg-slate-700 text-slate-200 border border-slate-700/80 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 cursor-pointer"
+                onClick={() => setMode('edit')}
+              >
+                <Edit3 className="w-3.5 h-3.5 text-sky-400" /> Edit Data Admisi
+              </button>
+            )}
+          </div>
 
           {/* MODAL PRATINJAU BERITA ACARA SERAH TERIMA */}
           {showBaModal && (
