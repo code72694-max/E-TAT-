@@ -241,7 +241,7 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
     },
     {
       step: '08',
-      title: 'Rujukan & Eksekusi',
+      title: 'Rujukan & Rehabilitasi',
       actor: 'Balai Rehabilitasi & Penyidik',
       sla: 'Sesuai Rencana Eksekusi',
       icon: <Share2 className="w-5 h-5 text-[#D4AF37]" />,
@@ -567,37 +567,35 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
                     <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2">
                       {[
                         {
-                          icon: <Shield className="w-4 h-4 text-sky-300" />,
-                          bg: 'bg-sky-500/10 border-sky-500/25',
+                          iconSrc: '/images/logo-detail/01_perisai.png',
                           title: 'PERISAI',
                           desc: 'Perlindungan dan kepastian layanan.',
                         },
                         {
-                          icon: <User className="w-4 h-4 text-teal-300" />,
-                          bg: 'bg-teal-500/10 border-teal-500/25',
+                          iconSrc: '/images/logo-detail/02_figur_manusia.png',
                           title: 'FIGUR MANUSIA',
                           desc: 'Pemulihan, harapan, dan keberdayaan.',
                         },
                         {
-                          icon: <HeartHandshake className="w-4 h-4 text-blue-400" />,
-                          bg: 'bg-blue-500/10 border-blue-500/25',
+                          iconSrc: '/images/logo-detail/03_tangan_menopang.png',
                           title: 'TANGAN MENOPANG',
                           desc: 'Kepedulian, pendampingan, dan rehabilitasi humanis.',
                         },
                         {
-                          icon: <Share2 className="w-4 h-4 text-[#D4AF37]" />,
-                          bg: 'bg-amber-500/10 border-amber-500/25',
+                          iconSrc: '/images/logo-detail/04_tiga_simpul_terhubung.png',
                           title: 'TIGA SIMPUL TERHUBUNG',
                           desc: 'Sinergi tim medis, tim hukum, dan layanan pemulihan.',
                         },
                       ].map((item) => (
                         <div
                           key={item.title}
-                          className="flex items-center gap-3 p-2.5 rounded-xl bg-[#0b172a]/90 border border-[#1b3459]"
+                          className="flex items-center gap-3.5 p-2.5 rounded-xl bg-[#0b172a]/90 border border-[#1b3459]"
                         >
-                          <div className={`p-2 rounded-lg border shrink-0 ${item.bg}`}>
-                            {item.icon}
-                          </div>
+                          <img
+                            src={item.iconSrc}
+                            alt={item.title}
+                            className="w-9 h-9 object-contain shrink-0 drop-shadow-md"
+                          />
                           <div className="min-w-0">
                             <h4 className="text-xs font-bold text-white tracking-wide">{item.title}</h4>
                             <p className="text-[11px] text-slate-300 truncate sm:whitespace-normal">{item.desc}</p>
@@ -605,8 +603,8 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
                         </div>
                       ))}
 
-                      <div className="flex items-center gap-3 p-2.5 rounded-xl bg-[#0b172a]/90 border border-[#1b3459] sm:col-span-2 lg:col-span-1">
-                        <div className="flex items-center gap-1 p-1.5 rounded-lg bg-slate-900 border border-slate-700/80 shrink-0">
+                      <div className="flex items-center gap-3.5 p-2.5 rounded-xl bg-[#0b172a]/90 border border-[#1b3459] sm:col-span-2 lg:col-span-1">
+                        <div className="w-9 flex items-center justify-center gap-1 shrink-0">
                           <span className="w-2.5 h-2.5 rounded-full bg-blue-500 inline-block" />
                           <span className="w-2.5 h-2.5 rounded-full bg-teal-400 inline-block" />
                           <span className="w-2.5 h-2.5 rounded-full bg-[#D4AF37] inline-block" />
@@ -787,13 +785,13 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
             </p>
           </div>
 
-          {/* SOP Cards Grid (2 rows on desktop: 5 + 4, 2 columns on mobile) */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-3.5">
+          {/* SOP Cards Flex Centered (2 rows on desktop: 5 + 4 centered, 2 columns on mobile) */}
+          <div className="flex flex-wrap justify-center gap-3 sm:gap-3.5">
             {SOP_8_STEPS.map((item, i) => (
               <div
                 key={item.step}
                 onClick={() => setSelectedSopStep(item)}
-                className={`reveal-on-scroll reveal-delay-${Math.min(i + 1, 8)} group bg-[#0d1f38] border border-[#1b3459]/80 hover:border-[#D4AF37] rounded-xl p-3.5 sm:p-4 flex flex-col justify-between space-y-2.5 cursor-pointer transition-all duration-300 hover:-translate-y-1 shadow-lg hover:shadow-[#D4AF37]/10 min-h-[145px]`}
+                className={`reveal-on-scroll reveal-delay-${Math.min(i + 1, 8)} w-[calc(50%-0.375rem)] sm:w-[calc(33.333%-0.6rem)] lg:w-[calc(20%-0.7rem)] group bg-[#0d1f38] border border-[#1b3459]/80 hover:border-[#D4AF37] rounded-xl p-3.5 sm:p-4 flex flex-col justify-between space-y-2.5 cursor-pointer transition-all duration-300 hover:-translate-y-1 shadow-lg hover:shadow-[#D4AF37]/10 min-h-[145px]`}
               >
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between">

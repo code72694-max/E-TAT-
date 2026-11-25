@@ -501,8 +501,8 @@ export const PlenoTATView: React.FC<PlenoTATViewProps> = ({
 
                   {/* Right: Unified Action Buttons */}
                   <div className="flex items-center gap-2 flex-wrap">
-                    {/* Dokumen Surat Tersangka */}
-                    {hasSignedBA && (
+                    {/* Dokumen Surat Tersangka (disembunyikan pada tampilan Hukum Pleno) */}
+                    {!isHukum && hasSignedBA && (
                       <button
                         type="button"
                         onClick={(e) => {
