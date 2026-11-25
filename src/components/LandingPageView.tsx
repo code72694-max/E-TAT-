@@ -496,12 +496,12 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
                     </h1>
 
                     {/* Direct Clean Acronym Subtitles - Centered */}
-                    <div className="space-y-1 pt-1 text-slate-200 text-center max-w-2xl mx-auto">
+                    <div className="space-y-1.5 pt-1 text-slate-200 text-center max-w-2xl mx-auto">
                       <p className="text-sm sm:text-base md:text-lg font-bold tracking-wide text-white drop-shadow-md">
-                        Elektronik Teknis Pelaksanaan Asesmen Terpadu
+                        Sistem Integrasi Asesmen dan Pemantauan Pemulihan
                       </p>
-                      <p className="text-xs sm:text-sm md:text-base font-medium text-slate-300 drop-shadow-md">
-                        Sistem Integrasi Asesmen Perkara &amp; Pemantauan Pemulihan
+                      <p className="text-xs sm:text-sm md:text-base font-medium italic text-teal-300 drop-shadow-md">
+                        Asesmen Tepat, Pemulihan Terpantau
                       </p>
                     </div>
                   </div>
@@ -565,6 +565,102 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
                 />
               );
             })}
+          </div>
+        </div>
+      </section>
+
+      {/* MAKNA SIMBOL E-TAT SIAP PULIH */}
+      <section id="makna-simbol" className="py-14 sm:py-20 bg-[#071326] border-b border-[#1b3459]/60">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-10 space-y-1.5">
+            <h2 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-white tracking-wider font-['Cinzel',serif] uppercase">
+              MAKNA SIMBOL E-TAT <span className="text-[#D4AF37]">SIAP PULIH</span>
+            </h2>
+            <p className="text-xs sm:text-sm text-teal-300 font-medium tracking-wide">
+              Interpretasi konseptual logo
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center bg-[#081224] border border-[#1b3459] rounded-2xl p-6 sm:p-8 shadow-xl">
+            {/* Left: Logo + Kepanjangan + Tagline */}
+            <div className="lg:col-span-5 flex flex-col items-center text-center space-y-3 lg:border-r lg:border-[#1b3459]/70 lg:pr-6">
+              <img
+                src="/logo_etat.png"
+                alt="Logo E-TAT SIAP PULIH"
+                className="h-36 sm:h-44 w-auto object-contain drop-shadow-[0_8px_24px_rgba(212,175,55,0.45)]"
+              />
+              <div className="space-y-1">
+                <h3 className="text-lg sm:text-xl font-extrabold text-white font-['Cinzel',serif] tracking-wide">
+                  E-TAT <span className="text-[#D4AF37]">SIAP PULIH</span>
+                </h3>
+                <p className="text-xs sm:text-sm font-semibold text-slate-200 leading-snug max-w-xs mx-auto">
+                  Sistem Integrasi Asesmen dan Pemantauan Pemulihan
+                </p>
+                <p className="text-xs font-medium italic text-teal-300 pt-0.5">
+                  Asesmen Tepat, Pemulihan Terpantau
+                </p>
+              </div>
+            </div>
+
+            {/* Right: 5 Makna Simbol Cards */}
+            <div className="lg:col-span-7 space-y-3">
+              {[
+                {
+                  icon: <Shield className="w-5 h-5 text-sky-300" />,
+                  bg: 'bg-sky-500/10 border-sky-500/25',
+                  title: 'PERISAI',
+                  desc: 'Perlindungan dan kepastian layanan.',
+                },
+                {
+                  icon: <User className="w-5 h-5 text-teal-300" />,
+                  bg: 'bg-teal-500/10 border-teal-500/25',
+                  title: 'FIGUR MANUSIA',
+                  desc: 'Pemulihan, harapan, dan keberdayaan.',
+                },
+                {
+                  icon: <HeartHandshake className="w-5 h-5 text-blue-400" />,
+                  bg: 'bg-blue-500/10 border-blue-500/25',
+                  title: 'TANGAN MENOPANG',
+                  desc: 'Kepedulian, pendampingan, dan rehabilitasi humanis.',
+                },
+                {
+                  icon: <Share2 className="w-5 h-5 text-[#D4AF37]" />,
+                  bg: 'bg-amber-500/10 border-amber-500/25',
+                  title: 'TIGA SIMPUL TERHUBUNG',
+                  desc: 'Sinergi tim medis, tim hukum, dan layanan pemulihan.',
+                },
+              ].map((item) => (
+                <div
+                  key={item.title}
+                  className="flex items-start gap-3.5 p-3.5 rounded-xl bg-[#0b172a] border border-[#1b3459] hover:border-[#2c528c] transition-colors"
+                >
+                  <div className={`p-2.5 rounded-xl border shrink-0 ${item.bg}`}>
+                    {item.icon}
+                  </div>
+                  <div>
+                    <h4 className="text-xs sm:text-sm font-bold text-white tracking-wide">{item.title}</h4>
+                    <p className="text-xs text-slate-300 mt-0.5">{item.desc}</p>
+                  </div>
+                </div>
+              ))}
+
+              {/* Warna */}
+              <div className="flex items-start gap-3.5 p-3.5 rounded-xl bg-[#0b172a] border border-[#1b3459] hover:border-[#2c528c] transition-colors">
+                <div className="flex items-center gap-1 p-2 rounded-xl bg-slate-900 border border-slate-700/80 shrink-0 mt-0.5">
+                  <span className="w-3 h-3 rounded-full bg-blue-500 inline-block" />
+                  <span className="w-3 h-3 rounded-full bg-teal-400 inline-block" />
+                  <span className="w-3 h-3 rounded-full bg-[#D4AF37] inline-block" />
+                </div>
+                <div>
+                  <h4 className="text-xs sm:text-sm font-bold text-white tracking-wide">WARNA</h4>
+                  <p className="text-xs text-slate-300 mt-0.5">
+                    <span className="text-blue-400 font-medium">Biru:</span> kepercayaan &bull;{' '}
+                    <span className="text-teal-300 font-medium">Hijau toska:</span> pemulihan &bull;{' '}
+                    <span className="text-[#D4AF37] font-medium">Emas:</span> harapan.
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
