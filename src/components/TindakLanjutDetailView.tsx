@@ -183,10 +183,13 @@ export const TindakLanjutDetailView: React.FC<Props> = ({
 
   const noSuratRekom = rekom?.nomorSurat || pleno?.nomorBeritaAcara || `R-TAT/2026/${permohonan.id.slice(-4)}`;
 
+  const nextMedisKe = Math.max(monitoring.laporanKontrolList.length, riwayatUrinList.length) + 1;
+  const nextWajibLaporKe = monitoring.buktiWajibLaporList.length + 1;
+
   const tabs = [
-    { id: 'pelaksanaan' as const, label: '1. Admisi & Serah Terima', roleTag: 'Input Pengaju', icon: <Building2 className="w-3.5 h-3.5" /> },
-    { id: 'laporan' as const, label: '2. Rekam Medis & Tes Urin', roleTag: 'Input Medis', icon: <Syringe className="w-3.5 h-3.5" /> },
-    { id: 'wajib_lapor' as const, label: '3. Jurnal Wajib Lapor', roleTag: 'Input Pengaju', icon: <CheckSquare className="w-3.5 h-3.5" /> },
+    { id: 'pelaksanaan' as const, label: '1. Admisi & Serah Terima', roleTag: 'Input Pengaju • Laporan Ke-1', icon: <Building2 className="w-3.5 h-3.5" /> },
+    { id: 'laporan' as const, label: '2. Rekam Medis & Tes Urin', roleTag: `Input Medis • Laporan Ke-${nextMedisKe}`, icon: <Syringe className="w-3.5 h-3.5" /> },
+    { id: 'wajib_lapor' as const, label: '3. Jurnal Wajib Lapor', roleTag: `Input Pengaju • Laporan Ke-${nextWajibLaporKe}`, icon: <CheckSquare className="w-3.5 h-3.5" /> },
     { id: 'akhir' as const, label: '4. Output Surat SKSR', roleTag: 'Medis / Admin', icon: <Award className="w-3.5 h-3.5" /> },
   ];
 

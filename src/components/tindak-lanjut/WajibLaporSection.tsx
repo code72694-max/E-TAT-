@@ -63,6 +63,8 @@ export const WajibLaporSection: React.FC<{
     buktiPenerimaanUrl: 'internal://bukti-wajib-lapor-aktual'
   });
 
+  const nextWajibLaporKe = monitoring.buktiWajibLaporList.length + 1;
+
   const setF = (k: keyof BuktiWajibLapor, v: unknown) => setForm(p => ({ ...p, [k]: v }));
 
   const handleSaveWajibLapor = () => {
@@ -85,7 +87,9 @@ export const WajibLaporSection: React.FC<{
       waktuInputSistem: nowTimestamp,
       namaPenyidikPenerima: form.namaPenyidikPenerima!,
       instansiPenyidik: form.instansiPenyidik || 'Satresnarkoba Polresta Samarinda',
-      kegiatanRehabTerkait: formMode === 'aktual' ? 'Catatan Wajib Lapor Aktual (Telah Dilaksanakan)' : 'Rencana Jadwal Wajib Lapor',
+      kegiatanRehabTerkait: formMode === 'aktual'
+        ? `Laporan Ke-${nextWajibLaporKe} — Wajib Lapor Aktual`
+        : `Laporan Ke-${nextWajibLaporKe} — Rencana Wajib Lapor`,
       kanal: form.kanal || 'langsung',
       buktiPenerimaanUrl: form.buktiPenerimaanUrl,
       statusKonfirmasi: 'dikonfirmasi_penyidik',
@@ -101,8 +105,8 @@ export const WajibLaporSection: React.FC<{
     });
     setShowForm(false);
     onSaveSuccess?.({
-      title: formMode === 'aktual' ? 'Wajib Lapor Aktual Tersimpan' : 'Rencana Wajib Lapor Tersimpan',
-      description: 'Catatan Jurnal Wajib Lapor telah berhasil disimpan ke sistem e-TAT.',
+      title: `Jurnal Wajib Lapor (Laporan Ke-${nextWajibLaporKe}) Tersimpan`,
+      description: `Laporan Ke-${nextWajibLaporKe} telah berhasil disimpan ke sistem e-TAT. Input wajib lapor berikutnya akan otomatis tercatat sebagai Laporan Ke-${nextWajibLaporKe + 1}.`,
       nextTab: 'akhir',
       nextStepLabel: 'Lihat Tab 4: Output Surat SKSR',
     });
@@ -165,6 +169,21 @@ export const WajibLaporSection: React.FC<{
         title="3. Jurnal Pengawasan & Catatan Wajib Lapor Penyidik (Input Pengaju)"
         subtitle="Menu Pengaju (Penyidik/JPU Berwenang) untuk mencatat tanggal kejadian aktual wajib lapor setelah tersangka melapor."
       />
+
+      <div className="flex flex-wrap items-center justify-between gap-2 px-3.5 py-2.5 rounded-xl bg-[#091529] border border-[#1b3459] text-xs">
+        <div className="flex items-center gap-2">
+          <span className="px-2.5 py-0.5 rounded-md font-mono font-bold bg-[#144782] text-white border border-sky-400/30">
+            Laporan Ke-{nextWajibLaporKe}
+          </span>
+          <span className="text-slate-300">
+            {readOnly
+              ? monitoring.buktiWajibLaporList.length > 0
+                ? `Tercatat ${monitoring.buktiWajibLaporList.length} laporan wajib lapor. Berikutnya: Laporan Ke-${nextWajibLaporKe}.`
+                : 'Menunggu Pengaju (Polsek/Polres) mencatat Wajib Lapor untuk Laporan Ke-1.'
+              : `Input berikutnya akan dicatat sebagai Laporan Ke-${nextWajibLaporKe} (kemudian periode selanjutnya menjadi Laporan Ke-${nextWajibLaporKe + 1}).`}
+          </span>
+        </div>
+      </div>
 
       {readOnly && (
         <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-slate-900/80 border border-slate-800 text-xs text-slate-300">
@@ -250,7 +269,9 @@ export const WajibLaporSection: React.FC<{
           <div className="flex items-center justify-between border-b border-slate-800/80 pb-2.5">
             <h4 className="text-xs font-semibold text-slate-200 flex items-center gap-2">
               <CheckSquare className="w-3.5 h-3.5 text-slate-400" />
-              {formMode === 'aktual' ? 'Form Catatan Wajib Lapor (Pelaporan Aktual)' : 'Form Rencana Wajib Lapor'}
+              {formMode === 'aktual'
+                ? `Form Catatan Wajib Lapor — Laporan Ke-${nextWajibLaporKe} (Pelaporan Aktual)`
+                : `Form Rencana Wajib Lapor — Laporan Ke-${nextWajibLaporKe}`}
             </h4>
             <div className="flex bg-slate-900 p-1 rounded-lg border border-slate-800">
               <button
@@ -398,13 +419,17 @@ export const WajibLaporSection: React.FC<{
             </p>
           </div>
         ) : (
-          monitoring.buktiWajibLaporList.map(wl => {
+          monitoring.buktiWajibLaporList.map((wl, idx) => {
             const isAktualExist = Boolean(wl.tanggalPelaporanAktual);
+            const laporanKeNum = monitoring.buktiWajibLaporList.length - idx;
 
             return (
               <div key={wl.id} className="bg-slate-950/50 border border-slate-800/80 rounded-xl p-3.5 space-y-3">
                 <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-2.5">
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="font-mono font-bold text-white bg-[#144782] border border-sky-400/30 px-2.5 py-0.5 rounded text-[11px]">
+                      Laporan Ke-{laporanKeNum}
+                    </span>
                     {isAktualExist ? (
                       <InfoBadge label="✓ Pelaporan Aktual" color="green" />
                     ) : (

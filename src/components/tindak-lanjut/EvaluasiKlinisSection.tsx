@@ -41,18 +41,20 @@ export const EvaluasiKlinisSection: React.FC<{
   const [ringkasanKlinis, setRingkasanKlinis] = useState('Klien menjalani terapi medis rutin. Skor WHO-ASSIST menurun signifikan, kestabilan emosi dan fisik pulih.');
 
   const riwayatUrin = getMonitoringUrineHistory(monitoring, permohonan);
+  const nextLaporanKe = Math.max(monitoring.laporanKontrolList.length, riwayatUrin.length) + 1;
 
   const handleAddUrine = (e: React.FormEvent) => {
     e.preventDefault();
     const newReport: LaporanKontrol = {
       id: genId(),
       jenisLaporan: 'Laporan Kemajuan Periodik',
+      nomorLaporanFasilitas: `Laporan Ke-${nextLaporanKe}`,
       tanggalKegiatanSebenarnya: today(),
       namaFasilitasPelapor: monitoring.pelaksanaanRehab?.namaFasilitasTujuan || 'Balai Rehab BNN',
       namaPenerbitLaporan: 'Tim Laboratorium Toksikologi Medis',
       kapasitasPenerbit: 'Analis Medis / Dokter DPJP',
       statusPelaksanaanBerdasarkanBukti: urinHasil === 'Negatif' ? 'terlaksana' : 'tidak_terlaksana',
-      ringkasanAdministratif: `Uji Toksikologi Urin Berkala (${urinJenis}): Hasil ${urinHasil.toUpperCase()} (AMP, MET, THC, BZO, MOP). ${urinKet}`,
+      ringkasanAdministratif: `[Laporan Ke-${nextLaporanKe}] Uji Toksikologi Urin Berkala (${urinJenis}): Hasil ${urinHasil.toUpperCase()} (AMP, MET, THC, BZO, MOP). ${urinKet}`,
       diunggahOleh: userRole,
       kapasitasPengunggah: 'Tim Medis TAT',
       tanggalDiunggah: today(),
@@ -69,10 +71,10 @@ export const EvaluasiKlinisSection: React.FC<{
     });
     setShowUrineModal(false);
     onSaveSuccess?.({
-      title: 'Hasil Tes Urin Tersimpan',
-      description: 'Hasil uji toksikologi urin telah disimpan. Tahap selanjutnya masuk ke Pengaju (Polsek/Polres) pada Tab 3: Jurnal Wajib Lapor.',
+      title: `Hasil Tes Urin (Laporan Ke-${nextLaporanKe}) Tersimpan`,
+      description: `Hasil uji toksikologi urin untuk Laporan Ke-${nextLaporanKe} telah disimpan. Tahap selanjutnya masuk ke Pengaju (Polsek/Polres) pada Tab 3: Jurnal Wajib Lapor (Laporan Ke-${nextLaporanKe}).`,
       nextTab: 'wajib_lapor',
-      nextStepLabel: 'Lanjut ke Tab 3: Jurnal Wajib Lapor',
+      nextStepLabel: `Lanjut ke Tab 3: Wajib Lapor (Laporan Ke-${nextLaporanKe})`,
     });
   };
 
@@ -81,12 +83,13 @@ export const EvaluasiKlinisSection: React.FC<{
     const newReport: LaporanKontrol = {
       id: genId(),
       jenisLaporan: jenisLaporan,
+      nomorLaporanFasilitas: `Laporan Ke-${nextLaporanKe}`,
       tanggalKegiatanSebenarnya: today(),
       namaFasilitasPelapor: monitoring.pelaksanaanRehab?.namaFasilitasTujuan || 'Balai Rehab BNN',
       namaPenerbitLaporan: permohonan.timAsesmen?.asesorMedisNama || 'Tim Medis TAT',
       kapasitasPenerbit: 'Dokter Penanggung Jawab Pasien (DPJP)',
       statusPelaksanaanBerdasarkanBukti: 'terlaksana',
-      ringkasanAdministratif: ringkasanKlinis,
+      ringkasanAdministratif: `[Laporan Ke-${nextLaporanKe}] ${ringkasanKlinis}`,
       diunggahOleh: userRole,
       kapasitasPengunggah: 'Tim Medis / DPJP',
       tanggalDiunggah: today(),
@@ -103,10 +106,10 @@ export const EvaluasiKlinisSection: React.FC<{
     });
     setShowReportModal(false);
     onSaveSuccess?.({
-      title: 'Evaluasi Klinis Medis Tersimpan',
-      description: 'Catatan evaluasi klinis medis telah disimpan. Tahap selanjutnya masuk ke Pengaju (Polsek/Polres) pada Tab 3: Jurnal Wajib Lapor.',
+      title: `Evaluasi Klinis Medis (Laporan Ke-${nextLaporanKe}) Tersimpan`,
+      description: `Catatan evaluasi klinis medis untuk Laporan Ke-${nextLaporanKe} telah disimpan. Tahap selanjutnya masuk ke Pengaju (Polsek/Polres) pada Tab 3: Jurnal Wajib Lapor (Laporan Ke-${nextLaporanKe}).`,
       nextTab: 'wajib_lapor',
-      nextStepLabel: 'Lanjut ke Tab 3: Jurnal Wajib Lapor',
+      nextStepLabel: `Lanjut ke Tab 3: Wajib Lapor (Laporan Ke-${nextLaporanKe})`,
     });
   };
 
@@ -117,6 +120,21 @@ export const EvaluasiKlinisSection: React.FC<{
         title="2. Input Evaluasi Klinis & Uji Toksikologi Urin Berkala (Input Medis)"
         subtitle="Rekam medis kontrol periodik, skrining tes urin berkala/acak (toksikologi), dan catatan perkembangan pasien."
       />
+
+      <div className="flex flex-wrap items-center justify-between gap-2 px-3.5 py-2.5 rounded-xl bg-[#091529] border border-[#1b3459] text-xs">
+        <div className="flex items-center gap-2">
+          <span className="px-2.5 py-0.5 rounded-md font-mono font-bold bg-[#144782] text-white border border-sky-400/30">
+            Laporan Ke-{nextLaporanKe}
+          </span>
+          <span className="text-slate-300">
+            {readOnly
+              ? riwayatUrin.length > 0
+                ? `Tercatat ${riwayatUrin.length} laporan medis. Menunggu input Laporan Ke-${nextLaporanKe} dari Tim Medis.`
+                : 'Menunggu Tim Medis menginput Rekam Medis & Tes Urin untuk Laporan Ke-1.'
+              : `Input berikutnya akan dicatat sebagai Laporan Ke-${nextLaporanKe} dan diteruskan ke Pengaju pada Tab 3.`}
+          </span>
+        </div>
+      </div>
 
       {readOnly && (
         <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-slate-900/80 border border-slate-800 text-xs text-slate-300">
@@ -210,45 +228,51 @@ export const EvaluasiKlinisSection: React.FC<{
             </p>
           </div>
         ) : (
-          riwayatUrin.map((urin, idx) => (
-            <div
-              key={urin.id}
-              className="bg-[#081224] border border-[#1b3459] rounded-xl p-3.5 space-y-2 text-xs hover:border-[#234b7d] transition-all"
-            >
-              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#1b3459]/60 pb-2">
-                <div className="flex items-center gap-2">
-                  <span className="font-mono font-bold text-white bg-[#142642] px-2 py-0.5 rounded text-[11px]">
-                    Uji Ke-{idx + 1} &bull; {urin.jenisPemeriksaan}
-                  </span>
-                  <span className={`font-bold px-2.5 py-0.5 rounded text-[11px] ${
-                    urin.hasil.toLowerCase() === 'positif'
-                      ? 'text-rose-400 bg-rose-950/90 border border-rose-600/40'
-                      : 'text-emerald-400 bg-emerald-950/90 border border-emerald-600/40'
-                  }`}>
-                    {urin.hasil.toLowerCase() === 'positif' ? '⚠ HASIL: POSITIF (TERDETEKSI ZAT)' : '✓ HASIL: NEGATIF (NON-REAKTIF)'}
-                  </span>
+          riwayatUrin.map((urin, idx) => {
+            const laporanKeNum = riwayatUrin.length - idx;
+            return (
+              <div
+                key={urin.id}
+                className="bg-[#081224] border border-[#1b3459] rounded-xl p-3.5 space-y-2 text-xs hover:border-[#234b7d] transition-all"
+              >
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#1b3459]/60 pb-2">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="font-mono font-bold text-white bg-[#144782] border border-sky-400/30 px-2.5 py-0.5 rounded text-[11px]">
+                      Laporan Ke-{laporanKeNum}
+                    </span>
+                    <span className="font-mono font-semibold text-slate-200 bg-[#142642] px-2 py-0.5 rounded text-[11px]">
+                      {urin.jenisPemeriksaan}
+                    </span>
+                    <span className={`font-bold px-2.5 py-0.5 rounded text-[11px] ${
+                      urin.hasil.toLowerCase() === 'positif'
+                        ? 'text-rose-400 bg-rose-950/90 border border-rose-600/40'
+                        : 'text-emerald-400 bg-emerald-950/90 border border-emerald-600/40'
+                    }`}>
+                      {urin.hasil.toLowerCase() === 'positif' ? '⚠ HASIL: POSITIF (TERDETEKSI ZAT)' : '✓ HASIL: NEGATIF (NON-REAKTIF)'}
+                    </span>
+                  </div>
+                  <span className="font-mono text-slate-400 text-[11px]">{urin.tanggalTes}</span>
                 </div>
-                <span className="font-mono text-slate-400 text-[11px]">{urin.tanggalTes}</span>
-              </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5 text-slate-300 pt-1">
-                <div>
-                  <span className="text-[10px] uppercase font-semibold text-slate-400 block">Parameter Skrining 5-Panel:</span>
-                  <span className="font-mono font-bold text-slate-200 mt-0.5 block">
-                    {Array.isArray(urin.parameter) ? urin.parameter.join(', ') : 'AMP, MET, THC, BZO, MOP'}
-                  </span>
-                </div>
-                <div>
-                  <span className="text-[10px] uppercase font-semibold text-slate-400 block">Dokter Pemeriksa / Analis:</span>
-                  <span className="text-slate-200 font-medium mt-0.5 block">{urin.petugasPemeriksa}</span>
-                </div>
-                <div>
-                  <span className="text-[10px] uppercase font-semibold text-slate-400 block">Catatan Medis:</span>
-                  <span className="text-slate-300 italic mt-0.5 block">{urin.keterangan}</span>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5 text-slate-300 pt-1">
+                  <div>
+                    <span className="text-[10px] uppercase font-semibold text-slate-400 block">Parameter Skrining 5-Panel:</span>
+                    <span className="font-mono font-bold text-slate-200 mt-0.5 block">
+                      {Array.isArray(urin.parameter) ? urin.parameter.join(', ') : 'AMP, MET, THC, BZO, MOP'}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] uppercase font-semibold text-slate-400 block">Dokter Pemeriksa / Analis:</span>
+                    <span className="text-slate-200 font-medium mt-0.5 block">{urin.petugasPemeriksa}</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] uppercase font-semibold text-slate-400 block">Catatan Medis:</span>
+                    <span className="text-slate-300 italic mt-0.5 block">{urin.keterangan}</span>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
     </div>
