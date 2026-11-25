@@ -377,8 +377,25 @@ export const AkhirLayananSection: React.FC<{
           </div>
         )}
 
-        {/* Input Form for Output Generation */}
-        {!readOnly && (
+        {/* Finalized View vs Input Form */}
+        {existing ? (
+          <div className="bg-slate-900/60 border border-emerald-500/25 rounded-xl p-4 space-y-2.5 text-xs">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md font-semibold bg-emerald-950/80 text-emerald-300 border border-emerald-500/30">
+                <Check className="w-3.5 h-3.5" /> Output Surat SKSR Sudah Difinalkan
+              </span>
+              <span className="font-mono text-slate-400 text-[11px]">
+                Tanggal Selesai: {existing.tanggalAkhirLayananAktual || existing.tanggalDiisi}
+              </span>
+            </div>
+            <div>
+              <span className="text-[10px] uppercase font-semibold text-slate-400 tracking-wider block">
+                Ringkasan Hasil Evaluasi Selesai Rehabilitasi
+              </span>
+              <p className="text-slate-200 mt-1 leading-relaxed">{existing.hasilSesuaiDokumenFasilitas}</p>
+            </div>
+          </div>
+        ) : !readOnly ? (
           <div className="space-y-3 pt-1">
             <FieldGroup label="Ringkasan Hasil Evaluasi Selesai Rehabilitasi" required>
               <textarea className="w-full bg-slate-900 border border-slate-800 rounded-lg p-3 text-xs text-slate-100 focus:border-slate-600 outline-none" rows={3} value={form.hasilSesuaiDokumenFasilitas ?? ''} onChange={e => setF('hasilSesuaiDokumenFasilitas', e.target.value)} />
@@ -386,6 +403,10 @@ export const AkhirLayananSection: React.FC<{
             <button className="px-4 py-2 bg-gradient-to-r from-[#144782] to-[#1c64b8] hover:from-[#17549c] hover:to-[#2272d1] text-white border border-sky-400/20 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-sm transition-all" onClick={handleSave}>
               <Check className="w-3.5 h-3.5 text-emerald-300" /> Simpan &amp; Finalkan Output Surat SKSR
             </button>
+          </div>
+        ) : (
+          <div className="p-6 text-center bg-slate-900/50 border border-slate-800 rounded-xl text-xs text-slate-400">
+            Menunggu finalisasi Output Surat SKSR oleh Pengaju (Polsek/Polres) atau Admin.
           </div>
         )}
       </div>
