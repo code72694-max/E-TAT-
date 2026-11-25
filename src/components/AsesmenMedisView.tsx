@@ -371,8 +371,13 @@ export const AsesmenMedisView: React.FC<AsesmenMedisViewProps> = ({
 
     if (isFinal) {
       updated.medicalStatus = 'FINAL';
-      if (updated.statusProsesUtama === 'asesmen_berlangsung' || updated.statusProsesUtama === 'penugasan_jadwal') {
-        updated.statusProsesUtama = 'siap_pleno';
+      const isHukumFinal = updated.asesmenHukum?.status === 'FINAL' || updated.legalStatus === 'FINAL';
+      if (isHukumFinal) {
+        if (updated.statusProsesUtama === 'asesmen_berlangsung' || updated.statusProsesUtama === 'penugasan_jadwal') {
+          updated.statusProsesUtama = 'siap_pleno';
+        }
+      } else if (updated.statusProsesUtama === 'penugasan_jadwal') {
+        updated.statusProsesUtama = 'asesmen_berlangsung';
       }
     }
 

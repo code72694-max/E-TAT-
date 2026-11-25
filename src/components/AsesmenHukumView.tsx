@@ -45,15 +45,17 @@ export const AsesmenHukumView: React.FC<AsesmenHukumViewProps> = ({
 
   const selectedCase = permohonanList.find(p => p.id === selectedCaseId);
 
-  const isCompleted = 
-    selectedCase?.asesmenHukum?.status === 'FINAL' || 
-    selectedCase?.legalStatus === 'FINAL' ||
-    selectedCase?.applicationStatus === 'READY_FOR_CONFERENCE' ||
+  const isHukumFinal =
+    selectedCase?.asesmenHukum?.status === 'FINAL' ||
+    selectedCase?.legalStatus === 'FINAL';
+
+  const isCompleted =
+    isHukumFinal ||
     selectedCase?.applicationStatus === 'CONFERENCE_HELD' ||
     selectedCase?.applicationStatus === 'OUTCOME_RECORDED_FOR_DRAFT' ||
     selectedCase?.applicationStatus === 'AWAITING_SIGNED_OUTPUTS' ||
     selectedCase?.applicationStatus === 'RESULTS_ISSUED' ||
-    selectedCase?.statusProsesUtama === 'siap_pleno' ||
+    selectedCase?.statusProsesUtama === 'pembahasan_pleno' ||
     selectedCase?.statusProsesUtama === 'pengesahan_rekomendasi' ||
     selectedCase?.statusProsesUtama === 'rekomendasi_terbit' ||
     selectedCase?.statusProsesUtama === 'selesai_tindak_lanjut';
@@ -378,8 +380,13 @@ export const AsesmenHukumView: React.FC<AsesmenHukumViewProps> = ({
 
     if (isFinal) {
       updated.legalStatus = 'FINAL';
-      if (updated.statusProsesUtama === 'asesmen_berlangsung' || updated.statusProsesUtama === 'penugasan_jadwal') {
-        updated.statusProsesUtama = 'siap_pleno';
+      const isMedisFinal = updated.asesmenMedis?.status === 'FINAL' || updated.medicalStatus === 'FINAL';
+      if (isMedisFinal) {
+        if (updated.statusProsesUtama === 'asesmen_berlangsung' || updated.statusProsesUtama === 'penugasan_jadwal') {
+          updated.statusProsesUtama = 'siap_pleno';
+        }
+      } else if (updated.statusProsesUtama === 'penugasan_jadwal') {
+        updated.statusProsesUtama = 'asesmen_berlangsung';
       }
     }
 
@@ -461,15 +468,14 @@ export const AsesmenHukumView: React.FC<AsesmenHukumViewProps> = ({
     
     if (!matchesSearch) return false;
     
-    const isHukumBeres = 
-      item.asesmenHukum?.status === 'FINAL' || 
+    const isHukumBeres =
+      item.asesmenHukum?.status === 'FINAL' ||
       item.legalStatus === 'FINAL' ||
-      item.applicationStatus === 'READY_FOR_CONFERENCE' ||
       item.applicationStatus === 'CONFERENCE_HELD' ||
       item.applicationStatus === 'OUTCOME_RECORDED_FOR_DRAFT' ||
       item.applicationStatus === 'AWAITING_SIGNED_OUTPUTS' ||
       item.applicationStatus === 'RESULTS_ISSUED' ||
-      item.statusProsesUtama === 'siap_pleno' ||
+      item.statusProsesUtama === 'pembahasan_pleno' ||
       item.statusProsesUtama === 'pengesahan_rekomendasi' ||
       item.statusProsesUtama === 'rekomendasi_terbit' ||
       item.statusProsesUtama === 'selesai_tindak_lanjut';
