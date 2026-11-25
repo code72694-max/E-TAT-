@@ -44,6 +44,7 @@ export type ActiveTab =
   | 'tindak_lanjut'
   | 'tindak_lanjut_input_jadwal'
   | 'tindak_lanjut_jadwal'
+  | 'tindak_lanjut_pasca_rehab'
   | 'monitoring'
   | 'administrasi'
   | 'pemulihan'
@@ -329,6 +330,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       <FileCheck2 className="w-3 h-3 text-blue-400" />
                       <span>Daftar Tindak Lanjut</span>
                     </button>
+                    {userRole === 'MEDIS' && (
+                      <button
+                        onClick={() => handleItemClick('tindak_lanjut_pasca_rehab')}
+                        className={`w-full text-left px-2.5 py-1.5 text-[11px] font-medium rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer ${
+                          currentTab === 'tindak_lanjut_pasca_rehab'
+                            ? 'bg-[#142642] text-[#38bdf8] font-bold border border-[#234475]'
+                            : 'text-slate-300 hover:text-white hover:bg-[#142642]/60'
+                        }`}
+                      >
+                        <Activity className="w-3 h-3 text-emerald-400" />
+                        <span>Rehabilitasi Pasca Rehab</span>
+                      </button>
+                    )}
                   </div>
                 )}
               </div>

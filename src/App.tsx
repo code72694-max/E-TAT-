@@ -16,6 +16,7 @@ import { DokumenPengesahanView } from './components/DokumenPengesahanView';
 import { RujukanTindakLanjutView } from './components/RujukanTindakLanjutView';
 import { InputJadwalKontrolView } from './components/InputJadwalKontrolView';
 import { JadwalKlienView } from './components/JadwalKlienView';
+import { RehabilitasiPascaRehabView } from './components/RehabilitasiPascaRehabView';
 import { AsesmenPemulihanView } from './components/AsesmenPemulihanView';
 import { VerifikasiAkunView } from './components/VerifikasiAkunView';
 import { MonitoringLaporanView } from './components/MonitoringLaporanView';
@@ -153,7 +154,7 @@ const DEFAULT_USER: UserProfile = DEFAULT_USERS[0];
 export const ROLE_ALLOWED_TABS: Record<string, ActiveTab[]> = {
   PENGAJU: ['beranda', 'permohonan', 'pengajuan_baru', 'asesmen_aktif', 'dokumen', 'tindak_lanjut', 'tindak_lanjut_jadwal', 'riwayat', 'about', 'profile'],
   ADMIN: ['beranda', 'permohonan', 'pengajuan_baru', 'asesmen_aktif', 'riwayat', 'verifikasi', 'penugasan', 'pleno', 'tindak_lanjut', 'tindak_lanjut_jadwal', 'verifikasi_akun', 'monitoring', 'about', 'profile'],
-  MEDIS: ['beranda', 'medis', 'riwayat_medis', 'tindak_lanjut', 'pleno', 'about', 'profile'],
+  MEDIS: ['beranda', 'medis', 'riwayat_medis', 'tindak_lanjut', 'tindak_lanjut_pasca_rehab', 'pleno', 'about', 'profile'],
   HUKUM: ['beranda', 'hukum', 'pleno', 'riwayat_hukum', 'about', 'profile'],
   SEKRETARIAT: ['beranda', 'permohonan', 'pengajuan_baru', 'asesmen_aktif', 'riwayat', 'verifikasi', 'penugasan', 'pleno', 'tindak_lanjut', 'tindak_lanjut_jadwal', 'verifikasi_akun', 'monitoring', 'about', 'profile'],
 };
@@ -640,6 +641,9 @@ export default function App() {
         if (subParts[1] === 'input_jadwal') {
           setCurrentTab('tindak_lanjut_input_jadwal');
           setSelectedTindakLanjutId(subParts[2] || null);
+        } else if (subParts[1] === 'pasca_rehab') {
+          setCurrentTab('tindak_lanjut_pasca_rehab');
+          setSelectedTindakLanjutId(subParts[2] || null);
         } else {
           setCurrentTab(tabParam as ActiveTab);
           if (subParts[1] === 'detail' && subParts[2]) {
@@ -874,7 +878,7 @@ export default function App() {
     const roleAllowedTabs: Record<string, ActiveTab[]> = {
       PENGAJU: ['beranda', 'permohonan', 'pengajuan_baru', 'asesmen_aktif', 'dokumen', 'tindak_lanjut', 'tindak_lanjut_jadwal', 'riwayat', 'about', 'profile'],
       ADMIN: ['beranda', 'permohonan', 'pengajuan_baru', 'asesmen_aktif', 'riwayat', 'verifikasi', 'penugasan', 'pleno', 'tindak_lanjut', 'tindak_lanjut_jadwal', 'verifikasi_akun', 'monitoring', 'about', 'profile'],
-      MEDIS: ['beranda', 'medis', 'riwayat_medis', 'tindak_lanjut', 'pleno', 'about', 'profile'],
+      MEDIS: ['beranda', 'medis', 'riwayat_medis', 'tindak_lanjut', 'tindak_lanjut_pasca_rehab', 'pleno', 'about', 'profile'],
       HUKUM: ['beranda', 'hukum', 'pleno', 'riwayat_hukum', 'about', 'profile'],
       // Backward compat
       pengaju: ['beranda', 'permohonan', 'pengajuan_baru', 'asesmen_aktif', 'verifikasi', 'dokumen', 'riwayat', 'about', 'profile'],
@@ -1145,6 +1149,21 @@ export default function App() {
           />
         );
 
+      case 'tindak_lanjut_pasca_rehab':
+        return (
+          <RehabilitasiPascaRehabView
+            permohonanList={permohonanList}
+            currentUser={currentUser}
+            initialCaseId={selectedTindakLanjutId || undefined}
+            onUpdatePermohonan={handleUpdatePermohonan}
+            onBack={() => {
+              setSelectedTindakLanjutId(null);
+              setCurrentTab('tindak_lanjut');
+              navigateToDashboard('/tindak_lanjut');
+            }}
+          />
+        );
+
       case 'tindak_lanjut':
         return (
           <RujukanTindakLanjutView
@@ -1169,6 +1188,15 @@ export default function App() {
                 navigateToDashboard(`/tindak_lanjut/input_jadwal/${caseId}`);
               } else {
                 navigateToDashboard('/tindak_lanjut/input_jadwal');
+              }
+            }}
+            onNavigateToPascaRehab={(caseId) => {
+              setSelectedTindakLanjutId(caseId || null);
+              setCurrentTab('tindak_lanjut_pasca_rehab');
+              if (caseId) {
+                navigateToDashboard(`/tindak_lanjut/pasca_rehab/${caseId}`);
+              } else {
+                navigateToDashboard('/tindak_lanjut_pasca_rehab');
               }
             }}
           />

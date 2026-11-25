@@ -46,6 +46,7 @@ import TindakLanjutDetailView from './TindakLanjutDetailView';
 import { SuratPengantarTersangkaModal } from './SuratPengantarTersangkaModal';
 import { getKodeLacakRehab, normalizeSearchCode } from '../utils/getKodeLacak';
 import { InputJadwalKontrolView } from './InputJadwalKontrolView';
+import { getPascaRehabSchedule } from './RehabilitasiPascaRehabView';
 
 interface RujukanTindakLanjutViewProps {
   permohonanList: PermohonanAsesmen[];
@@ -56,6 +57,7 @@ interface RujukanTindakLanjutViewProps {
   onSelectCase?: (id: string | null) => void;
   currentTab?: string;
   onNavigateToInputJadwal?: (caseId?: string) => void;
+  onNavigateToPascaRehab?: (caseId?: string) => void;
 }
 
 
@@ -68,7 +70,8 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
   selectedCaseId,
   onSelectCase,
   currentTab,
-  onNavigateToInputJadwal
+  onNavigateToInputJadwal,
+  onNavigateToPascaRehab
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterModalitas, setFilterModalitas] = useState<'all' | 'Rawat Inap' | 'Rawat Jalan'>('all');
@@ -561,6 +564,13 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
                     const modalitas = item.pengawasanKlien?.modalitasLayanan || item.asesmenMedis?.kebutuhanRawat || 'Rawat Jalan';
                     const status = item.tindakLanjut?.statusMonitoring || (item.pengawasanKlien ? 'Dalam Pengawasan' : 'Menunggu Pelaksanaan');
                     const fasilitas = item.pengawasanKlien?.instansiPelaksanaRehab || item.monitoringTindakLanjut?.pelaksanaanRehab?.namaFasilitasRehab || item.tindakLanjut?.namaFasilitasTujuan || '-';
+                    const isSelesaiRehab = Boolean(
+                      item.monitoringTindakLanjut?.akhirLayanan ||
+                      item.monitoringTindakLanjut?.statusMonitoring === 'selesai' ||
+                      item.statusProsesUtama === 'selesai_tindak_lanjut' ||
+                      item.pengawasanKlien?.statusKepatuhan === 'selesai_program'
+                    );
+                    const pascaRehabSched = getPascaRehabSchedule(item.id);
 
                     return (
                       <div
@@ -612,12 +622,31 @@ export const RujukanTindakLanjutView: React.FC<RujukanTindakLanjutViewProps> = (
                                   {item.pengawasanKlien.sesiTerselesaikan}/{item.pengawasanKlien.totalSesiWajib} Sesi
                                 </span>
                               )}
+                              {pascaRehabSched && (
+                                <span className="text-[11px] text-emerald-300 bg-emerald-950/60 px-2.5 py-0.5 rounded-md border border-emerald-500/30 flex items-center gap-1 font-mono">
+                                  <Calendar className="w-3 h-3 text-emerald-400 shrink-0" />
+                                  Pasca Rehab: {pascaRehabSched.tanggal} • {pascaRehabSched.waktu}
+                                </span>
+                              )}
                             </div>
                           </div>
                         </div>
 
                         {/* Right: Action buttons */}
-                        <div className="flex items-center justify-end gap-2 shrink-0 pt-2 md:pt-0 border-t md:border-t-0 border-slate-800/60">
+                        <div className="flex flex-wrap items-center justify-end gap-2 shrink-0 pt-2 md:pt-0 border-t md:border-t-0 border-slate-800/60">
+                          {isMedisRole && isSelesaiRehab && onNavigateToPascaRehab && (
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onNavigateToPascaRehab(item.id);
+                              }}
+                              className="px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-950/70 hover:bg-emerald-900/70 text-emerald-300 border border-emerald-500/35 flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
+                            >
+                              <Activity className="w-3.5 h-3.5 text-emerald-400" />
+                              <span>Input Rehabilitasi Pasca Rehab</span>
+                            </button>
+                          )}
                           <button
                             type="button"
                             onClick={(e) => {
