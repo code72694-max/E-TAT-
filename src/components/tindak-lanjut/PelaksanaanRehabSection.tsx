@@ -31,10 +31,11 @@ export const PelaksanaanRehabSection: React.FC<{
   monitoring: MonitoringTindakLanjut;
   permohonan: PermohonanAsesmen;
   userRole: UserRole;
+  activeBatchKe: number;
   readOnly?: boolean;
   onUpdate: (updated: MonitoringTindakLanjut) => void;
   onSaveSuccess?: (info: SaveConfirmInfo) => void;
-}> = ({ monitoring, permohonan, userRole, readOnly, onUpdate, onSaveSuccess }) => {
+}> = ({ monitoring, permohonan, userRole, activeBatchKe, readOnly, onUpdate, onSaveSuccess }) => {
   const existing = monitoring.pelaksanaanRehab;
   const [mode, setMode] = useState<'view' | 'edit' | 'new'>(!existing && !readOnly ? 'new' : 'view');
   const canEdit = !readOnly && ['PENGAJU', 'ADMIN', 'SEKRETARIAT'].includes((userRole || '').toUpperCase());
@@ -85,10 +86,10 @@ export const PelaksanaanRehabSection: React.FC<{
     onUpdate({ ...monitoring, pelaksanaanRehab: saved, terakhirDiperbarui: today() });
     setMode('view');
     onSaveSuccess?.({
-      title: 'Admisi & Serah Terima (Laporan Ke-1) Tersimpan',
-      description: 'Data admisi dan serah terima tersangka untuk Laporan Ke-1 telah disimpan. Tahap selanjutnya diteruskan ke Tim Medis untuk input Rekam Medis & Tes Urin (Laporan Ke-1).',
+      title: `Admisi & Serah Terima (Laporan Ke-${activeBatchKe}) Tersimpan`,
+      description: `Data admisi dan serah terima tersangka untuk Laporan Ke-${activeBatchKe} telah disimpan. Tahap selanjutnya diteruskan ke Tim Medis untuk input Rekam Medis & Tes Urin (Laporan Ke-${activeBatchKe}).`,
       nextTab: 'laporan',
-      nextStepLabel: 'Lanjut ke Tab 2: Rekam Medis (Laporan Ke-1)',
+      nextStepLabel: `Lanjut ke Tab 2: Rekam Medis (Laporan Ke-${activeBatchKe})`,
     });
   };
 
@@ -105,12 +106,12 @@ export const PelaksanaanRehabSection: React.FC<{
       <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-2.5 rounded-xl bg-slate-900/70 border border-slate-800 text-xs">
         <div className="flex items-center gap-2.5">
           <span className="px-2.5 py-0.5 rounded-md font-mono font-semibold bg-[#144782] text-white border border-sky-400/25">
-            Laporan Ke-1
+            Batch Aktif: Laporan Ke-{activeBatchKe}
           </span>
           <span className="text-slate-300">
             {existing
-              ? 'Admisi & Serah Terima selesai — diteruskan ke Tim Medis (Laporan Ke-1).'
-              : 'Tahap awal sebelum Tim Medis menginput Rekam Medis & Tes Urin (Laporan Ke-1).'}
+              ? `Admisi & Serah Terima selesai — diteruskan ke Tim Medis (Laporan Ke-${activeBatchKe}).`
+              : `Tahap awal sebelum Tim Medis menginput Rekam Medis & Tes Urin (Laporan Ke-${activeBatchKe}).`}
           </span>
         </div>
       </div>

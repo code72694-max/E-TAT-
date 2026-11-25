@@ -188,10 +188,10 @@ export const TindakLanjutDetailView: React.FC<Props> = ({
   const activeBatchKe = monitoring.buktiWajibLaporList.length + 1;
 
   const tabs = [
-    { id: 'pelaksanaan' as const, label: '1. Admisi & Serah Terima', roleTag: 'Input Pengaju • Laporan Ke-1', icon: <Building2 className="w-3.5 h-3.5" /> },
+    { id: 'pelaksanaan' as const, label: '1. Admisi & Serah Terima', roleTag: `Input Pengaju • Laporan Ke-${activeBatchKe}`, icon: <Building2 className="w-3.5 h-3.5" /> },
     { id: 'laporan' as const, label: '2. Rekam Medis & Tes Urin', roleTag: `Input Medis • Laporan Ke-${activeBatchKe}`, icon: <Syringe className="w-3.5 h-3.5" /> },
     { id: 'wajib_lapor' as const, label: '3. Jurnal Wajib Lapor', roleTag: `Input Pengaju • Laporan Ke-${activeBatchKe}`, icon: <CheckSquare className="w-3.5 h-3.5" /> },
-    { id: 'akhir' as const, label: '4. Output Surat SKSR', roleTag: 'Input Pengaju', icon: <Award className="w-3.5 h-3.5" /> },
+    { id: 'akhir' as const, label: '4. Output Surat SKSR', roleTag: `Input Pengaju • Laporan Ke-${activeBatchKe}`, icon: <Award className="w-3.5 h-3.5" /> },
   ];
 
   const progress = {
@@ -246,9 +246,9 @@ export const TindakLanjutDetailView: React.FC<Props> = ({
       )}
 
       {/* Clean Compact Summary Card */}
-      <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 sm:p-5 space-y-4 shadow-sm">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-          <div className="space-y-1.5 min-w-0">
+      <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 sm:p-5 space-y-4 shadow-sm overflow-hidden">
+        <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-3">
+          <div className="space-y-1.5 min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
               <span className="font-mono text-[11px] font-semibold text-slate-300 bg-slate-800 border border-slate-700 px-2.5 py-0.5 rounded-md">
                 {noSuratRekom}
@@ -265,7 +265,7 @@ export const TindakLanjutDetailView: React.FC<Props> = ({
                 </span>
               )}
               <span className="text-[11px] px-2.5 py-0.5 rounded-md font-mono font-semibold bg-[#144782] text-white border border-sky-400/25">
-                Batch: Laporan Ke-{activeBatchKe}
+                Batch Aktif: Laporan Ke-{activeBatchKe}
               </span>
             </div>
 
@@ -416,6 +416,7 @@ export const TindakLanjutDetailView: React.FC<Props> = ({
             monitoring={monitoring}
             permohonan={permohonan}
             userRole={currentUser.role}
+            activeBatchKe={activeBatchKe}
             readOnly={readOnlyTab1}
             onUpdate={handleMonitoringUpdate}
             onSaveSuccess={setSaveConfirmModal}
