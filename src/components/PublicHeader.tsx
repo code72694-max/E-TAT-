@@ -26,23 +26,24 @@ export interface TimTatMember {
   jabatan: string;
   pangkatGol: string;
   nipNrp: string;
-  keterangan: 'Ketua Tim TAT' | 'Tim Hukum' | 'Tim Medis' | 'Tim Psikolog' | 'Tim Sekretariat';
+  kesatuan: string;
+  keterangan: 'PENANGGUNG JAWAB' | 'KETUA' | 'TIM HUKUM' | 'TIM MEDIS' | 'SEKRETARIS' | 'TIM SEKRETARIS';
 }
 
 export const TIM_TAT_LIST: TimTatMember[] = [
-  { no: 1, nama: 'Risnoto, S.H., M.H', jabatan: 'Kepala BNN Kabupaten Kutai Timur', pangkatGol: 'AKBP / IV-B', nipNrp: '69010124', keterangan: 'Ketua Tim TAT' },
-  { no: 2, nama: 'Irwansyah, S.H', jabatan: 'Jaksa Penuntut Umum', pangkatGol: 'Ajun Jaksa / III-B', nipNrp: '199510042020121011', keterangan: 'Tim Hukum' },
-  { no: 3, nama: 'Elsa Chairunnisa, S.H', jabatan: 'Analis Penuntutan dan Penegakan Hukum', pangkatGol: 'Yuana Wira / III-A', nipNrp: '200101212024042001', keterangan: 'Tim Hukum' },
-  { no: 4, nama: 'Andi Ishak, S.H', jabatan: 'Petugas Pengejaran Seksi Intelijen Bidang Pemberantasan dan Intelijen BNNP Kaltim', pangkatGol: 'AIPDA / II-E', nipNrp: '84031446', keterangan: 'Tim Hukum' },
-  { no: 5, nama: 'Supriadi, S.H., M.H', jabatan: 'Penyidik BNN Kab. Kutai Timur', pangkatGol: 'AIPDA / II-E', nipNrp: '85031825', keterangan: 'Tim Hukum' },
-  { no: 6, nama: 'Budiansyah, S.H', jabatan: 'Kanit I Satresnarkoba Polres Kutim', pangkatGol: 'IPDA / III-A', nipNrp: '87111286', keterangan: 'Tim Hukum' },
-  { no: 7, nama: 'Muhamad Said Athar, S.H', jabatan: 'Banit Resnarkoba Polres Kutim', pangkatGol: 'BRIPTU / II-B', nipNrp: '00030240', keterangan: 'Tim Hukum' },
-  { no: 8, nama: 'dr. Raina Sari Wulan', jabatan: 'Konselor BNN Kabupaten Kutai Timur', pangkatGol: 'Penata Muda Tk. I / III-B', nipNrp: '198805202020122009', keterangan: 'Tim Medis' },
-  { no: 9, nama: 'dr. Milka Datu Tasik L.A', jabatan: 'Ahli Pertama Dokter', pangkatGol: 'Ahli Pertama / X', nipNrp: '199308272024212030', keterangan: 'Tim Medis' },
-  { no: 10, nama: 'Fufahanna S.Psi., M.Psi', jabatan: 'Ketua Himpsi', pangkatGol: '-', nipNrp: '-', keterangan: 'Tim Psikolog' },
-  { no: 11, nama: 'Syarifah Nur Latifah, M.Psi', jabatan: 'Wakil Ketua Himpsi', pangkatGol: '-', nipNrp: '-', keterangan: 'Tim Psikolog' },
-  { no: 12, nama: 'Eko Prasetya Prayoko, S.Sos', jabatan: 'Kasubbag Umum BNN Kutai Timur', pangkatGol: 'Penata Muda TK I', nipNrp: '198507102010011001', keterangan: 'Tim Sekretariat' },
-  { no: 13, nama: 'Veronica Febrianty, S.A.P', jabatan: 'Staff Bagian Umum', pangkatGol: '-', nipNrp: '689806008', keterangan: 'Tim Sekretariat' }
+  { no: 1, nama: 'Belny Warlansyah, SH.,S.IK.,M.H.', pangkatGol: 'Kombes Pol/82030991', nipNrp: '82030991', jabatan: 'Kepala BNN Kota Samarinda', kesatuan: 'BNN Kota Samarinda', keterangan: 'PENANGGUNG JAWAB' },
+  { no: 2, nama: 'Belny Warlansyah, SH.,S.IK.,M.H.', pangkatGol: 'Kombes Pol/82030991', nipNrp: '82030991', jabatan: 'Kepala BNN Kota Samarinda', kesatuan: 'BNN Kota Samarinda', keterangan: 'KETUA' },
+  { no: 3, nama: 'Stefano, SH', pangkatGol: 'Jaksa Pratama/19940522201801101', nipNrp: '19940522201801101', jabatan: 'Jaksa Penuntut Umum', kesatuan: 'Kejaksaan Negeri Samarinda', keterangan: 'TIM HUKUM' },
+  { no: 4, nama: 'Bintang Samudera, SH', pangkatGol: 'Ajun Jaksa/199710202020121002', nipNrp: '199710202020121002', jabatan: 'Jaksa Penuntut Umum', kesatuan: 'Kejaksaan Negeri Samarinda', keterangan: 'TIM HUKUM' },
+  { no: 5, nama: 'Bambang Suheri, SE', pangkatGol: 'IPTU/74110386', nipNrp: '74110386', jabatan: 'Kanit Sidik', kesatuan: 'Polresta Samarinda', keterangan: 'TIM HUKUM' },
+  { no: 6, nama: 'Yunus Setiawan, SH.,MH', pangkatGol: 'IPDA/82051393', nipNrp: '82051393', jabatan: 'Kasubnit Sidik', kesatuan: 'Polresta Samarinda', keterangan: 'TIM HUKUM' },
+  { no: 7, nama: 'Defriyadi, SH', pangkatGol: 'AIPDA/75120543', nipNrp: '75120543', jabatan: 'Penata Pemberantasan', kesatuan: 'BNN Kota Samarinda', keterangan: 'TIM HUKUM' },
+  { no: 8, nama: 'Darwis, SH.,MH', pangkatGol: 'AIPDA/78081025', nipNrp: '78081025', jabatan: 'Penata Pemberantasan', kesatuan: 'BNN Kota Samarinda', keterangan: 'TIM HUKUM' },
+  { no: 9, nama: 'Dr. Candra Ramadhanny, SP.Kj.,M.H.,M.Kom', pangkatGol: 'Penata/198904272015021003', nipNrp: '198904272015021003', jabatan: 'Dokter Muda', kesatuan: 'BNN Kota Samarinda', keterangan: 'TIM MEDIS' },
+  { no: 10, nama: 'Dr. Nadia Shahnaz', pangkatGol: '-', nipNrp: '-', jabatan: 'Tenaga Alih Daya Dokter', kesatuan: 'BNN Kota Samarinda', keterangan: 'TIM MEDIS' },
+  { no: 11, nama: 'Ayunda Ramadhani, M.Psi.,Psikolog', pangkatGol: '-', nipNrp: '-', jabatan: 'Psikolog', kesatuan: 'Himpsi Prov. Kalimantan Timur', keterangan: 'TIM MEDIS' },
+  { no: 12, nama: 'Bheny Indarpojo, SH.,M.H.', pangkatGol: 'AIPTU/84060482', nipNrp: '84060482', jabatan: 'Penata Pemberantasan', kesatuan: 'BNN Kota Samarinda', keterangan: 'SEKRETARIS' },
+  { no: 13, nama: 'Halifatul Ardi, S.Pd', pangkatGol: '199209072025212150', nipNrp: '199209072025212150', jabatan: 'Penata Layanan Operasional', kesatuan: 'BNN Kota Samarinda', keterangan: 'TIM SEKRETARIS' },
 ];
 
 interface PublicHeaderProps {
@@ -348,30 +349,94 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
               </button>
               
               <h3 className="text-lg sm:text-xl font-extrabold text-white font-['Cinzel',serif] tracking-wider uppercase">
-                DAFTAR NAMA TIM ASESMEN TERPADU
+                DAFTAR NAMA TIM ASESMEN TERPADU TINGKAT KOTA SAMARINDA
               </h3>
               <p className="text-xs text-[#D4AF37] font-semibold tracking-wide uppercase mt-1">
-                LAMPIRAN KEPUTUSAN KEPALA BNNK KUTAI TIMUR
+                TAHUN ANGGARAN 2026 &bull; BNN KOTA SAMARINDA
               </p>
               <div className="inline-flex items-center space-x-2 text-[11px] text-slate-400 font-mono mt-1 px-3 py-0.5 rounded-full bg-[#0b172a] border border-[#1b3459]">
-                <span>NOMOR: KEP/9/VIII/KA/PB.06.06/2026/BNNK-KUTIM</span>
+                <span>DITETAPKAN DI SAMARINDA</span>
                 <span>&bull;</span>
-                <span>TANGGAL: 05 AGUSTUS 2026</span>
+                <span>TANGGAL: 16 JULI 2026</span>
               </div>
             </div>
 
-            {/* Modal Body: Scrollable Official Table */}
+            {/* Modal Body: Scrollable Official Org Chart & Table */}
             <div className="p-5 sm:p-6 overflow-y-auto custom-scrollbar text-slate-200 space-y-6">
-              {/* Struktur Organisasi Image */}
-              <div className="bg-[#081224] border border-[#1b3459] rounded-xl overflow-hidden shadow-xl p-3 flex flex-col items-center justify-center">
-                <h4 className="text-xs font-bold text-[#D4AF37] uppercase tracking-wider mb-3">
-                  Bagan Struktur Organisasi Tim Asesmen Terpadu
+              {/* Bagan Struktur Organisasi (Sesuai Dokumen Kota Samarinda 2026) */}
+              <div className="bg-[#081224] border border-[#1b3459] rounded-xl overflow-hidden shadow-xl p-4 sm:p-5 space-y-4">
+                <h4 className="text-xs font-bold text-[#D4AF37] uppercase tracking-wider text-center">
+                  Bagan Struktur Organisasi Tim Asesmen Terpadu Kota Samarinda TA 2026
                 </h4>
-                <img 
-                  src="/struktur.png" 
-                  alt="Bagan Struktur Organisasi Tim TAT" 
-                  className="w-full h-auto object-contain rounded border border-[#1b3459]/50 shadow-md bg-white/5" 
-                />
+
+                {/* Top: Penanggung Jawab & Ketua */}
+                <div className="flex flex-col items-center">
+                  <div className="bg-[#0b172a] border-2 border-[#D4AF37]/70 rounded-xl px-5 py-3 text-center max-w-md w-full shadow-md">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#D4AF37] block">
+                      Penanggung Jawab &amp; Ketua Tim TAT
+                    </span>
+                    <p className="text-sm font-extrabold text-white mt-0.5">
+                      Belny Warlansyah, SH.,S.IK.,M.H.
+                    </p>
+                    <p className="text-[11px] text-slate-300 mt-0.5">
+                      Kombes Pol / 82030991 &bull; Kepala BNN Kota Samarinda
+                    </p>
+                  </div>
+                  <div className="w-px h-5 bg-[#1b3459]" />
+                </div>
+
+                {/* 3 Columns: Tim Hukum, Tim Medis, Sekretaris & Tim Sekretaris */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {/* Tim Hukum */}
+                  <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl overflow-hidden">
+                    <div className="bg-[#144782] px-3 py-2 text-center text-xs font-bold text-white uppercase tracking-wider">
+                      Tim Hukum (6 Personel)
+                    </div>
+                    <div className="p-3 space-y-2 text-xs">
+                      {TIM_TAT_LIST.filter(m => m.keterangan === 'TIM HUKUM').map(m => (
+                        <div key={m.no} className="bg-[#081224] border border-[#1b3459]/70 rounded-lg px-2.5 py-1.5">
+                          <div className="font-semibold text-white">{m.no}. {m.nama}</div>
+                          <div className="text-[10px] text-slate-400">{m.jabatan} &bull; {m.kesatuan}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Tim Medis */}
+                  <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl overflow-hidden">
+                    <div className="bg-emerald-800/80 px-3 py-2 text-center text-xs font-bold text-white uppercase tracking-wider">
+                      Tim Medis (3 Personel)
+                    </div>
+                    <div className="p-3 space-y-2 text-xs">
+                      {TIM_TAT_LIST.filter(m => m.keterangan === 'TIM MEDIS').map(m => (
+                        <div key={m.no} className="bg-[#081224] border border-[#1b3459]/70 rounded-lg px-2.5 py-1.5">
+                          <div className="font-semibold text-white">{m.no}. {m.nama}</div>
+                          <div className="text-[10px] text-slate-400">{m.jabatan} &bull; {m.kesatuan}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Sekretaris & Tim Sekretaris */}
+                  <div className="bg-[#0b172a] border border-[#1b3459] rounded-xl overflow-hidden">
+                    <div className="bg-slate-800 px-3 py-2 text-center text-xs font-bold text-[#D4AF37] uppercase tracking-wider">
+                      Sekretariat (2 Personel)
+                    </div>
+                    <div className="p-3 space-y-2 text-xs">
+                      {TIM_TAT_LIST.filter(m => m.keterangan === 'SEKRETARIS' || m.keterangan === 'TIM SEKRETARIS').map(m => (
+                        <div key={m.no} className="bg-[#081224] border border-[#1b3459]/70 rounded-lg px-2.5 py-1.5">
+                          <div className="flex items-center justify-between gap-1">
+                            <span className="font-semibold text-white">{m.no}. {m.nama}</span>
+                            <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-[#142642] text-sky-300 border border-[#234475] shrink-0">
+                              {m.keterangan}
+                            </span>
+                          </div>
+                          <div className="text-[10px] text-slate-400 mt-0.5">{m.jabatan} &bull; {m.kesatuan}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
               </div>
 
               {/* Tabel Daftar Nama */}
@@ -382,20 +447,20 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
                       <tr className="bg-[#0b172a] text-[#D4AF37] border-b border-[#1b3459] font-mono text-[11px] uppercase tracking-wider">
                         <th className="py-3.5 px-3 text-center font-bold border-r border-[#1b3459] w-12">NO.</th>
                         <th className="py-3.5 px-4 font-bold border-r border-[#1b3459]">NAMA</th>
+                        <th className="py-3.5 px-4 font-bold border-r border-[#1b3459]">PANGKAT / GOL / NRP / NIP</th>
                         <th className="py-3.5 px-4 font-bold border-r border-[#1b3459]">JABATAN</th>
-                        <th className="py-3.5 px-4 font-bold border-r border-[#1b3459]">PANGKAT / GOL</th>
-                        <th className="py-3.5 px-4 font-bold border-r border-[#1b3459]">NIP / NRP</th>
-                        <th className="py-3.5 px-4 text-center font-bold">KETERANGAN</th>
+                        <th className="py-3.5 px-4 font-bold border-r border-[#1b3459]">KESATUAN</th>
+                        <th className="py-3.5 px-4 text-center font-bold">TIM / UNSUR</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[#1b3459]">
                       {TIM_TAT_LIST.map((member, idx) => {
-                        const isKetua = member.keterangan === 'Ketua Tim TAT';
+                        const isPimpinan = member.keterangan === 'PENANGGUNG JAWAB' || member.keterangan === 'KETUA';
                         return (
                           <tr
                             key={member.no}
                             className={`transition-colors hover:bg-[#133863]/30 ${
-                              isKetua
+                              isPimpinan
                                 ? 'bg-[#133863]/40 font-semibold'
                                 : idx % 2 === 0
                                 ? 'bg-[#071325]/60'
@@ -406,23 +471,25 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
                               {member.no}
                             </td>
                             <td className="py-3 px-4 border-r border-[#1b3459]">
-                              <span className={`text-xs block ${isKetua ? 'font-extrabold text-[#D4AF37]' : 'font-bold text-white'}`}>
+                              <span className={`text-xs block ${isPimpinan ? 'font-extrabold text-[#D4AF37]' : 'font-bold text-white'}`}>
                                 {member.nama}
                               </span>
-                            </td>
-                            <td className="py-3 px-4 border-r border-[#1b3459] text-slate-200">
-                              {member.jabatan}
                             </td>
                             <td className="py-3 px-4 border-r border-[#1b3459] text-slate-300 font-mono text-[11px]">
                               {member.pangkatGol}
                             </td>
-                            <td className="py-3 px-4 border-r border-[#1b3459] font-mono text-slate-300 text-[11px]">
-                              {member.nipNrp}
+                            <td className="py-3 px-4 border-r border-[#1b3459] text-slate-200">
+                              {member.jabatan}
+                            </td>
+                            <td className="py-3 px-4 border-r border-[#1b3459] text-slate-300 text-[11px]">
+                              {member.kesatuan}
                             </td>
                             <td className="py-3 px-4 text-center">
-                              <span className={`text-[11px] font-semibold px-2.5 py-1 rounded border ${
-                                isKetua
+                              <span className={`text-[10px] font-semibold px-2.5 py-1 rounded border whitespace-nowrap ${
+                                isPimpinan
                                   ? 'bg-[#D4AF37]/15 text-[#D4AF37] border-[#D4AF37]/40'
+                                  : member.keterangan === 'TIM MEDIS'
+                                  ? 'bg-emerald-950/60 text-emerald-300 border-emerald-500/30'
                                   : 'bg-[#142642] text-slate-200 border-[#234475]'
                               }`}>
                                 {member.keterangan}
@@ -439,10 +506,10 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
               {/* Legality Footer Note */}
               <div className="mt-4 p-3 bg-[#050c1a] border border-[#1b3459] rounded-xl text-[11px] text-slate-400 flex flex-col sm:flex-row items-center justify-between gap-2">
                 <span className="italic text-center sm:text-left">
-                  Dokumen ini telah ditandatangani secara elektronik menggunakan Sertifikat Elektronik yang dikeluarkan oleh Balai Besar Sertifikasi Elektronik (BSrE), BSSN.
+                  Ditetapkan di Samarinda pada tanggal 16 Juli 2026 &bull; Tim Asesmen Terpadu Tingkat Kota Samarinda TA 2026.
                 </span>
                 <span className="font-mono text-[#D4AF37] font-bold shrink-0">
-                  BNNK Kutai Timur
+                  BNN Kota Samarinda
                 </span>
               </div>
             </div>
@@ -450,7 +517,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
             {/* Modal Footer */}
             <div className="px-6 py-3.5 border-t border-[#1b3459] bg-[#050c1a] flex items-center justify-between shrink-0">
               <span className="text-xs text-slate-400 font-mono">
-                Total Personel: 13 Anggota Tim TAT Kutai Timur
+                Total: 13 Baris Personel Tim TAT Kota Samarinda TA 2026
               </span>
               <button
                 type="button"
