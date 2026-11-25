@@ -152,11 +152,11 @@ export const DEFAULT_USERS: UserProfile[] = [
 const DEFAULT_USER: UserProfile = DEFAULT_USERS[0];
 
 export const ROLE_ALLOWED_TABS: Record<string, ActiveTab[]> = {
-  PENGAJU: ['beranda', 'permohonan', 'pengajuan_baru', 'asesmen_aktif', 'dokumen', 'tindak_lanjut', 'tindak_lanjut_jadwal', 'riwayat', 'about', 'profile'],
-  ADMIN: ['beranda', 'permohonan', 'pengajuan_baru', 'asesmen_aktif', 'riwayat', 'verifikasi', 'penugasan', 'pleno', 'tindak_lanjut', 'tindak_lanjut_jadwal', 'verifikasi_akun', 'monitoring', 'about', 'profile'],
+  PENGAJU: ['beranda', 'permohonan', 'pengajuan_baru', 'asesmen_aktif', 'dokumen', 'tindak_lanjut', 'tindak_lanjut_jadwal', 'tindak_lanjut_pasca_rehab', 'riwayat', 'about', 'profile'],
+  ADMIN: ['beranda', 'permohonan', 'pengajuan_baru', 'asesmen_aktif', 'riwayat', 'verifikasi', 'penugasan', 'pleno', 'tindak_lanjut', 'tindak_lanjut_jadwal', 'tindak_lanjut_pasca_rehab', 'verifikasi_akun', 'monitoring', 'about', 'profile'],
   MEDIS: ['beranda', 'medis', 'riwayat_medis', 'tindak_lanjut', 'tindak_lanjut_pasca_rehab', 'pleno', 'about', 'profile'],
   HUKUM: ['beranda', 'hukum', 'pleno', 'riwayat_hukum', 'about', 'profile'],
-  SEKRETARIAT: ['beranda', 'permohonan', 'pengajuan_baru', 'asesmen_aktif', 'riwayat', 'verifikasi', 'penugasan', 'pleno', 'tindak_lanjut', 'tindak_lanjut_jadwal', 'verifikasi_akun', 'monitoring', 'about', 'profile'],
+  SEKRETARIAT: ['beranda', 'permohonan', 'pengajuan_baru', 'asesmen_aktif', 'riwayat', 'verifikasi', 'penugasan', 'pleno', 'tindak_lanjut', 'tindak_lanjut_jadwal', 'tindak_lanjut_pasca_rehab', 'verifikasi_akun', 'monitoring', 'about', 'profile'],
 };
 
 export default function App() {
@@ -876,8 +876,8 @@ export default function App() {
     setSelectedTindakLanjutId(null);
     // 4 role kanonis + backward compat untuk role lama
     const roleAllowedTabs: Record<string, ActiveTab[]> = {
-      PENGAJU: ['beranda', 'permohonan', 'pengajuan_baru', 'asesmen_aktif', 'dokumen', 'tindak_lanjut', 'tindak_lanjut_jadwal', 'riwayat', 'about', 'profile'],
-      ADMIN: ['beranda', 'permohonan', 'pengajuan_baru', 'asesmen_aktif', 'riwayat', 'verifikasi', 'penugasan', 'pleno', 'tindak_lanjut', 'tindak_lanjut_jadwal', 'verifikasi_akun', 'monitoring', 'about', 'profile'],
+      PENGAJU: ['beranda', 'permohonan', 'pengajuan_baru', 'asesmen_aktif', 'dokumen', 'tindak_lanjut', 'tindak_lanjut_jadwal', 'tindak_lanjut_pasca_rehab', 'riwayat', 'about', 'profile'],
+      ADMIN: ['beranda', 'permohonan', 'pengajuan_baru', 'asesmen_aktif', 'riwayat', 'verifikasi', 'penugasan', 'pleno', 'tindak_lanjut', 'tindak_lanjut_jadwal', 'tindak_lanjut_pasca_rehab', 'verifikasi_akun', 'monitoring', 'about', 'profile'],
       MEDIS: ['beranda', 'medis', 'riwayat_medis', 'tindak_lanjut', 'tindak_lanjut_pasca_rehab', 'pleno', 'about', 'profile'],
       HUKUM: ['beranda', 'hukum', 'pleno', 'riwayat_hukum', 'about', 'profile'],
       // Backward compat

@@ -330,7 +330,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       <FileCheck2 className="w-3 h-3 text-blue-400" />
                       <span>Daftar Tindak Lanjut</span>
                     </button>
-                    {userRole === 'MEDIS' && (
+                    {(userRole === 'MEDIS' || userRole === 'ADMIN' || userRole === 'SEKRETARIAT' || userRole === 'PENGAJU') && (
                       <button
                         onClick={() => handleItemClick('tindak_lanjut_pasca_rehab')}
                         className={`w-full text-left px-2.5 py-1.5 text-[11px] font-medium rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer ${
