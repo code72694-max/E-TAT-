@@ -1150,16 +1150,16 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
                   </div>
                   <ol className="space-y-2 text-xs text-slate-200">
                     {[
-                      'Surat Permohonan Asesmen Terpadu dari penyidik kepada Ketua Tim Asesmen Terpadu (sesuai dengan tingkat Nasional, Provinsi atau Kabupaten/Kota); (Format terlampir)',
-                      'Fotocopy Kartu Identitas Tersangka (KTP atau Kartu Pelajar atau Kartu Mahasiswa dan Kartu Keluarga);',
-                      'Laporan Polisi (LP) / Laporan Kasus Narkotika;',
-                      'Berita Acara Pemeriksaan (BAP) Tersangka / Interogasi;',
-                      'Surat Perintah Penangkapan & Penahanan;',
-                      'Surat Perintah Penyidikan;',
-                      'Surat Perintah Penyitaan Barang Bukti Narkotika;',
-                      'Berita Acara Penyitaan Barang Bukti Narkotika;',
-                      'Surat Keterangan Uji Laboratorium Barang Bukti Narkotika (Puslabfor / Lab Forensik);',
-                      'Surat Keterangan Hasil Pemeriksaan Urine (SKHPU) yang dikeluarkan oleh Fasilitas Kesehatan Milik Pemerintah (seperti Labkesda, Klinik Polres, IPWL BNN, IPWL BNNP, IPWL BNN Kabupaten/Kota, Puskesmas IPWL, RSUD, dll.) dengan jangka waktu maksimal 3 × 24 jam setelah ditangkap;',
+                      'Surat Permohonan Asesmen Terpadu dari penyidik kepada Ketua Tim Asesmen Terpadu (sesuai dengan tingkat Nasional, Provinsi atau Kabupaten/Kota) (Format terlampir).',
+                      'Fotocopy Kartu Identitas Tersangka (KTP atau Kartu Pelajar atau Kartu Mahasiswa dan Kartu Keluarga).',
+                      'Laporan Polisi (LP) / Laporan Kasus Narkotika.',
+                      'Berita Acara Pemeriksaan (BAP) Tersangka / Interogasi.',
+                      'Surat Perintah Penangkapan & Penahanan.',
+                      'Surat Perintah Penyidikan.',
+                      'Surat Perintah Penyitaan Barang Bukti Narkotika.',
+                      'Berita Acara Penyitaan Barang Bukti Narkotika.',
+                      'Surat Keterangan Uji Laboratorium Barang Bukti Narkotika (Puslabfor / Lab Forensik).',
+                      'Surat Keterangan Hasil Pemeriksaan Urine (SKHPU) yang dikeluarkan oleh Fasilitas Kesehatan Milik Pemerintah (seperti Labkesda, Klinik Polres, IPWL BNN, IPWL BNNP, IPWL BNN Kabupaten/Kota, Puskesmas IPWL, RSUD, dll.) dengan jangka waktu maksimal 3 × 24 jam setelah ditangkap.',
                       'Data dukung elektronik seperti screenshot percakapan, pembelian barang, transfer (bila ada).',
                     ].map((item, idx) => (
                       <li key={idx} className="flex items-start space-x-2.5 bg-[#071326]/60 p-2.5 rounded-xl border border-[#1b3459]/70">
@@ -1183,12 +1183,12 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
                   </div>
                   <ol className="space-y-2 text-xs text-slate-200">
                     {[
-                      'Surat Permohonan Asesmen Terpadu dari penyidik kepada Ketua Tim Asesmen Terpadu (sesuai dengan tingkat Nasional, Provinsi atau Kabupaten/Kota); (Format terlampir)',
-                      'Fotocopy Kartu Identitas Tersangka (KTP atau Kartu Pelajar atau Kartu Mahasiswa dan Kartu Keluarga);',
-                      'Laporan Informasi;',
-                      'Berita Acara Interogasi;',
-                      'Surat Perintah Penangkapan;',
-                      'Surat Keterangan Hasil Pemeriksaan Urine yang dikeluarkan oleh Fasilitas Kesehatan Milik Pemerintah (seperti Labkesda, Klinik Polres, IPWL BNN, IPWL BNNP, IPWL BNN Kabupaten/Kota, Puskesmas IPWL, RSUD, dll.) dengan jangka waktu maksimal 3 × 24 jam setelah ditangkap dengan hasil positif;',
+                      'Surat Permohonan Asesmen Terpadu dari penyidik kepada Ketua Tim Asesmen Terpadu (sesuai dengan tingkat Nasional, Provinsi atau Kabupaten/Kota) (Format terlampir).',
+                      'Fotocopy Kartu Identitas Tersangka (KTP atau Kartu Pelajar atau Kartu Mahasiswa dan Kartu Keluarga).',
+                      'Laporan Informasi.',
+                      'Berita Acara Interogasi.',
+                      'Surat Perintah Penangkapan.',
+                      'Surat Keterangan Hasil Pemeriksaan Urine yang dikeluarkan oleh Fasilitas Kesehatan Milik Pemerintah (seperti Labkesda, Klinik Polres, IPWL BNN, IPWL BNNP, IPWL BNN Kabupaten/Kota, Puskesmas IPWL, RSUD, dll.) dengan jangka waktu maksimal 3 × 24 jam setelah ditangkap dengan hasil positif.',
                       'Data dukung elektronik seperti screenshot percakapan, pembelian barang, transfer (bila ada).',
                     ].map((item, idx) => (
                       <li key={idx} className="flex items-start space-x-2.5 bg-[#071326]/60 p-2.5 rounded-xl border border-[#1b3459]/70">
@@ -1212,19 +1212,19 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
                   </div>
                   <ol className="space-y-2 text-xs text-slate-200">
                     {[
-                      'Surat Permohonan Asesmen Terpadu dari penyidik kepada Ketua Tim Asesmen Terpadu (sesuai dengan tingkat Nasional, Provinsi atau Kabupaten/Kota); (Format terlampir)',
-                      'Fotocopy Kartu Identitas Tersangka (KTP atau Kartu Pelajar atau Kartu Mahasiswa dan Kartu Keluarga);',
-                      'Laporan Polisi atau LKN;',
-                      'Petunjuk P19 dari Jaksa Penuntut Umum;',
-                      'Berita Acara Pemeriksaan Tersangka;',
-                      'Berita Acara Saksi Penangkap;',
-                      'Surat Perintah Penyidikan;',
-                      'Surat Perintah Penahanan;',
-                      'Surat Perintah Penyitaan Barang Bukti Narkotika;',
-                      'Berita Acara Penyitaan Barang Bukti Narkotika;',
-                      'Penetapan Status Barang Bukti Narkotika dari Kejaksaan;',
-                      'Surat Keterangan Uji Laboratorium Barang Bukti Narkotika;',
-                      'Surat Keterangan Hasil Pemeriksaan Urine yang dikeluarkan oleh Fasilitas Kesehatan Milik Pemerintah (seperti Labkesda, Klinik Polres, IPWL BNN, IPWL BNNP, IPWL BNN Kabupaten/Kota, Puskesmas IPWL, RSUD, dll.) (apabila ada);',
+                      'Surat Permohonan Asesmen Terpadu dari penyidik kepada Ketua Tim Asesmen Terpadu (sesuai dengan tingkat Nasional, Provinsi atau Kabupaten/Kota) (Format terlampir).',
+                      'Fotocopy Kartu Identitas Tersangka (KTP atau Kartu Pelajar atau Kartu Mahasiswa dan Kartu Keluarga).',
+                      'Laporan Polisi atau LKN.',
+                      'Petunjuk P19 dari Jaksa Penuntut Umum.',
+                      'Berita Acara Pemeriksaan Tersangka.',
+                      'Berita Acara Saksi Penangkap.',
+                      'Surat Perintah Penyidikan.',
+                      'Surat Perintah Penahanan.',
+                      'Surat Perintah Penyitaan Barang Bukti Narkotika.',
+                      'Berita Acara Penyitaan Barang Bukti Narkotika.',
+                      'Penetapan Status Barang Bukti Narkotika dari Kejaksaan.',
+                      'Surat Keterangan Uji Laboratorium Barang Bukti Narkotika.',
+                      'Surat Keterangan Hasil Pemeriksaan Urine yang dikeluarkan oleh Fasilitas Kesehatan Milik Pemerintah (seperti Labkesda, Klinik Polres, IPWL BNN, IPWL BNNP, IPWL BNN Kabupaten/Kota, Puskesmas IPWL, RSUD, dll.) (apabila ada).',
                       'Data dukung elektronik seperti screenshot percakapan, pembelian barang, transfer.',
                     ].map((item, idx) => (
                       <li key={idx} className="flex items-start space-x-2.5 bg-[#071326]/60 p-2.5 rounded-xl border border-[#1b3459]/70">
