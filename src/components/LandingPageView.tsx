@@ -1158,7 +1158,7 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
             className="fixed inset-0"
             onClick={() => setShowSyaratModal(false)}
           />
-          <div className="relative z-10 max-w-3xl w-full max-h-[90vh] flex flex-col bg-[#0b172a] border border-[#234b7d] rounded-2xl shadow-2xl text-slate-200 overflow-hidden">
+          <div className={`relative z-10 w-full max-h-[90vh] flex flex-col bg-[#0b172a] border border-[#234b7d] rounded-2xl shadow-2xl text-slate-200 overflow-hidden ${syaratTab === 'dengan_bb' ? 'max-w-5xl' : 'max-w-3xl'}`}>
             {/* Modal Header */}
             <div className="flex items-start justify-between p-5 sm:p-6 pb-3.5 border-b border-[#1b3459] gap-3 shrink-0">
               <div className="flex items-center space-x-3">
@@ -1232,28 +1232,132 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
                       Pengajuan Permohonan Asesmen Terpadu oleh penyidik kepada Ketua TAT dilakukan dalam masa penangkapan dengan maksimal waktu pengajuan <strong className="text-white">3 × 24 jam</strong> sejak dikeluarkan Surat Perintah Penangkapan dengan melampirkan berkas berikut:
                     </p>
                   </div>
-                  <ol className="space-y-2 text-xs text-slate-200">
-                    {[
-                      'Surat Permohonan Asesmen Terpadu dari penyidik kepada Ketua Tim Asesmen Terpadu (sesuai dengan tingkat Nasional, Provinsi atau Kabupaten/Kota) (Format terlampir).',
-                      'Fotocopy Kartu Identitas Tersangka (KTP atau Kartu Pelajar atau Kartu Mahasiswa dan Kartu Keluarga).',
-                      'Laporan Polisi (LP) / Laporan Kasus Narkotika.',
-                      'Berita Acara Pemeriksaan (BAP) Tersangka / Interogasi.',
-                      'Surat Perintah Penangkapan & Penahanan.',
-                      'Surat Perintah Penyidikan.',
-                      'Surat Perintah Penyitaan Barang Bukti Narkotika.',
-                      'Berita Acara Penyitaan Barang Bukti Narkotika.',
-                      'Surat Keterangan Uji Laboratorium Barang Bukti Narkotika (Puslabfor / Lab Forensik).',
-                      'Surat Keterangan Hasil Pemeriksaan Urine (SKHPU) yang dikeluarkan oleh Fasilitas Kesehatan Milik Pemerintah (seperti Labkesda, Klinik Polres, IPWL BNN, IPWL BNNP, IPWL BNN Kabupaten/Kota, Puskesmas IPWL, RSUD, dll.) dengan jangka waktu maksimal 3 × 24 jam setelah ditangkap.',
-                      'Data dukung elektronik seperti screenshot percakapan, pembelian barang, transfer (bila ada).',
-                    ].map((item, idx) => (
-                      <li key={idx} className="flex items-start space-x-2.5 bg-[#071326]/60 p-2.5 rounded-xl border border-[#1b3459]/70">
-                        <span className="w-5 h-5 rounded-full bg-[#132d54] text-[#D4AF37] font-mono font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5 border border-[#2d5289]">
-                          {idx + 1}
-                        </span>
-                        <span className="leading-relaxed">{item}</span>
-                      </li>
-                    ))}
-                  </ol>
+
+                  {/* 2 Kolom: Kiri Daftar 11 Syarat, Kanan Penjelasan Kriteria Urine & SEMA */}
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+                    <ol className="lg:col-span-7 space-y-2 text-xs text-slate-200">
+                      {[
+                        'Surat Permohonan Asesmen Terpadu dari penyidik kepada Ketua Tim Asesmen Terpadu (sesuai dengan tingkat Nasional, Provinsi atau Kabupaten/Kota) (Format terlampir).',
+                        'Fotocopy Kartu Identitas Tersangka (KTP atau Kartu Pelajar atau Kartu Mahasiswa dan Kartu Keluarga).',
+                        'Laporan Polisi (LP) / Laporan Kasus Narkotika.',
+                        'Berita Acara Pemeriksaan (BAP) Tersangka / Interogasi.',
+                        'Surat Perintah Penangkapan & Penahanan.',
+                        'Surat Perintah Penyidikan.',
+                        'Surat Perintah Penyitaan Barang Bukti Narkotika.',
+                        'Berita Acara Penyitaan Barang Bukti Narkotika.',
+                        'Surat Keterangan Uji Laboratorium Barang Bukti Narkotika (Puslabfor / Lab Forensik).',
+                        'Surat Keterangan Hasil Pemeriksaan Urine (SKHPU) yang dikeluarkan oleh Fasilitas Kesehatan Milik Pemerintah (seperti Labkesda, Klinik Polres, IPWL BNN, IPWL BNNP, IPWL BNN Kabupaten/Kota, Puskesmas IPWL, RSUD, dll.) dengan jangka waktu maksimal 3 × 24 jam setelah ditangkap.',
+                        'Data dukung elektronik seperti screenshot percakapan, pembelian barang, transfer (bila ada).',
+                      ].map((item, idx) => (
+                        <li key={idx} className="flex items-start space-x-2.5 bg-[#071326]/60 p-2.5 rounded-xl border border-[#1b3459]/70">
+                          <span className="w-5 h-5 rounded-full bg-[#132d54] text-[#D4AF37] font-mono font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5 border border-[#2d5289]">
+                            {idx + 1}
+                          </span>
+                          <span className="leading-relaxed">{item}</span>
+                        </li>
+                      ))}
+                    </ol>
+
+                    {/* Kolom Kanan: Penjelasan Pemeriksaan Urine & Kriteria SEMA 04/2010 */}
+                    <div className="lg:col-span-5 bg-[#071326] border border-[#234b7d] rounded-xl p-4 space-y-3 text-xs">
+                      <div className="flex items-center space-x-2 pb-2 border-b border-[#1b3459]">
+                        <Scale className="w-4 h-4 text-[#D4AF37] shrink-0" />
+                        <h5 className="font-bold text-[#D4AF37] uppercase tracking-wider text-[11px]">
+                          Ketentuan Urine &amp; Kriteria SEMA No. 04 Tahun 2010
+                        </h5>
+                      </div>
+                      <p className="text-slate-300 leading-relaxed">
+                        Surat Keterangan Hasil Pemeriksaan Urine yang dikeluarkan oleh fasilitas kesehatan milik pemerintah, paling lambat <strong className="text-white">3 × 24 jam</strong> setelah Surat Perintah Penangkapan diterbitkan.
+                      </p>
+                      <p className="text-slate-300 leading-relaxed">
+                        Jenis dan jumlah barang bukti (BB) narkotika mengacu pada <strong className="text-white">Surat Edaran Mahkamah Agung (SEMA) Nomor 04 Tahun 2010</strong>, dengan kriteria pengajuan Asesmen Terpadu sebagai berikut:
+                      </p>
+                      <div className="space-y-2 pt-1">
+                        <div className="p-2.5 rounded-lg bg-[#0b172a] border border-[#1b3459] flex items-start space-x-2">
+                          <span className="font-mono font-bold text-[#D4AF37] shrink-0">a.</span>
+                          <span className="text-slate-300 leading-relaxed">
+                            <strong className="text-white">Berat BB kurang dari ketentuan SEMA:</strong> dapat diajukan dengan hasil pemeriksaan urine positif atau negatif.
+                          </span>
+                        </div>
+                        <div className="p-2.5 rounded-lg bg-[#0b172a] border border-[#1b3459] flex items-start space-x-2">
+                          <span className="font-mono font-bold text-[#D4AF37] shrink-0">b.</span>
+                          <span className="text-slate-300 leading-relaxed">
+                            <strong className="text-white">Berat BB melebihi ketentuan SEMA:</strong> dapat diajukan dengan hasil pemeriksaan urine positif.
+                          </span>
+                        </div>
+                        <div className="p-2.5 rounded-lg bg-[#0b172a] border border-[#1b3459] flex items-start space-x-2">
+                          <span className="font-mono font-bold text-[#D4AF37] shrink-0">c.</span>
+                          <span className="text-slate-300 leading-relaxed">
+                            <strong className="text-white">Jenis atau jumlah BB belum diatur dalam SEMA:</strong> dapat diajukan dengan hasil pemeriksaan urine positif atau negatif.
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Tabel Rincian Batas Berat Barang Bukti Pemakaian 1 Hari (SEMA No. 04 Tahun 2010) */}
+                  <div className="bg-[#071326] border border-[#1b3459] rounded-xl p-4 space-y-3">
+                    <div className="pb-2 border-b border-[#1b3459]">
+                      <h5 className="text-xs font-bold text-[#D4AF37] uppercase tracking-wider">
+                        Detail Ketentuan SEMA No. 04 Tahun 2010 (Barang Bukti Pemakaian 1 Hari)
+                      </h5>
+                    </div>
+                    <p className="text-[11px] text-slate-300 leading-relaxed">
+                      Pada saat tertangkap tangan oleh penyidik Polri dan penyidik BNN ditemukan barang bukti pemakaian <strong>1 (satu) hari</strong> dengan perincian sebagai berikut:
+                    </p>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                      {[
+                        [
+                          { no: 1, nama: 'Kelompok metamphetamine (shabu)', batas: '1 gram' },
+                          { no: 2, nama: 'Kelompok MDMA (ekstasi)', batas: '2,4 gram = 8 butir' },
+                          { no: 3, nama: 'Kelompok Heroin', batas: '1,8 gram' },
+                          { no: 4, nama: 'Kelompok Kokain', batas: '1,8 gram' },
+                          { no: 5, nama: 'Kelompok Ganja', batas: '5 gram' },
+                          { no: 6, nama: 'Daun Koka', batas: '5 gram' },
+                          { no: 7, nama: 'Meskalin', batas: '5 gram' },
+                          { no: 8, nama: 'Kelompok Psilosybin', batas: '3 gram' },
+                        ],
+                        [
+                          { no: 9, nama: 'Kelompok LSD (d-lysergic acid diethylamide)', batas: '2 gram' },
+                          { no: 10, nama: 'Kelompok PCP (phencyclidine)', batas: '3 gram' },
+                          { no: 11, nama: 'Kelompok Fentanil', batas: '1 gram' },
+                          { no: 12, nama: 'Kelompok Metadon', batas: '0,5 gram' },
+                          { no: 13, nama: 'Kelompok Morfin', batas: '1,8 gram' },
+                          { no: 14, nama: 'Kelompok Petidin', batas: '0,96 gram' },
+                          { no: 15, nama: 'Kelompok Kodein', batas: '72 gram' },
+                          { no: 16, nama: 'Kelompok Bufrenorfin', batas: '32 mg' },
+                        ],
+                      ].map((group, gIdx) => (
+                        <div key={gIdx} className="overflow-x-auto rounded-lg border border-[#1b3459]">
+                          <table className="w-full text-left border-collapse text-[11px]">
+                            <thead>
+                              <tr className="bg-[#0b172a] text-[#D4AF37] border-b border-[#1b3459] font-mono text-[10px] uppercase">
+                                <th className="py-2 px-2.5 text-center w-9 border-r border-[#1b3459]">No</th>
+                                <th className="py-2 px-3 border-r border-[#1b3459]">Jenis / Kelompok Zat</th>
+                                <th className="py-2 px-3 text-right">Batas 1 Hari</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-[#1b3459]/70">
+                              {group.map((row) => (
+                                <tr key={row.no} className="hover:bg-[#0d1f38]/70 transition-colors">
+                                  <td className="py-1.5 px-2.5 text-center font-mono text-slate-400 border-r border-[#1b3459]/70">
+                                    {row.no}
+                                  </td>
+                                  <td className="py-1.5 px-3 text-slate-200 border-r border-[#1b3459]/70">
+                                    {row.nama}
+                                  </td>
+                                  <td className="py-1.5 px-3 text-right font-mono font-bold text-[#D4AF37] whitespace-nowrap">
+                                    {row.batas}
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </>
               ) : syaratTab === 'tanpa_bb' ? (
                 <>
