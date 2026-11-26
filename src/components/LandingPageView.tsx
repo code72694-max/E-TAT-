@@ -135,6 +135,8 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
 
   const [selectedSopStep, setSelectedSopStep] = useState<SopStepItem | null>(null);
   const [selectedDasarHukum, setSelectedDasarHukum] = useState<DasarHukumItem | null>(null);
+  const [showSyaratModal, setShowSyaratModal] = useState(false);
+  const [syaratTab, setSyaratTab] = useState<'dengan_bb' | 'tanpa_bb' | 'p19'>('dengan_bb');
 
   const SOP_8_STEPS: SopStepItem[] = [
     {
@@ -820,6 +822,55 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
               </div>
             ))}
           </div>
+
+          {/* Syarat Administrasi Pengajuan TAT (Tanpa BB & P19 Jaksa) */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-[#0b172a] border border-[#1b3459] rounded-2xl p-4 sm:p-5 shadow-lg">
+            <div className="flex items-center space-x-3 text-center sm:text-left">
+              <div className="w-9 h-9 rounded-xl bg-[#071326] border border-[#234b7d] flex items-center justify-center shrink-0">
+                <FileCheck className="w-4 h-4 text-[#D4AF37]" />
+              </div>
+              <div>
+                <h3 className="text-xs sm:text-sm font-bold text-white">
+                  Syarat Administrasi Pengajuan TAT (BNNP Kalimantan Timur)
+                </h3>
+                <p className="text-[11px] text-slate-400 mt-0.5">
+                  Rincian kelengkapan berkas pengajuan untuk kategori <strong className="text-slate-200">Dengan BB Narkotika</strong>, <strong className="text-slate-200">Tanpa BB Narkotika</strong>, dan <strong className="text-slate-200">P19 Jaksa</strong>.
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-wrap items-center justify-center gap-2 shrink-0">
+              <button
+                type="button"
+                onClick={() => {
+                  setSyaratTab('dengan_bb');
+                  setShowSyaratModal(true);
+                }}
+                className="px-3.5 py-2 bg-[#142642] hover:bg-[#1a345a] text-slate-200 hover:text-white border border-[#234475] rounded-xl text-xs font-semibold transition-colors cursor-pointer"
+              >
+                Dengan BB Narkotika
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setSyaratTab('tanpa_bb');
+                  setShowSyaratModal(true);
+                }}
+                className="px-3.5 py-2 bg-[#142642] hover:bg-[#1a345a] text-slate-200 hover:text-white border border-[#234475] rounded-xl text-xs font-semibold transition-colors cursor-pointer"
+              >
+                Tanpa BB Narkotika
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setSyaratTab('p19');
+                  setShowSyaratModal(true);
+                }}
+                className="px-3.5 py-2 bg-[#D4AF37] hover:bg-[#e8c84a] text-[#071326] rounded-xl text-xs font-bold transition-colors cursor-pointer shadow"
+              >
+                P19 Jaksa
+              </button>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -987,6 +1038,21 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
                   <span>Landasan Regulasi:</span>
                   <span className="font-semibold text-slate-200">{selectedSopStep.legalBasis}</span>
                 </div>
+
+                {selectedSopStep.step === '01' && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedSopStep(null);
+                      setSyaratTab('dengan_bb');
+                      setShowSyaratModal(true);
+                    }}
+                    className="w-full bg-[#071326] hover:bg-[#142642] text-[#D4AF37] font-bold text-xs py-2.5 rounded-xl border border-[#D4AF37]/40 transition-colors cursor-pointer flex items-center justify-center space-x-1.5"
+                  >
+                    <FileCheck className="w-4 h-4" />
+                    <span>Lihat Syarat Administrasi (Dengan BB, Tanpa BB &amp; P19 Jaksa)</span>
+                  </button>
+                )}
               </>
             )}
 
@@ -997,6 +1063,192 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
             >
               Tutup Penjelasan SOP
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL POPUP FOR SYARAT ADMINISTRASI PENGAJUAN TAT */}
+      {showSyaratModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
+          <div
+            className="fixed inset-0"
+            onClick={() => setShowSyaratModal(false)}
+          />
+          <div className="relative z-10 max-w-3xl w-full max-h-[90vh] flex flex-col bg-[#0b172a] border border-[#234b7d] rounded-2xl shadow-2xl text-slate-200 overflow-hidden">
+            {/* Modal Header */}
+            <div className="flex items-start justify-between p-5 sm:p-6 pb-3.5 border-b border-[#1b3459] gap-3 shrink-0">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 rounded-xl bg-[#071326] border border-[#234b7d] flex items-center justify-center shrink-0">
+                  <FileCheck className="w-5 h-5 text-[#D4AF37]" />
+                </div>
+                <div>
+                  <span className="font-mono text-[10px] font-bold text-[#D4AF37] uppercase tracking-wider block">
+                    Badan Narkotika Nasional Provinsi Kalimantan Timur
+                  </span>
+                  <h3 className="text-base sm:text-lg font-bold text-white mt-0.5">
+                    Syarat Administrasi Pengajuan TAT
+                  </h3>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowSyaratModal(false)}
+                className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-[#132d54] transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Category Tabs */}
+            <div className="px-5 sm:px-6 pt-3.5 flex flex-wrap items-center gap-2 shrink-0">
+              <button
+                type="button"
+                onClick={() => setSyaratTab('dengan_bb')}
+                className={`px-4 py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                  syaratTab === 'dengan_bb'
+                    ? 'bg-[#D4AF37] text-[#071326] border-[#D4AF37]'
+                    : 'bg-[#071326] text-slate-300 hover:text-white border-[#1b3459]'
+                }`}
+              >
+                Dengan BB Narkotika (11 Syarat)
+              </button>
+              <button
+                type="button"
+                onClick={() => setSyaratTab('tanpa_bb')}
+                className={`px-4 py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                  syaratTab === 'tanpa_bb'
+                    ? 'bg-[#D4AF37] text-[#071326] border-[#D4AF37]'
+                    : 'bg-[#071326] text-slate-300 hover:text-white border-[#1b3459]'
+                }`}
+              >
+                Tanpa BB Narkotika (7 Syarat)
+              </button>
+              <button
+                type="button"
+                onClick={() => setSyaratTab('p19')}
+                className={`px-4 py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                  syaratTab === 'p19'
+                    ? 'bg-[#D4AF37] text-[#071326] border-[#D4AF37]'
+                    : 'bg-[#071326] text-slate-300 hover:text-white border-[#1b3459]'
+                }`}
+              >
+                P19 Jaksa (14 Syarat)
+              </button>
+            </div>
+
+            {/* Scrollable Body */}
+            <div className="p-5 sm:p-6 overflow-y-auto space-y-4">
+              {syaratTab === 'dengan_bb' ? (
+                <>
+                  <div className="p-3.5 bg-[#071326] border border-[#1b3459] rounded-xl space-y-1">
+                    <h4 className="text-xs sm:text-sm font-bold text-[#D4AF37]">
+                      Pengajuan Permohonan Asesmen Terpadu dalam Masa Penangkapan (Dengan BB Narkotika)
+                    </h4>
+                    <p className="text-xs text-slate-300 leading-relaxed">
+                      Pengajuan Permohonan Asesmen Terpadu oleh penyidik kepada Ketua TAT dilakukan dalam masa penangkapan dengan maksimal waktu pengajuan <strong className="text-white">3 × 24 jam</strong> sejak dikeluarkan Surat Perintah Penangkapan dengan melampirkan berkas berikut:
+                    </p>
+                  </div>
+                  <ol className="space-y-2 text-xs text-slate-200">
+                    {[
+                      'Surat Permohonan Asesmen Terpadu dari penyidik kepada Ketua Tim Asesmen Terpadu (sesuai dengan tingkat Nasional, Provinsi atau Kabupaten/Kota); (Format terlampir)',
+                      'Fotocopy Kartu Identitas Tersangka (KTP atau Kartu Pelajar atau Kartu Mahasiswa dan Kartu Keluarga);',
+                      'Laporan Polisi (LP) / Laporan Kasus Narkotika;',
+                      'Berita Acara Pemeriksaan (BAP) Tersangka / Interogasi;',
+                      'Surat Perintah Penangkapan & Penahanan;',
+                      'Surat Perintah Penyidikan;',
+                      'Surat Perintah Penyitaan Barang Bukti Narkotika;',
+                      'Berita Acara Penyitaan Barang Bukti Narkotika;',
+                      'Surat Keterangan Uji Laboratorium Barang Bukti Narkotika (Puslabfor / Lab Forensik);',
+                      'Surat Keterangan Hasil Pemeriksaan Urine (SKHPU) yang dikeluarkan oleh Fasilitas Kesehatan Milik Pemerintah (seperti Labkesda, Klinik Polres, IPWL BNN, IPWL BNNP, IPWL BNN Kabupaten/Kota, Puskesmas IPWL, RSUD, dll.) dengan jangka waktu maksimal 3 × 24 jam setelah ditangkap;',
+                      'Data dukung elektronik seperti screenshot percakapan, pembelian barang, transfer (bila ada).',
+                    ].map((item, idx) => (
+                      <li key={idx} className="flex items-start space-x-2.5 bg-[#071326]/60 p-2.5 rounded-xl border border-[#1b3459]/70">
+                        <span className="w-5 h-5 rounded-full bg-[#132d54] text-[#D4AF37] font-mono font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5 border border-[#2d5289]">
+                          {idx + 1}
+                        </span>
+                        <span className="leading-relaxed">{item}</span>
+                      </li>
+                    ))}
+                  </ol>
+                </>
+              ) : syaratTab === 'tanpa_bb' ? (
+                <>
+                  <div className="p-3.5 bg-[#071326] border border-[#1b3459] rounded-xl space-y-1">
+                    <h4 className="text-xs sm:text-sm font-bold text-[#D4AF37]">
+                      Pengajuan Permohonan Asesmen Terpadu dalam Masa Penangkapan (Tanpa BB Narkotika)
+                    </h4>
+                    <p className="text-xs text-slate-300 leading-relaxed">
+                      Pengajuan Permohonan Asesmen Terpadu oleh penyidik kepada Ketua TAT dilakukan dalam masa penangkapan dengan maksimal waktu pengajuan <strong className="text-white">3 × 24 jam</strong> sejak dikeluarkan Surat Perintah Penangkapan oleh Penyidik dengan melampirkan:
+                    </p>
+                  </div>
+                  <ol className="space-y-2 text-xs text-slate-200">
+                    {[
+                      'Surat Permohonan Asesmen Terpadu dari penyidik kepada Ketua Tim Asesmen Terpadu (sesuai dengan tingkat Nasional, Provinsi atau Kabupaten/Kota); (Format terlampir)',
+                      'Fotocopy Kartu Identitas Tersangka (KTP atau Kartu Pelajar atau Kartu Mahasiswa dan Kartu Keluarga);',
+                      'Laporan Informasi;',
+                      'Berita Acara Interogasi;',
+                      'Surat Perintah Penangkapan;',
+                      'Surat Keterangan Hasil Pemeriksaan Urine yang dikeluarkan oleh Fasilitas Kesehatan Milik Pemerintah (seperti Labkesda, Klinik Polres, IPWL BNN, IPWL BNNP, IPWL BNN Kabupaten/Kota, Puskesmas IPWL, RSUD, dll.) dengan jangka waktu maksimal 3 × 24 jam setelah ditangkap dengan hasil positif;',
+                      'Data dukung elektronik seperti screenshot percakapan, pembelian barang, transfer (bila ada).',
+                    ].map((item, idx) => (
+                      <li key={idx} className="flex items-start space-x-2.5 bg-[#071326]/60 p-2.5 rounded-xl border border-[#1b3459]/70">
+                        <span className="w-5 h-5 rounded-full bg-[#132d54] text-[#D4AF37] font-mono font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5 border border-[#2d5289]">
+                          {idx + 1}
+                        </span>
+                        <span className="leading-relaxed">{item}</span>
+                      </li>
+                    ))}
+                  </ol>
+                </>
+              ) : (
+                <>
+                  <div className="p-3.5 bg-[#071326] border border-[#1b3459] rounded-xl space-y-1">
+                    <h4 className="text-xs sm:text-sm font-bold text-[#D4AF37]">
+                      Pengajuan Permohonan Asesmen Terpadu Berdasarkan Petunjuk Jaksa Penuntut Umum P19
+                    </h4>
+                    <p className="text-xs text-slate-300 leading-relaxed">
+                      Dalam hal adanya permohonan Penyidik karena adanya permintaan Jaksa Penuntut Umum P19 untuk tersangka dilakukan Asesmen Terpadu, maka penyidik dapat mengajukan permohonan Asesmen Terpadu kepada Ketua TAT dengan melampirkan:
+                    </p>
+                  </div>
+                  <ol className="space-y-2 text-xs text-slate-200">
+                    {[
+                      'Surat Permohonan Asesmen Terpadu dari penyidik kepada Ketua Tim Asesmen Terpadu (sesuai dengan tingkat Nasional, Provinsi atau Kabupaten/Kota); (Format terlampir)',
+                      'Fotocopy Kartu Identitas Tersangka (KTP atau Kartu Pelajar atau Kartu Mahasiswa dan Kartu Keluarga);',
+                      'Laporan Polisi atau LKN;',
+                      'Petunjuk P19 dari Jaksa Penuntut Umum;',
+                      'Berita Acara Pemeriksaan Tersangka;',
+                      'Berita Acara Saksi Penangkap;',
+                      'Surat Perintah Penyidikan;',
+                      'Surat Perintah Penahanan;',
+                      'Surat Perintah Penyitaan Barang Bukti Narkotika;',
+                      'Berita Acara Penyitaan Barang Bukti Narkotika;',
+                      'Penetapan Status Barang Bukti Narkotika dari Kejaksaan;',
+                      'Surat Keterangan Uji Laboratorium Barang Bukti Narkotika;',
+                      'Surat Keterangan Hasil Pemeriksaan Urine yang dikeluarkan oleh Fasilitas Kesehatan Milik Pemerintah (seperti Labkesda, Klinik Polres, IPWL BNN, IPWL BNNP, IPWL BNN Kabupaten/Kota, Puskesmas IPWL, RSUD, dll.) (apabila ada);',
+                      'Data dukung elektronik seperti screenshot percakapan, pembelian barang, transfer.',
+                    ].map((item, idx) => (
+                      <li key={idx} className="flex items-start space-x-2.5 bg-[#071326]/60 p-2.5 rounded-xl border border-[#1b3459]/70">
+                        <span className="w-5 h-5 rounded-full bg-[#132d54] text-[#D4AF37] font-mono font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5 border border-[#2d5289]">
+                          {idx + 1}
+                        </span>
+                        <span className="leading-relaxed">{item}</span>
+                      </li>
+                    ))}
+                  </ol>
+                </>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="p-4 sm:px-6 border-t border-[#1b3459] bg-[#071326]/70 flex justify-end shrink-0">
+              <button
+                type="button"
+                onClick={() => setShowSyaratModal(false)}
+                className="px-5 py-2 bg-[#133863] hover:bg-[#1a4a82] text-white font-bold text-xs rounded-xl border border-[#235594] transition-colors cursor-pointer"
+              >
+                Tutup Persyaratan
+              </button>
+            </div>
           </div>
         </div>
       )}
