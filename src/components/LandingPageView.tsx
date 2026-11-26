@@ -12,6 +12,7 @@ import {
   Users,
   Stethoscope,
   Scale,
+  Gavel,
   FileSignature,
   Share2,
   Activity,
@@ -34,7 +35,7 @@ import {
   GraduationCap,
   Sparkles,
   Filter,
-  User
+  User,
 } from 'lucide-react';
 
 interface LandingPageViewProps {
@@ -137,7 +138,7 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
   const [selectedDasarHukum, setSelectedDasarHukum] = useState<DasarHukumItem | null>(null);
   const [showSyaratModal, setShowSyaratModal] = useState(false);
   const [syaratTab, setSyaratTab] = useState<'dengan_bb' | 'tanpa_bb' | 'p19'>('dengan_bb');
-  const [showSopHukumModal, setShowSopHukumModal] = useState(false);
+  const [activeSopDoc, setActiveSopDoc] = useState<'hukum' | 'hakim' | null>(null);
 
   const SOP_8_STEPS: SopStepItem[] = [
     {
@@ -824,12 +825,17 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
             ))}
           </div>
 
-          {/* Dokumen Pendukung SOP: 2 Card Sejajar & Simetris */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {/* Garis Pemisah Rapih antara 9 Tahapan SOP & 3 Dokumen SOP */}
+          <div className="pt-2">
+            <div className="h-px w-full bg-gradient-to-r from-transparent via-[#234b7d] to-transparent" />
+          </div>
+
+          {/* Dokumen Pendukung SOP: 3 Card Sejajar, Selaras & Simetris */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             {/* Card 1: Syarat Administrasi Pengajuan TAT */}
-            <div className="bg-[#0b172a] border border-[#1b3459] hover:border-[#234b7d] rounded-2xl p-4 sm:p-5 shadow-lg flex flex-col justify-between gap-4 transition-colors">
+            <div className="bg-[#0d1f38] border border-[#1b3459]/80 hover:border-[#D4AF37] rounded-xl p-4 sm:p-5 shadow-lg hover:shadow-[#D4AF37]/10 flex flex-col justify-between gap-4 transition-all duration-300">
               <div className="flex items-start space-x-3">
-                <div className="w-9 h-9 rounded-xl bg-[#071326] border border-[#234b7d] flex items-center justify-center shrink-0 mt-0.5">
+                <div className="w-8 h-8 rounded-lg bg-[#071326] border border-[#1b3459] flex items-center justify-center shrink-0 mt-0.5">
                   <FileCheck className="w-4 h-4 text-[#D4AF37]" />
                 </div>
                 <div>
@@ -837,18 +843,18 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
                     Syarat Administrasi Pengajuan TAT
                   </h3>
                   <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">
-                    Kelengkapan berkas pengajuan resmi BNNP Kaltim untuk kategori <strong className="text-slate-200">Dengan BB</strong>, <strong className="text-slate-200">Tanpa BB</strong>, dan <strong className="text-slate-200">P19 Jaksa</strong>.
+                    Kelengkapan berkas resmi BNNP Kaltim untuk kategori Dengan BB, Tanpa BB, dan P19 Jaksa.
                   </p>
                 </div>
               </div>
-              <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-[#1b3459]/60">
+              <div className="flex flex-wrap items-center gap-1.5 pt-3 border-t border-[#1b3459]/60">
                 <button
                   type="button"
                   onClick={() => {
                     setSyaratTab('dengan_bb');
                     setShowSyaratModal(true);
                   }}
-                  className="px-3 py-1.5 bg-[#142642] hover:bg-[#1a345a] text-slate-200 hover:text-white border border-[#234475] rounded-lg text-[11px] font-semibold transition-colors cursor-pointer"
+                  className="px-2.5 py-1.5 bg-[#071326] hover:bg-[#142642] text-slate-200 hover:text-[#D4AF37] border border-[#1b3459] hover:border-[#D4AF37]/50 rounded-lg text-[11px] font-semibold transition-all cursor-pointer"
                 >
                   Dengan BB (11)
                 </button>
@@ -858,7 +864,7 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
                     setSyaratTab('tanpa_bb');
                     setShowSyaratModal(true);
                   }}
-                  className="px-3 py-1.5 bg-[#142642] hover:bg-[#1a345a] text-slate-200 hover:text-white border border-[#234475] rounded-lg text-[11px] font-semibold transition-colors cursor-pointer"
+                  className="px-2.5 py-1.5 bg-[#071326] hover:bg-[#142642] text-slate-200 hover:text-[#D4AF37] border border-[#1b3459] hover:border-[#D4AF37]/50 rounded-lg text-[11px] font-semibold transition-all cursor-pointer"
                 >
                   Tanpa BB (7)
                 </button>
@@ -868,7 +874,7 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
                     setSyaratTab('p19');
                     setShowSyaratModal(true);
                   }}
-                  className="px-3 py-1.5 bg-[#D4AF37] hover:bg-[#e8c84a] text-[#071326] rounded-lg text-[11px] font-bold transition-colors cursor-pointer shadow-sm"
+                  className="px-2.5 py-1.5 bg-[#071326] hover:bg-[#142642] text-slate-200 hover:text-[#D4AF37] border border-[#1b3459] hover:border-[#D4AF37]/50 rounded-lg text-[11px] font-semibold transition-all cursor-pointer"
                 >
                   P19 Jaksa (14)
                 </button>
@@ -876,9 +882,9 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
             </div>
 
             {/* Card 2: SOP Pelaksanaan Asesmen Hukum (BNN RI) */}
-            <div className="bg-[#0b172a] border border-[#1b3459] hover:border-[#234b7d] rounded-2xl p-4 sm:p-5 shadow-lg flex flex-col justify-between gap-4 transition-colors">
+            <div className="bg-[#0d1f38] border border-[#1b3459]/80 hover:border-[#D4AF37] rounded-xl p-4 sm:p-5 shadow-lg hover:shadow-[#D4AF37]/10 flex flex-col justify-between gap-4 transition-all duration-300">
               <div className="flex items-start space-x-3">
-                <div className="w-9 h-9 rounded-xl bg-[#071326] border border-[#234b7d] flex items-center justify-center shrink-0 mt-0.5">
+                <div className="w-8 h-8 rounded-lg bg-[#071326] border border-[#1b3459] flex items-center justify-center shrink-0 mt-0.5">
                   <Scale className="w-4 h-4 text-[#D4AF37]" />
                 </div>
                 <div>
@@ -890,17 +896,47 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
                   </p>
                 </div>
               </div>
-              <div className="flex items-center justify-between pt-3 border-t border-[#1b3459]/60">
-                <span className="text-[10px] font-mono text-slate-400">
-                  Deputi Bidang Pemberantasan BNN RI
+              <div className="flex items-center justify-between gap-2 pt-3 border-t border-[#1b3459]/60">
+                <span className="text-[10px] font-mono text-slate-400 truncate">
+                  Deputi Pemberantasan BNN RI
                 </span>
                 <button
                   type="button"
-                  onClick={() => setShowSopHukumModal(true)}
-                  className="px-3.5 py-1.5 bg-[#133863] hover:bg-[#1a4a82] text-white border border-[#235594] rounded-lg text-[11px] font-bold transition-colors cursor-pointer shadow-sm flex items-center space-x-1.5"
+                  onClick={() => setActiveSopDoc('hukum')}
+                  className="px-3 py-1.5 bg-[#071326] hover:bg-[#142642] text-slate-200 hover:text-[#D4AF37] border border-[#1b3459] hover:border-[#D4AF37]/50 rounded-lg text-[11px] font-semibold transition-all cursor-pointer flex items-center space-x-1.5 shrink-0"
                 >
                   <Scale className="w-3.5 h-3.5 text-[#D4AF37]" />
                   <span>Lihat SOP Hukum</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Card 3: SOP Permohonan Hakim (Persidangan) */}
+            <div className="bg-[#0d1f38] border border-[#1b3459]/80 hover:border-[#D4AF37] rounded-xl p-4 sm:p-5 shadow-lg hover:shadow-[#D4AF37]/10 flex flex-col justify-between gap-4 transition-all duration-300">
+              <div className="flex items-start space-x-3">
+                <div className="w-8 h-8 rounded-lg bg-[#071326] border border-[#1b3459] flex items-center justify-center shrink-0 mt-0.5">
+                  <Gavel className="w-4 h-4 text-[#D4AF37]" />
+                </div>
+                <div>
+                  <h3 className="text-xs sm:text-sm font-bold text-white">
+                    SOP Permohonan Hakim (Persidangan)
+                  </h3>
+                  <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">
+                    SOP Penerimaan Permohonan Asesmen Terpadu berdasarkan permohonan Hakim untuk kepentingan persidangan.
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center justify-between gap-2 pt-3 border-t border-[#1b3459]/60">
+                <span className="text-[10px] font-mono text-slate-400 truncate">
+                  Deputi Pemberantasan BNN RI
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setActiveSopDoc('hakim')}
+                  className="px-3 py-1.5 bg-[#071326] hover:bg-[#142642] text-slate-200 hover:text-[#D4AF37] border border-[#1b3459] hover:border-[#D4AF37]/50 rounded-lg text-[11px] font-semibold transition-all cursor-pointer flex items-center space-x-1.5 shrink-0"
+                >
+                  <Gavel className="w-3.5 h-3.5 text-[#D4AF37]" />
+                  <span>Lihat SOP Hakim</span>
                 </button>
               </div>
             </div>
@@ -1093,7 +1129,7 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
                     type="button"
                     onClick={() => {
                       setSelectedSopStep(null);
-                      setShowSopHukumModal(true);
+                      setActiveSopDoc('hukum');
                     }}
                     className="w-full bg-[#071326] hover:bg-[#142642] text-[#D4AF37] font-bold text-xs py-2.5 rounded-xl border border-[#D4AF37]/40 transition-colors cursor-pointer flex items-center justify-center space-x-1.5"
                   >
@@ -1301,78 +1337,101 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
         </div>
       )}
 
-      {/* MODAL POPUP FOR SOP HUKUM DETAIL */}
-      {showSopHukumModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-          <div
-            className="fixed inset-0"
-            onClick={() => setShowSopHukumModal(false)}
-          />
-          <div className="relative z-10 max-w-4xl w-full max-h-[90vh] flex flex-col bg-[#0b172a] border border-[#234b7d] rounded-2xl shadow-2xl text-slate-200 overflow-hidden">
-            {/* Header */}
-            <div className="flex items-start justify-between p-5 sm:p-6 pb-3.5 border-b border-[#1b3459] gap-3 shrink-0">
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 rounded-xl bg-[#071326] border border-[#234b7d] flex items-center justify-center shrink-0">
-                  <Scale className="w-5 h-5 text-[#D4AF37]" />
+      {/* MODAL POPUP FOR SOP HUKUM & SOP HAKIM DETAIL */}
+      {activeSopDoc && (() => {
+        const isHakim = activeSopDoc === 'hakim';
+        const sopTitle = isHakim
+          ? 'SOP Penerimaan Permohonan Asesmen Terpadu Berdasarkan Permohonan Hakim Untuk Kepentingan Persidangan'
+          : 'SOP Pelaksanaan Asesmen Hukum Dalam Proses Asesmen Terpadu';
+        const dasarHukum = [
+          'Undang-Undang Nomor 35 Tahun 2009 tentang Narkotika.',
+          'Peraturan Presiden Nomor 47 Tahun 2019 tentang Perubahan Atas Peraturan Presiden Nomor 23 Tahun 2010 Tentang Badan Narkotika Nasional.',
+          'Peraturan Menteri Pendayagunaan Aparatur Negara Dan Reformasi Birokrasi Republik Indonesia Nomor 35 Tahun 2012 Tentang Pedoman Penyusunan Standar Operasional Prosedur Administrasi Pemerintah.',
+          'Peraturan Badan Narkotika Nasional Nomor 1 Tahun 2022 tentang Perubahan atas Peraturan Badan Narkotika Nasional Nomor 5 Tahun 2020 tentang Organisasi dan Tata Kerja Badan Narkotika Nasional.',
+          'Peraturan Kepala Badan Narkotika Nasional Nomor 11 Tahun 2014 tentang Tata Cara Penanganan Tersangka dan/atau Terdakwa Pecandu Narkotika dan Korban Penyalahgunaan Narkotika ke dalam Lembaga Rehabilitasi.',
+          'Peraturan Kepala BNN Nomor 2 Tahun 2015 tentang Perubahan Atas Peraturan Kepala BNN Nomor 3 Tahun 2013 tentang Pedoman Penyusunan SOP di Lingkungan BNN.',
+          'Keputusan Kepala Badan Narkotika Nasional Nomor: KEP/1066/XII/KA/OT.01/2022/BNN tentang Standar Operasional Prosedur Mikro Administrasi Pemerintahan Di Lingkungan Badan Narkotika Nasional.',
+          'Keputusan Kepala Badan Narkotika Nasional Nomor: KEP/01/IX/DE/PB.06/2023/BERANTAS tentang Petunjuk Teknis Tentang Tata Cara Penanganan Tersangka dan/atau Terdakwa Penyalahguna, Pecandu Narkotika, Dan Korban Penyalahguna Narkotika Melalui Asesmen Terpadu.',
+        ];
+        const kualifikasi = isHakim
+          ? [
+              'Memahami dan menguasai alur Layanan Asesmen Terpadu.',
+              'Menguasai Teknik Komunikasi Dasar.',
+              'Menguasai Administrasi Dasar.',
+              'Menguasai berkas persyaratan yang dibutuhkan dalam pelaksanaan Asesmen Terpadu (TAT) Berdasarkan Permohonan Hakim.',
+              'Mampu menjaga kerahasiaan data klien TAT.',
+            ]
+          : [
+              'Memahami UU Narkotika dan Memiliki Pengetahuan di Bidang Hukum Narkotika.',
+              'Memiliki Kemampuan Komunikasi yang Baik.',
+              'Mampu Menganalisa Jaringan Narkotika.',
+            ];
+        const peralatan = isHakim
+          ? [
+              'Alat Tulis Kantor.',
+              'Laptop / Komputer.',
+              'Buku Register Klien TAT.',
+              'Formulir Registrasi Klien TAT Berdasarkan Permohonan Hakim Untuk Persidangan.',
+              'Lembar Disposisi.',
+            ]
+          : [
+              'Ruang Rapat.',
+              'Berkas Permohonan Asesmen Terpadu.',
+              'Formulir Asesmen Hukum dalam Aplikasi BOSS.',
+              'Map Rekam Data Klien TAT.',
+              'Dokumen UU Nomor 35 Tahun 2009 dan Peraturan Bersama 01 Tahun 2014.',
+            ];
+        const keterkaitan = isHakim
+          ? 'SOP Pelaksanaan Asesmen Terpadu.'
+          : 'SOP Pelaksanaan Rapat Pembahasan Kasus / Case Conference (CC) Dan Penerbitan Berita Acara Pelaksanaan Asesmen Terpadu dan Surat Rekomendasi TAT.';
+        const peringatan = isHakim
+          ? 'Agar Satuan Kerja Mengetahui dan Memahami Tata Cara Penerimaan Asesmen Terpadu Berdasarkan Permohonan Hakim Untuk Kepentingan Persidangan.'
+          : 'Jika prosedur asesmen hukum tidak dilakukan dengan benar maka keterlibatan tersangka dan/atau terdakwa penyalah guna, pecandu dan korban penyalahgunaan narkotika dalam jaringan peredaran gelap narkotika tidak teridentifikasi sehingga penegakan hukum tidak tepat.';
+        const pencatatan = isHakim
+          ? 'Data klien Asesmen Terpadu dicatat dalam buku Register Klien TAT.'
+          : 'Hasil Asesmen Hukum berupa formulir Asesmen Hukum yang telah terisi didokumentasikan dalam Rekam Data Klien Asesmen Terpadu (TAT).';
+
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
+            <div
+              className="fixed inset-0"
+              onClick={() => setActiveSopDoc(null)}
+            />
+            <div className="relative z-10 max-w-4xl w-full max-h-[90vh] flex flex-col bg-[#0b172a] border border-[#234b7d] rounded-2xl shadow-2xl text-slate-200 overflow-hidden">
+              {/* Header */}
+              <div className="flex items-start justify-between p-5 sm:p-6 pb-3.5 border-b border-[#1b3459] gap-3 shrink-0">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 rounded-xl bg-[#071326] border border-[#234b7d] flex items-center justify-center shrink-0">
+                    {isHakim ? <Gavel className="w-5 h-5 text-[#D4AF37]" /> : <Scale className="w-5 h-5 text-[#D4AF37]" />}
+                  </div>
+                  <div>
+                    <span className="font-mono text-[10px] font-bold text-[#D4AF37] uppercase tracking-wider block">
+                      Badan Narkotika Nasional &bull; Deputi Bidang Pemberantasan
+                    </span>
+                    <h3 className="text-sm sm:text-base font-bold text-white mt-0.5 leading-snug">
+                      {sopTitle}
+                    </h3>
+                  </div>
                 </div>
-                <div>
-                  <span className="font-mono text-[10px] font-bold text-[#D4AF37] uppercase tracking-wider block">
-                    Badan Narkotika Nasional &bull; Deputi Bidang Pemberantasan
-                  </span>
-                  <h3 className="text-base sm:text-lg font-bold text-white mt-0.5">
-                    SOP Pelaksanaan Asesmen Hukum Dalam Proses Asesmen Terpadu
-                  </h3>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => setActiveSopDoc(null)}
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-[#132d54] transition-colors cursor-pointer shrink-0"
+                >
+                  <X className="w-5 h-5" />
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={() => setShowSopHukumModal(false)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-[#132d54] transition-colors cursor-pointer"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
 
-            {/* Scrollable Content */}
-            <div className="p-5 sm:p-6 overflow-y-auto space-y-5 text-xs">
-              {/* Top 2 Columns: Dasar Hukum & Kualifikasi */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-                {/* Dasar Hukum */}
-                <div className="lg:col-span-7 bg-[#071326] border border-[#1b3459] rounded-xl p-4 space-y-2.5">
-                  <h4 className="text-xs font-bold text-[#D4AF37] uppercase tracking-wider">
-                    Dasar Hukum
-                  </h4>
-                  <ol className="space-y-1.5 text-slate-300">
-                    {[
-                      'Undang-Undang Nomor 35 Tahun 2009 tentang Narkotika.',
-                      'Peraturan Presiden Nomor 47 Tahun 2019 tentang Perubahan Atas Peraturan Presiden Nomor 23 Tahun 2010 Tentang Badan Narkotika Nasional.',
-                      'Peraturan Menteri Pendayagunaan Aparatur Negara Dan Reformasi Birokrasi Republik Indonesia Nomor 35 Tahun 2012 Tentang Pedoman Penyusunan Standar Operasional Prosedur Administrasi Pemerintah.',
-                      'Peraturan Badan Narkotika Nasional Nomor 1 Tahun 2022 tentang Perubahan atas Peraturan Badan Narkotika Nasional Nomor 5 Tahun 2020 tentang Organisasi dan Tata Kerja Badan Narkotika Nasional.',
-                      'Peraturan Kepala Badan Narkotika Nasional Nomor 11 Tahun 2014 tentang Tata Cara Penanganan Tersangka dan/atau Terdakwa Pecandu Narkotika dan Korban Penyalahgunaan Narkotika ke dalam Lembaga Rehabilitasi.',
-                      'Peraturan Kepala BNN Nomor 2 Tahun 2015 tentang Perubahan Atas Peraturan Kepala BNN Nomor 3 Tahun 2013 tentang Pedoman Penyusunan SOP di Lingkungan BNN.',
-                      'Keputusan Kepala Badan Narkotika Nasional Nomor: KEP/1066/XII/KA/OT.01/2022/BNN tentang Standar Operasional Prosedur Mikro Administrasi Pemerintahan Di Lingkungan Badan Narkotika Nasional.',
-                      'Keputusan Kepala Badan Narkotika Nasional Nomor: KEP/01/IX/DE/PB.06/2023/BERANTAS tentang Petunjuk Teknis Tentang Tata Cara Penanganan Tersangka dan/atau Terdakwa Penyalahguna, Pecandu Narkotika, Dan Korban Penyalahguna Narkotika Melalui Asesmen Terpadu.',
-                    ].map((item, idx) => (
-                      <li key={idx} className="flex items-start space-x-2">
-                        <span className="font-mono font-bold text-[#D4AF37] shrink-0">{idx + 1}.</span>
-                        <span className="leading-relaxed">{item}</span>
-                      </li>
-                    ))}
-                  </ol>
-                </div>
-
-                {/* Right Column: Kualifikasi + Peralatan */}
-                <div className="lg:col-span-5 space-y-4">
-                  <div className="bg-[#071326] border border-[#1b3459] rounded-xl p-4 space-y-2">
+              {/* Scrollable Content */}
+              <div className="p-5 sm:p-6 overflow-y-auto space-y-5 text-xs">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+                  {/* Dasar Hukum */}
+                  <div className="lg:col-span-7 bg-[#071326] border border-[#1b3459] rounded-xl p-4 space-y-2.5">
                     <h4 className="text-xs font-bold text-[#D4AF37] uppercase tracking-wider">
-                      Kualifikasi Pelaksanaan
+                      Dasar Hukum
                     </h4>
                     <ol className="space-y-1.5 text-slate-300">
-                      {[
-                        'Memahami UU Narkotika dan Memiliki Pengetahuan di Bidang Hukum Narkotika.',
-                        'Memiliki Kemampuan Komunikasi yang Baik.',
-                        'Mampu Menganalisa Jaringan Narkotika.',
-                      ].map((item, idx) => (
+                      {dasarHukum.map((item, idx) => (
                         <li key={idx} className="flex items-start space-x-2">
                           <span className="font-mono font-bold text-[#D4AF37] shrink-0">{idx + 1}.</span>
                           <span className="leading-relaxed">{item}</span>
@@ -1381,75 +1440,80 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
                     </ol>
                   </div>
 
-                  <div className="bg-[#071326] border border-[#1b3459] rounded-xl p-4 space-y-2">
-                    <h4 className="text-xs font-bold text-[#D4AF37] uppercase tracking-wider">
-                      Peralatan / Perlengkapan
+                  {/* Right Column: Kualifikasi + Peralatan */}
+                  <div className="lg:col-span-5 space-y-4">
+                    <div className="bg-[#071326] border border-[#1b3459] rounded-xl p-4 space-y-2">
+                      <h4 className="text-xs font-bold text-[#D4AF37] uppercase tracking-wider">
+                        Kualifikasi Pelaksanaan
+                      </h4>
+                      <ol className="space-y-1.5 text-slate-300">
+                        {kualifikasi.map((item, idx) => (
+                          <li key={idx} className="flex items-start space-x-2">
+                            <span className="font-mono font-bold text-[#D4AF37] shrink-0">{idx + 1}.</span>
+                            <span className="leading-relaxed">{item}</span>
+                          </li>
+                        ))}
+                      </ol>
+                    </div>
+
+                    <div className="bg-[#071326] border border-[#1b3459] rounded-xl p-4 space-y-2">
+                      <h4 className="text-xs font-bold text-[#D4AF37] uppercase tracking-wider">
+                        Peralatan / Perlengkapan
+                      </h4>
+                      <ol className="space-y-1.5 text-slate-300">
+                        {peralatan.map((item, idx) => (
+                          <li key={idx} className="flex items-start space-x-2">
+                            <span className="font-mono font-bold text-[#D4AF37] shrink-0">{idx + 1}.</span>
+                            <span className="leading-relaxed">{item}</span>
+                          </li>
+                        ))}
+                      </ol>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Bottom 3 Cards: Keterkaitan, Peringatan, Pencatatan */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="bg-[#071326] border border-[#1b3459] rounded-xl p-4 space-y-1.5">
+                    <h4 className="text-xs font-bold text-sky-300 uppercase tracking-wider">
+                      Keterkaitan
                     </h4>
-                    <ol className="space-y-1.5 text-slate-300">
-                      {[
-                        'Ruang Rapat.',
-                        'Berkas Permohonan Asesmen Terpadu.',
-                        'Formulir Asesmen Hukum dalam Aplikasi BOSS.',
-                        'Map Rekam Data Klien TAT.',
-                        'Dokumen UU Nomor 35 Tahun 2009 dan Peraturan Bersama 01 Tahun 2014.',
-                      ].map((item, idx) => (
-                        <li key={idx} className="flex items-start space-x-2">
-                          <span className="font-mono font-bold text-[#D4AF37] shrink-0">{idx + 1}.</span>
-                          <span className="leading-relaxed">{item}</span>
-                        </li>
-                      ))}
-                    </ol>
+                    <p className="text-slate-300 leading-relaxed">{keterkaitan}</p>
+                  </div>
+
+                  <div className="bg-amber-950/30 border border-amber-500/40 rounded-xl p-4 space-y-1.5">
+                    <h4 className="text-xs font-bold text-amber-300 uppercase tracking-wider">
+                      Peringatan
+                    </h4>
+                    <p className="text-amber-100/90 leading-relaxed">{peringatan}</p>
+                  </div>
+
+                  <div className="bg-[#071326] border border-[#1b3459] rounded-xl p-4 space-y-1.5">
+                    <h4 className="text-xs font-bold text-emerald-300 uppercase tracking-wider">
+                      Pencatatan dan Pendataan
+                    </h4>
+                    <p className="text-slate-300 leading-relaxed">{pencatatan}</p>
                   </div>
                 </div>
               </div>
 
-              {/* Bottom 3 Cards: Keterkaitan, Peringatan, Pencatatan */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-[#071326] border border-[#1b3459] rounded-xl p-4 space-y-1.5">
-                  <h4 className="text-xs font-bold text-sky-300 uppercase tracking-wider">
-                    Keterkaitan
-                  </h4>
-                  <p className="text-slate-300 leading-relaxed">
-                    SOP Pelaksanaan Rapat Pembahasan Kasus / Case Conference (CC) Dan Penerbitan Berita Acara Pelaksanaan Asesmen Terpadu dan Surat Rekomendasi TAT.
-                  </p>
-                </div>
-
-                <div className="bg-amber-950/30 border border-amber-500/40 rounded-xl p-4 space-y-1.5">
-                  <h4 className="text-xs font-bold text-amber-300 uppercase tracking-wider">
-                    Peringatan
-                  </h4>
-                  <p className="text-amber-100/90 leading-relaxed">
-                    Jika prosedur asesmen hukum tidak dilakukan dengan benar maka keterlibatan tersangka dan/atau terdakwa penyalah guna, pecandu dan korban penyalahgunaan narkotika dalam jaringan peredaran gelap narkotika tidak teridentifikasi sehingga penegakan hukum tidak tepat.
-                  </p>
-                </div>
-
-                <div className="bg-[#071326] border border-[#1b3459] rounded-xl p-4 space-y-1.5">
-                  <h4 className="text-xs font-bold text-emerald-300 uppercase tracking-wider">
-                    Pencatatan dan Pendataan
-                  </h4>
-                  <p className="text-slate-300 leading-relaxed">
-                    Hasil Asesmen Hukum berupa formulir Asesmen Hukum yang telah terisi didokumentasikan dalam Rekam Data Klien Asesmen Terpadu (TAT).
-                  </p>
-                </div>
+              {/* Footer */}
+              <div className="p-4 sm:px-6 border-t border-[#1b3459] bg-[#071326]/70 flex items-center justify-between gap-2 shrink-0">
+                <span className="text-[11px] text-slate-400">
+                  Direktorat Pengawasan Tahanan dan Barang Bukti &bull; BNN RI
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setActiveSopDoc(null)}
+                  className="px-5 py-2 bg-[#133863] hover:bg-[#1a4a82] text-white font-bold text-xs rounded-xl border border-[#235594] transition-colors cursor-pointer"
+                >
+                  Tutup SOP
+                </button>
               </div>
-            </div>
-
-            {/* Footer */}
-            <div className="p-4 sm:px-6 border-t border-[#1b3459] bg-[#071326]/70 flex items-center justify-between gap-2 shrink-0">
-              <span className="text-[11px] text-slate-400">
-                Direktorat Pengawasan Tahanan dan Barang Bukti &bull; BNN RI
-              </span>
-              <button
-                type="button"
-                onClick={() => setShowSopHukumModal(false)}
-                className="px-5 py-2 bg-[#133863] hover:bg-[#1a4a82] text-white font-bold text-xs rounded-xl border border-[#235594] transition-colors cursor-pointer"
-              >
-                Tutup SOP Hukum
-              </button>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* MODAL POPUP FOR DASAR HUKUM DETAIL */}
       {selectedDasarHukum && (
